@@ -1,11 +1,14 @@
 var server = require('jxm');
 var form_lang = require('./form_lang');
 var system_tools = require("./../system_tools");
+var hosting_tools = require("./../hosting_tools");
 var database = require("./../install/database");
 var site_defaults = require("./site_defaults");
 var nginxconf = require("../spawner/nginxconf");
 var nginx = require("../install/nginx");
 var _active_user = require("../definitions/active_user");
+var path = require('path');
+var fs = require("fs");
 
 
 /**
@@ -152,7 +155,7 @@ exports.MaxPort = function(min_port_field) {
 
         var min = params.controls[_min_port_field];
         var max = val;
-        var ret = new exports.Int({ gt : min, lte : site_defaults.defaultAppMaxPort }).validate(env, active_user, val, params.controls);
+        var ret = new exports.Int({ gt : min, lte : site_defaults.defaultAppMaxPort }).validate(env, active_user, val);
         if (!ret.result) return ret;
 
         var domains = database.getDomainsByUserName(null, 1e5);
@@ -263,7 +266,7 @@ exports.NginxDirectives = function() {
         if (!plan)
             return {result: false, msg: form_lang.Get(active_user.lang, "PlanInvalid", true )};
 
-        var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 10000, 10001], null, params.controls["plan_nginx_directives"]);
+        var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, params.controls["plan_nginx_directives"]);
         var test = nginx.testConfig(configString);
 
         if (test.err)
@@ -274,4 +277,48 @@ exports.NginxDirectives = function() {
 };
 
 
+// validates certificate's file name for an app
+exports.SSLCertFileName = function(testConfig) {
+
+    var _testConfig = testConfig;
+
+    this.validate = function (env, active_user, val, params) {
+
+        if (params.controls.ssl && !val)
+            return {result: false, msg: form_lang.Get(active_user.lang, "ValueRequired", true )};
+
+        var ret = new exports.FileName().validate(env, active_user, val, params);
+        if (!ret.result) return ret;
+
+        // now checking if cert file exists
+        var domain_name = _active_user.isRecordUpdating(active_user, params.form);
+        if (!domain_name)
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainNotFound", true)};
+
+        var domain = database.getDomain(domain_name);
+        if (!domain)
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainNotFound", true)};
+
+        var user = database.getUser(domain.owner);
+        if (!user)
+            return {result: false, msg: form_lang.Get(active_user.lang, "UserUnknown", true)};
+
+        var appDir = hosting_tools.appGetHomeDirByPlanAndUser(user.plan, user.name, domain_name);
+        var file = path.join(appDir, val);
+
+        if (!fs.existsSync(file))
+            return {result: false, msg: form_lang.Get(active_user.lang, "FileDoesNotExist", true)};
+
+        if (params.controls.ssl && _testConfig) {
+            var ssl_info = { key : params.controls.ssl_key, crt : params.controls.ssl_crt };
+
+            var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, "", ssl_info );
+            var test = nginx.testConfig(configString);
+            if (test.err)
+                return {result: false, msg: form_lang.Get(active_user.lang, "NginxDirectivesInvalid", true ) + " " + test.err};
+        }
+
+        return {result: true};
+    };
+};
 

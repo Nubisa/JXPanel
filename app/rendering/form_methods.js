@@ -336,6 +336,7 @@ methods.sessionApply = function(env, params){
                 var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
                 var jx_app_path_changed = domain.jx_app_path !== json.jx_app_path;
                 var jx_app_options = hosting_tools.appGetOptions(update_name);
+                var ssl_changed = domain.ssl !== json.ssl || domain.ssl_crt !== json.ssl_crt || domain.ssl_key !== json.ssl_key;
                 if (!domain)
                     return sendError("DBCannotGetDomain");
 
@@ -355,7 +356,7 @@ methods.sessionApply = function(env, params){
                         });
                         return;
                     }
-                    if (jx_web_log_changed) {
+                    if (jx_web_log_changed || ssl_changed) {
                         var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
                         if (res.err)
                             ret = res.err;

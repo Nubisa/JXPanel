@@ -294,6 +294,10 @@ exports.Labels = {
     "DomainCannotAdd" : "Cannot add domain.",
     "DomainCannotRemoveDir" : "Cannot remove domain's directory.",
     "DomainHomeDirDoesNotExist" : "Domain's home directory does not exist.",
+    "DomainEnableSSL" : "Enable SSL",
+    "DomainEnableSSL_Description" : "When you enable SSL option, no changes in Node application are required. Just keep non-SSL (http) server running in your application, and SSL will be applied automatically with certificate files provided below.",
+    "DomainSSLCertFile" : "SSL certificate file",
+    "DomainSSLKeyFile" : "SSL certificate key file",
 
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",

@@ -89,20 +89,6 @@ exports.form = function () {
 
             {"BEGIN": "JXcore options"},
 
-//            {
-//                name: "jx_enabled",
-//                details: {
-//                    label: "JXEnabled",
-//                    method: tool.createCheckBox,
-//                    options: { },
-//                    displayValues : {
-//                        "true" : '<i class="fa-fw fa fa-check text-success"></i>',
-//                        "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
-//                    }
-//                },
-//                validation : new validations.Boolean()
-//            },
-
             {
                 name: "jx_app_status",
                 details: {
@@ -194,7 +180,41 @@ exports.form = function () {
                 validation : new validations.Boolean()
             },
 
-            {"END" : 1}
+            {"END" : 1},
+
+            {"BEGIN": "SSL"},
+
+            {
+                name: "ssl",
+                details: {
+                    label: "DomainEnableSSL",
+                    method: tool.createCheckBox,
+                    options: { }
+                },
+                validation : new validations.Boolean()
+            },
+
+            {
+                name: "ssl_crt",
+                details: {
+                    label: "DomainSSLCertFile",
+                    method: tool.createTextBox,
+                    options: { }
+                },
+                validation : new validations.SSLCertFileName()
+            },
+
+            {
+                name: "ssl_key",
+                details: {
+                    label: "DomainSSLKeyFile",
+                    method: tool.createTextBox,
+                    options: { }
+                },
+                validation : new validations.SSLCertFileName(true)
+            },
+
+            {"END" : 1},
         ];
     };
 

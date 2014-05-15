@@ -206,24 +206,29 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
             return {err : "NginxConfDirCannotCreate" };
     }
 
-    var path = exports.appGetNginxConfigPath(domain_name);
-    if (path.err)
-        return path;
+    var cfgPath = exports.appGetNginxConfigPath(domain_name);
+    if (cfgPath.err)
+        return cfgPath;
 
     var options = exports.appGetOptions(domain_name);
     var domain = options.domain;
 
     var plan = options.plan;
 
-    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null, plan.plan_nginx_directives);
+    var ssl_info = null;
+    if (domain.ssl)
+        ssl_info = { key : path.join(options.app_dir, domain.ssl_key), crt : path.join(options.app_dir, domain.ssl_crt) };
+
+    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null,
+        plan.plan_nginx_directives, ssl_info);
 
     var current = "";
-    if (fs.existsSync(path)) {
-        current = fs.readFileSync(path).toString();
+    if (fs.existsSync(cfgPath)) {
+        current = fs.readFileSync(cfgPath).toString();
     }
 
     if (current !== cfg) {
-        fs.writeFileSync(path, cfg);
+        fs.writeFileSync(cfgPath, cfg);
         nginx.needsReload = true;
 
         if (reloadIfNeeded) {
@@ -539,8 +544,8 @@ exports.appRestartMultiple = function (domain_names, cb) {
         var notKilled = [];
         for (var o in ret) {
             var pid = ret[o].pid;
-            var path = ret[o].path;
-            if (spawners.indexOf(path) !== -1) {
+            var _path = ret[o].path;
+            if (spawners.indexOf(_path) !== -1) {
                 try {
                     process.kill(pid);
                     killed.push(pid);
