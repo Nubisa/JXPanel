@@ -6,7 +6,7 @@ cd pcre-8.35
 make
 cd ..
 make clean
-./configure --prefix=/nginx --with-pcre=pcre-8.35/
+./configure --prefix=/nginx --with-pcre=pcre-8.35/ --with-http_ssl_module
 make install
 cp *.js /nginx/
 cp *.jxp /nginx/
