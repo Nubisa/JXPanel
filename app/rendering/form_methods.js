@@ -546,8 +546,7 @@ methods.installNPM = function(env, params) {
     }
 
     var task = function(cmd) {
-        var ret = jxcore.utils.cmdSync(cmd);
-        console.error(ret);
+        return jxcore.utils.cmdSync(cmd);
     };
 
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
