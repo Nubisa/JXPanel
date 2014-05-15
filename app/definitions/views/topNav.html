@@ -6,12 +6,17 @@
             <span class="glyphicon glyphicon-th-large" style='font-size:125%'></span> JXPanel
         </td>
         <td id='nav-right'>
-            <!--<ul class="header-dropdown-list hidden-xs">-->
-                <!--<li>-->
-                    <!--{{user.langs}}-->
-                <!--</li>-->
-            <!--</ul>-->
-            <span id="top-menu">Language &nbsp;&nbsp;|&nbsp;&nbsp; Logout</span>
+
+            <!--<span id="top-menu">Language &nbsp;&nbsp;|&nbsp;&nbsp; Logout</span>-->
+            <span id="top-menu">
+
+                 <ul class="header-dropdown-list hidden-xs" style="display: inline-block; float: none; margin-top: -14px; padding: 0px;">
+                     <li>
+                         {{user.langs}}
+                     </li>
+                 </ul>
+
+                &nbsp;&nbsp;|&nbsp;&nbsp; Logout</span>
         </td>
     </tr>
     </tbody>
