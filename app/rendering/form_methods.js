@@ -546,12 +546,13 @@ methods.installNPM = function(env, params) {
     }
 
     var task = function(cmd) {
-        jxcore.utils.cmdSync(cmd);
+        var ret = jxcore.utils.cmdSync(cmd);
+        console.error(ret);
     };
 
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
     var cmd = "cd '" + site_defaults.dirNativeModules + "'; '" + process.execPath + "' install " + nameAndVersion;
-    jxcore.tasks.addTask(task, cmd, function() {
+    jxcore.tasks.addTask(task, cmd, function(ret) {
         var id = process.threadId;
         var expectedModulePath = path.join(site_defaults.dirNativeModules, "/node_modules/", name);
         server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
