@@ -67,7 +67,8 @@ methods.tryLogin = function(env, params){
                 try{
                     var ret = system_tools.addSystemUser({plan:database.unlimitedPlanName, name:params.username }, null, 1);
                     if(ret.err){
-                        database.deleteUser(params.username);
+                        // why to remove first logging user?
+                        //database.deleteUser(params.username);
                         server.sendCallBack(env, {err: form_lang.Get("EN", ret.err, true)});
                         return;
                     }
