@@ -2,12 +2,12 @@
     window.jxInstallNPM = function() {
         utils.jxAskValue("{{label.JXcoreNPMAddModule}}", "{{label.JXcoreNPMEnterName}}", function(ok, value) {
 
-            if (!value) {
-                utils.jxAddMessage('danger', "{{label.JXcoreNPMEnterName}}");
-                return;
-            }
-
             if (ok) {
+                if (!value) {
+                    utils.jxAddMessage('danger', "{{label.JXcoreNPMEnterName}}");
+                    return;
+                }
+
                 window.jxstatus = "{{label.JXcoreNPMInstalling}}";
                 window.toServer("installNPM", value, function(param) {
                     if (param.err)
@@ -28,6 +28,6 @@
 <a id="btn_refresh" data-original-title="{{label.JXcoreNPMAddModule}}" class="jxbtn" onclick="return window.jxInstallNPM();">
     <i class="fa fa-plus"></i> <span class="dummy-label">{{label.JXcoreNPMAddModule}}</span>
 </a>
-<a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows();">
+<a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows(true);">
     <i class="fa fa-trash-o"></i> <span class="dummy-label">{{label.RemoveSelected}}</span>
 </a>
