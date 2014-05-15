@@ -360,7 +360,7 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                     var msg = null;
                     if (err) {
                         msg = startOrStop ? "JXcoreAppCannotStart" : "JXcoreAppCannotStop";
-                        msg += "|" + domain_name;
+                        msg += "|" + domain_name + " (" + errExec + ")";
                         if (err2) msg += " " + err2;
                     } else {
                         console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
@@ -370,7 +370,12 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                         var res = nginx.reload(true);
                         if (res)
                             msg = res;
+                    } else {
+                        var s = form_lang.Get('EN', msg, true);
+                        console.error(s, errExec, stdout, stderr);
                     }
+
+
                     cb(msg, domain_name, online_before);
                 });
             }, startOrStop ? 4000 : 10);
