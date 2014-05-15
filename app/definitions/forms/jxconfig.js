@@ -143,10 +143,7 @@ exports.form = function () {
                 details: {
                     label: "JXcoreAppMinPort",
                     method: tool.createTextBox,
-                    options: { required: true },
-                    getValue : function(active_user) {
-                        return database.getConfigValue("jx_app_min_port") ||   site_defaults.defaultAppMinPort;
-                    }
+                    options: { required: true, default: site_defaults.defaultAppMinPort }
                 },
                 validation : new validations.Int({ gte : site_defaults.defaultAppMinPort, lte : site_defaults.defaultAppMaxPort })
             },
@@ -156,10 +153,7 @@ exports.form = function () {
                 details: {
                     label: "JXcoreAppMaxPort",
                     method: tool.createTextBox,
-                    options: { required: true },
-                    getValue : function(active_user) {
-                        return database.getConfigValue("jx_app_max_port") ||   site_defaults.defaultAppMaxPort;
-                    }
+                    options: { required: true, default : site_defaults.defaultAppMaxPort }
                 },
                 validation : new validations.MaxPort("jx_app_min_port")
             },
