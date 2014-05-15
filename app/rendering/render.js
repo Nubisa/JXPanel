@@ -155,6 +155,13 @@ var apply_smart = function(file, req, res, data){
 //    console.log("apply_smart::SessionId", req.session);
     var sessionId = (!req.session)?null:req.session.id;
 
+    var isUninstalled = _active_user.isPanelUninstalled();
+
+    if (isUninstalled) {
+        res.write(isUninstalled);
+        return;
+    }
+
     var _user = _active_user.getUser(sessionId);
     var _lang = "EN";
     if(_user && _user.lang)

@@ -13,6 +13,7 @@ var system_tools = require('../system_tools');
 var folder_tools = require('./user_folders');
 var form_tools = require('../rendering/form_tools');
 var page_utils = require('../rendering/page_utils');
+var site_defaults = require('./site_defaults');
 var users = {};
 var sessionIDs = {};
 
@@ -73,6 +74,9 @@ exports.getUser = function(sessionId)
         console.log("active_user::getUser not_exist");
         return null;
     }
+
+    if (exports.isPanelUninstalled())
+        return null;
 
     jxcore.store.shared.set(sessionId, Date.now());
 
@@ -168,6 +172,23 @@ exports.clearUser = function(sessionId) {
     jxcore.store.shared.remove(sessionId);
     delete(sessionIDs[sessionId]);
     delete users[sessionId];
+};
+
+exports.isPanelUninstalled = function() {
+    if (!fs.existsSync(site_defaults.apps_folder)) {
+
+        // clearing all users
+        for(var sessionId in users) {
+            jxcore.store.shared.remove(sessionId);
+        }
+        sessionIDs = {};
+        users = {};
+
+        var ret = "JXpanel has been uninstalled";
+        console.log(ret);
+        return ret;
+    }
+    return false;
 };
 
 // called when deleting a user from panel
@@ -569,6 +590,8 @@ exports.defineMethods = function(){
 
     server.addJSMethod("userIn", function(env, params){
         var val = {done:true};
+
+        exports.isPanelUninstalled();
 
         if(!env.SessionID || !users[env.SessionID]){
             val.relogin = true;
