@@ -1,6 +1,6 @@
 <script>
     window.jxInstallNPM = function() {
-        utils.jxAskValue("{{label.JXcoreNPMAddModule}}", "{{label.JXcoreNPMEnterName}}", function(ok, value) {
+        utils.jxAskValue('<i class="fa fa-download txt-color-orangeDark"></i> ' + "{{label.JXcoreNPMAddModule}}", "{{label.JXcoreNPMEnterName}}", function(ok, value) {
 
             if (ok) {
                 if (!value) {
