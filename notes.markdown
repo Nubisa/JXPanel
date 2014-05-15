@@ -18,10 +18,6 @@ TODO
 
 - SSH
 
-- big icons on top
-
-- check install / uninstall
-
 - on jxPanel uninstall
     -- should we remove system users created before in panel?
 
@@ -40,6 +36,9 @@ DONE
 - would be nice to implement on our forms control validation similar like on login page
     (error shows under the invalid control, not as a bubble) - DONE
 
+- installing JXcore and starting monitor on JXpanel install
+
+- stopping monitor on JXpanel uninstall
 
 - header - remove - DONE
 - window - remove - DONE

@@ -8,6 +8,7 @@ var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored fro
 var tools_folder = pathModule.join(__dirname, "../../tools");
 var sqlite2 = require("./sqlite2");
 var hosting_tools = require("../hosting_tools");
+var system_tools = require("../system_tools");
 
 exports.apps_folder = app_folder;
 
@@ -103,6 +104,14 @@ exports.install = function(){
 
     installNGINX();
     installDB();
+
+    clog("Installing JXcore", "green");
+    system_tools.installJX(null, function(err) {
+        if (err)
+            console.error("Cannot install JXcore. You need to do after logging into JXPanel", err);
+        else
+            console.log("JXcore installed succesfully.");
+    });
 };
 
 exports.uninstall = function(){
@@ -114,17 +123,30 @@ exports.uninstall = function(){
             console.error(res.out);
         }
 
-        var jxPath = hosting_tools.getJXPath();
-        if (!jxPath.err) {
-            res = jxcore.utils.cmdSync(jxPath + " monitor stop");
-            console.log(res.out);
-        }
+        var removeFiles = function() {
+            clog("Removing files", "red");
+            res = jxcore.utils.cmdSync("rm -rf "+app_folder);
+            if(res.exitCode != 0){
+                console.error(res.out);
+                process.exit(res.exitCode);
+            }
+        };
 
-        res = jxcore.utils.cmdSync("rm -rf "+app_folder);
-        if(res.exitCode != 0){
-            console.error(res.out);
-            process.exit(res.exitCode);
-            return;
-        }
+        var database = require("./database");
+        database.ReadDB(function(err) {
+            if (!err) {
+                var jxPath = hosting_tools.getJXPath();
+                if (!jxPath.err) {
+                    clog("Stopping JXcore monitor", "red");
+
+                    hosting_tools.monitorStartStop(null, false, function(err) {
+                        removeFiles();
+                    });
+                    return;
+                }
+            }
+
+            removeFiles();
+        });
     }
 };

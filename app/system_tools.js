@@ -415,7 +415,9 @@ exports.installJX = function (active_user, cb) {
         var zipFile = path.join(site_defaults.apps_folder, basename + ".zip");
         var url = "https://s3.amazonaws.com/nodejx/" + basename + ".zip";
 
-        active_user.session.status = form_lang.Get(active_user.lang, "JXcoreDownloading", true);
+        if (active_user)
+            active_user.session.status = form_lang.Get(active_user.lang, "JXcoreDownloading", true);
+
         exports.downloadFile(url, zipFile, function (err) {
             if (err) {
                 cb(err);

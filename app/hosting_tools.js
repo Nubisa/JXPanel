@@ -675,6 +675,13 @@ var appStartEnabledApplications = function(cb) {
 
     var commands = [];
 
+    var unlimited = database.getPlan(database.unlimitedPlanName);
+    if (!unlimited) {
+        // no plan yet
+        cb(false);
+        return;
+    }
+
     var domains = database.getDomainsByPlanName(database.unlimitedPlanName, 1e7);
     for(var o in domains) {
         var domain_name = domains[o];
@@ -729,10 +736,14 @@ exports.monitorStartStop = function (active_user, startOrStop, cb) {
                 }
 
                 if (startOrStop) {
-                    active_user.session.status = form_lang.Get(active_user.lang, "JXcoreAppsStarting", true);
+                    if (active_user)
+                        active_user.session.status = form_lang.Get(active_user.lang, "JXcoreAppsStarting", true);
+
                     appStartEnabledApplications(function() {
                         cb(msg);
-                        active_user.session.status = "";
+
+                        if (active_user)
+                            active_user.session.status = "";
                     });
                 } else {
                     cb(msg);
@@ -752,9 +763,13 @@ exports.monitorStartStop = function (active_user, startOrStop, cb) {
 
         var cmd = "./jx monitor " + (startOrStop ? "start" : "stop");
 
-        active_user.session.status = form_lang.Get(active_user.lang, startOrStop ? "JXcoreMonitorStarting" : "JXcoreMonitorStopping", true);
+        if (active_user)
+            active_user.session.status = form_lang.Get(active_user.lang, startOrStop ? "JXcoreMonitorStarting" : "JXcoreMonitorStopping", true);
+
         exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
-            active_user.session.status = null;
+
+            if (active_user)
+                active_user.session.status = null;
             // cannot rely on err in this case. command returns non-zero exitCode on success
             checkAfter();
         });
