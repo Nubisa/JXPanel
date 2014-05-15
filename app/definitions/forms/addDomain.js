@@ -4,6 +4,7 @@
 
 var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
+var _active_user = require('../active_user');
 var path = require("path");
 var validations = require('./../validations');
 var hosting_tools = require("./../../hosting_tools");
@@ -184,12 +185,15 @@ exports.form = function () {
 
             {"BEGIN": "SSL"},
 
+            {"INFO": "ValuesOnlyForEdit", OnEdit : false },
+
             {
                 name: "ssl",
                 details: {
                     label: "DomainEnableSSL",
                     method: tool.createCheckBox,
-                    options: { }
+                    options: { },
+                    cannotInsert : true
                 },
                 validation : new validations.Boolean()
             },
@@ -199,7 +203,8 @@ exports.form = function () {
                 details: {
                     label: "DomainSSLCertFile",
                     method: tool.createTextBox,
-                    options: { }
+                    options: { },
+                    cannotInsert : true
                 },
                 validation : new validations.SSLCertFileName()
             },
@@ -209,12 +214,13 @@ exports.form = function () {
                 details: {
                     label: "DomainSSLKeyFile",
                     method: tool.createTextBox,
-                    options: { }
+                    options: { },
+                    cannotInsert : true
                 },
                 validation : new validations.SSLCertFileName(true)
             },
 
-            {"END" : 1},
+            {"END" : 1}
         ];
     };
 

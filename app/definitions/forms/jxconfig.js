@@ -164,18 +164,7 @@ exports.form = function () {
                 validation : new validations.MaxPort("jx_app_min_port")
             },
 
-
-            {
-                name: "submit_warning",
-                details: {
-                    label: "",
-                    method: tool.createSimpleText,
-                    options: {  },
-                    getValue : function(active_user) {
-                        return '<code>' + form_lang.Get(active_user.lang, "JXcoreAppsRestartWarning", true ) +  '</code>'
-                    }
-                }
-            },
+            {"INFO" : "JXcoreAppsRestartWarning" },
 
             {"END": 1}
         ];

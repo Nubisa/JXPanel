@@ -295,6 +295,9 @@ for(var i in files) {
  */
 exports.Get = function(lang, val, notNull, arrParams){
 
+    if (!val)
+        return "";
+
     if (val.toString().indexOf("|") !== -1) {
         var arr = val.split("|");
         val = arr[0];

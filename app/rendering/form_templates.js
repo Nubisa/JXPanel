@@ -167,6 +167,19 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             continue;
         }
 
+        if(controls[i].INFO != undefined){
+            if (isUpdate && controls[i].OnEdit === false)
+                continue;
+
+            if (!isUpdate && controls[i].OnInsert === false)
+                continue;
+
+            var str = "<code>" + form_lang.Get(active_user.lang, controls[i].INFO, true) + "</code>";
+            arr.push(tool.createSimpleText(" ", null, null, str, active_user, null));
+            continue;
+        }
+
+
         var name = controls[i].name;
         var ctrl = controls[i].details;
         if (!ctrl.method)
@@ -189,6 +202,16 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             }
             ctrl.options.extra.noEditDisplayValue = val;
         }
+
+        if (!isUpdate && ctrl.cannotInsert) {
+            if (ctrl.getValue && typeof ctrl.getValue === "function") {
+                val = ctrl.getValue(active_user, values);
+            }
+            ctrl.options.extra.noEditDisplayValue = form_lang.Get(active_user.lang, "ValueOnlyForEdit", true);
+        }
+
+        if (isUpdate && ctrl.hideOnEdit)
+            continue;
 
         if (ctrl.getDescription && typeof ctrl.getDescription === "function") {
             ctrl.options.extra.description = ctrl.getDescription(active_user, values);

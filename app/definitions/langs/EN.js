@@ -142,6 +142,8 @@ exports.Labels = {
     "ValueNotDefined" : "not defined",
     "ValueUnlimited" : "unlimited",
     "FieldNotFound" : "The field %s was not found.",
+    "ValueOnlyForEdit" : "This value can be set only after record is added.",
+    "ValuesOnlyForEdit" : "Options below can be set only after record is added.",
 
     "RequiresMinimumLength": "Minimum string length for this control must be %s.",
     "RequiresMaximumLength": "Maximum string length for this control must be %s.",
