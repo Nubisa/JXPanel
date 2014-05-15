@@ -22,6 +22,16 @@ if(process.argv[2] == "uninstall" || process.argv[2] == "reinstall"){
         return;
 }
 
+if(process.argv[2] === "nginx") {
+
+    var nginx = require("./install/nginx");
+    if (process.argv[3] === "start") nginx.start(); else
+    if (process.argv[3] === "stop") nginx.stop(); else
+    if (process.argv[3] === "reload") nginx.reload(false);
+
+    return;
+}
+
 if(icheck.requireInstallation()){
     if(process.argv[2] != "install" && process.argv[2] != "reinstall"){
         jxcore.utils.console.log("To install "+site_defaults.EN.panelName+", use\n" + process.argv[0] + " index install");
