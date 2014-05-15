@@ -272,6 +272,13 @@
         });
         return false;
     };
+    utils.logOutWithQuestion = function() {
+        utils.jxConfirm('<i class="fa fa-sign-out txt-color-orangeDark"></i> ' + "{{label.logout}}", "{{label.logoutQuestion}}", function(ButtonPressed) {
+            if (ButtonPressed === "{{label.Yes}}")
+                utils.logOut();
+        });
+        return false;
+    };
     utils.jxConfirm = function (title, question, cb, buttons) {
 
         if (!cb) return;
@@ -460,11 +467,15 @@
         var addMenuIcons = function(){
             $('.normal-menu').each(function(index){
                 var id = $(this).attr('id');
-                var str = '<img class="menu-icon" src="icons/' + id + '.png" id="'+id+'_img"/><span class="menu-text">';
+                var str = $(this).attr('data-icon') === "none" ? "" : '<img class="menu-icon" src="icons/' + id + '.png" id="'+id+'_img"/><span class="menu-text">';
                 $(this).html(str + $(this).html() + "</span>");
                 $(this).click(function(){
                     var id = $(this).attr('id');
-                    location.href = '/' + id + '.html';
+                    var data_action = $(this).attr('data-action');
+                    if (!data_action)
+                        location.href = '/' + id + '.html';
+                    else
+                        eval(data_action);
                 });
             });
         };
