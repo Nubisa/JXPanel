@@ -1,4 +1,5 @@
 exports.Labels = {
+
     "Empty":"Pusty",
     "Yes":"Tak",
     "No":"Nie",
@@ -33,16 +34,26 @@ exports.Labels = {
     "RunningOn" : "Uruchomiony",
     "Granted" : "Przyznany",
     "Denied" : "Zablokowany",
+    "Name" : "Nazwa",
+    "Value" : "Wartość",
+    "Usage" : "Wykorzystanie",
 
-    "serverManagement":"Zarządzanie serwerem",
     "help":"Pomoc",
     "logoutQuestion":"Czy na pewno chcesz się wylogować?",
     "fileManager":"Menedżer plików",
+    "FTPManager":"FTP Manager",
     "codeEditor":"Edytor Kodu",
     "serviceManagement":"Zarządzanie Usługami",
+    "ToolsAndServices":"Narzędzia i usługi",
+    "Configuration" : "Konfiguracja",
+    "Extras" : "Dodatki",
+    "AddOnManager" : "Menedżer dodatków",
+    "Management" : "Zarządzanie",
     "stats":"Statystyki Serwera",
     "UsersUpperCase":"Użytkownicy",
     "users":"użytkownicy",
+
+    "LanguageUnsupported" : "Unsupported language",
 
     "RefreshTooltip":"Refresh selected folder",
     "AddTooltip":"Add a new file or folder",
@@ -159,8 +170,8 @@ exports.Labels = {
     "UsersCannotDeleteSystemUser" : "Cannot delete system user.",
     "UsersCannotDeleteSystemUsersFolder" : "Cannot delete user's folder.",
 
-    "domains" : "domains",
-    "DomainsUpperCase" : "Domains",
+    "domains" : "domoeny",
+    "DomainsUpperCase" : "Domeny",
     "DomainsManagement" : "Domain Management",
     "DomainsHeader": "Customize the options",
     "DomainsContent": "Create new domains and manage their options.",
@@ -408,7 +419,7 @@ exports.Labels = {
 
 
 
-    "JXcoreNPMModules" : "NPM Modules",
+    "JXcoreNPMModules" : "NPM Wizard",
     "JXcoreNPMAddModule" : "Install new module",
     "JXcoreNPMEnterName" : "Please enter a name for NPM module.",
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",

@@ -38,13 +38,18 @@ exports.Labels = {
     "Value" : "Value",
     "Usage" : "Usage",
 
-    "serverManagement":"Server Management",
     "help":"Help",
     "logout":"Logout",
     "logoutQuestion":"Do you really want to log out?",
     "fileManager":"File Manager",
+    "FTPManager":"FTP Manager",
     "codeEditor":"Code Editor",
     "serviceManagement":"Service Management",
+    "ToolsAndServices":"Tools & Services",
+    "Configuration" : "Configuration",
+    "Extras" : "Extras",
+    "AddOnManager" : "Add-On Manager",
+    "Management" : "Management",
     "stats":"Server Stats",
     "UsersUpperCase":"Users",
     "users":"users",
@@ -308,10 +313,6 @@ exports.Labels = {
     "JXcoreAppStatus" : "Application status",
     "JXcoreAppPath_Description" : "The path is relative to domain root folder.",
 
-    // JXcore
-    "JXcoreUpperCase" : "JXcore",
-
-
     "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
     "NoPlanOwned" : "You have no hosting plan of your own. Please add one.",
     "PlanCannotAddUsers" : "This hosting plan does not allow to add any users.",
@@ -427,7 +428,7 @@ exports.Labels = {
 
 
 
-    "JXcoreNPMModules" : "NPM Modules",
+    "JXcoreNPMModules" : "NPM Wizard",
     "JXcoreNPMAddModule" : "Install new module",
     "JXcoreNPMEnterName" : "Please enter a name for NPM module.",
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
