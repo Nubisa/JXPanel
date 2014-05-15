@@ -341,7 +341,7 @@ exports.getSupportedLangs = function (active_user) {
     var lang = active_user.lang;
     var alias = lang;
     if (lang === "EN") alias = "GB";
-    html.push('<a href="#" class="dropdown-toggle" data-toggle="dropdown">');
+    html.push('<a href="#" class="dropdown-toggle jxbtn" data-toggle="dropdown" style="background: none;!important">');
     html.push('<img src="img/blank.gif" class="flag flag-' + alias.toLocaleLowerCase() + '" alt="' + countries[lang] + '"><span style="margin-left: 5px; margin-right: 5px;">' + lang + '</span><i class="fa fa-angle-down"></i></a>');
 
 
