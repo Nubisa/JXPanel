@@ -109,7 +109,7 @@ exports.form = function () {
 
                         var ports = '<div style="display: inline">'
                                 + ' <span class="label label-info">TCP: '+ domain.port_http + '</span>'
-                                + ' <span class="label label-info">TCPS: '+ domain.port_https + '</span>'
+                               // + ' <span class="label label-info">TCPS: '+ domain.port_https + '</span>'
                                 + '</div>'
 
                         var iconOnline = form_lang.GetBool(active_user.lang, true, "RunningOn") + ports;

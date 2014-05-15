@@ -9,7 +9,7 @@ exports.name = path.basename(__filename, ".js").toLowerCase();
 exports.displayNameLabel = "DomainsUpperCase";
 
 exports.settings = {
-    columns :[ "_checkbox",  "_id", "domain_name", "user_owner_id", "plan_table_id", "port_http", "port_https", "jx_app_status" ],
+    columns :[ "_checkbox",  "_id", "domain_name", "user_owner_id", "plan_table_id", "port_http", "ssl", "jx_app_status" ],
     addForm : "addDomain",
     addFormURL : "adddomain.html"
 };
