@@ -116,12 +116,15 @@
     <div class="col-md-4" style="padding-left: 0px">
         <span id="buttons" class="jxbuttons">
             <i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>
-            <button id="jxFormBtnSubmit" type="submit" class="jxbtn" onclick="{{form.submitOnClick}}">
-                <i class="fa fa-check"></i> <span class="dummy-label">{{label.Apply}}</span>
-            </button>
-            <button type="button" class="jxbtn" onclick="location = '{{form.onSubmitCancel}}';">
-                <i class="fa fa-times"></i> <span class="dummy-label">{{label.Cancel}}</span>
-            </button>
+
+            <button type="submit" onclick="return false;" style="display: none;"></button>
+
+            <a id="jxFormBtnSubmit" type="submit" class="jxbtn" onclick="{{form.submitOnClick}}">
+                <i class="fa fa-check"></i><span class="dummy-label">{{label.Apply}}</span>
+            </a>
+            <a class="jxbtn" class="jxbtn" onclick="location = '{{form.onSubmitCancel}}';">
+                <i class="fa fa-times"></i><span class="dummy-label">{{label.Cancel}}</span>
+            </a>
         </span>
     </div>
 </div>

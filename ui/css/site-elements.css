@@ -77,6 +77,10 @@
     color:#ffa500;
 }
 
+.jxbtn span.dummy-label {
+    margin-left: 7px;
+}
+
 .jxTable td {
     vertical-align: middle !important;
 }

@@ -52,7 +52,7 @@ exports.getSingleButton = function(label, iconClass, onclick, additionalStyle) {
         +'<span id="buttons" class="jxbuttons" style="' + additionalStyle + '">'
         +'<i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;'
         +'<a id="btn_refresh" data-original-title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
-        +'<i class="fa ' + iconClass + '"></i> <span class="dummy-label">' + label + '</span>'
+        +'<i class="fa ' + iconClass + '"></i><span class="dummy-label">' + label + '</span>'
         +'</a>'
         +'</span>';
 
