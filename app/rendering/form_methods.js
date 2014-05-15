@@ -305,7 +305,7 @@ methods.sessionApply = function(env, params){
                         ret = res.err;
                 }
 
-                if (!json.panel_access && active_user.plan !== database.unlimitedPlanName) {
+                if (!json.panel_access && user.plan !== database.unlimitedPlanName) {
                     // user cannot update by himself panel_access field
                     if (active_user.username !== update_name)
                         _active_user.clearUserByName(update_name);
