@@ -90,7 +90,16 @@ exports.appGetHomeDirByPlanAndUser = function(plan_name, user_name, domain_name)
     return appDir = path.join(user_folders.getUserPath(plan_name, user_name), domain_name) + path.sep;
 };
 
-exports.appGetOptions = function (domain_name) {
+
+exports.appGetSSLInfo = function(app_dir, ssl_enabled, ssl_crt, ssl_key) {
+
+    if (!ssl_enabled)
+        return null;
+
+    return { key : path.join(app_dir, ssl_key), crt : path.join(app_dir, ssl_crt) };
+};
+
+exports.appGetOptions = function (domain_name, domain_data) {
 
     var fields = {
         // plan settings
@@ -163,7 +172,9 @@ exports.appGetOptions = function (domain_name) {
     var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jxcore.config";
     var logPath = path.join(appDir, "jxcore_logs/index.txt");
 
-    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_replaced : appPathReplaced, log_path : logPath, user : user, plan: plan, domain : domain };
+    var ssl_info = exports.appGetSSLInfo(appDir, domain.ssl, domain.ssl_crt, domain.ssl_key );
+
+    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_replaced : appPathReplaced, log_path : logPath, user : user, plan: plan, domain : domain, ssl_info : ssl_info };
 };
 
 exports.appCreateHomeDir = function(domain_name) {
@@ -188,7 +199,6 @@ exports.appCreateHomeDir = function(domain_name) {
 
     return false;
 };
-
 
 exports.appGetNginxConfigPath = function(domain_name) {
 
@@ -215,12 +225,8 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
 
     var plan = options.plan;
 
-    var ssl_info = null;
-    if (domain.ssl)
-        ssl_info = { key : path.join(options.app_dir, domain.ssl_key), crt : path.join(options.app_dir, domain.ssl_crt) };
-
     var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null,
-        plan.plan_nginx_directives, ssl_info);
+        plan.plan_nginx_directives, options.ssl_info);
 
     var current = "";
     if (fs.existsSync(cfgPath)) {

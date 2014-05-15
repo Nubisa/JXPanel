@@ -295,22 +295,17 @@ exports.SSLCertFileName = function(testConfig) {
         if (!domain_name)
             return {result: false, msg: form_lang.Get(active_user.lang, "DomainNotFound", true)};
 
-        var domain = database.getDomain(domain_name);
-        if (!domain)
-            return {result: false, msg: form_lang.Get(active_user.lang, "DomainNotFound", true)};
+        var options = hosting_tools.appGetOptions(domain_name);
+        if (options.err)
+            return {result: false, msg: form_lang.Get(active_user.lang, options.err, true)};
 
-        var user = database.getUser(domain.owner);
-        if (!user)
-            return {result: false, msg: form_lang.Get(active_user.lang, "UserUnknown", true)};
-
-        var appDir = hosting_tools.appGetHomeDirByPlanAndUser(user.plan, user.name, domain_name);
-        var file = path.join(appDir, val);
+        var file = path.join(options.app_dir, val);
 
         if (!fs.existsSync(file))
             return {result: false, msg: form_lang.Get(active_user.lang, "FileDoesNotExist", true)};
 
         if (params.controls.ssl && _testConfig) {
-            var ssl_info = { key : params.controls.ssl_key, crt : params.controls.ssl_crt };
+            var ssl_info = hosting_tools.appGetSSLInfo(options.app_dir, true, params.controls.ssl_crt, params.controls.ssl_key);
 
             var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, "", ssl_info );
             var test = nginx.testConfig(configString);
