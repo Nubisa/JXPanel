@@ -1,0 +1,2 @@
+
+exports.title = "JXPanel";
