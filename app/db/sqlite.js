@@ -58,7 +58,7 @@ tables[data_value_table] = {
 
 
 
-// ########## private definitions
+// ########## private methods
 
 
 // generates sql query for creating table, with indexes
@@ -206,11 +206,6 @@ var getUpdateQuery = function (table_name, json) {
 
 var getDeleteQuery = function (table_name, json_where) {
     var ret = { err: false, sql: "" };
-
-//    if (!json_where || !json_where.ID) {
-//        ret.err = "ID column must be provided for deleting the record.";
-//        return ret;
-//    }
 
     var where = [];
     for (var field in json_where) {
