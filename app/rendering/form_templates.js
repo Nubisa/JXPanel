@@ -1,17 +1,19 @@
 var tool = require('./form_tools');
+var _active_user = require('../definitions/active_user');
 
-exports.addUser = function(){
+exports.addUser = function(sessionId){
+    var lang = _active_user.getUser(sessionId).lang;
 
     var formName = "addUser";
 
     var controls = [
         {
             name: "person_name",
-            val: tool.createTextBox("Name", "Name", "person_name", null)
+            val: tool.createTextBox("Name", "Name", "person_name", null, lang)
         },
         {
             name: "person_surname",
-            val: tool.createTextBox("Surname", "Surname", "person_surname", null)
+            val: tool.createTextBox("Surname", "Surname", "person_surname", null, lang)
         }
     ];
 

@@ -1,12 +1,11 @@
 var form_lang = require('../definitions/form_lang');
-var lang = require('../definitions/active_user').lang;
 
 exports.begin = ''
     +'<script>if(!window.renderForms){window.renderForms=[function(){$.fn.editable.defaults.mode = "inline";}];};</script>'
     +'<table style="clear: both" class="table table-bordered table-striped" id="user">'
     +'<tbody>';
 
-exports.createTextBox = function(label, _title, input_id, _value){
+exports.createTextBox = function(label, _title, input_id, _value, lang){
     if(!_value || !_value.length){
         _value = form_lang.Get(lang, "Empty");
     }
@@ -32,7 +31,6 @@ exports.createTextBox = function(label, _title, input_id, _value){
 
     var _validate = function(_value){
         var obj = {form:_this.form, key:_this.name, value:_value};
-        document.title = (JSON.stringify(obj));
         jxcore.Call("sessionAdd", obj , function(param){
             alert("CALLBACK:: " + param)
         });

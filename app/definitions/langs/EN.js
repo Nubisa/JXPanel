@@ -15,6 +15,8 @@ exports.Labels = {
     "Home":"Home",
     "MSBrowserOutOfDate": "Your browser is out of date, please update your browser by going to www.microsoft.com/download",
 
+    "Access Denied": "You do not have a permission to view this resource.",
+
     // login page
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
