@@ -17,6 +17,9 @@ exports.Labels = {
 
     "Access Denied": "You do not have a permission to view this resource.",
 
+    //Form
+    "Nothing to Apply": "There was nothing to apply. Operation wasn't successful.",
+
     // login page
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
