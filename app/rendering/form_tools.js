@@ -1,10 +1,12 @@
 var form_lang = require('../definitions/form_lang');
 var lang = require('../definitions/active_user').lang;
 
-var beginning = '<table style="clear: both" class="table table-bordered table-striped" id="user">'
+exports.begin = ''
+    +'<script>if(!window.renderForms){window.renderForms=[function(){$.fn.editable.defaults.mode = "inline";}];};</script>'
+    +'<table style="clear: both" class="table table-bordered table-striped" id="user">'
     +'<tbody>';
 
-var createTextBox = function(label, _title, input_id, _value){
+exports.createTextBox = function(label, _title, input_id, _value){
     if(!_value || !_value.length){
         _value = form_lang.Get(lang, "Empty");
     }
@@ -28,19 +30,32 @@ var createTextBox = function(label, _title, input_id, _value){
         + _value
         +'</a></td></tr>';
 
+    var _validate = function(_value){
+        var obj = {form:_this.form, key:_this.name, value:_value};
+        document.title = (JSON.stringify(obj));
+        jxcore.Call("sessionAdd", obj , function(param){
+            alert("CALLBACK:: " + param)
+        });
+    };
+
+    _validate += ";;;";
+
     var base_script = "$('#"+input_id+"').editable(" +
         JSON.stringify({
         type: 'text',
         pk: 1,
         name: input_id,
         title: _title,
-        validate:function(value){
-            alert(value);
-        }
+        validate:_validate
     }) + ");";
+    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
+        .replace(/\\n/g, " ")
+        .replace(/\\t/g, " ")
+        .replace(/\\\"/g, "\"")
+        .replace(new RegExp("};;;\"", "g"), "}");
 
     return {html:base_input, js:base_script};
 };
 
-var end = "</tbody></table>";
+exports.end = "</tbody></table>";
 
