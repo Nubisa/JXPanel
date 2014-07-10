@@ -5,11 +5,13 @@ exports.lang = "EN";
 exports.session = { forms:{} };
 
 exports.getForm = function(form_name){
-   // TODO check permissions to form
+    // TODO check permissions to form
 
-   if(forms[form_name]){
-       return forms[form_name]();
-   }
+    if(forms[form_name]){
+        return forms[form_name]();
+    }
 
-   return "";
+    return "";
 };
+
+//{{user.LABELHERE}}
