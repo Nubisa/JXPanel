@@ -26,7 +26,8 @@ var takeValue = function(obj, val){
 var smart_rule = [
     {from:"{{defaults.$$}}", to:"$$", "$":function(val){ return takeValue(site_defaults, val);}},
     {from:"{{user.$$}}", to:"$$", "$":function(val){ return !active_user[val] ? "":active_user[val];}},
-    {from:"{{label.$$}}", to:"$$", "$":function(val){ var res = form_lang.Get(active_user.lang, val); return !res?"":res;}}
+    {from:"{{label.$$}}", to:"$$", "$":function(val){ var res = form_lang.Get(active_user.lang, val); return !res?"":res;}},
+    {from:"{{forms.$$}}", to:"$$", "$":function(val){ return active_user.getForm(val);}}
 ];
 
 var apply_smart = function(res, data){

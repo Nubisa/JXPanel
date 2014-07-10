@@ -240,6 +240,8 @@
 					<!-- RENDER AREA -->
                     <div style="height:500px;">
 
+                        {{forms.addUser}}
+
                         <table style="clear: both" class="table table-bordered table-striped" id="user">
                             <tbody>
                             <tr>
@@ -429,6 +431,7 @@
 		
 		<!-- PAGE RELATED PLUGIN(S) -->
 
+        <script src="/jx?ms=connect" type="text/javascript"></script>
         <script src="js/plugin/maxlength/bootstrap-maxlength.min.js"></script>
         <script src="js/plugin/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
         <script src="js/plugin/clockpicker/clockpicker.min.js"></script>
@@ -445,10 +448,22 @@
         <script src="js/editable.js"></script>
 
 		<script>
+            document.onjxready = function () {
+                jxcore.Start(function (status) {
+
+                });
+            };
+
 			$(document).ready(function() {
 
 				// DO NOT REMOVE : GLOBAL FUNCTIONS!
 				pageSetUp();
+
+                if(window.renderForms){
+                    for(var o in window.renderForms){
+                        window.renderForms[o]();
+                    }
+                }
 
 				/*
 				 * PAGE RELATED SCRIPTS
