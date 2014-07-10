@@ -35,7 +35,10 @@ exports.Labels = {
     "BlockLeftHeader" : "About SmartAdmin - Are you up to date?",
     "BlockLeftBody" : "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa.",
     "BlockRightHeader" : "Not just your average template!",
-    "BlockRightBody" : "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi voluptatem accusantium!"
+    "BlockRightBody" : "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi voluptatem accusantium!",
+
+    // form controls
+    "ComboNotSelected" : "not selected"
 };
 
 
