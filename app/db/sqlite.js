@@ -158,7 +158,7 @@ var getInsertQuery = function (table_name, json) {
     }
 
     ret.sql = "INSERT INTO " + table_name + " (" + columns.join(", ") + ") VALUES ('" + values.join("', '") + "')";
-    console.log("getInsertQuery sql:", ret.sql);
+//    console.log("getInsertQuery sql:", ret.sql);
     return ret;
 };
 
@@ -173,7 +173,7 @@ var getSelectQuery = function (table_name, json_where) {
 
     var strWhere = where.length ? " WHERE " + where.join(" AND ") : "";
     ret.sql = "SELECT * FROM " + table_name + " " + strWhere;
-    console.log("getSelectQuery sql:", ret.sql);
+//    console.log("getSelectQuery sql:", ret.sql);
     return ret;
 };
 
@@ -199,7 +199,7 @@ var getUpdateQuery = function (table_name, json) {
     }
 
     ret.sql = "UPDATE " + table_name + " SET " + updates.join(", ") + " WHERE ID = '" + json.ID + "'";
-    console.log("getUpdateQuery sql:", ret.sql);
+//    console.log("getUpdateQuery sql:", ret.sql);
     return ret;
 };
 
@@ -225,7 +225,7 @@ var getDeleteQuery = function (table_name, json_where) {
     var strWhere = where.length ? " WHERE " + where.join(" AND ") : "";
     ret.sql = "DELETE FROM " + table_name + " " + strWhere;
 
-    console.log("getDeleteQuery sql:", ret.sql);
+//    console.log("getDeleteQuery sql:", ret.sql);
     return ret;
 };
 
