@@ -61,7 +61,7 @@
 			<div id="logo-group">
 
 				<!-- PLACE YOUR LOGO HERE -->
-				<span id="logo"> <img src="img/logo.png" alt="SmartAdmin"> </span>
+				<span id="logo"> <img src="img/logo.png" alt="{{defaults.panelName}}"> </span>
 				<!-- END LOGO PLACEHOLDER -->
 
 				<!-- Note: The activity badge color changes when clicked and resets the number to 0
@@ -260,9 +260,13 @@
 				<span> <!-- User image size is adjusted inside CSS, it should stay as it --> 
 					
 					<a href="javascript:void(0);" id="show-shortcut" data-action="toggleShortcut">
-						<img src="img/avatars/sunny.png" alt="me" class="online" /> 
+						<!--<img src="img/avatars/sunny.png" alt="me" class="online" /> -->
+                        <span id="activity" class="activity-dropdown">
+<i class="fa fa-user"></i>
+<b class="badge bg-color-red bounceIn animated"> 21 </b>
+</span>
 						<span>
-							john.doe 
+							{{user.nameTitle}}
 						</span>
 						<i class="fa fa-angle-down"></i>
 					</a> 
@@ -505,7 +509,7 @@
 						</ul>
 					</li>
 					<li class="top-menu-hidden">
-						<a href="#"><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">SmartAdmin Intel</span></a>
+						<a href="#"><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">{{defaults.panelName}} Intel</span></a>
 						<ul>
 							<li>
 								<a href="difver.html"><i class="fa fa-stack-overflow"></i> Different Versions</a>
@@ -1493,7 +1497,7 @@
 		<div class="page-footer">
 			<div class="row">
 				<div class="col-xs-12 col-sm-6">
-					<span class="txt-color-white">SmartAdmin WebApp © 2013-2014</span>
+					<span class="txt-color-white">Copyright {{defaults.panelName}} © 2014</span>
 				</div>
 
 				<div class="col-xs-6 col-sm-6 text-right hidden-xs">

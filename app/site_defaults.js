@@ -1,2 +1,0 @@
-
-exports.title = "JXPanel";
