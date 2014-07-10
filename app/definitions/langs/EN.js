@@ -15,3 +15,6 @@ exports.Labels = {
     "Home":"Home",
     "MSBrowserOutOfDate": "Your browser is out of date, please update your browser by going to www.microsoft.com/download"
 };
+
+
+//{{label.LABELHERE}}
