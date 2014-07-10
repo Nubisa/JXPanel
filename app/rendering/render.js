@@ -3,9 +3,7 @@ var site_defaults = require('../definitions/site_defaults');
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
 
-var takeValue = function(obj, val){
-    var active_user = _active_user.getUser("XXX");
-
+var takeValue = function(active_user, obj, val){
     if(!obj[active_user.lang]){
         obj[active_user.lang] = {};
     }
@@ -26,29 +24,45 @@ var takeValue = function(obj, val){
 };
 
 var smart_rule = [
-    {from:"{{defaults.$$}}", to:"$$", "$":function(val){ return takeValue(site_defaults, val);}},
-    {from:"{{user.$$}}", to:"$$", "$":function(val){ var active_user = _active_user.getUser("XXX"); return !active_user[val] ? "":active_user[val];}},
-    {from:"{{label.$$}}", to:"$$", "$":function(val){ var active_user = _active_user.getUser("XXX"); var res = form_lang.Get(active_user.lang, val); return !res?"":res;}},
-    {from:"{{forms.$$}}", to:"$$", "$":function(val){ return _active_user.getForm("XXX", val);}}
+    {from:"{{defaults.$$}}", to:"$$", "$":function(val, gl){
+        return takeValue(gl.active_user, site_defaults, val);}
+    },
+    {from:"{{user.$$}}", to:"$$", "$":function(val, gl){
+        var active_user = gl.active_user;
+        return !active_user[val] ? "":active_user[val];}
+    },
+    {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
+        var active_user = gl.active_user;
+        var res = form_lang.Get(active_user.lang, val);
+        return !res?"":res;}
+    },
+    {from:"{{forms.$$}}", to:"$$", "$":function(val, gl){
+        return _active_user.getForm(gl.sessionId, val);}
+    }
 ];
 
-var apply_smart = function(file, res, data){
-    if(!_active_user.hasPermission("XXX", file)){
-        res.write(form_lang.Get(active_user.lang, "Access Denied"));
+var apply_smart = function(file, req, res, data){
+    console.log("apply_smart::SessionId", req.session);
+    var sessionId = (!req.session)?null:req.session.id;
+
+    if(!_active_user.hasPermission(sessionId, file)){
+        res.write(form_lang.Get("EN", "Access Denied"));
         return;
     }
 
+    smart_rule.globals = {"sessionId":sessionId, "active_user": _active_user.getUser(sessionId, true)};
     data = smart_replace(data, smart_rule);
     res.write(data);
 };
 
 exports.defineRender = function(ms){
-    ms.on('.html', function(file, res, cb){
+    ms.on('.html', function(file, req, res, cb){
         var temp = template();
         temp.response = res;
         temp.render = apply_smart;
         temp.callback = cb;
         temp.file = file.path;
+        temp.request = req;
         file.pipe(temp);
     });
 };
@@ -69,7 +83,7 @@ var template = function() {
 
     stream.end = function() {
         stream.emit("end");
-        stream.render(stream.file, stream.response, stream.cache.join(""));
+        stream.render(stream.file, stream.request, stream.response, stream.cache.join(""));
         stream.callback();
     };
 

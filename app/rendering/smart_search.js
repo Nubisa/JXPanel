@@ -25,7 +25,7 @@
 
  */
 
-var _replace = function(str, markers, _markers, from, togr, logic){
+var _replace = function(str, markers, _markers, from, togr, logic, gl){
     var search = from + "";
     var res = from.match(new RegExp("([^a-zA-Z0-9_>\\-':\"}{ "+markers.join()+"]+)", "g"));
     for(var o in res){
@@ -114,7 +114,7 @@ var _replace = function(str, markers, _markers, from, togr, logic){
                     //console.log("REMAINS", f, "POS", pos, "CH", "("+ch+")")
 
                     if(logic[markers[i]]){
-                        ch = logic[markers[i]](ch);
+                        ch = logic[markers[i]](ch, gl);
                     }
                     newstr = newstr.replace(new RegExp("\\" + markers[i] + "\\" + markers[i], "g"), ch);
 
@@ -137,9 +137,10 @@ var _replace = function(str, markers, _markers, from, togr, logic){
         if(ops.length){
             for(var i in markers){
                 if(logic[markers[i] + "!"]){
+                    ops.push(gl);
                     var ch = logic[markers[i] + "!"].apply(null, ops);
                     if(logic[markers[i]]){
-                        ch = logic[markers[i]](ch);
+                        ch = logic[markers[i]](ch, gl);
                     }
                     newstr = newstr.replace(new RegExp("\\" + markers[i] + "\\" + markers[i], "g"), ch);
                 }
@@ -165,7 +166,9 @@ var smart_replace = function(str, logic, markers){
 
     var res = str;
     for(var i in logic){
-        res = _replace(res, markers, _markers, logic[i].from, logic[i].to, logic[i]);
+        if(i == 'globals')
+            continue;
+        res = _replace(res, markers, _markers, logic[i].from, logic[i].to, logic[i], logic.globals);
     }
 
     return res;

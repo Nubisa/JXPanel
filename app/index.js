@@ -13,7 +13,6 @@ server.addJSMethod("serverMethod", function (env, params) {
 });
 
 for(var o in form_methods){
-    console.log(o)
     server.addJSMethod(o, form_methods[o]);
 }
 

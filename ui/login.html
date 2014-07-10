@@ -3,10 +3,12 @@
 	<head>
 		<meta charset="utf-8">
 		<title> {{defaults.title}} </title>
+
         <meta name="description" content="{{defaults.description}}">
         <meta name="author" content="{{defaults.author}}">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		
+
+
 		<!-- #CSS Links -->
 		<!-- Basic Styles -->
 		<link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css">
@@ -165,6 +167,15 @@
 
 		<!-- MAIN APP JS FILE -->
 		<script src="js/app.min.js"></script>
+
+        <script src="/jx?ms=connect" type="text/javascript"></script>
+        <script>
+            document.onjxready = function () {
+                jxcore.Start(function (status) {
+
+                });
+            };
+        </script>
 
 		<script type="text/javascript">
 			runAllForms();
