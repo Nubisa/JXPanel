@@ -1,6 +1,7 @@
 var smart_replace = require('./smart_search').replace;
 var site_defaults = require('../definitions/site_defaults');
 var active_user = require('../definitions/active_user');
+var form_lang = require('../definitions/form_lang');
 
 var takeValue = function(obj, val){
     if(!obj[active_user.lang]){
@@ -24,7 +25,8 @@ var takeValue = function(obj, val){
 
 var smart_rule = [
     {from:"{{defaults.$$}}", to:"$$", "$":function(val){ return takeValue(site_defaults, val);}},
-    {from:"{{user.$$}}", to:"$$", "$":function(val){ return !active_user[val] ? "":active_user[val];}}
+    {from:"{{user.$$}}", to:"$$", "$":function(val){ return !active_user[val] ? "":active_user[val];}},
+    {from:"{{label.$$}}", to:"$$", "$":function(val){ var res = form_lang.Get(active_user.lang, val); return !res?"":res;}}
 ];
 
 var apply_smart = function(res, data){

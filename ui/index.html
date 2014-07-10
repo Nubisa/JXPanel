@@ -210,7 +210,7 @@
 
 				<!-- breadcrumb -->
 				<ol class="breadcrumb">
-					<li>Home</li><li>Dashboard</li>
+					<li>{{label.Home}}</li><li>{{label.Dashboard}}</li>
 				</ol>
 				<!-- end breadcrumb -->
 
@@ -238,7 +238,73 @@
 				<section id="widget-grid" class="">
 
 					<!-- RENDER AREA -->
-                    <div style="height:500px;"></div>
+                    <div style="height:500px;">
+
+                        <table style="clear: both" class="table table-bordered table-striped" id="user">
+                            <tbody>
+                            <tr>
+                                <td style="width:35%;">Simple text field</td>
+                                <td style="width:65%"><a data-original-title="Enter username" data-pk="1" data-type="text" id="username" href="form-x-editable.html#" class="editable editable-click">superuser</a></td>
+                            </tr>
+                            <tr>
+                                <td>Empty text field, required</td>
+                                <td><a data-original-title="Enter your firstname" data-placeholder="Required" data-placement="right" data-pk="1" data-type="text" id="firstname" href="form-x-editable.html#" class="editable editable-click editable-empty">Empty</a></td>
+                            </tr>
+                            <tr>
+                                <td>Select, local array, custom display</td>
+                                <td><a data-original-title="Select sex" data-value="" data-pk="1" data-type="select" id="sex" href="form-x-editable.html#" class="editable editable-click" style="color: rgb(128, 128, 128);">not selected</a></td>
+                            </tr>
+                            <tr>
+                                <td>Select, remote array, no buttons</td>
+                                <td><a data-original-title="Select group" data-source="/groups" data-value="5" data-pk="1" data-type="select" id="group" href="form-x-editable.html#" class="editable editable-click">Admin</a></td>
+                            </tr>
+                            <tr>
+                                <td>Select, error while loading</td>
+                                <td><a data-original-title="Select status" data-source="/status" data-value="0" data-pk="1" data-type="select" id="status" href="form-x-editable.html#" class="editable editable-click">Active</a></td>
+                            </tr>
+
+                            <tr>
+                                <td>Datepicker</td>
+                                <td><a data-original-title="When you want vacation to start?" data-placement="right" data-pk="1" data-viewformat="dd.mm.yyyy" data-type="date" id="vacation" href="#" class="editable editable-click">25.02.2013</a></td>
+                            </tr>
+                            <tr>
+                                <td>Combodate (date)</td>
+                                <td><a data-original-title="Select Date of birth" data-pk="1" data-template="D / MMM / YYYY" data-viewformat="DD/MM/YYYY" data-format="YYYY-MM-DD" data-value="1984-05-15" data-type="combodate" id="dob" href="form-x-editable.html#" class="editable editable-click">15/05/1984</a></td>
+                            </tr>
+                            <tr>
+                                <td>Combodate (datetime)</td>
+                                <td><a data-original-title="Setup event date and time" data-pk="1" data-viewformat="MMM D, YYYY, HH:mm" data-format="YYYY-MM-DD HH:mm" data-template="D MMM YYYY  HH:mm" data-type="combodate" id="event" href="form-x-editable.html#" class="editable editable-click editable-empty">Empty</a></td>
+                            </tr>
+
+                            <tr>
+                                <td>Textarea, buttons below. Submit by <i>ctrl+enter</i></td>
+                                <td><a data-original-title="Enter comments" data-placeholder="Your comments here..." data-pk="1" data-type="textarea" id="comments" href="form-x-editable.html#" class="editable editable-pre-wrapped editable-click">awesome user!</a></td>
+                            </tr>
+
+                            <tr>
+                                <td>Twitter typeahead.js</td>
+                                <td><a data-original-title="Start typing State.." data-placement="right" data-pk="1" data-type="typeaheadjs" id="state2" href="form-x-editable.html#" class="editable editable-click">California</a></td>
+                            </tr>
+
+                            <tr>
+                                <td>Checklist</td>
+                                <td><a data-original-title="Select fruits" data-value="2,3" data-type="checklist" id="fruits" href="form-x-editable.html#" class="editable editable-click">peach<br>apple</a></td>
+                            </tr>
+
+                            <tr>
+                                <td>Select2 (tags mode)</td>
+                                <td><a data-original-title="Enter tags" data-pk="1" data-type="select2" id="tags" href="form-x-editable.html#" class="editable editable-click">html, javascript</a></td>
+                            </tr>
+
+                            <tr>
+                                <td>Select2 (dropdown mode)</td>
+                                <td><a data-original-title="Select country" data-value="BS" data-select-search="true" data-pk="1" data-type="select2" id="country" href="form-x-editable.html#" class="editable editable-click">Bahamas</a></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
 
 				</section>
 				<!-- end widget grid -->
@@ -258,7 +324,7 @@
 
 				<div class="col-xs-6 col-sm-6 text-right hidden-xs">
 					<div class="txt-color-white inline-block">
-						<span class="txt-color-blue hidden-mobile">Copyright {{defaults.panelName}} © 2014 &nbsp;&nbsp; </span>
+						<span class="txt-color-blue hidden-mobile">JXman by Nubisa © 2014 &nbsp;&nbsp; </span>
 
 					</div>
 				</div>
@@ -352,7 +418,7 @@
 
 		<!--[if IE 8]>
 
-		<h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
+		<h1>{{label.MSBrowserOutOfDate}}</h1>
 
 		<![endif]-->
 
@@ -362,6 +428,20 @@
 		
 		<!-- PAGE RELATED PLUGIN(S) -->
 
+        <script src="js/plugin/maxlength/bootstrap-maxlength.min.js"></script>
+        <script src="js/plugin/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+        <script src="js/plugin/clockpicker/clockpicker.min.js"></script>
+        <script src="js/plugin/bootstrap-tags/bootstrap-tagsinput.min.js"></script>
+        <script src="js/plugin/noUiSlider/jquery.nouislider.min.js"></script>
+        <script src="js/plugin/ion-slider/ion.rangeSlider.min.js"></script>
+        <script src="js/plugin/colorpicker/bootstrap-colorpicker.min.js"></script>
+        <script src="js/plugin/knob/jquery.knob.min.js"></script>
+        <script src="js/plugin/x-editable/moment.min.js"></script>
+        <script src="js/plugin/x-editable/jquery.mockjax.min.js"></script>
+        <script src="js/plugin/x-editable/x-editable.min.js"></script>
+        <script src="js/plugin/typeahead/typeahead.min.js"></script>
+        <script src="js/plugin/typeahead/typeaheadjs.min.js"></script>
+        <script src="js/editable.js"></script>
 
 		<script>
 			$(document).ready(function() {
@@ -426,26 +506,9 @@
 
 				}
 
-
+                applyEditables();
 
 			});
-
-		</script>
-
-		<!-- Your GOOGLE ANALYTICS CODE Below -->
-		<script type="text/javascript">
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
-			_gaq.push(['_trackPageview']);
-
-			(function() {
-				var ga = document.createElement('script');
-				ga.type = 'text/javascript';
-				ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0];
-				s.parentNode.insertBefore(ga, s);
-			})();
 
 		</script>
 
