@@ -2,6 +2,8 @@ var tool = require('./form_tools');
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
 var forms = require('../definitions/forms');
+var fs = require("fs");
+var path = require("path");
 
 exports.addUser_Test = function(sessionId){
     var lang = _active_user.getUser(sessionId).lang;
@@ -43,45 +45,6 @@ exports.addUser_Test = function(sessionId){
     return renderFinal(sessionId, formName, controls);
 };
 
-
-//exports.addUser_old = function(sessionId){
-//    var lang = _active_user.getUser(sessionId).lang;
-//
-//    var formName = "addUser";
-//
-//    var subscriptions = [ "ALL" ];
-//
-//    var controls = [
-//        {
-//            name: "person_name",
-//            val: tool.createTextBox("UserContactName", "UserContactName", "person_name", null, lang, { required : true })
-//        },
-//        {
-//            name: "person_email",
-//            val: tool.createTextBox("UserEmailAddress", "UserEmailAddress", "person_email", null, lang)
-//        },
-//        {
-//            name: "person_subscriptions",
-//            val: tool.createCheckList("UserSubscriptionAccess", "UserSubscriptionAccess", "person_subscriptions", "some text", lang, { values : subscriptions })
-//        },
-//        {
-//            name: "person_lang",
-//            val: tool.createComboBox("UserPanelLanguage", "UserPanelLanguage", "person_lang", "EN", lang, { values : ["EN"] })
-//        },
-//        {
-//            name: "person_username",
-//            val: tool.createTextBox("Username", "Username", "person_username", null, lang, {required : true })
-//        },
-//        {
-//            name: "person_password",
-//            val: tool.createTextBox("Password", "Password", "person_password", null, lang, { required : true, password : true})
-//        }
-//    ];
-//
-//    return renderFinal(sessionId, formName, controls);
-//};
-
-
 exports.addUser = function(sessionId){
     var lang = _active_user.getUser(sessionId).lang;
 
@@ -113,7 +76,7 @@ var renderFinal = function(sessionId, formName, controls){
         html += controls[o].val.html;
 
     var lang = _active_user.getUser(sessionId).lang;
-    var submit = '<button class="btn btn-primary" type="button" onclick="jxcore.Call(\'sessionApply\', { form : \'' + formName + '\' }, function (param) { alert(\'CALLBACK:: \' + JSON.stringify(param) )});">' + form_lang.Get(lang, "Apply") + '</button>';
+    var submit = '<br><button class="btn btn-primary" type="button" onclick="jxcore.Call(\'sessionApply\', { form : \'' + formName + '\' }, function (param) { window.jxAddMessage(param.err ? \'danger\' : \'success\', param.err ? param.err : JSON.stringify(param))});">' + form_lang.Get(lang, "Apply") + '</button>';
 
     var scr = "";
 
@@ -125,5 +88,13 @@ var renderFinal = function(sessionId, formName, controls){
 
     var final = tool.begin + html + tool.end + submit + "<script>window.renderForms.push(function() {"+scr+"});</script>";
 
-    return final;
+    var containerFile = path.join(__dirname, "../definitions/forms/container.html");
+
+    if (fs.existsSync(containerFile)) {
+        var widget = fs.readFileSync(containerFile).toString();
+        return widget.replace("{{form.contents}}", final).replace("{{form.name}}", formName);
+    } else {
+        return final;
+    }
+
 };

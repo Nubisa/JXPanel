@@ -1,0 +1,83 @@
+<!-- widget grid -->
+<section id="widget-grid" class="">
+
+    <!-- row -->
+    <div class="row">
+
+        <!-- NEW WIDGET START -->
+        <article class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+
+<!-- Widget ID (each widget will need unique ID)-->
+<div class="jarviswidget" id="wid-id-3" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-togglebutton="false" data-widget-deletebutton="false">
+    <!-- widget options:
+        usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
+
+        data-widget-colorbutton="false"
+        data-widget-editbutton="false"
+        data-widget-togglebutton="false"
+        data-widget-deletebutton="false"
+        data-widget-fullscreenbutton="false"
+        data-widget-custombutton="false"
+        data-widget-collapsed="true"
+        data-widget-sortable="false"
+
+    -->
+    <header>
+        <h2><strong>{{form.name}}</h2>
+
+    </header>
+
+    <!-- widget div-->
+    <div>
+
+        <!-- widget edit box -->
+        <div class="jarviswidget-editbox">
+            <!-- This area used as dropdown edit box -->
+
+        </div>
+        <!-- end widget edit box -->
+
+        <!-- widget content -->
+        <div class="widget-body">
+            <p id="jxFormMessage"></p>
+
+
+            <p>{{form.contents}}</p>
+        </div>
+        <!-- end widget content -->
+
+    </div>
+    <!-- end widget div -->
+
+</div>
+<!-- end widget -->
+
+
+        </article>
+        <!-- WIDGET END -->
+
+    </div>
+
+    <!-- end row -->
+
+
+</section>
+<!-- end widget grid -->
+
+<script type="text/javascript">
+
+
+    window.jxAddMessage = function(type, txt) {
+
+
+        var p = document.getElementById('jxFormMessage');
+        if (p) {
+//            var str = "<p class='alert alert-" + type + "'> <strong><i class='fa fa-check'></i></strong> " + txt + " </p>";
+            var str = "<p class='alert alert-" + type + "'> <strong></strong> " + txt + " </p>";
+            p.innerHTML = str;
+//            var json = { type : type, txt : txt};
+//            alert(JSON.stringify(json));
+        }
+    };
+
+</script>
