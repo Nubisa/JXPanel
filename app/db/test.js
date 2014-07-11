@@ -5,7 +5,7 @@
 
 var sqlite = require("./sqlite.js");
 var fs = require("fs");
-
+var util = require("util");
 
 var id = 0;
 
@@ -35,8 +35,13 @@ var test = function (db) {
             console.log(id, "error:", err)
         } else {
             console.log(id, "OK:", data);
-            if (data)
-                lastRet = data;
+            if (data) {
+                if (util.isArray(data))
+                    lastRet = data;
+//                else
+//                    console.log("last added record ID", data);
+            }
+
         }
         console.log("");
         next();

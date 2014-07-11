@@ -42,8 +42,8 @@ tables[domain_table] = {
 
 tables[data_field_table] = {
     "ID": { type: "CHAR(20)", required: true, primary: true },
-    "table_name": { type: "TEXT", required: true, unique1 : true },
-    "field_name": { type: "TEXT", required: true, unique1 : true },
+    "table_name": { type: "TEXT", required: true, unique1: true },
+    "field_name": { type: "TEXT", required: true, unique1: true },
     "field_type": { type: "TEXT"},
     "default_value_rules": { type: "TEXT"},
     "default_value": { type: "TEXT"}
@@ -51,11 +51,10 @@ tables[data_field_table] = {
 
 tables[data_value_table] = {
     "ID": { type: "CHAR(20)", required: true, primary: true},
-    "data_field_table_id": { type: "CHAR(20)", required: true, unique1 : true },
-    "owner_table_id": { type: "INTEGER", required: true, unique1 : true },
-    "value" : { type : "TEXT" }
+    "data_field_table_id": { type: "CHAR(20)", required: true, unique1: true },
+    "owner_table_id": { type: "INTEGER", required: true, unique1: true },
+    "value": { type: "TEXT" }
 };
-
 
 
 // ########## private methods
@@ -126,7 +125,7 @@ var checkRequiredFields = function (table_name, json) {
     for (var field_name in fields) {
         var fieldDef = fields[field_name];
         if (fieldDef.required && !json[field_name]) {
-            return "Field `" + field_name + "` is required for table `" + table_name +"`.";
+            return "Field `" + field_name + "` is required for table `" + table_name + "`.";
         }
     }
     return null;
@@ -158,6 +157,7 @@ var getInsertQuery = function (table_name, json) {
     }
 
     ret.sql = "INSERT INTO " + table_name + " (" + columns.join(", ") + ") VALUES ('" + values.join("', '") + "')";
+    ret.ID = json.ID;
 //    console.log("getInsertQuery sql:", ret.sql);
     return ret;
 };
@@ -235,7 +235,9 @@ var addRecord = function (table_name, db_object, json, cb) {
             cb(ret.err)
         }
     } else {
-        db_object.run(ret.sql, cb);
+        db_object.run(ret.sql, function (err) {
+            if (cb) cb(err, ret.ID);
+        });
     }
 };
 
@@ -320,12 +322,12 @@ exports.CreateDatabase = function (file_name, cb) {
 
     var errors = [];
 
-    db_object.serialize(function() {
+    db_object.serialize(function () {
         for (var table_name in tables) {
             var ret = getCreateTableQuery(table_name);
 
             // ret.sql is array in this case
-            for(var id in ret.sql) {
+            for (var id in ret.sql) {
                 db_object.run(ret.sql[id], function (err) {
                     if (err) {
                         errors.push(err);
@@ -423,17 +425,17 @@ var Table = function (table_name) {
             return;
         }
 
-        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
-           if (err) {
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name: _table_name }, function (err, rows) {
+            if (err) {
                 if (cb) cb(err);
-           } else {
-               if (!rows.length) {
-                   if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
-               } else {
-                   console.log("adding record");
-                   addRecord(data_value_table, db_object, { data_field_table_id : rows[0].ID, owner_table_id : user_id, value : value }, cb);
-               }
-           }
+            } else {
+                if (!rows.length) {
+                    if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
+                } else {
+                    console.log("adding record");
+                    addRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: user_id, value: value }, cb);
+                }
+            }
         });
     };
 
@@ -452,14 +454,14 @@ var Table = function (table_name) {
             return;
         }
 
-        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name: _table_name }, function (err, rows) {
             if (err) {
                 cb(err);
             } else {
                 if (!rows.length) {
                     cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
                 } else {
-                    getRecord(data_value_table, db_object, { data_field_table_id : rows[0].ID, owner_table_id : user_id }, function(err2, rows2) {
+                    getRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: user_id }, function (err2, rows2) {
                         if (!err2 && rows2 && rows2.length) {
                             cb(false, rows2[0].value)
                         } else {
@@ -482,7 +484,7 @@ var Table = function (table_name) {
             return;
         }
 
-        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name: _table_name }, function (err, rows) {
             if (err) {
                 if (cb) cb(err);
             } else {
@@ -507,7 +509,7 @@ var Table = function (table_name) {
             return;
         }
 
-        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name: _table_name }, function (err, rows) {
             if (err) {
                 if (cb) cb(err);
             } else {
