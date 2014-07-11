@@ -366,7 +366,7 @@ var Table = function (table_name) {
         deleteRecord(_table_name, db_object, json, cb)
     };
 
-    // field rules related to table_name
+    // field rules related to table_name (data_field_table)
 
     this.AddNewFieldRule = function (db_object, json, cb) {
         json = json || {};
@@ -392,7 +392,7 @@ var Table = function (table_name) {
         deleteRecord(data_field_table, db_object, json, cb);
     };
 
-    // field values related to table_name
+    // field values related to table_name (data_value_table)
 
     this.AddNewFieldValue = function (db_object, json, cb) {
         addRecord(data_value_table, db_object, json, cb);
@@ -410,7 +410,7 @@ var Table = function (table_name) {
         deleteRecord(data_value_table, db_object, json, cb);
     };
 
-    // field values related to table_name, but base on field_name rather than json object
+    // field values related to table_name (data_value_table), but based on field_name rather than json object
 
     this.AddNewFieldValue2 = function (db_object, user_id, field_name, value, cb) {
 
