@@ -60,17 +60,26 @@ var test = function (db) {
         if (id == 12) sqlite.Subscription.AddNewFieldRule(db,  { field_name : "xsub_name2", field_type : "sometype", default_value_rules :"", default_value : null}, cb); else
         if (id == 13) sqlite.Subscription.GetFieldRule(db,  null, cb); else
         if (id == 14) sqlite.Subscription.UpdateFieldRule(db,  { ID : lastRet[0].ID, default_value: "osiem" }, cb); else
-        if (id == 15) sqlite.Subscription.DeleteFieldRules(db,  { field_name: "xsub_name2" }, cb); else
+        if (id == 15) sqlite.Subscription.DeleteFieldRule(db,  { field_name: "xsub_name2" }, cb); else
         if (id == 16) sqlite.Subscription.GetFieldRule(db,  null, cb); else
 
 
 
         if (id == 21) sqlite.Subscription.AddNewFieldValue(db,  { data_field_table_id : lastRet[0].ID,   owner_table_id : 10, value : 10}, cb); else
-        if (id == 22) sqlite.Subscription.AddNewFieldValue(db,  { data_field_table_id : lastRet[0].ID,  owner_table_id : 10, value : 30}, cb); else
+        if (id == 22) sqlite.Subscription.AddNewFieldValue(db,  { data_field_table_id : lastRet[0].ID,  owner_table_id : 11, value : 30}, cb); else
         if (id == 23) sqlite.Subscription.GetFieldValue(db,  null, cb); else
         if (id == 24) sqlite.Subscription.UpdateFieldValue(db,  { ID : lastRet[1].ID, value: "osiem" }, cb); else
         if (id == 25) sqlite.Subscription.DeleteFieldValue(db,  { value: "10" }, cb); else
         if (id == 26) sqlite.Subscription.GetFieldValue(db,  null, cb); else
+
+        if (id == 31) sqlite.Subscription.AddNewFieldValue2(db, 10, "xsub_name", "cos", cb); else
+        if (id == 32) sqlite.Subscription.AddNewFieldValue2(db, 10, "xsub_name2", "cos2", cb); else
+        if (id == 33) sqlite.Subscription.GetFieldValue2(db, 10, "xsub_name", cb); else
+        if (id == 34) sqlite.Subscription.UpdateFieldValue2(db, 10, "xsub_name", "siedem", cb); else
+        if (id == 35) sqlite.Subscription.DeleteFieldValue2(db, 10, "xsub_name", cb); else
+        if (id == 36) sqlite.Subscription.GetFieldValue2(db, 10, "xsub_name", cb); else
+        if (id == 37) sqlite.Subscription.GetFieldValue(db,  null, cb); else
+
             cb("empty");
     };
 

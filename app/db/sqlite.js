@@ -51,8 +51,8 @@ tables[data_field_table] = {
 
 tables[data_value_table] = {
     "ID": { type: "CHAR(20)", required: true, primary: true},
-    "data_field_table_id": { type: "CHAR(20)", required: true },
-    "owner_table_id": { type: "INTEGER", required: true },
+    "data_field_table_id": { type: "CHAR(20)", required: true, unique1 : true },
+    "owner_table_id": { type: "INTEGER", required: true, unique1 : true },
     "value" : { type : "TEXT" }
 };
 
@@ -242,11 +242,14 @@ var addRecord = function (table_name, db_object, json, cb) {
 // cb receives two param: err, rows
 var getRecord = function (table_name, db_object, json_where, cb) {
 
+    if (!cb) {
+        throw "The callback is required";
+        return;
+    }
+
     var ret = getSelectQuery(table_name, json_where);
     if (ret.err) {
-        if (cb) {
-            cb(ret.err)
-        }
+        cb(ret.err)
     } else {
         db_object.all(ret.sql, cb);
     }
@@ -383,7 +386,7 @@ var Table = function (table_name) {
         updateRecord(data_field_table, db_object, json, cb);
     };
 
-    this.DeleteFieldRules = function (db_object, json, cb) {
+    this.DeleteFieldRule = function (db_object, json, cb) {
         json = json || {};
         json.table_name = _table_name;
         deleteRecord(data_field_table, db_object, json, cb);
@@ -405,6 +408,117 @@ var Table = function (table_name) {
 
     this.DeleteFieldValue = function (db_object, json, cb) {
         deleteRecord(data_value_table, db_object, json, cb);
+    };
+
+    // field values related to table_name, but base on field_name rather than json object
+
+    this.AddNewFieldValue2 = function (db_object, user_id, field_name, value, cb) {
+
+        if (!user_id) {
+            if (cb) cb("The `user_id` field must be provided.");
+            return;
+        }
+        if (!field_name) {
+            if (cb) cb("The `field_name` field must be provided.");
+            return;
+        }
+
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+           if (err) {
+                if (cb) cb(err);
+           } else {
+               if (!rows.length) {
+                   if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
+               } else {
+                   console.log("adding record");
+                   addRecord(data_value_table, db_object, { data_field_table_id : rows[0].ID, owner_table_id : user_id, value : value }, cb);
+               }
+           }
+        });
+    };
+
+    this.GetFieldValue2 = function (db_object, user_id, field_name, cb) {
+
+        if (!cb) {
+            throw "The callback is required";
+            return;
+        }
+        if (!user_id) {
+            if (cb) cb("The `user_id` field must be provided.");
+            return;
+        }
+        if (!field_name) {
+            if (cb) cb("The `field_name` field must be provided.");
+            return;
+        }
+
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+            if (err) {
+                cb(err);
+            } else {
+                if (!rows.length) {
+                    cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
+                } else {
+                    getRecord(data_value_table, db_object, { data_field_table_id : rows[0].ID, owner_table_id : user_id }, function(err2, rows2) {
+                        if (!err2 && rows2 && rows2.length) {
+                            cb(false, rows2[0].value)
+                        } else {
+                            cb(false, rows[0].default_value);
+                        }
+                    });
+                }
+            }
+        });
+    };
+
+    this.UpdateFieldValue2 = function (db_object, user_id, field_name, value, cb) {
+
+        if (!user_id) {
+            if (cb) cb("The `user_id` field must be provided.");
+            return;
+        }
+        if (!field_name) {
+            if (cb) cb("The `field_name` field must be provided.");
+            return;
+        }
+
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+            if (err) {
+                if (cb) cb(err);
+            } else {
+                if (!rows.length) {
+                    if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
+                } else {
+                    var sql = "UPDATE " + data_value_table + " SET value = '" + value + "' WHERE data_field_table_id = '" + rows[0].ID + "' AND owner_table_id = '" + user_id + "'";
+                    db_object.run(sql, cb);
+                }
+            }
+        });
+    };
+
+    this.DeleteFieldValue2 = function (db_object, user_id, field_name, cb) {
+
+        if (!user_id) {
+            if (cb) cb("The `user_id` field must be provided.");
+            return;
+        }
+        if (!field_name) {
+            if (cb) cb("The `field_name` field must be provided.");
+            return;
+        }
+
+        getRecord(data_field_table, db_object, { field_name: field_name, table_name : _table_name }, function(err, rows) {
+            if (err) {
+                if (cb) cb(err);
+            } else {
+                if (!rows.length) {
+                    if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
+                } else {
+                    var sql = "DELETE FROM " + data_value_table + " WHERE data_field_table_id = '" + rows[0].ID + "' AND owner_table_id = '" + user_id + "'";
+                    db_object.run(sql, cb);
+                }
+            }
+        });
     };
 };
 
