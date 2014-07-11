@@ -29,7 +29,7 @@ tables[subscription_table] = {
 
 tables[user_table] = {
     "ID": { type: "CHAR(20)", required: true, primary: true},
-    "subscription_table_id": { type: "CHAR(20)", required: true },
+    "subscription_table_id": { type: "CHAR(20)", required: false },
     "username": { type: "TEXT", required: true, unique: true},
     "password": { type: "TEXT", required: true }
 };
@@ -129,6 +129,23 @@ var checkRequiredFields = function (table_name, json) {
         }
     }
     return null;
+};
+
+
+var getIfNotExistsQuery = function(table_name) {
+    var ret = { err: false, sql: "" };
+
+
+    var uniques = [];
+
+    for (var field_name in tables[table_name]) {
+        var field = tables[table_name][field_name];
+        if (field.unique1) {
+            uniques[table_name].push(field_name);
+        }
+    }
+
+
 };
 
 
@@ -284,66 +301,6 @@ var deleteRecord = function (table_name, db_object, json_where, cb) {
 };
 
 
-/**
- *
- * @param file_name
- * @param cb (err: true || string, db_object)
- * @constructor
- */
-exports.CreateDatabase = function (file_name, cb) {
-
-    if (!cb) {
-        throw "The callback is required";
-        return;
-    }
-
-    var exists = fs.existsSync(file_name);
-
-    var db_object = null;
-
-    try {
-        var mode = exists ? sqlite3.OPEN_READWRITE : sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE;
-        db_object = new sqlite3.Database(file_name, mode);
-    } catch (ex) {
-        cb("Cannot create database file: " + ex, null);
-        return;
-    }
-
-    if (exists) {
-        cb(null, db_object);
-        return;
-    }
-
-    if (!db_object) {
-        cb("Cannot create database file.", null);
-        return;
-    }
-
-
-    var errors = [];
-
-    db_object.serialize(function () {
-        for (var table_name in tables) {
-            var ret = getCreateTableQuery(table_name);
-
-            // ret.sql is array in this case
-            for (var id in ret.sql) {
-                db_object.run(ret.sql[id], function (err) {
-                    if (err) {
-                        errors.push(err);
-                    }
-                });
-            }
-        }
-    });
-
-
-    db_object.wait(function () {
-        var errStr = errors.length ? errors.join("\n") : null;
-        cb(errStr, errStr ? null : db_object);
-    });
-};
-
 // class for manipulating single table (table_name)
 // as well as records from data_field_table and data_value_table (but related to table_name)
 var Table = function (table_name) {
@@ -375,6 +332,34 @@ var Table = function (table_name) {
         json.table_name = _table_name;
         addRecord(data_field_table, db_object, json, cb);
     };
+
+    // each item in field arr is json containing one field definition (row of data_field_table)
+    this.AddNewFieldRules = function(db_object, fieldsArr, cb) {
+
+        var errors = [];
+        var _cb = function(err) {
+            if (err) errors.push(err);
+        };
+
+        db_object.serialize( function() {
+            for(var id in fieldsArr) {
+                var field = fieldsArr[id];
+                field.table_name = _table_name;
+                var ret = getInsertQuery(data_field_table, field);
+                if (ret.err) {
+                    if (cb) cb(ret.err);
+                    return;
+                }
+                db_object.run(ret.sql, _cb);
+            }
+        });
+
+        db_object.wait(function () {
+            var errStr = errors.length ? errors.join("\n") : null;
+            cb(errStr);
+        });
+    };
+
 
     this.GetFieldRule = function (db_object, json, cb) {
         json = json || {};
@@ -432,7 +417,6 @@ var Table = function (table_name) {
                 if (!rows.length) {
                     if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
                 } else {
-                    console.log("adding record");
                     addRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: user_id, value: value }, cb);
                 }
             }
@@ -522,6 +506,7 @@ var Table = function (table_name) {
             }
         });
     };
+
 };
 
 
@@ -530,3 +515,82 @@ var Table = function (table_name) {
 exports.Subscription = new Table(subscription_table);
 exports.User = new Table(user_table);
 exports.Domain = new Table(domain_table);
+
+
+
+/**
+ *
+ * @param file_name
+ * @param cb (err: true || string, db_object)
+ * @constructor
+ */
+exports.CreateDatabase = function (file_name, cb) {
+
+    if (!cb) {
+        throw "The callback is required";
+        return;
+    }
+
+    var exists = fs.existsSync(file_name);
+
+    var db_object = null;
+
+    try {
+        var mode = exists ? sqlite3.OPEN_READWRITE : sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE;
+        db_object = new sqlite3.Database(file_name, mode);
+    } catch (ex) {
+        cb("Cannot create database file: " + ex, null);
+        return;
+    }
+
+    if (exists) {
+        cb(null, db_object);
+        return;
+    }
+
+    if (!db_object) {
+        cb("Cannot create database file.", null);
+        return;
+    }
+
+
+    var errors = [];
+
+    db_object.serialize(function () {
+        for (var table_name in tables) {
+            var ret = getCreateTableQuery(table_name);
+
+            // ret.sql is array in this case
+            for (var id in ret.sql) {
+                db_object.run(ret.sql[id], function (err) {
+                    if (err) {
+                        errors.push(err);
+                    }
+                });
+            }
+        }
+    });
+
+
+    db_object.wait(function () {
+        var errStr = errors.length ? errors.join("\n") : null;
+        cb(errStr, errStr ? null : db_object);
+    });
+};
+
+
+
+// just for now
+
+exports.db = null;
+
+exports.CreateDatabase( __dirname + "/dbfile.db", function (err, db) {
+    if (!err) {
+        exports.db = db;
+    } else {
+        console.log("SQLITE, create database err", err);
+    }
+});
+
+
+

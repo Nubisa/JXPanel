@@ -19,6 +19,7 @@ exports.Labels = {
 
     //Form
     "Nothing to Apply": "There was nothing to apply. Operation wasn't successful.",
+    "UnknownForm" : "Unknown form",
 
     // login page
     "SignIn" : "Sign In",
@@ -29,6 +30,7 @@ exports.Labels = {
 
     "Password" : "Password",
     "PasswordForgot" : "Forgot password?",
+    "PasswordConfirm" : "Confirm password",
     "PasswordEnter" : "Enter your password",
     "PasswordEnterRequired" : "Please enter your password",
 
@@ -38,7 +40,13 @@ exports.Labels = {
     "BlockRightBody" : "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi voluptatem accusantium!",
 
     // form controls
-    "ComboNotSelected" : "not selected"
+    "ComboNotSelected" : "not selected",
+    "UserContactName" : "Contact Name",
+    "UserEmailAddress" : "Email Address",
+    "UserSubscriptionAccess" : "Access to subscriptions",
+    "UserPanelLanguage" : "JXPanel language",
+
+    "ValueRequired" : "This field is required"
 };
 
 

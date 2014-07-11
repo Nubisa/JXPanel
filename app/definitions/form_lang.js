@@ -2,7 +2,15 @@ var langs = {};
 
 langs.EN = require("./langs/EN.js").Labels;
 
-exports.Get = function(lang, val){
+/**
+ *
+ * @param lang
+ * @param val
+ * @param notNull - if provided and translation was not found in langs - val is returned instead of null.
+ * @return {*}
+ * @constructor
+ */
+exports.Get = function(lang, val, notNull){
 
     if(langs[lang] && langs[lang][val]){
         return langs[lang][val];
@@ -12,5 +20,5 @@ exports.Get = function(lang, val){
         return langs.EN[val];
 
 
-    return null;
+    return notNull ? val : null;
 };

@@ -85,11 +85,15 @@ var test = function (db) {
         if (id == 36) sqlite.Subscription.GetFieldValue2(db, 10, "xsub_name", cb); else
         if (id == 37) sqlite.Subscription.GetFieldValue(db,  null, cb); else
 
+        if (id == 41) sqlite.User.AddNew(db,  {  }, cb); else
+
             cb("empty");
     };
 
     next();
 };
+
+
 
 var dbfile = "./dbfile.db";
 
@@ -101,8 +105,10 @@ sqlite.CreateDatabase("./dbfile.db", function (err, db) {
         return;
     } else {
         console.log("DB created OK.");
+
+        test(db);
     }
-    test(db);
+
 });
 
 

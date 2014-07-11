@@ -5,12 +5,25 @@ exports.begin = ''
     +'<table style="clear: both" class="table table-bordered table-striped" id="user">'
     +'<tbody>';
 
-exports.createTextBox = function(label, _title, input_id, _value, lang){
+
+var getRequiredCheck = function(lang, options) {
+
+    if (options && options.required) {
+        return "if ($.trim(_value) == '') return '" + form_lang.Get(lang, "ValueRequired") + "';"
+    }
+
+    return "";
+};
+
+
+exports.createTextBox = function(label, _title, input_id, _value, lang, options){
 
     _valueStr = _value ? _value : "";
     _value = _value || form_lang.Get(lang, "Empty");
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
+
+    if (options && options.required) label += ' <span style="color: #b94a48">*</span>';
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label +'</td>'
@@ -18,7 +31,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang){
         +'<a data-original-title="'
         + _title
         +'" data-pk="1" data-type="'
-        +'text'
+        + (options && options.password ? 'password' : 'text')
         +'" data-value="'+ _valueStr +'" id="'
         + input_id
         +'" href="#" class="editable editable-click">'
@@ -26,6 +39,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang){
         +'</a></td></tr>';
 
     var _validate = function(_value){
+        /*text*/
         var obj = {form:_this.form, key:_this.name, value:_value};
         jxcore.Call("sessionAdd", obj , function(param){
             alert("CALLBACK:: " + param)
@@ -33,6 +47,8 @@ exports.createTextBox = function(label, _title, input_id, _value, lang){
     };
 
     _validate += ";;;";
+    _validate = _validate.replace("_this.name", '"' + input_id + '"');
+    _validate = _validate.replace("/*text*/", getRequiredCheck(lang, options));
 
     var base_script = "$('#"+input_id+"').editable(" +
         JSON.stringify({
@@ -52,15 +68,15 @@ exports.createTextBox = function(label, _title, input_id, _value, lang){
 };
 
 
-exports.createComboBox = function (label, _title, input_id, _value, lang, values) {
+exports.createComboBox = function (label, _title, input_id, _value, lang, options) {
 
     var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
 
     var _valueId = ""
     var _valueStr = _empty;
 
-    if (_value && _value.trim()) {
-            var pos = values.indexOf(_value);
+    if (_value && _value.trim() && options && options.values) {
+            var pos = options.values.indexOf(_value);
             if (pos > -1) {
                 _valueId = _value;
                 _valueStr = _value;
@@ -95,12 +111,13 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, values
     };
 
     _validate += ";;;";
+    _validate = _validate.replace("_this.name", '"' + input_id + '"');
 
     var source = [];
-    if (values && values.length) {
-        for(var id in values) {
+    if (options && options.values && options.values.length) {
+        for(var id in options.values) {
             var c = parseInt(id) + 1;
-            source.push( { value: values[id], text: values[id]} )
+            source.push( { value: options.values[id], text: options.values[id]} )
         }
     }
 
@@ -140,7 +157,7 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, values
     return {html: base_input, js: base_script};
 };
 
-exports.createTextArea = function(label, _title, input_id, _value, lang){
+exports.createTextArea = function(label, _title, input_id, _value, lang, options){
 
     _valueStr = _value ? _value : "";
     _value = _value || form_lang.Get(lang, "Empty");
@@ -161,6 +178,7 @@ exports.createTextArea = function(label, _title, input_id, _value, lang){
         +'</a></td></tr>';
 
     var _validate = function(_value){
+        /*text*/
         var obj = {form:_this.form, key:_this.name, value:_value};
         jxcore.Call("sessionAdd", obj , function(param){
             alert("CALLBACK:: " + param)
@@ -168,6 +186,8 @@ exports.createTextArea = function(label, _title, input_id, _value, lang){
     };
 
     _validate += ";;;";
+    _validate = _validate.replace("_this.name", '"' + input_id + '"');
+    _validate = _validate.replace("/*text*/", getRequiredCheck(lang, options));
 
     var base_script = "$('#"+input_id+"').editable(" +
         JSON.stringify({
@@ -186,16 +206,16 @@ exports.createTextArea = function(label, _title, input_id, _value, lang){
     return {html:base_input, js:base_script};
 };
 
-exports.createCheckList = function (label, _title, input_id, _value, lang, values) {
+exports.createCheckList = function (label, _title, input_id, _value, lang, options) {
 
     var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
     var _arrStr = [];
 
-    if (_value && _value.trim() && values) {
+    if (_value && _value.trim() && options && options.values) {
         var arr = _value.split(",");
 
         for(var a in arr) {
-            var pos = values.indexOf(arr[a]);
+            var pos = options.values.indexOf(arr[a]);
             if (pos > -1) {
                 _arrStr.push(arr[a]);
             }
@@ -235,12 +255,13 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, value
     };
 
     _validate += ";;;";
+    _validate = _validate.replace("_this.name", '"' + input_id + '"');
 
     var source = [];
-    if (values && values.length) {
-        for(var id in values) {
+    if (options && options.values && options.values.length) {
+        for(var id in options.values) {
             var c = parseInt(id) + 1;
-            source.push( { value: values[id], text: values[id]} )
+            source.push( { value: options.values[id], text: options.values[id]} )
         }
     }
 
@@ -264,16 +285,16 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, value
 };
 
 
-exports.createTags = function (label, _title, input_id, _value, lang, values) {
+exports.createTags = function (label, _title, input_id, _value, lang, options) {
 
     var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
     var _arrStr = [];
 
-    if (_value && _value.trim() && values) {
+    if (_value && _value.trim() && options && options.values) {
         var arr = _value.split(",");
 
         for(var a in arr) {
-            var pos = values.indexOf(arr[a]);
+            var pos = options.values.indexOf(arr[a]);
             if (pos > -1) {
                 _arrStr.push(arr[a]);
             }
@@ -313,14 +334,7 @@ exports.createTags = function (label, _title, input_id, _value, lang, values) {
     };
 
     _validate += ";;;";
-
-    var source = [];
-    if (values && values.length) {
-        for(var id in values) {
-            var c = parseInt(id) + 1;
-            source.push( { value: c, text: values[id]} )
-        }
-    }
+    _validate = _validate.replace("_this.name", '"' + input_id + '"');
 
     var base_script = "$('#" + input_id + "').editable(" +
         JSON.stringify(
@@ -328,7 +342,7 @@ exports.createTags = function (label, _title, input_id, _value, lang, values) {
             {
                 inputclass: 'input-large',
                 select2: {
-                    tags: values,
+                    tags: options.values,
                     tokenSeparators: [",", " "]
                 },
 
@@ -348,13 +362,14 @@ exports.createTags = function (label, _title, input_id, _value, lang, values) {
 };
 
 
-exports.createComboDate = function (label, _title, input_id, _value, lang, dateFormat) {
+exports.createComboDate = function (label, _title, input_id, _value, lang, options) {
 
     _value = _value || form_lang.Get(lang, "Empty");
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    var _dateFormat = dateFormat.replace(/([./-])/g, " $1 ");
+    var format = options && options.format || "";
+    var _format = format.replace(/([./-])/g, " $1 ");
 
     var base_input = '<tr>'
         + '<td style="width:35%;">' + label + '</td>'
@@ -363,7 +378,7 @@ exports.createComboDate = function (label, _title, input_id, _value, lang, dateF
         + _title
         + '" data-pk="1" data-type="'
         + 'combodate'
-        + '" data-template="' + _dateFormat + '" data-viewformat="' + dateFormat + '" data-format="' + dateFormat + '" data-value="' + _value
+        + '" data-template="' + _format + '" data-viewformat="' + format + '" data-format="' + format + '" data-value="' + _value
         + '" id="'
         + input_id
         + '" href="#" class="editable editable-click">'
@@ -378,6 +393,7 @@ exports.createComboDate = function (label, _title, input_id, _value, lang, dateF
     };
 
     _validate += ";;;";
+    _validate = _validate.replace("_this.name", '"' + input_id + '"');
 
     var base_script = "$('#" + input_id + "').editable(" +
         JSON.stringify({
