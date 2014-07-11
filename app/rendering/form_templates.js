@@ -17,8 +17,8 @@ exports.addUser = function(sessionId){
         },
         {
             name: "person_cat",
-            //val: tool.createComboBox("Category", "Category", "person_cat", "Customer", lang, ["Administrator", "Customer"])
-            val: tool.createComboBox("Category", "Category", "person_cat", "", lang, ["Administrator", "Customer"])
+            val: tool.createComboBox("Category", "Category", "person_cat", "Customer", lang, ["Administrator", "Customer"])
+//            val: tool.createComboBox("Category", "Category", "person_cat", "", lang, ["Administrator", "Customer"])
         },
         {
             name: "person_desc",

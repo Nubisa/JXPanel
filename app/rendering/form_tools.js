@@ -6,15 +6,11 @@ exports.begin = ''
     +'<tbody>';
 
 exports.createTextBox = function(label, _title, input_id, _value, lang){
-    if(!_value || !_value.length){
-        _value = form_lang.Get(lang, "Empty");
-    }
-    if(form_lang.Get(lang, _title)){
-        _title = form_lang.Get(lang, _title);
-    }
-    if(form_lang.Get(lang, label)){
-        label = form_lang.Get(lang, label);
-    }
+
+    _valueStr = _value ? _value : "";
+    _value = _value || form_lang.Get(lang, "Empty");
+    _title = form_lang.Get(lang, _title) || _title;
+    label = form_lang.Get(lang, label) || label;
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label +'</td>'
@@ -23,7 +19,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang){
         + _title
         +'" data-pk="1" data-type="'
         +'text'
-        +'" id="'
+        +'" data-value="'+ _valueStr +'" id="'
         + input_id
         +'" href="#" class="editable editable-click">'
         + _value
@@ -146,6 +142,7 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, values
 
 exports.createTextArea = function(label, _title, input_id, _value, lang){
 
+    _valueStr = _value ? _value : "";
     _value = _value || form_lang.Get(lang, "Empty");
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
@@ -157,7 +154,7 @@ exports.createTextArea = function(label, _title, input_id, _value, lang){
         + _title
         +'" data-pk="1" data-type="'
         +'textarea'
-        +'" id="'
+        +'" data-value="'+ _valueStr +'" id="'
         + input_id
         +'" href="#" class="editable editable-pre-wrapped editable-click">'
         + _value
