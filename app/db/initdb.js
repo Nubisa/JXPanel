@@ -6,45 +6,50 @@
 // adds field definitions based on forms definitions
 
 
-var forms = require("../definitions/forms");
 var sqlite = require("./sqlite");
+var fs = require("fs");
+var path = require("path");
 
 
+var createFields = function (db, table, controls) {
 
-
-var createFields = function(db) {
-    for(var form_name in forms.forms) {
-        var fields = [];
-        var form = forms.forms[form_name];
-        for (var name in form.controls) {
-            var json = { field_name: name };
-            fields.push(json);
+    var fields = [];
+    for (var name in controls) {
+        if (controls[name].value_table === false) {
+            continue;
         }
-
-        console.log("fields", fields);
-        sqlite.User.AddNewFieldRules(db, fields, function (err) {
-            if (err) {
-                console.log("Error", err);
-            } else {
-                console.log("Fields Added");
-            }
-        })
+        var json = { field_name: name };
+        fields.push(json);
     }
+
+//    console.log(fields);
+
+    table.AddNewFieldRules(db, fields, function (err) {
+        if (err) {
+            console.log("Error", err);
+        } else {
+            console.log("Fields Added");
+        }
+    });
 };
 
 
-sqlite.CreateDatabase("./dbfile.db", function (err, db) {
-    if (err) {
-        console.error(err);
-        return;
+// waiting for sqlite to open db file
+setTimeout(function() {
+
+    if (sqlite.db) {
+        console.log("DB ready");
+        var fname = path.join(__dirname, "../definitions/forms/addUser");
+        var mod = require(fname);
+        var form = mod.form();
+        createFields(sqlite.db, sqlite.User, form.controls);
+
+        var fname = path.join(__dirname, "../definitions/forms/addPlan");
+        var mod = require(fname);
+        var form = mod.form();
+        createFields(sqlite.db, sqlite.Plan, form.controls);
     } else {
-        console.log("DB created OK.");
-
-        createFields(db);
+        console.log("DB was not opened");
     }
-
-});
-
-
-
+}, 1000);
 

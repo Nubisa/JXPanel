@@ -10,41 +10,72 @@ var path = require("path");
 
 exports.form = function () {
 
-    var func = function(){
+    var func = function () {
         this.name = path.basename(__filename, ".js");
 
-        this.controls = {
-            "person_name": {
-                label: "UserContactName",
-                method: tool.createTextBox,
-                options: { required: true, description : "Some description 2"}
+        this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
+
+        this.controls = [
+            {"BEGIN": "User Details"},
+
+            {
+                name: "person_name",
+                details: {
+                    label: "UserContactName",
+                    method: tool.createTextBox,
+                    options: { required: true, description: "Some description 2"}
+                }
             },
-            "person_email": {
-                label: "UserEmailAddress",
-                method: tool.createTextBox,
-                options: { required: true }
+
+            {
+                name: "person_email",
+                details: {
+                    label: "UserEmailAddress",
+                    method: tool.createTextBox,
+                    options: { required: true }
+                }
             },
-            "person_subscriptions": {
-                label: "UserSubscriptionAccess",
-                method: tool.createCheckList,
-                options: { values: ["ALL"] }
+
+            {
+                name: "person_subscriptions",
+                details: {
+                    label: "UserSubscriptionAccess",
+                    method: tool.createComboBox,
+                    options: { values: ["ALL"] }
+                }
             },
-            "person_lang": {
-                label: "UserPanelLanguage",
-                method: tool.createComboBox,
-                options: { values: ["EN"], description : "Some description" }
+
+            {
+                name: "person_lang",
+                details: {
+                    label: "UserPanelLanguage",
+                    method: tool.createComboBox,
+                    options: { values: ["EN"], description: "Some description" }
+                }
             },
-            "person_username": {
-                label: "Username",
-                method: tool.createTextBox,
-                options: { required: true, values: ["EN"]}
+
+            {
+                name: "person_username",
+                details: {
+                    label: "Username",
+                    method: tool.createTextBox,
+                    options: { required: true, values: ["EN"]},
+                    value_table: false
+                }
             },
-            "person_password": {
-                label: "Password",
-                method: tool.createTextBox,
-                options: { required: true, password: true }
-            }
-        };
+
+            {
+                name: "person_password",
+                details: {
+                    label: "Password",
+                    method: tool.createTextBox,
+                    options: { required: true, password: true },
+                    value_table: false
+                }
+            },
+
+            {"END": 1}
+        ];
     };
 
     func.prototype.apply = function (active_user, cb) {

@@ -14,13 +14,12 @@ var ifcs = os.networkInterfaces();
 var ifcv4_list = [];
 var ifcv6_list = [];
 
-var resetInterfaces = function(){
+var resetInterfaces = function () {
     ifcv4_list = [];
     for (var i in ifcs) {
         var arr = ifcs[i];
-        for(var o in arr){
-            if(arr[o])
-            {
+        for (var o in arr) {
+            if (arr[o]) {
                 if (arr[o].family === "IPv4")
                     ifcv4_list.push(arr[o].address);
 
@@ -32,45 +31,176 @@ var resetInterfaces = function(){
 }();
 
 
-
 exports.form = function () {
 
-    var func = function(){
+    var func = function () {
         this.name = path.basename(__filename, ".js");
 
-        this.controls = {
-            "sub_domain_name": {
-                label: "DomainName",
-                method: tool.createTextBox,
-                options: { required: true, prefix : "www."}
+        this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
+
+        this.controls = [
+            {"BEGIN": "User Details"},
+
+            {
+                name: "plan_name",
+                details: {
+                    label: "PlanName",
+                    method: tool.createTextBox,
+                    options: { required: true },
+                    value_table: false
+                }
             },
-            "sub_ipv4": {
-                label: "IPv4",
-                method: tool.createComboBox,
-                options: { required: true, values : ifcv4_list }
+
+            { name: "plan_overuse",
+                details: {
+                    label: "Overuse",
+                    method: tool.createCheckBox,
+                    options: { },
+                    validation: [ "bool" ]
+                }
             },
-            "sub_ipv6": {
-                label: "IPv6",
-                method: tool.createComboBox,
-                options: { required: true, values : ifcv6_list }
+
+            { name: "plan_disk_space",
+                details: {
+                    label: "MaxDiskSpace",
+                    method: tool.createTextBox,
+                    options: { suffix: " MB"},
+                    validation: [ "int", "gte" , 0 ]
+                }
             },
-            "sub_username": {
-                label: "Username",
-                method: tool.createTextBox,
-                options: { required: true, values: ["EN"]}
+
+            { name: "plan_traffic",
+                details: {
+                    label: "MaxTraffic",
+                    method: tool.createTextBox,
+                    options: { suffix: " MB/month"}
+                }
             },
-            "sub_password": {
-                label: "Password",
-                method: tool.createTextBox,
-                options: { required: true, password: true }
+
+            { name: "plan_memory",
+                details: {
+                    label: "MaxMemory",
+                    method: tool.createTextBox,
+                    options: { }
+                }
             },
-            "sub_repeatpassword": {
-                label: "PasswordRepeat",
-                method: tool.createTextBox,
-                options: { required: true, password: true },
-                db : false
-            }
-        };
+
+            { name: "plan_cpu",
+                details: {
+                    label: "MaxCPU",
+                    method: tool.createTextBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_cpu_interval",
+                details: {
+                    label: "MaxCPUInterval",
+                    method: tool.createTextBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_domain_count",
+                details: {
+                    label: "MaxDomains",
+                    method: tool.createTextBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_ssl",
+                details: {
+                    label: "AllowSSL",
+                    method: tool.createCheckBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_custom_socket",
+                details: {
+                    label: "AllowCustomSocketPort",
+                    method: tool.createCheckBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_sys_exec",
+                details: {
+                    label: "AllowSysExec",
+                    method: tool.createCheckBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_local_native_modules",
+                details: {
+                    label: "AllowLocalNativeModules",
+                    method: tool.createCheckBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_app_log_web_access",
+                details: {
+                    label: "AppLogWebAccess",
+                    method: tool.createCheckBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_ssh",
+                details: {
+                    label: "AllowSSH",
+                    method: tool.createCheckBox,
+                    options: { }
+                }
+            },
+
+            { name: "plan_nginx_directives",
+                details: {
+                    label: "NginxDirectives",
+                    method: tool.createTextBox,
+                    options: { multiline : true }
+                }
+            },
+
+
+            // do not remove this yet, may be useful
+//            "sub_domain_name": {
+//                label: "DomainName",
+//                method: tool.createTextBox,
+//                options: { required: true, prefix : "www."}
+//            },
+//            "sub_ipv4": {
+//                label: "IPv4",
+//                method: tool.createComboBox,
+//                options: { required: true, values : ifcv4_list }
+//            },
+//            "sub_ipv6": {
+//                label: "IPv6",
+//                method: tool.createComboBox,
+//                options: { required: true, values : ifcv6_list }
+//            },
+//            "sub_username": {
+//                label: "Username",
+//                method: tool.createTextBox,
+//                options: { required: true, values: ["EN"]}
+//            },
+//            "sub_password": {
+//                label: "Password",
+//                method: tool.createTextBox,
+//                options: { required: true, password: true }
+//            },
+//            "sub_repeatpassword": {
+//                label: "PasswordRepeat",
+//                method: tool.createTextBox,
+//                options: { required: true, password: true },
+//                db : false
+//            }
+
+            {"END" : 1}
+        ];
     };
 
     func.prototype.apply = function (active_user, cb) {
@@ -81,15 +211,17 @@ exports.form = function () {
 
         for (var name in _controls) {
             var ctrl = _controls[name];
+//            console.log(name, name, "value", userForm[name]);
             if (ctrl.options) {
                 if (ctrl.options.required && (!userForm || !userForm[name])) {
                     cb(form_lang.Get(active_user.lang, "ValueRequired") + ": `" + form_lang.Get(active_user.lang, ctrl.label) + "`.");
+//                    console.log("NO VALUE");
                     return;
                 }
             }
         }
 
-        var addUser = function() {
+        var addPlan = function () {
             // if arrived here - required fields are non empty
 
             var errors = [];
@@ -100,31 +232,37 @@ exports.form = function () {
                     errors.push(err);
                     console.error(err);
                 }
-                if (len===0) {
+                if (len === 0) {
                     cb(null);
                 }
 
             };
 
-            var crypto = require('crypto');
-            var encrypted = crypto.createHash('md5').update(userForm["person_password"]).digest('hex').toString();
+            sqlite.Plan.AddNew(sqlite.db, { plan_name: userForm["plan_name"] }, function (err, id) {
 
-
-            sqlite.User.AddNew(sqlite.db, { username : userForm["person_username"], password : encrypted }, function(err, id) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log("OK");
+                }
                 for (var name in userForm) {
                     // only for defined columns
                     if (_controls[name]) {
-                        sqlite.User.AddNewFieldValue2(sqlite.db, id, name, userForm[name], _cb);
+                        var addValue = _controls[name].value_table !== false;
+                        if (addValue) {
+                            console.log("adding plan value", name, userForm[name]);
+                            sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, userForm[name], _cb);
+                        }
                     }
                 }
             });
         };
 
-        sqlite.User.Get(sqlite.db, { username : userForm["person_username"]}, function(err, rows) {
+        sqlite.Plan.Get(sqlite.db, { username: userForm["plan_name"]}, function (err, rows) {
             if (!err && rows && rows.length) {
-                cb("User already exists.")
+                cb("Plan with this name already exists.")
             } else {
-                addUser();
+                addPlan();
             }
         })
 
