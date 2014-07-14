@@ -6,13 +6,18 @@ exports.begin = ''
     +'<tbody>';
 
 
-var getRequiredCheck = function(lang, options) {
-
-    if (options && options.required) {
-        return "if ($.trim(_value) == '') return '" + form_lang.Get(lang, "ValueRequired") + "';"
+var getData = function(lang, options) {
+    var ret = { prefix : "", description: ""};
+    if (!options) {
+        return ret;
     }
 
-    return "";
+    ret.description = options.description ? "<br><div class=\"note\">" + form_lang.Get(lang, options.description) : "</div>";
+    ret.prefix = options.prefix || "";
+    ret.required = options.required ? ' <span style="color: #b94a48">*</span>' : "";
+    ret.requiredCheck = options.required ? "if ($.trim(_value) == '') return '" + form_lang.Get(lang, "ValueRequired") + "';" : "";
+
+    return ret;
 };
 
 
@@ -23,11 +28,12 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    if (options && options.required) label += ' <span style="color: #b94a48">*</span>';
+    var data = getData(lang, options);
 
     var base_input = '<tr>'
-        +'<td style="width:35%;">' + label +'</td>'
+        +'<td style="width:35%;">' + label + data.required +'</td>'
         +'<td style="width:65%">'
+        + data.prefix
         +'<a data-original-title="'
         + _title
         +'" data-pk="1" data-type="'
@@ -36,7 +42,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
         + input_id
         +'" href="#" class="editable editable-click">'
         + _value
-        +'</a></td></tr>';
+        +'</a>'+data.description+'</td></tr>\n';
 
     var _validate = function(_value){
         /*text*/
@@ -48,7 +54,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
 
     _validate += ";;;";
     _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", getRequiredCheck(lang, options));
+    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
     var base_script = "$('#"+input_id+"').editable(" +
         JSON.stringify({
@@ -88,9 +94,12 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, option
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
+    var data = getData(lang, options);
+
     var base_input = '<tr>'
-        + '<td style="width:35%;">' + label + '</td>'
+        +'<td style="width:35%;">' + label + data.required +'</td>'
         + '<td style="width:65%">'
+        + data.prefix
         + '<a data-original-title="'
         + _title
         + '" data-pk="1" data-type="'
@@ -101,7 +110,7 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, option
         + _valueId
         + '" href="#" class="editable editable-click">'
         + _valueStr
-        + '</a></td></tr>\n';
+        +'</a>'+data.description+'</td></tr>\n';
 
     var _validate = function (_value) {
         var obj = {form: _this.form, key: _this.name, value: _value};
@@ -112,6 +121,7 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, option
 
     _validate += ";;;";
     _validate = _validate.replace("_this.name", '"' + input_id + '"');
+    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
     var source = [];
     if (options && options.values && options.values.length) {
@@ -164,9 +174,12 @@ exports.createTextArea = function(label, _title, input_id, _value, lang, options
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
+    var data = getData(lang, options);
+
     var base_input = '<tr>'
-        +'<td style="width:35%;">' + label +'</td>'
+        +'<td style="width:35%;">' + label + data.required +'</td>'
         +'<td style="width:65%">'
+        + data.prefix
         +'<a data-original-title="'
         + _title
         +'" data-pk="1" data-type="'
@@ -175,7 +188,7 @@ exports.createTextArea = function(label, _title, input_id, _value, lang, options
         + input_id
         +'" href="#" class="editable editable-pre-wrapped editable-click">'
         + _value
-        +'</a></td></tr>';
+        +'</a>'+data.description+'</td></tr>\n';
 
     var _validate = function(_value){
         /*text*/
@@ -187,7 +200,7 @@ exports.createTextArea = function(label, _title, input_id, _value, lang, options
 
     _validate += ";;;";
     _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", getRequiredCheck(lang, options));
+    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
     var base_script = "$('#"+input_id+"').editable(" +
         JSON.stringify({
@@ -232,9 +245,12 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, optio
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
+    var data = getData(lang, options);
+
     var base_input = '<tr>'
-        + '<td style="width:35%;">' + label + '</td>'
+        +'<td style="width:35%;">' + label + data.required +'</td>'
         + '<td style="width:65%">'
+        + data.prefix
         + '<a data-original-title="'
         + _title
         + '" data-pk="1" data-type="'
@@ -245,7 +261,7 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, optio
         + _valueIDs
         + '" href="#" class="editable editable-click">'
         + _valueStr
-        + '</a></td></tr>\n';
+        +'</a>'+data.description+'</td></tr>\n';
 
     var _validate = function (_value) {
         var obj = {form: _this.form, key: _this.name, value: _value};
@@ -256,6 +272,7 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, optio
 
     _validate += ";;;";
     _validate = _validate.replace("_this.name", '"' + input_id + '"');
+    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
     var source = [];
     if (options && options.values && options.values.length) {
@@ -311,9 +328,12 @@ exports.createTags = function (label, _title, input_id, _value, lang, options) {
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
+    var data = getData(lang, options);
+
     var base_input = '<tr>'
-        + '<td style="width:35%;">' + label + '</td>'
+        +'<td style="width:35%;">' + label + data.required +'</td>'
         + '<td style="width:65%">'
+        + data.prefix
         + '<a data-original-title="'
         + _title
         + '" data-pk="1" data-type="'
@@ -324,7 +344,7 @@ exports.createTags = function (label, _title, input_id, _value, lang, options) {
         + _valueIds
         + '" href="#" class="editable editable-click">'
         + _valueStr
-        + '</a></td></tr>\n';
+        +'</a>'+data.description+'</td></tr>\n';
 
     var _validate = function (_value) {
         var obj = {form: _this.form, key: _this.name, value: _value};
@@ -335,6 +355,7 @@ exports.createTags = function (label, _title, input_id, _value, lang, options) {
 
     _validate += ";;;";
     _validate = _validate.replace("_this.name", '"' + input_id + '"');
+    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
     var base_script = "$('#" + input_id + "').editable(" +
         JSON.stringify(
@@ -371,9 +392,12 @@ exports.createComboDate = function (label, _title, input_id, _value, lang, optio
     var format = options && options.format || "";
     var _format = format.replace(/([./-])/g, " $1 ");
 
+    var data = getData(lang, options);
+
     var base_input = '<tr>'
-        + '<td style="width:35%;">' + label + '</td>'
+        +'<td style="width:35%;">' + label + data.required +'</td>'
         + '<td style="width:65%">'
+        + data.prefix
         + '<a data-original-title="'
         + _title
         + '" data-pk="1" data-type="'
@@ -383,7 +407,7 @@ exports.createComboDate = function (label, _title, input_id, _value, lang, optio
         + input_id
         + '" href="#" class="editable editable-click">'
         + _value
-        + '</a></td></tr>';
+        +'</a>'+data.description+'</td></tr>\n';
 
     var _validate = function (_value) {
         var obj = {form: _this.form, key: _this.name, value: _value};
@@ -394,6 +418,7 @@ exports.createComboDate = function (label, _title, input_id, _value, lang, optio
 
     _validate += ";;;";
     _validate = _validate.replace("_this.name", '"' + input_id + '"');
+    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
     var base_script = "$('#" + input_id + "').editable(" +
         JSON.stringify({

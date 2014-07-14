@@ -23,6 +23,7 @@ exports.Labels = {
 
     // Form names
     "addUser" : "Add new user",
+    "addSubscription" : "Add new subscription",
 
     // login page
     "SignIn" : "Sign In",
@@ -34,6 +35,7 @@ exports.Labels = {
     "Password" : "Password",
     "PasswordForgot" : "Forgot password?",
     "PasswordConfirm" : "Confirm password",
+    "PasswordRepeat" : "Repeat password",
     "PasswordEnter" : "Enter your password",
     "PasswordEnterRequired" : "Please enter your password",
 
@@ -54,7 +56,13 @@ exports.Labels = {
 
     // Pages
     "Subscription" : "Subscription Management",
-    "Users" : "User Management"
+    "Users" : "User Management",
+
+
+    "DomainName" : "Domain",
+    "DomainNameDescription" : "The domain name for you subscription.",
+    "IPv4" : "IPv4 address",
+    "IPv6" : "IPv6 address"
 };
 
 

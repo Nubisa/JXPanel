@@ -56,7 +56,7 @@ methods.sessionApply = function(env, params){
         }
 
         var active_user = checkUser(env);
-        console.log("sessionApply - form", active_user.session.forms[params.form]);
+//        console.log("sessionApply - form", active_user.session.forms[params.form]);
     }
     else {
         server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Nothing to Apply")});

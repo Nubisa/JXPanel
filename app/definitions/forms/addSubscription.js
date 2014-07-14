@@ -8,41 +8,67 @@ var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
 
 
+var os = require('os');
+var ifcs = os.networkInterfaces();
+
+var ifcv4_list = [];
+var ifcv6_list = [];
+
+var resetInterfaces = function(){
+    ifcv4_list = [];
+    for (var i in ifcs) {
+        var arr = ifcs[i];
+        for(var o in arr){
+            if(arr[o])
+            {
+                if (arr[o].family === "IPv4")
+                    ifcv4_list.push(arr[o].address);
+
+                if (arr[o].family === "IPv6")
+                    ifcv6_list.push(arr[o].address);
+            }
+        }
+    }
+}();
+
+
+
 exports.form = function () {
 
     var func = function(){
         this.name = path.basename(__filename, ".js");
 
         this.controls = {
-            "person_name": {
-                label: "UserContactName",
+            "sub_domain_name": {
+                label: "DomainName",
                 method: tool.createTextBox,
-                options: { required: true, description : "Some description 2"}
+                options: { required: true, description : "DomainNameDescription", prefix : "www."}
             },
-            "person_email": {
-                label: "UserEmailAddress",
-                method: tool.createTextBox,
-                options: { required: true }
-            },
-            "person_subscriptions": {
-                label: "UserSubscriptionAccess",
-                method: tool.createCheckList,
-                options: { values: ["ALL"] }
-            },
-            "person_lang": {
-                label: "UserPanelLanguage",
+            "sub_ipv4": {
+                label: "IPv4",
                 method: tool.createComboBox,
-                options: { values: ["EN"], description : "Some description" }
+                options: { required: true, values : ifcv4_list }
             },
-            "person_username": {
+            "sub_ipv6": {
+                label: "IPv6",
+                method: tool.createComboBox,
+                options: { required: true, values : ifcv6_list }
+            },
+            "sub_username": {
                 label: "Username",
                 method: tool.createTextBox,
                 options: { required: true, values: ["EN"]}
             },
-            "person_password": {
+            "sub_password": {
                 label: "Password",
                 method: tool.createTextBox,
                 options: { required: true, password: true }
+            },
+            "sub_repeatpassword": {
+                label: "PasswordRepeat",
+                method: tool.createTextBox,
+                options: { required: true, password: true },
+                db : false
             }
         };
     };

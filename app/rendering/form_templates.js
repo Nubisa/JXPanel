@@ -55,15 +55,13 @@ var logic = [
 
 exports.renderForm = function(sessionId, formName){
     var html = "";
-
-    var activeForm = require('../definitions/forms/' + formName).form();
-
     var active_user = _active_user.getUser(sessionId);
 
     var lang = active_user.lang;
     if(!active_user.session.forms[formName])
         active_user.session.forms[formName] = {};
 
+    var activeForm = require('../definitions/forms/' + formName).form();
     active_user.session.forms[formName].activeInstance = activeForm;
 
     var controls = activeForm.controls;
