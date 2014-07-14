@@ -1,10 +1,6 @@
 var form_lang = require('../definitions/form_lang');
 
-exports.begin = ''
-    +'<script>if(!window.renderForms){window.renderForms=[function(){$.fn.editable.defaults.mode = "inline";}];};</script>'
-    +'<table style="clear: both" class="table table-bordered table-striped" id="user">'
-    +'<tbody>';
-
+exports.begin = '<form class="form-horizontal">';
 
 var getData = function(label, _title, input_id, lang, options) {
     var ret = { prefix : "", description: ""};
@@ -12,16 +8,28 @@ var getData = function(label, _title, input_id, lang, options) {
         return ret;
     }
 
-    var desc = form_lang.Get(lang, label + "_Description", false);
+    var desc = form_lang.Get(lang, label + "_Description");
 
-    console.log("getData, label", label, desc);
-
-    ret.description = desc ? "<br><div class=\"note\">" + desc : "</div>";
+    ret.description = !desc?options.description:desc;
     ret.prefix = options.prefix || "";
-    ret.required = options.required ? ' <span style="color: #b94a48">*</span>' : "";
-    ret.requiredCheck = options.required ? "if ($.trim(_value) == '') return '" + form_lang.Get(lang, "ValueRequired") + "';" : "";
+    ret.required = options.required;
 
     return ret;
+};
+
+
+exports.createLegend = function(label){
+    return {html:"<legend>"+label+"</legend>", js:""};
+};
+
+
+exports.startFieldSet = function(){
+    return "<fieldset>";
+};
+
+
+exports.endFieldSet = function(){
+    return "</fieldset>";
 };
 
 
@@ -29,417 +37,131 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
 
     var data = getData(label, _title, input_id, lang, options);
 
-    _valueStr = _value ? _value : "";
-    _value = _value || form_lang.Get(lang, "Empty");
+    _value = _value || "";
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    var base_input = '<tr>'
-        +'<td style="width:35%;">' + label + data.required +'</td>'
-        +'<td style="width:65%">'
-        + data.prefix
-        +'<a data-original-title="'
-        + _title
-        +'" data-pk="1" data-type="'
-        + (options && options.password ? 'password' : 'text')
-        +'" data-value="'+ _valueStr +'" id="'
-        + input_id
-        +'" href="#" class="editable editable-click">'
-        + _value
-        +'</a>'+data.description+'</td></tr>\n';
+    var _type = "text";
+    if(options.password)
+        _type = "password";
+    else if(options.multiline){
+        _type = "textarea";
+    }
 
-    var _validate = function(_value){
-        /*text*/
-        var obj = {form:_this.form, key:_this.name, value:_value};
-        jxcore.Call("sessionAdd", obj , function(param){
-            alert("CALLBACK:: " + param)
-        });
-    };
+    var req_label = "";
+    if(data.required){
+        req_label = "&nbsp;<span style='color:red;'>*</span>";
+    }
+    else
+        req_label = "&nbsp;<span style='color:red;'>&nbsp;</span>";
 
-    _validate += ";;;";
-    _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", data.requiredCheck);
+    var _html = '<div class="form-group">'
+        +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
+        +'<div class="col-md-10">';
 
-    var base_script = "$('#"+input_id+"').editable(" +
-        JSON.stringify({
-        type: 'text',
-        pk: 1,
-        name: input_id,
-        title: _title,
-        validate:_validate
-    }) + ");";
-    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
-        .replace(/\\n/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\"/g, "\"")
-        .replace(new RegExp("};;;\"", "g"), "}");
+    if(!options.multiline)
+        _html += '<input id="'+input_id+'" class="form-control" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
+    else{
+        var _rows = options.rows ? options.rows:5;
+        _html += '<textarea id="'+input_id+'" class="form-control" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
+    }
 
-    return {html:base_input, js:base_script};
+    if(data.description)
+        _html += '<p class="note">'+data.description+'</p>';
+
+    _html +=
+         '</div>'
+        +'</div>';
+
+    var _js = "window.jxForms[_form_name].controls['" + input_id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+
+    return {html:_html, js:_js};
 };
 
-
-exports.createComboBox = function (label, _title, input_id, _value, lang, options) {
+exports.createComboBox = function(label, _title, input_id, _value, lang, options){
 
     var data = getData(label, _title, input_id, lang, options);
 
-    var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
-
-    var _valueId = ""
-    var _valueStr = _empty;
-
-    if (_value && _value.trim() && options && options.values) {
-            var pos = options.values.indexOf(_value);
-            if (pos > -1) {
-                _valueId = _value;
-                _valueStr = _value;
-            } else {
-                _valueStr = _empty;
-            }
-    }
-
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    var base_input = '<tr>'
-        +'<td style="width:35%;">' + label + data.required +'</td>'
-        + '<td style="width:65%">'
-        + data.prefix
-        + '<a data-original-title="'
-        + _title
-        + '" data-pk="1" data-type="'
-        + 'select'
-        + '" id="'
-        + input_id
-        + '"  data-value="'
-        + _valueId
-        + '" href="#" class="editable editable-click">'
-        + _valueStr
-        +'</a>'+data.description+'</td></tr>\n';
+    var req_label = "";
+    if(data.required){
+        req_label = "&nbsp;<span style='color:red;'>*</span>";
+    }
+    else
+        req_label = "&nbsp;<span style='color:red;'>&nbsp;</span>";
 
-    var _validate = function (_value) {
-        var obj = {form: _this.form, key: _this.name, value: _value};
-        jxcore.Call("sessionAdd", obj, function (param) {
-            alert("CALLBACK:: " + param)
-        });
-    };
+    var _html = '<div class="form-group">'
+        +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
+        +'<div class="col-md-10">';
 
-    _validate += ";;;";
-    _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", data.requiredCheck);
 
-    var source = [];
-    if (options && options.values && options.values.length) {
-        for(var id in options.values) {
-            var c = parseInt(id) + 1;
-            source.push( { value: options.values[id], text: options.values[id]} )
+    _html += '<select class="form-control" id="'+input_id+'"><option>'+form_lang.Get(lang, "ComboNotSelected")+'</option>';
+
+    if(options && options.values){
+        for(var o in options.values){
+            var str = "value='"+options.values[o]+"' ";
+            if(_value && _value.trim().length){
+                if(options.values[o] == _value)
+                    str += " selected";
+            }
+            _html += "<option " + str + ">" + options.values[o] + "</option>";
         }
     }
 
-    var base_script = "$('#" + input_id + "').editable(" +
-        JSON.stringify(
+    _html += "</select>";
 
-            { prepend: _empty,
-                source: source,
-                display: function (value, sourceData) {
-                    var colors = {
-                        "": "gray",
-                        1: "green",
-                        2: "blue"
-                    }, elem = $.grep(sourceData, function (o) {
-                        return o.value == value;
-                    });
+    if(data.description)
+        _html += '<p class="note">'+data.description+'</p>';
 
-                    if (elem.length) {
-                        $(this).text(elem[0].text).css("color", colors[value]);
-                    } else {
-                        $(this).empty();
-                    }
-                },
+    _html +=
+        '</div>'
+        +'</div>';
 
-                pk: 1,
-                name: input_id,
-                title: _title,
-                validate: _validate
-            }
-        ) + ");";
-    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
-        .replace(/\\n/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\"/g, "\"")
-        .replace(new RegExp("};;;\"", "g"), "}");
+    var _js = "window.jxForms[_form_name].controls['" + input_id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"' };";
 
-    return {html: base_input, js: base_script};
+    return {html:_html, js:_js};
 };
 
-exports.createTextArea = function(label, _title, input_id, _value, lang, options){
+// <input type="checkbox" class="checkbox style-0" checked="checked">
+exports.createCheckBox = function(label, _title, input_id, _value, lang, options){
 
     var data = getData(label, _title, input_id, lang, options);
 
-    _valueStr = _value ? _value : "";
-    _value = _value || form_lang.Get(lang, "Empty");
+    _value = !_value?  "" : "checked='checked'";
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    var base_input = '<tr>'
-        +'<td style="width:35%;">' + label + data.required +'</td>'
-        +'<td style="width:65%">'
-        + data.prefix
-        +'<a data-original-title="'
-        + _title
-        +'" data-pk="1" data-type="'
-        +'textarea'
-        +'" data-value="'+ _valueStr +'" id="'
-        + input_id
-        +'" href="#" class="editable editable-pre-wrapped editable-click">'
-        + _value
-        +'</a>'+data.description+'</td></tr>\n';
+    var _type = "checkbox";
 
-    var _validate = function(_value){
-        /*text*/
-        var obj = {form:_this.form, key:_this.name, value:_value};
-        jxcore.Call("sessionAdd", obj , function(param){
-            alert("CALLBACK:: " + param)
-        });
-    };
-
-    _validate += ";;;";
-    _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", data.requiredCheck);
-
-    var base_script = "$('#"+input_id+"').editable(" +
-        JSON.stringify({
-            showbuttons: 'bottom',
-            pk: 1,
-            name: input_id,
-            title: _title,
-            validate:_validate
-        }) + ");";
-    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
-        .replace(/\\n/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\"/g, "\"")
-        .replace(new RegExp("};;;\"", "g"), "}");
-
-    return {html:base_input, js:base_script};
-};
-
-exports.createCheckList = function (label, _title, input_id, _value, lang, options) {
-
-    var data = getData(label, _title, input_id, lang, options);
-
-    var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
-    var _arrStr = [];
-
-    if (_value && _value.trim() && options && options.values) {
-        var arr = _value.split(",");
-
-        for(var a in arr) {
-            var pos = options.values.indexOf(arr[a]);
-            if (pos > -1) {
-                _arrStr.push(arr[a]);
-            }
-        }
+    var req_label = "";
+    if(data.required){
+        req_label = "&nbsp;<span style='color:red;'>*</span>";
     }
+    else
+        req_label = "&nbsp;<span style='color:red;'>&nbsp;</span>";
 
-    var _valueIDs = "";
-    var _valueStr = _empty;
-    if (_arrStr.length) {
-        _valueIDs = _arrStr.join(",");
-        _valueStr = _arrStr.join("<br>");
-    }
 
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
+    var _html = '<div class="form-group">'
+        + '<label class="col-md-2 control-label">'+label + req_label + '</label><div class="col-md-10">'
+        + '<div class="checkbox"><label>';
 
-    var base_input = '<tr>'
-        +'<td style="width:35%;">' + label + data.required +'</td>'
-        + '<td style="width:65%">'
-        + data.prefix
-        + '<a data-original-title="'
-        + _title
-        + '" data-pk="1" data-type="'
-        + 'checklist'
-        + '" id="'
-        + input_id
-        + '"  data-value="'
-        + _valueIDs
-        + '" href="#" class="editable editable-click">'
-        + _valueStr
-        +'</a>'+data.description+'</td></tr>\n';
 
-    var _validate = function (_value) {
-        var obj = {form: _this.form, key: _this.name, value: _value};
-        jxcore.Call("sessionAdd", obj, function (param) {
-            alert("CALLBACK:: " + param)
-        });
-    };
+    _html += '<input id="'+input_id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
 
-    _validate += ";;;";
-    _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", data.requiredCheck);
+    _html += '<span>&nbsp;</span></label></div>';
 
-    var source = [];
-    if (options && options.values && options.values.length) {
-        for(var id in options.values) {
-            var c = parseInt(id) + 1;
-            source.push( { value: options.values[id], text: options.values[id]} )
-        }
-    }
+    if(data.description)
+        _html += '<p class="note">'+data.description+'</p>';
 
-    var base_script = "$('#" + input_id + "').editable(" +
-        JSON.stringify(
-            {
-                source: source,
-                pk: 1,
-                name: input_id,
-                title: _title,
-                validate: _validate
-            }
-        ) + ");";
-    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
-        .replace(/\\n/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\"/g, "\"")
-        .replace(new RegExp("};;;\"", "g"), "}");
+    _html +=
+        '</div></div>';
 
-    return {html: base_input, js: base_script};
+    var _js = "window.jxForms[_form_name].controls['" + input_id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+
+    return {html:_html, js:_js};
 };
 
 
-exports.createTags = function (label, _title, input_id, _value, lang, options) {
-
-    var data = getData(label, _title, input_id, lang, options);
-
-    var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
-    var _arrStr = [];
-
-    if (_value && _value.trim() && options && options.values) {
-        var arr = _value.split(",");
-
-        for(var a in arr) {
-            var pos = options.values.indexOf(arr[a]);
-            if (pos > -1) {
-                _arrStr.push(arr[a]);
-            }
-        }
-    }
-
-    var _valueIds = "";
-    var _valueStr = _empty;
-    if (_arrStr.length) {
-        _valueIds = _arrStr.join(",");
-        _valueStr = _arrStr.join("<br>");
-    }
-
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
-
-    var base_input = '<tr>'
-        +'<td style="width:35%;">' + label + data.required +'</td>'
-        + '<td style="width:65%">'
-        + data.prefix
-        + '<a data-original-title="'
-        + _title
-        + '" data-pk="1" data-type="'
-        + 'select2'
-        + '" id="'
-        + input_id
-        + '"  data-value="'
-        + _valueIds
-        + '" href="#" class="editable editable-click">'
-        + _valueStr
-        +'</a>'+data.description+'</td></tr>\n';
-
-    var _validate = function (_value) {
-        var obj = {form: _this.form, key: _this.name, value: _value};
-        jxcore.Call("sessionAdd", obj, function (param) {
-            alert("CALLBACK:: " + param)
-        });
-    };
-
-    _validate += ";;;";
-    _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", data.requiredCheck);
-
-    var base_script = "$('#" + input_id + "').editable(" +
-        JSON.stringify(
-
-            {
-                inputclass: 'input-large',
-                select2: {
-                    tags: options.values,
-                    tokenSeparators: [",", " "]
-                },
-
-                pk: 1,
-                name: input_id,
-                title: _title,
-                validate: _validate
-            }
-        ) + ");";
-    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
-        .replace(/\\n/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\"/g, "\"")
-        .replace(new RegExp("};;;\"", "g"), "}");
-
-    return {html: base_input, js: base_script};
-};
-
-
-exports.createComboDate = function (label, _title, input_id, _value, lang, options) {
-
-    var data = getData(label, _title, input_id, lang, options);
-
-    _value = _value || form_lang.Get(lang, "Empty");
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
-
-    var format = options && options.format || "";
-    var _format = format.replace(/([./-])/g, " $1 ");
-
-    var base_input = '<tr>'
-        +'<td style="width:35%;">' + label + data.required +'</td>'
-        + '<td style="width:65%">'
-        + data.prefix
-        + '<a data-original-title="'
-        + _title
-        + '" data-pk="1" data-type="'
-        + 'combodate'
-        + '" data-template="' + _format + '" data-viewformat="' + format + '" data-format="' + format + '" data-value="' + _value
-        + '" id="'
-        + input_id
-        + '" href="#" class="editable editable-click">'
-        + _value
-        +'</a>'+data.description+'</td></tr>\n';
-
-    var _validate = function (_value) {
-        var obj = {form: _this.form, key: _this.name, value: _value};
-        jxcore.Call("sessionAdd", obj, function (param) {
-            alert("CALLBACK:: " + param)
-        });
-    };
-
-    _validate += ";;;";
-    _validate = _validate.replace("_this.name", '"' + input_id + '"');
-    _validate = _validate.replace("/*text*/", data.requiredCheck);
-
-    var base_script = "$('#" + input_id + "').editable(" +
-        JSON.stringify({
-
-            pk: 1,
-            name: input_id,
-            title: _title,
-            validate: _validate
-        }) + ");";
-    base_script = base_script.replace(new RegExp("\"function", "g"), "function")
-        .replace(/\\n/g, " ")
-        .replace(/\\t/g, " ")
-        .replace(/\\\"/g, "\"")
-        .replace(new RegExp("};;;\"", "g"), "}");
-
-    return {html: base_input, js: base_script};
-};
-
-exports.end = "</tbody></table>";
-
+exports.end = "</fieldset></form>";

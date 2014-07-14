@@ -47,7 +47,15 @@ exports.addUser_Test = function(sessionId){
 
 
 var logic = [
+    {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
+        var active_user = gl.active_user;
+        var res = form_lang.Get(active_user.lang, val);
+        return !res?"":res;}
+    },
     {from:"{{form.##}}", to:"##", "#":function(val, gl){
+        if(val == "id")
+            return gl.name;
+
         return form_lang.Get(gl.lang, gl[val], true);
     }}
 ];
@@ -67,36 +75,50 @@ exports.renderForm = function(sessionId, formName){
     var controls = activeForm.controls;
 
     var arr = [];
-    for(var name in controls) {
-        var ctrl = controls[name];
-        var json = {
-            name: name,
-            val: ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, null, lang, ctrl.options)
-        };
-        arr.push(json);
+    for(var i in controls) {
+
+        if(controls[i].BEGIN != undefined){
+            arr.push({html:tool.startFieldSet(), js:""});
+            if(controls[i].BEGIN){
+                arr.push(tool.createLegend( form_lang.Get(active_user.lang, controls[i].BEGIN, true) ));
+            }
+            continue;
+        }
+
+        if(controls[i].END != undefined){
+            arr.push({html:tool.endFieldSet(), js:""});
+            continue;
+        }
+
+        var name = controls[i].name;
+        var ctrl = controls[i].details;
+
+        arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, null, lang, ctrl.options));
     }
 
     for(var o in arr)
-        html += arr[o].val.html;
+        html += arr[o].html;
 
-    var submit = '<br><button class="btn btn-primary" type="button" onclick="jxcore.Call(\'sessionApply\', { form : \'' + formName + '\' }, function (param) { window.jxAddMessage(param.err ? \'danger\' : \'success\', param.err ? param.err : JSON.stringify(param))});">' + form_lang.Get(lang, "Apply") + '</button>';
+    var scr = "{ var _form_name='"+formName+"';";
 
-    var scr = "";
-
-    for(var o in arr){
-        scr += "{var _this = {form:'"+ formName +"', name:'" + arr[o].name +"'};";
-        scr += arr[o].val.js;
-        scr += "}";
+    for(var o in arr)
+    {
+        scr += arr[o].js;
     }
 
-    var fstr = tool.begin + html + tool.end + submit + "<script>window.renderForms.push(function() {"+scr+"});</script>";
+    scr += "}";
+
+    var fstr = tool.begin + html + tool.end + "<script>"+scr+"</script>";
 
     var containerFile = path.join(__dirname, "../definitions/forms/container.html");
 
     if (fs.existsSync(containerFile)) {
         var widget = fs.readFileSync(containerFile).toString();
-        logic.globals = { name: formName, contents: fstr };
-        return rep(widget, logic);
+        var _icon = (!activeForm.icon)? "": activeForm.icon;
+        logic.globals = { name: formName, contents: fstr, active_user:active_user, icon:_icon };
+        var result = rep(widget, logic);
+
+        return result;
     } else {
         return fstr;
     }

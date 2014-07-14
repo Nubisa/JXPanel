@@ -19,6 +19,5 @@ exports.Get = function(lang, val, notNull){
     if(langs.EN[val])
         return langs.EN[val];
 
-
     return notNull ? val : null;
 };

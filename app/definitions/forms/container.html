@@ -1,83 +1,134 @@
-<!-- widget grid -->
-<section id="widget-grid" class="">
+<article class="col-sm-12 col-md-12 col-lg-6">
 
-    <!-- row -->
-    <div class="row">
+    <script>
+        if(!window.jxForms){
+            window.jxForms = {};
+        }
 
-        <!-- NEW WIDGET START -->
-        <article class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        window.jxForms["{{form.id}}"] = {
+            controls:{},
+            apply:function(){
+                var _this = window.jxForms["{{form.id}}"];
 
-<!-- Widget ID (each widget will need unique ID)-->
-<div class="jarviswidget" id="wid-id-3" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-togglebutton="false" data-widget-deletebutton="false">
-    <!-- widget options:
-        usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
+                var values = {};
+                var failed = false;
+                window.jxAddMessage();
 
-        data-widget-colorbutton="false"
-        data-widget-editbutton="false"
-        data-widget-togglebutton="false"
-        data-widget-deletebutton="false"
-        data-widget-fullscreenbutton="false"
-        data-widget-custombutton="false"
-        data-widget-collapsed="true"
-        data-widget-sortable="false"
+                for(var o in _this.controls){
+                    var type = _this.controls[o].type;
+                    var required = _this.controls[o].required;
+                    var name = _this.controls[o].name;
 
-    -->
-    <header>
-        <h2><strong>{{form.name}}</strong></h2>
+                    if(type == 'text' || type == 'password' || type == 'textarea'){
+                        values[o] = document.getElementById(o).value;
+                        if(required && !values[o].trim().length){
+                            window.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
+                            failed = true;
+                        }
+                    }
+                    else if (type == 'select'){
+                        var index = document.getElementById(o).selectedIndex;
+                        var value = document.getElementById(o).value;
 
-    </header>
+                        if(required && index <= 0){
+                            window.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
+                            failed = true;
+                        }
+                        else{
+                            if(index<=0)
+                                values[o] = "";
+                            else
+                                values[o] = value;
+                        }
+                    }
+                    else if (type == 'checkbox'){
+                        var value = document.getElementById(o).checked;
+                        if(value){
+                            if(value.substr){
+                                if(value == "checked")
+                                {
+                                    value = true;
+                                }
+                                else
+                                    value = false;
+                            }
+                            else
+                                value = true;
+                        }
+                        else
+                            value = false;
 
-    <!-- widget div-->
-    <div>
+                        if(required && !value){
+                            window.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
+                            failed = true;
+                        }
+                        else{
+                            values[o] = value;
+                        }
+                    }
+                }
 
-        <!-- widget edit box -->
-        <div class="jarviswidget-editbox">
-            <!-- This area used as dropdown edit box -->
+                if(!failed){
+                    jxcore.Call('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
+                        window.jxAddMessage(param.err ? 'danger' : 'success', param.err ? param.err : JSON.stringify(param));
+                    });
+                }
+            }
+        };
+    </script>
+    <!-- Widget ID (each widget will need unique ID)-->
+    <div class="jarviswidget" id="wid-id-0" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
+
+        <header>
+            {{form.icon}}
+            <h2><strong>{{form.name}}</strong></h2>
+
+        </header>
+
+        <!-- widget div-->
+        <div>
+
+            <!-- widget edit box -->
+            <div class="jarviswidget-editbox">
+                <!-- This area used as dropdown edit box -->
+
+            </div>
+            <!-- end widget edit box -->
+
+            <!-- widget content -->
+            <div class="widget-body">
+                <p id="jxFormMessage"></p>
+
+                {{form.contents}}
+
+                <br>
+
+                <button class="btn btn-primary" type="button" onclick="window.jxForms['{{form.id}}'].apply()">{{label.Apply}}</button>
+
+
+            </div>
+            <!-- end widget div -->
 
         </div>
-        <!-- end widget edit box -->
-
-        <!-- widget content -->
-        <div class="widget-body">
-            <p id="jxFormMessage"></p>
-
-
-            <p>{{form.contents}}</p>
-        </div>
-        <!-- end widget content -->
-
-    </div>
-    <!-- end widget div -->
-
-</div>
-<!-- end widget -->
-
-
-        </article>
-        <!-- WIDGET END -->
+        <!-- end widget -->
 
     </div>
 
-    <!-- end row -->
+</article>
+<!-- WIDGET END -->
 
-
-</section>
-<!-- end widget grid -->
 
 <script type="text/javascript">
-
-
     window.jxAddMessage = function(type, txt) {
-
-
         var p = document.getElementById('jxFormMessage');
+
         if (p) {
-//            var str = "<p class='alert alert-" + type + "'> <strong><i class='fa fa-check'></i></strong> " + txt + " </p>";
-            var str = "<p class='alert alert-" + type + "'> <strong></strong> " + txt + " </p>";
-            p.innerHTML = str;
-//            var json = { type : type, txt : txt};
-//            alert(JSON.stringify(json));
+            if(!type && !txt){
+                p.innerHTML = "";
+                return;
+            }
+
+            p.innerHTML += "<p class='alert alert-" + type + "' style='padding:3px;margin:2px;'> <strong></strong> " + txt + " </p>";
         }
     };
-
 </script>
