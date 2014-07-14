@@ -14,6 +14,45 @@ var checkUser = function(env){
     return active_user;
 };
 
+var validateControl = function (active_user, form_name, key, value) {
+
+    var activeInstance = active_user.session.forms[form_name].activeInstance;
+
+    var control = activeInstance.controls[key];
+    var valids = control.validation;
+
+    if (valids) {
+        for (var a in valids) {
+            var v = valids[a];
+            var valueStr = value + "";
+
+            if (v === "bool") {
+                var allowed = ["1", "0", "true", "false"];
+                if (allowed.indexOf(valueStr) == -1) {
+                    return form_lang.Get(active_user.lang, "ValueInvalidBoolean");
+                }
+            }
+
+            if (v === "int") {
+                console.log("testing INT");
+                var i = parseInt(valueStr);
+                if (isNaN(i)) {
+                    return form_lang.Get(active_user.lang, "ValueInvalidInteger");
+                }
+            }
+
+            if (v === "gte") {
+                console.log("testing gte");
+                var i = parseInt(valueStr);
+                if (isNaN(i) || i < valids[a+1] ) {
+                    return form_lang.Get(active_user.lang, "ValueInvalidIntegerGTE").replace("%s", valids[a+1]);
+                }
+            }
+        }
+    }
+    return true;
+};
+
 methods.sessionAdd = function(env, params){
     var active_user = checkUser(env);
 
@@ -25,7 +64,14 @@ methods.sessionAdd = function(env, params){
         if(!active_user.session.forms[params.form])
             active_user.session.forms[params.form] = {};
 
-        active_user.session.forms[params.form][params.key] = params.value;
+        var ret = validateControl(active_user, params.form, params.key, params.value);
+        if (ret === true) {
+            active_user.session.forms[params.form][params.key] = params.value;
+        } else {
+            var str = form_lang.Get(active_user.lang, "ValueInvalid") + " " + ret;
+            console.log(str);
+            server.sendCallBack(env, {err: str});
+        }
     }
     else
         active_user.session[params.key] = params.value;
@@ -55,7 +101,7 @@ methods.sessionApply = function(env, params){
             });
         }
 
-        var active_user = checkUser(env);
+//        var active_user = checkUser(env);
 //        console.log("sessionApply - form", active_user.session.forms[params.form]);
     }
     else {

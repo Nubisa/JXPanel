@@ -3,7 +3,7 @@
  */
 
 
-var sqlite3 = require('sqlite3').verbose();
+var sqlite3 = require('sqlite3');
 var fs = require('fs');
 
 var counter = 1;
@@ -11,6 +11,7 @@ var counter = 1;
 // ########## table names
 
 var subscription_table = "subscription_table";
+var plan_table = "plan_table";
 var user_table = "user_table";
 var domain_table = "domain_table";
 
@@ -26,6 +27,12 @@ tables[subscription_table] = {
     "subscription_name": { type: "TEXT", required: true, unique: true},
     "owner_user_ids": { type: "TEXT" }
 };
+
+tables[plan_table] = {
+    "ID": { type: "CHAR(20)", required: true, primary: true },
+    "plan_name": { type: "TEXT", required: true, unique: true}
+};
+
 
 tables[user_table] = {
     "ID": { type: "CHAR(20)", required: true, primary: true},
@@ -399,10 +406,10 @@ var Table = function (table_name) {
 
     // field values related to table_name (data_value_table), but based on field_name rather than json object
 
-    this.AddNewFieldValue2 = function (db_object, user_id, field_name, value, cb) {
+    this.AddNewFieldValue2 = function (db_object, owner_table_id, field_name, value, cb) {
 
-        if (!user_id) {
-            if (cb) cb("The `user_id` field must be provided.");
+        if (!owner_table_id) {
+            if (cb) cb("The `owner_table_id` field must be provided.");
             return;
         }
         if (!field_name) {
@@ -417,20 +424,20 @@ var Table = function (table_name) {
                 if (!rows.length) {
                     if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
                 } else {
-                    addRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: user_id, value: value }, cb);
+                    addRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: owner_table_id, value: value }, cb);
                 }
             }
         });
     };
 
-    this.GetFieldValue2 = function (db_object, user_id, field_name, cb) {
+    this.GetFieldValue2 = function (db_object, owner_table_id, field_name, cb) {
 
         if (!cb) {
             throw "The callback is required";
             return;
         }
-        if (!user_id) {
-            if (cb) cb("The `user_id` field must be provided.");
+        if (!owner_table_id) {
+            if (cb) cb("The `owner_table_id` field must be provided.");
             return;
         }
         if (!field_name) {
@@ -445,7 +452,7 @@ var Table = function (table_name) {
                 if (!rows.length) {
                     cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
                 } else {
-                    getRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: user_id }, function (err2, rows2) {
+                    getRecord(data_value_table, db_object, { data_field_table_id: rows[0].ID, owner_table_id: owner_table_id }, function (err2, rows2) {
                         if (!err2 && rows2 && rows2.length) {
                             cb(false, rows2[0].value)
                         } else {
@@ -457,10 +464,10 @@ var Table = function (table_name) {
         });
     };
 
-    this.UpdateFieldValue2 = function (db_object, user_id, field_name, value, cb) {
+    this.UpdateFieldValue2 = function (db_object, owner_table_id, field_name, value, cb) {
 
-        if (!user_id) {
-            if (cb) cb("The `user_id` field must be provided.");
+        if (!owner_table_id) {
+            if (cb) cb("The `owner_table_id` field must be provided.");
             return;
         }
         if (!field_name) {
@@ -475,17 +482,17 @@ var Table = function (table_name) {
                 if (!rows.length) {
                     if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
                 } else {
-                    var sql = "UPDATE " + data_value_table + " SET value = '" + value + "' WHERE data_field_table_id = '" + rows[0].ID + "' AND owner_table_id = '" + user_id + "'";
+                    var sql = "UPDATE " + data_value_table + " SET value = '" + value + "' WHERE data_field_table_id = '" + rows[0].ID + "' AND owner_table_id = '" + owner_table_id + "'";
                     db_object.run(sql, cb);
                 }
             }
         });
     };
 
-    this.DeleteFieldValue2 = function (db_object, user_id, field_name, cb) {
+    this.DeleteFieldValue2 = function (db_object, owner_table_id, field_name, cb) {
 
-        if (!user_id) {
-            if (cb) cb("The `user_id` field must be provided.");
+        if (!owner_table_id) {
+            if (cb) cb("The `owner_table_id` field must be provided.");
             return;
         }
         if (!field_name) {
@@ -500,7 +507,7 @@ var Table = function (table_name) {
                 if (!rows.length) {
                     if (cb) cb("Field `" + field_name + "` definition for table `" + _table_name + "` was not found.");
                 } else {
-                    var sql = "DELETE FROM " + data_value_table + " WHERE data_field_table_id = '" + rows[0].ID + "' AND owner_table_id = '" + user_id + "'";
+                    var sql = "DELETE FROM " + data_value_table + " WHERE data_field_table_id = '" + rows[0].ID + "' AND owner_table_id = '" + owner_table_id + "'";
                     db_object.run(sql, cb);
                 }
             }
@@ -513,6 +520,7 @@ var Table = function (table_name) {
 // ############  public methods
 
 exports.Subscription = new Table(subscription_table);
+exports.Plan = new Table(plan_table);
 exports.User = new Table(user_table);
 exports.Domain = new Table(domain_table);
 
