@@ -1,0 +1,158 @@
+<!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script>
+    if (!window.jQuery) {
+        document.write('<script src="js/libs/jquery-2.0.2.min.js"><\/script>');
+    }
+</script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script>
+    if (!window.jQuery.ui) {
+        document.write('<script src="js/libs/jquery-ui-1.10.3.min.js"><\/script>');
+    }
+</script>
+
+<!-- JS TOUCH : include this plugin for mobile drag / drop touch events
+<script src="js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script> -->
+
+<!-- BOOTSTRAP JS -->
+<script src="js/bootstrap/bootstrap.min.js"></script>
+
+<!-- CUSTOM NOTIFICATION -->
+<script src="js/notification/SmartNotification.min.js"></script>
+
+<!-- JARVIS WIDGETS -->
+<script src="js/smartwidgets/jarvis.widget.min.js"></script>
+
+<!-- EASY PIE CHARTS -->
+<script src="js/plugin/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
+
+<!-- SPARKLINES -->
+<script src="js/plugin/sparkline/jquery.sparkline.min.js"></script>
+
+<!-- JQUERY VALIDATE -->
+<script src="js/plugin/jquery-validate/jquery.validate.min.js"></script>
+
+<!-- JQUERY MASKED INPUT -->
+<script src="js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+
+<!-- JQUERY SELECT2 INPUT -->
+<script src="js/plugin/select2/select2.min.js"></script>
+
+<!-- JQUERY UI + Bootstrap Slider -->
+<script src="js/plugin/bootstrap-slider/bootstrap-slider.min.js"></script>
+
+<!-- browser msie issue fix -->
+<script src="js/plugin/msie-fix/jquery.mb.browser.min.js"></script>
+
+<!-- FastClick: For mobile devices -->
+<script src="js/plugin/fastclick/fastclick.min.js"></script>
+
+<!--[if IE 8]>
+
+<h1>{{label.MSBrowserOutOfDate}}</h1>
+
+<![endif]-->
+
+
+<!-- MAIN APP JS FILE -->
+<script src="js/app.min.js"></script>
+
+<!-- PAGE RELATED PLUGIN(S) -->
+
+<script src="/jx?ms=connect" type="text/javascript"></script>
+<script src="js/plugin/maxlength/bootstrap-maxlength.min.js"></script>
+<script src="js/plugin/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+<script src="js/plugin/clockpicker/clockpicker.min.js"></script>
+<script src="js/plugin/bootstrap-tags/bootstrap-tagsinput.min.js"></script>
+<script src="js/plugin/noUiSlider/jquery.nouislider.min.js"></script>
+<script src="js/plugin/ion-slider/ion.rangeSlider.min.js"></script>
+<script src="js/plugin/colorpicker/bootstrap-colorpicker.min.js"></script>
+<script src="js/plugin/knob/jquery.knob.min.js"></script>
+<script src="js/plugin/x-editable/moment.min.js"></script>
+<script src="js/plugin/x-editable/jquery.mockjax.min.js"></script>
+<script src="js/plugin/x-editable/x-editable.min.js"></script>
+<script src="js/plugin/typeahead/typeahead.min.js"></script>
+<script src="js/plugin/typeahead/typeaheadjs.min.js"></script>
+
+<script>
+    document.onjxready = function () {
+        jxcore.Start(function (status) {
+
+        });
+    };
+
+    $(document).ready(function() {
+
+        // DO NOT REMOVE : GLOBAL FUNCTIONS!
+        pageSetUp();
+
+        if(window.renderForms){
+            for(var o in window.renderForms){
+                window.renderForms[o]();
+            }
+        }
+
+        /*
+         * PAGE RELATED SCRIPTS
+         */
+
+        $(".js-status-update a").click(function() {
+            var selText = $(this).text();
+            var $this = $(this);
+            $this.parents('.btn-group').find('.dropdown-toggle').html(selText + ' <span class="caret"></span>');
+            $this.parents('.dropdown-menu').find('li').removeClass('active');
+            $this.parent().addClass('active');
+        });
+
+        /*
+         * TODO: add a way to add more todo's to list
+         */
+
+        // initialize sortable
+        $(function() {
+            $("#sortable1, #sortable2").sortable({
+                handle : '.handle',
+                connectWith : ".todo",
+                update : countTasks
+            }).disableSelection();
+        });
+
+        // check and uncheck
+        $('.todo .checkbox > input[type="checkbox"]').click(function() {
+            var $this = $(this).parent().parent().parent();
+
+            if ($(this).prop('checked')) {
+                $this.addClass("complete");
+
+                // remove this if you want to undo a check list once checked
+                //$(this).attr("disabled", true);
+                $(this).parent().hide();
+
+                // once clicked - add class, copy to memory then remove and add to sortable3
+                $this.slideUp(500, function() {
+                    $this.clone().prependTo("#sortable3").effect("highlight", {}, 800);
+                    $this.remove();
+                    countTasks();
+                });
+            } else {
+                // insert undo code here...
+            }
+
+        })
+        // count tasks
+        function countTasks() {
+
+            $('.todo-group-title').each(function() {
+                var $this = $(this);
+                $this.find(".num-of-tasks").text($this.next().find("li").size());
+            });
+
+        }
+
+        // applyEditables();
+
+    });
+
+</script>

@@ -2,6 +2,7 @@ var smart_replace = require('./smart_search').replace;
 var site_defaults = require('../definitions/site_defaults');
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
+var fs = require('fs');
 
 var takeValue = function(active_user, obj, val){
     if(!obj[active_user.lang]){
@@ -38,7 +39,12 @@ var smart_rule = [
     },
     {from:"{{forms.$$}}", to:"$$", "$":function(val, gl){
         return _active_user.getForm(gl.sessionId, val);}
-    }
+    },
+    {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
+        var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
+
+        return smart_replace(view, smart_rule);
+    }}
 ];
 
 var apply_smart = function(file, req, res, data){
