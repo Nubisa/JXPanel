@@ -12,7 +12,7 @@ exports.form = function () {
     var func = function(){
         this.name = path.basename(__filename, ".js");
 
-        this.icon = '<span class="widget-icon"> <i class="fa fa-eye"></i> </span>';
+        this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
 
         this.controls = [
             {"BEGIN" : "User Details"},

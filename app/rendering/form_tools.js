@@ -59,11 +59,12 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
         +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
         +'<div class="col-md-10">';
 
+    var id = Date.now();
     if(!options.multiline)
-        _html += '<input id="'+input_id+'" class="form-control" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
+        _html += '<input id="a'+id+'" class="form-control" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
     else{
         var _rows = options.rows ? options.rows:5;
-        _html += '<textarea id="'+input_id+'" class="form-control" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
+        _html += '<textarea id="a'+id+'" class="form-control" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
     }
 
     if(data.description)
@@ -73,7 +74,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
          '</div>'
         +'</div>';
 
-    var _js = "window.jxForms[_form_name].controls['" + input_id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+    var _js = "window.jxForms[_form_name].controls['a" + id + "'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
 
     return {html:_html, js:_js};
 };
@@ -96,8 +97,9 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
         +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
         +'<div class="col-md-10">';
 
+    var id = Date.now();
 
-    _html += '<select class="form-control" id="'+input_id+'"><option>'+form_lang.Get(lang, "ComboNotSelected")+'</option>';
+    _html += '<select class="form-control" id="a'+id+'"><option>'+form_lang.Get(lang, "ComboNotSelected")+'</option>';
 
     if(options && options.values){
         for(var o in options.values){
@@ -119,7 +121,7 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
         '</div>'
         +'</div>';
 
-    var _js = "window.jxForms[_form_name].controls['" + input_id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"' };";
+    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"'  };";
 
     return {html:_html, js:_js};
 };
@@ -147,8 +149,9 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
         + '<label class="col-md-2 control-label">'+label + req_label + '</label><div class="col-md-10">'
         + '<div class="checkbox"><label>';
 
+    var id = Date.now();
 
-    _html += '<input id="'+input_id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
+    _html += '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
 
     _html += '<span>&nbsp;</span></label></div>';
 
@@ -158,7 +161,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
     _html +=
         '</div></div>';
 
-    var _js = "window.jxForms[_form_name].controls['" + input_id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"'  };";
 
     return {html:_html, js:_js};
 };

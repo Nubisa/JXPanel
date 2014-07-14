@@ -1,4 +1,4 @@
-<article class="col-sm-12 col-md-12 col-lg-6">
+<article class="col-sm-12 col-md-16 col-lg-6">
 
     <script>
         if(!window.jxForms){
@@ -18,9 +18,10 @@
                     var type = _this.controls[o].type;
                     var required = _this.controls[o].required;
                     var name = _this.controls[o].name;
+                    var _t = _this.controls[o]._t;
 
                     if(type == 'text' || type == 'password' || type == 'textarea'){
-                        values[o] = document.getElementById(o).value;
+                        values[_t] = document.getElementById(o).value;
                         if(required && !values[o].trim().length){
                             window.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
                             failed = true;
@@ -36,9 +37,9 @@
                         }
                         else{
                             if(index<=0)
-                                values[o] = "";
+                                values[_t] = "";
                             else
-                                values[o] = value;
+                                values[_t] = value;
                         }
                     }
                     else if (type == 'checkbox'){
@@ -63,7 +64,7 @@
                             failed = true;
                         }
                         else{
-                            values[o] = value;
+                            values[_t] = value;
                         }
                     }
                 }
@@ -101,11 +102,28 @@
 
                 {{form.contents}}
 
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-4" style="padding-left: 0px">
+                        <button type="button" class="btn btn-labeled btn-primary"  onclick="window.jxForms['{{form.id}}'].apply()">
+                             <span class="btn-label">
+                              <i class="glyphicon glyphicon-ok"></i>
+                             </span>
+                                    {{label.Apply}}
+                        </button>
+                        &nbsp;
+                        <button type="button" class="btn btn-labeled btn-danger" onclick="location.reload()">
+                             <span class="btn-label">
+                              <i class="glyphicon glyphicon-remove"></i>
+                             </span>
+                            {{label.Cancel}}
+                        </button>
+                    </div>
+                </div>
+
                 <br>
-
-                <button class="btn btn-primary" type="button" onclick="window.jxForms['{{form.id}}'].apply()">{{label.Apply}}</button>
-
-
             </div>
             <!-- end widget div -->
 
