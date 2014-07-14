@@ -42,7 +42,7 @@ exports.form = function () {
             "sub_domain_name": {
                 label: "DomainName",
                 method: tool.createTextBox,
-                options: { required: true, description : "DomainNameDescription", prefix : "www."}
+                options: { required: true, prefix : "www."}
             },
             "sub_ipv4": {
                 label: "IPv4",

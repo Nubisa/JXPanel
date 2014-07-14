@@ -60,7 +60,7 @@ exports.Labels = {
 
 
     "DomainName" : "Domain",
-    "DomainNameDescription" : "The domain name for you subscription.",
+    "DomainName_Description" : "The domain name for you subscription.",
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address"
 };

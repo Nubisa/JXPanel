@@ -6,13 +6,17 @@ exports.begin = ''
     +'<tbody>';
 
 
-var getData = function(lang, options) {
+var getData = function(label, _title, input_id, lang, options) {
     var ret = { prefix : "", description: ""};
     if (!options) {
         return ret;
     }
 
-    ret.description = options.description ? "<br><div class=\"note\">" + form_lang.Get(lang, options.description) : "</div>";
+    var desc = form_lang.Get(lang, label + "_Description", false);
+
+    console.log("getData, label", label, desc);
+
+    ret.description = desc ? "<br><div class=\"note\">" + desc : "</div>";
     ret.prefix = options.prefix || "";
     ret.required = options.required ? ' <span style="color: #b94a48">*</span>' : "";
     ret.requiredCheck = options.required ? "if ($.trim(_value) == '') return '" + form_lang.Get(lang, "ValueRequired") + "';" : "";
@@ -23,12 +27,12 @@ var getData = function(lang, options) {
 
 exports.createTextBox = function(label, _title, input_id, _value, lang, options){
 
+    var data = getData(label, _title, input_id, lang, options);
+
     _valueStr = _value ? _value : "";
     _value = _value || form_lang.Get(lang, "Empty");
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
-
-    var data = getData(lang, options);
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label + data.required +'</td>'
@@ -76,6 +80,8 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
 
 exports.createComboBox = function (label, _title, input_id, _value, lang, options) {
 
+    var data = getData(label, _title, input_id, lang, options);
+
     var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
 
     var _valueId = ""
@@ -93,8 +99,6 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, option
 
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
-
-    var data = getData(lang, options);
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label + data.required +'</td>'
@@ -169,12 +173,12 @@ exports.createComboBox = function (label, _title, input_id, _value, lang, option
 
 exports.createTextArea = function(label, _title, input_id, _value, lang, options){
 
+    var data = getData(label, _title, input_id, lang, options);
+
     _valueStr = _value ? _value : "";
     _value = _value || form_lang.Get(lang, "Empty");
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
-
-    var data = getData(lang, options);
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label + data.required +'</td>'
@@ -221,6 +225,8 @@ exports.createTextArea = function(label, _title, input_id, _value, lang, options
 
 exports.createCheckList = function (label, _title, input_id, _value, lang, options) {
 
+    var data = getData(label, _title, input_id, lang, options);
+
     var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
     var _arrStr = [];
 
@@ -244,8 +250,6 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, optio
 
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
-
-    var data = getData(lang, options);
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label + data.required +'</td>'
@@ -304,6 +308,8 @@ exports.createCheckList = function (label, _title, input_id, _value, lang, optio
 
 exports.createTags = function (label, _title, input_id, _value, lang, options) {
 
+    var data = getData(label, _title, input_id, lang, options);
+
     var _empty = form_lang.Get("EN", "NotSelected") || "not selected";
     var _arrStr = [];
 
@@ -327,8 +333,6 @@ exports.createTags = function (label, _title, input_id, _value, lang, options) {
 
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
-
-    var data = getData(lang, options);
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label + data.required +'</td>'
@@ -385,14 +389,14 @@ exports.createTags = function (label, _title, input_id, _value, lang, options) {
 
 exports.createComboDate = function (label, _title, input_id, _value, lang, options) {
 
+    var data = getData(label, _title, input_id, lang, options);
+
     _value = _value || form_lang.Get(lang, "Empty");
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
     var format = options && options.format || "";
     var _format = format.replace(/([./-])/g, " $1 ");
-
-    var data = getData(lang, options);
 
     var base_input = '<tr>'
         +'<td style="width:35%;">' + label + data.required +'</td>'
