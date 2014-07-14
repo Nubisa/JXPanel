@@ -40,11 +40,28 @@ var smart_rule = [
     {from:"{{forms.$$}}", to:"$$", "$":function(val, gl){
         return _active_user.getForm(gl.sessionId, val);}
     },
+    {from:"{{toSub.##:$$}}", to:"@@", "@!":function(first, second, gl){
+            var active_user = gl.active_user;
+            var res = form_lang.Get(active_user.lang, second);
+            res = !res?"":res;
+            gl[first] = " - " + res;
+        }
+    },
     {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
-        var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
+            var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
 
-        return smart_replace(view, smart_rule);
-    }}
+            return smart_replace(view, smart_rule);
+        }
+    },
+    {from:"{{sub.$$}}", to:"$$", "$": function(val,gl){
+            var v = "";
+            if(gl[val]){
+                v = gl[val];
+                gl[val] = null;
+            }
+            return v;
+        }
+    }
 ];
 
 var apply_smart = function(file, req, res, data){

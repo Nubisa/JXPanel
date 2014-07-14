@@ -27,7 +27,7 @@
 
 var _replace = function(str, markers, _markers, from, togr, logic, gl){
     var search = from + "";
-    var res = from.match(new RegExp("([^a-zA-Z0-9_>\\-':\"}{ "+markers.join()+"]+)", "g"));
+    var res = from.match(new RegExp("([^a-zA-Z0-9_>\\-':\".}{ "+markers.join()+"]+)", "g"));
     for(var o in res){
         var s = res[o];
         for(var i in s){

@@ -49,7 +49,12 @@ exports.Labels = {
     "UserSubscriptionAccess" : "Access to subscriptions",
     "UserPanelLanguage" : "JXPanel language",
 
-    "ValueRequired" : "This field is required"
+    "ValueRequired" : "This field is required",
+
+
+    // Pages
+    "Subscription" : "Subscription Management",
+    "Users" : "User Management"
 };
 
 
