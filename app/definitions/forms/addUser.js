@@ -2,53 +2,52 @@
  * Created by Nubisa Inc. on 7/11/14.
  */
 
-var tool = require('./../rendering/form_tools');
-var form_lang = require('../definitions/form_lang');
-var sqlite = require("./../db/sqlite.js");
+var tool = require('./../../rendering/form_tools');
+var form_lang = require('../form_lang');
+var sqlite = require("./../../db/sqlite.js");
 
 
-exports.forms = {};
+exports.form = function () {
 
-exports.forms["addUser"] = new function () {
-
-    var form_name = "addUser";
-
-    this.controls = {
-        "person_name": {
-            label: "UserContactName",
-            method: tool.createTextBox,
-            options: { required: true }
-        },
-        "person_email": {
-            label: "UserEmailAddress",
-            method: tool.createTextBox,
-            options: { required: true }
-        },
-        "person_subscriptions": {
-            label: "UserSubscriptionAccess",
-            method: tool.createCheckList,
-            options: { values: ["ALL"] }
-        },
-        "person_lang": {
-            label: "UserPanelLanguage",
-            method: tool.createComboBox,
-            options: { values: ["EN"]}
-        },
-        "person_username": {
-            label: "Username",
-            method: tool.createTextBox,
-            options: { required: true, values: ["EN"]}
-        },
-        "person_password": {
-            label: "Password",
-            method: tool.createTextBox,
-            options: { required: true, password: true }
-        }
+    var func = function(){
+        this.name = "addUser";
+        this.controls = {
+            "person_name": {
+                label: "UserContactName",
+                method: tool.createTextBox,
+                options: { required: true }
+            },
+            "person_email": {
+                label: "UserEmailAddress",
+                method: tool.createTextBox,
+                options: { required: true }
+            },
+            "person_subscriptions": {
+                label: "UserSubscriptionAccess",
+                method: tool.createCheckList,
+                options: { values: ["ALL"] }
+            },
+            "person_lang": {
+                label: "UserPanelLanguage",
+                method: tool.createComboBox,
+                options: { values: ["EN"]}
+            },
+            "person_username": {
+                label: "Username",
+                method: tool.createTextBox,
+                options: { required: true, values: ["EN"]}
+            },
+            "person_password": {
+                label: "Password",
+                method: tool.createTextBox,
+                options: { required: true, password: true }
+            }
+        };
     };
 
-    this.apply = function (active_user, cb) {
+    func.prototype.apply = function (active_user, cb) {
 
-        var userForm = active_user.session.forms[form_name];
+        var userForm = active_user.session.forms[this.name];
 
         for (var name in this.controls) {
             var ctrl = this.controls[name];
@@ -97,4 +96,6 @@ exports.forms["addUser"] = new function () {
         })
 
     };
+
+    return new func();
 };

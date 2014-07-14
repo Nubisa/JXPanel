@@ -1,9 +1,9 @@
 var tool = require('./form_tools');
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
-var forms = require('../definitions/forms');
 var fs = require("fs");
 var path = require("path");
+var rep = require('./smart_search').replace;
 
 exports.addUser_Test = function(sessionId){
     var lang = _active_user.getUser(sessionId).lang;
@@ -45,15 +45,28 @@ exports.addUser_Test = function(sessionId){
     return renderFinal(sessionId, formName, controls);
 };
 
-exports.addUser = function(sessionId){
-    var lang = _active_user.getUser(sessionId).lang;
 
-    var formName = "addUser";
+var logic = [
+    {from:"{{form.##}}", to:"##", "#":function(val, gl){
+        return form_lang.Get(gl.lang, gl[val], true);
+    }}
+];
 
-    if (!forms.forms[formName])
-        return form_lang.Get(lang, "UnknownForm");
 
-    var controls = forms.forms[formName].controls;
+exports.renderForm = function(sessionId, formName){
+    var html = "";
+
+    var activeForm = require('../definitions/forms/' + formName).form();
+
+    var active_user = _active_user.getUser(sessionId);
+
+    var lang = active_user.lang;
+    if(!active_user.session.forms[formName])
+        active_user.session.forms[formName] = {};
+
+    active_user.session.forms[formName].activeInstance = activeForm;
+
+    var controls = activeForm.controls;
 
     var arr = [];
     for(var name in controls) {
@@ -65,36 +78,29 @@ exports.addUser = function(sessionId){
         arr.push(json);
     }
 
-    return renderFinal(sessionId, formName, arr);
-};
+    for(var o in arr)
+        html += arr[o].val.html;
 
-
-var renderFinal = function(sessionId, formName, controls){
-    var html = "";
-
-    for(var o in controls)
-        html += controls[o].val.html;
-
-    var lang = _active_user.getUser(sessionId).lang;
     var submit = '<br><button class="btn btn-primary" type="button" onclick="jxcore.Call(\'sessionApply\', { form : \'' + formName + '\' }, function (param) { window.jxAddMessage(param.err ? \'danger\' : \'success\', param.err ? param.err : JSON.stringify(param))});">' + form_lang.Get(lang, "Apply") + '</button>';
 
     var scr = "";
 
-    for(var o in controls){
-        scr += "{var _this = {form:'"+ formName +"', name:'" + controls[o].name +"'};";
-        scr += controls[o].val.js;
+    for(var o in arr){
+        scr += "{var _this = {form:'"+ formName +"', name:'" + arr[o].name +"'};";
+        scr += arr[o].val.js;
         scr += "}";
     }
 
-    var final = tool.begin + html + tool.end + submit + "<script>window.renderForms.push(function() {"+scr+"});</script>";
+    var fstr = tool.begin + html + tool.end + submit + "<script>window.renderForms.push(function() {"+scr+"});</script>";
 
     var containerFile = path.join(__dirname, "../definitions/forms/container.html");
 
     if (fs.existsSync(containerFile)) {
         var widget = fs.readFileSync(containerFile).toString();
-        return widget.replace("{{form.contents}}", final).replace("{{form.name}}", form_lang.Get(lang, formName, true));
+        logic.globals = { name: formName, contents: fstr };
+        return rep(widget, logic);
     } else {
-        return final;
+        return fstr;
     }
 
 };

@@ -1,6 +1,5 @@
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
-var forms = require('../definitions/forms');
 var server = require('jxm');
 var methods = {};
 
@@ -43,10 +42,11 @@ methods.sessionApply = function(env, params){
 
     if (params.form) {
 
-        if (!forms.forms[params.form]) {
+        var activeForm = active_user.session.forms[params.form];
+        if (!activeForm) {
             server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "UnknownForm")});
         } else {
-            forms.forms[params.form].apply(active_user, function (err) {
+            activeForm.activeInstance.apply(active_user, function (err) {
                 if (err) {
                     server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
                 } else {

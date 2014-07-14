@@ -238,7 +238,7 @@
 				<section id="widget-grid" class="">
 
 					<!-- RENDER AREA -->
-                    <div style="height:500px;">
+                    <div style="min-height:500px;">
 
                         {{forms.addUser}}
 
@@ -297,11 +297,6 @@
 			</ul>
 		</div>
 		<!-- END SHORTCUT AREA -->
-
-		<!--================================================== -->
-
-		<!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
-		<script data-pace-options='{ "restartOnRequestAfter": true }' src="js/plugin/pace/pace.min.js"></script>
 
 		<!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
@@ -380,7 +375,6 @@
         <script src="js/plugin/x-editable/x-editable.min.js"></script>
         <script src="js/plugin/typeahead/typeahead.min.js"></script>
         <script src="js/plugin/typeahead/typeaheadjs.min.js"></script>
-        <script src="js/editable.js"></script>
 
 		<script>
             document.onjxready = function () {
@@ -457,7 +451,7 @@
 
 				}
 
-                applyEditables();
+               // applyEditables();
 
 			});
 

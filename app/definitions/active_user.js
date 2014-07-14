@@ -35,11 +35,7 @@ exports.getForm = function(sessionId, form_name){
     // TODO check permissions to form
     console.log("active_user::getForm", sessionId, form_name);
 
-    if(forms[form_name]){
-        return forms[form_name](sessionId);
-    }
-
-    return "";
+    return forms.renderForm(sessionId, form_name);
 };
 
 exports.hasPermission = function(sessionId, file){
