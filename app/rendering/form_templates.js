@@ -92,7 +92,7 @@ var renderFinal = function(sessionId, formName, controls){
 
     if (fs.existsSync(containerFile)) {
         var widget = fs.readFileSync(containerFile).toString();
-        return widget.replace("{{form.contents}}", final).replace("{{form.name}}", formName);
+        return widget.replace("{{form.contents}}", final).replace("{{form.name}}", form_lang.Get(lang, formName, true));
     } else {
         return final;
     }

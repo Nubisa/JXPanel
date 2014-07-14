@@ -21,6 +21,9 @@ exports.Labels = {
     "Nothing to Apply": "There was nothing to apply. Operation wasn't successful.",
     "UnknownForm" : "Unknown form",
 
+    // Form names
+    "addUser" : "Add new user",
+
     // login page
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
