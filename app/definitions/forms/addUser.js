@@ -48,9 +48,11 @@ exports.form = function () {
     func.prototype.apply = function (active_user, cb) {
 
         var userForm = active_user.session.forms[this.name];
+        var _controls = this.controls;
 
-        for (var name in this.controls) {
-            var ctrl = this.controls[name];
+
+        for (var name in _controls) {
+            var ctrl = _controls[name];
             if (ctrl.options) {
                 if (ctrl.options.required && (!userForm || !userForm[name])) {
                     cb(form_lang.Get(active_user.lang, "ValueRequired") + ": `" + form_lang.Get(active_user.lang, ctrl.label) + "`.");
@@ -58,7 +60,6 @@ exports.form = function () {
                 }
             }
         }
-
 
         var addUser = function() {
             // if arrived here - required fields are non empty
@@ -80,9 +81,13 @@ exports.form = function () {
             var crypto = require('crypto');
             var encrypted = crypto.createHash('md5').update(userForm["person_password"]).digest('hex').toString();
 
+
             sqlite.User.AddNew(sqlite.db, { username : userForm["person_username"], password : encrypted }, function(err, id) {
                 for (var name in userForm) {
-                    sqlite.User.AddNewFieldValue2(sqlite.db, id, name, userForm[name], _cb);
+                    // only for defined columns
+                    if (_controls[name]) {
+                        sqlite.User.AddNewFieldValue2(sqlite.db, id, name, userForm[name], _cb);
+                    }
                 }
             });
         };
