@@ -170,7 +170,7 @@
         <script>
             document.onjxready = function () {
                 jxcore.Start(function (status) {
-                    delete document.getElementById("btnSubmit").disabled;
+                    document.getElementById("btnSubmit").disabled = null;
                 });
             };
         </script>
