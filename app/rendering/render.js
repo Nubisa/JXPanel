@@ -61,7 +61,10 @@ var smart_rule = [
             }
             return v;
         }
-    }
+    },
+    {from:"{{datatable.$$}}", to:"$$", "$":function(val, gl){
+        return _active_user.getDataTable(gl.sessionId, val);}
+    },
 ];
 
 var apply_smart = function(file, req, res, data){
