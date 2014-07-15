@@ -59,7 +59,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
         +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
         +'<div class="col-md-10">';
 
-    var id = Date.now();
+    var id = jxcore.utils.uniqueId();
     if(!options.multiline)
         _html += '<input id="a'+id+'" class="form-control" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
     else{
@@ -97,7 +97,7 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
         +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
         +'<div class="col-md-10">';
 
-    var id = Date.now();
+    var id = jxcore.utils.uniqueId();
 
     _html += '<select class="form-control" id="a'+id+'"><option>'+form_lang.Get(lang, "ComboNotSelected")+'</option>';
 
@@ -149,7 +149,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
         + '<label class="col-md-2 control-label">'+label + req_label + '</label><div class="col-md-10">'
         + '<div class="checkbox"><label>';
 
-    var id = Date.now();
+    var id = jxcore.utils.uniqueId();
 
     _html += '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
 

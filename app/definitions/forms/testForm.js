@@ -6,6 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
+var validations = require('./../validations');
 
 exports.form = function () {
 
@@ -23,7 +24,9 @@ exports.form = function () {
                     label: "UserContactName",
                     method: tool.createTextBox,
                     options: { required: true, description : "Some description 2"}
-                }
+                },
+                validation:new validations.MinString(3)
+
             },
 
             {
@@ -59,6 +62,7 @@ exports.form = function () {
 
     func.prototype.apply = function (active_user, cb) {
 
+        return;
         var userForm = active_user.session.forms[this.name];
         var _controls = this.controls;
 

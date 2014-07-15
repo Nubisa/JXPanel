@@ -1,3 +1,5 @@
+var util = require('util');
+
 var langs = {};
 
 langs.EN = require("./langs/EN.js").Labels;
@@ -10,14 +12,24 @@ langs.EN = require("./langs/EN.js").Labels;
  * @return {*}
  * @constructor
  */
-exports.Get = function(lang, val, notNull){
+exports.Get = function(lang, val, notNull, arrParams){
 
+    var str = null;
     if(langs[lang] && langs[lang][val]){
-        return langs[lang][val];
+        str = langs[lang][val];
     }
 
     if(langs.EN[val])
-        return langs.EN[val];
+        str = langs.EN[val];
 
-    return notNull ? val : null;
+    if(!str)
+        str = notNull ? val : null;
+
+    if(str && arrParams)
+    {
+        arrParams = [str].concat(arrParams);
+        str = util.format.apply(null, arrParams);
+    }
+
+    return str;
 };

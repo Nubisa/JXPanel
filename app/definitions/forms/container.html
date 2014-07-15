@@ -22,7 +22,7 @@
 
                     if(type == 'text' || type == 'password' || type == 'textarea'){
                         values[_t] = document.getElementById(o).value;
-                        if(required && !values[o].trim().length){
+                        if(required && !values[_t].trim().length){
                             window.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
                             failed = true;
                         }
@@ -44,20 +44,6 @@
                     }
                     else if (type == 'checkbox'){
                         var value = document.getElementById(o).checked;
-                        if(value){
-                            if(value.substr){
-                                if(value == "checked")
-                                {
-                                    value = true;
-                                }
-                                else
-                                    value = false;
-                            }
-                            else
-                                value = true;
-                        }
-                        else
-                            value = false;
 
                         if(required && !value){
                             window.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
@@ -71,7 +57,14 @@
 
                 if(!failed){
                     jxcore.Call('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
-                        window.jxAddMessage(param.err ? 'danger' : 'success', param.err ? param.err : JSON.stringify(param));
+                        if(!param.arr)
+                            window.jxAddMessage(param.err ? 'danger' : 'success', param.err ? param.err : JSON.stringify(param));
+                        else
+                        {
+                            for(var o in param.arr){
+                                window.jxAddMessage('danger', param.arr[o].control + ":" + param.arr[o].msg);
+                            }
+                        }
                     });
                 }
             }

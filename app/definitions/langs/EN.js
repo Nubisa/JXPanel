@@ -13,7 +13,9 @@ exports.Labels = {
     "Control Panel":"Control Panel",
     "Account":"Account",
     "Home":"Home",
+
     "MSBrowserOutOfDate": "Your browser is out of date, please update your browser by going to www.microsoft.com/download",
+    "SessionExpired": "The user session is expired. Please login again!",
 
     "Access Denied": "You do not have a permission to view this resource.",
 
@@ -53,9 +55,8 @@ exports.Labels = {
 
     "ValueRequired" : "This field is required.",
     "ValueInvalid" : "The value for the field is invalid.",
-    "ValueInvalidBoolean" : "The value is not a boolean.",
-    "ValueInvalidInteger" : "The value is not an integer.",
-    "ValueInvalidIntegerGTE" : "The value should be greater or equal than %s.",
+
+    "RequiresMinimumLength": "Minimum length for this control must be %s.",
 
 
     // Pages
