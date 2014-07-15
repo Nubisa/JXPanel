@@ -91,12 +91,15 @@ exports.defineRender = function(ms){
 };
 
 var Stream = require('stream').Stream;
+var nm = 0;
 
 var template = function() {
     var stream = new Stream();
 
     stream.writable = true;
     stream.readable = true;
+    nm++;
+    console.log("OPEN", nm);
 
     stream.cache = [];
     stream.write = function(data) {
@@ -107,6 +110,8 @@ var template = function() {
     stream.end = function() {
         stream.emit("end");
         stream.render(stream.file, stream.request, stream.response, stream.cache.join(""));
+        nm--;
+        console.log("CLOSE", nm);
         stream.callback();
     };
 
