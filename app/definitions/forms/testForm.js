@@ -25,7 +25,7 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { required: true, description : "Some description 2"}
                 },
-                validation:new validations.MinString(3)
+                validation:new validations.String(3)
 
             },
 

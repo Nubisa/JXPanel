@@ -1,5 +1,6 @@
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
+var datatables = require('./datatable_templates');
 var server = require('jxm');
 var methods = {};
 
@@ -58,10 +59,17 @@ var sessionAdd = function(env, active_user, params){
         if(!ctrl)
             continue;
 
+        var ctrlDisplayName = form_lang.Get(active_user.lang, ctrl.details.label, true);
+
+        // checking if field si required and has a value
+        if (ctrl.options && ctrl.options.required && !params.controls[o]) {
+            messages.push({control:ctrlDisplayName, msg:form_lang.Get(active_user.lang, "ValueRequired1")});
+        }
+
         if(ctrl.validation){
            var res = ctrl.validation.validate(env, active_user, params.controls[o]);
            if(!res.result){
-               messages.push({control:form_lang.Get(active_user.lang, ctrl.details.label, true), msg:res.msg});
+               messages.push({control:ctrlDisplayName, msg:res.msg});
            }
         }
     }
@@ -82,7 +90,7 @@ methods.sessionApply = function(env, params){
         return;
 
     var activeForm = active_user.session.forms[params.form];
-    activeForm.activeInstance.apply(active_user, function (err) {
+    activeForm.activeInstance.apply(active_user, params, function (err) {
         if (err) {
             server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
         } else {
@@ -91,5 +99,14 @@ methods.sessionApply = function(env, params){
     });
 };
 
+
+methods.getTableData = function(env, params) {
+
+    if (params.dt) {
+        datatables.render(env.SessionID, params.dt, function(err, str) {
+            server.sendCallBack(env, str);
+        });
+    }
+};
 
 module.exports = methods;
