@@ -59,8 +59,11 @@
 <!-- MAIN APP JS FILE -->
 <script src="js/app.min.js"></script>
 
-
 <!-- PAGE RELATED PLUGIN(S) -->
+<script src="js/plugin/datatables/jquery.dataTables.min.js"></script>
+<script src="js/plugin/datatables/dataTables.colVis.min.js"></script>
+<script src="js/plugin/datatables/dataTables.tableTools.min.js"></script>
+<script src="js/plugin/datatables/dataTables.bootstrap.min.js"></script>
 
 <script src="/jx?ms=connect" type="text/javascript"></script>
 
@@ -134,6 +137,10 @@
 
         }
 
+
+        if (window.jxTemplateReady) {
+            window.jxTemplateReady();
+        }
     });
 
 </script>

@@ -82,7 +82,7 @@ exports.Labels = {
     "AllowCustomSocketPort" : "Allow custom socket port",
     "AllowSysExec" : "Allow to spawn/exec child processes",
     "AllowLocalNativeModules" : "Allow to call local native modules",
-    "AppLogWebAccess" : "Application's log web access",
+    "AppLogWebAccess" : "Application`s log web access",
     "AppLogWebAccess_Description" : "Will be available on http://yourdomain.com/jxcore_logs/index.txt",
     "AllowSSH" : "SSH",
     "NginxDirectives" : "NGINX directives",
@@ -93,7 +93,7 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
 
 
-    "testForm": "Test Form"
+    "testForm": "Test Form1"
 };
 
 

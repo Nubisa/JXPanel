@@ -1,4 +1,5 @@
 var forms = require('../rendering/form_templates');
+var datatables = require('../rendering/datatable_templates');
 
 var users = {};
 
@@ -42,6 +43,13 @@ exports.hasPermission = function(sessionId, file){
     console.log("active_user::hasPermission", sessionId, file); // file path
 
     return true;
+};
+
+
+exports.getDataTable = function(sessionId, table_name){
+    console.log("active_user::getDataTable", sessionId, table_name);
+
+    return datatables.render(sessionId, table_name);
 };
 
 //{{user.LABELHERE}}
