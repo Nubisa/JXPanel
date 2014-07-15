@@ -5,12 +5,12 @@ var form_lang = require('../definitions/form_lang');
 var page_utils = require('./page_utils');
 var fs = require('fs');
 
-var takeValue = function(lang, obj, val){
+var takeValue = function(lang, obj, val, active_user){
     if(!obj[lang]){
         obj[lang] = {};
     }
 
-    var lang_exists = !obj[lang][val];
+    var lang_exists = obj[lang][val];
 
     var _lang;
     if(!lang_exists){
@@ -23,38 +23,57 @@ var takeValue = function(lang, obj, val){
     if(!lang_exists)
         return "";
     else
-        return obj[_lang][val];
+    {
+        var call = obj[_lang][val];
+        if(call && call.substr){
+            return call;
+        }
+        else if (call){
+            return call(_lang, active_user);
+        }
+        return "";
+    }
 };
 
 var smart_rule = [
     {from:"{{defaults.$$}}", to:"$$", "$":function(val, gl){
-        return takeValue(gl.lang, site_defaults, val);}
+        return takeValue(gl.lang, site_defaults, val, gl.active_user);}
     },
     {from:"{{user.$$}}", to:"$$", "$":function(val, gl){
-        var active_user = gl.active_user;
-        if(!active_user){
-            return "";
-        }
+            if(!gl.active_user){
+                return "";
+            }
 
-        return !active_user[val] ? "":active_user[val];}
+            return !gl.active_user[val] ? "":gl.active_user[val];
+        }
     },
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
-        var res = form_lang.Get(gl.lang, val);
-        return !res?"":res;}
+            var res = form_lang.Get(gl.lang, val);
+            return !res?"":res;
+        }
     },
     {from:"{{forms.$$}}", to:"$$", "$":function(val, gl){
-        return _active_user.getForm(gl.sessionId, val);}
+            return _active_user.getForm(gl.sessionId, val);
+        }
     },
     {from:"{{toSub.##:$$}}", to:"@@", "@!":function(first, second, gl){
-            var res = form_lang.Get(gl.lang, second);
-            res = !res?"":res;
-            gl[first] = " - " + res;
+            if(second.indexOf("_")>0){
+                gl[first] = "{{" + second.replace("_", ".") + "}}";
+                gl.reset = true;
+            }
+            else{
+                var res = form_lang.Get(gl.lang, second);
+                res = !res?"":res;
+                gl[first] = res;
+            }
+            return "";
         }
     },
     {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
             var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
+            view = smart_replace(view, smart_rule);
 
-            return smart_replace(view, smart_rule);
+            return view;
         }
     },
     {from:"{{sub.$$}}", to:"$$", "$": function(val,gl){
@@ -92,6 +111,10 @@ var apply_smart = function(file, req, res, data){
     }
 
     data = smart_replace(data, smart_rule);
+    while(smart_rule.globals.reset){
+        smart_rule.globals.reset = false;
+        data = smart_replace(data, smart_rule);
+    }
     res.write(data);
 };
 
@@ -108,15 +131,13 @@ exports.defineRender = function(ms){
 };
 
 var Stream = require('stream').Stream;
-var nm = 0;
+
 
 var template = function() {
     var stream = new Stream();
 
     stream.writable = true;
     stream.readable = true;
-    nm++;
-    console.log("OPEN", nm);
 
     stream.cache = [];
     stream.write = function(data) {
@@ -127,8 +148,6 @@ var template = function() {
     stream.end = function() {
         stream.emit("end");
         stream.render(stream.file, stream.request, stream.response, stream.cache.join(""));
-        nm--;
-        console.log("CLOSE", nm);
         stream.callback();
     };
 

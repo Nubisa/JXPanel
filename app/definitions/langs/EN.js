@@ -42,6 +42,7 @@ exports.Labels = {
     "PasswordEnterRequired" : "Please enter your password",
 
     "CredentialsFailed": "Incorrect username and/or password",
+    "WelcomeDashboard": "Welcome %s!",
 
     "BlockLeftHeader" : "About SmartAdmin - Are you up to date?",
     "BlockLeftBody" : "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa.",
