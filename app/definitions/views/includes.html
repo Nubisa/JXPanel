@@ -71,7 +71,9 @@
 <script>
     document.onjxready = function () {
         jxcore.Start(function (status) {
-
+            if (window.jxTemplateReadyForjxm) {
+                window.jxTemplateReadyForjxm();
+            }
         });
     };
 
