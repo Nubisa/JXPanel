@@ -1,6 +1,7 @@
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
 var datatables = require('./datatable_templates');
+var util = require("util");
 var server = require('jxm');
 var methods = {};
 
@@ -61,15 +62,29 @@ var sessionAdd = function(env, active_user, params){
 
         var ctrlDisplayName = form_lang.Get(active_user.lang, ctrl.details.label, true);
 
-        // checking if field si required and has a value
+        // checking if field is required and has a value
         if (ctrl.options && ctrl.options.required && !params.controls[o]) {
-            messages.push({control:ctrlDisplayName, msg:form_lang.Get(active_user.lang, "ValueRequired1")});
+            messages.push({control:ctrlDisplayName, msg:form_lang.Get(active_user.lang, "ValueRequired")});
         }
 
-        if(ctrl.validation){
-           var res = ctrl.validation.validate(env, active_user, params.controls[o]);
-           if(!res.result){
-               messages.push({control:ctrlDisplayName, msg:res.msg});
+        var valids = [];
+
+        if(ctrl.validation) {
+//            console.log("isarray? ", util.isArray(ctrl.validation), ctrl.validation);
+            // multiple validations for one field
+            if (util.isArray(ctrl.validation)) {
+                valids = valids.concat(ctrl.validation);
+            } else {
+                valids.push(ctrl.validation);
+            }
+        }
+
+        if (valids.length) {
+           for(var a in valids) {
+               var res = valids[a].validate(env, active_user, params.controls[o]);
+               if(!res.result){
+                   messages.push({control:ctrlDisplayName, msg:res.msg});
+               }
            }
         }
     }

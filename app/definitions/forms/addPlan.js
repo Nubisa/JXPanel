@@ -6,7 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
-
+var validations = require('./../validations');
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -56,7 +56,7 @@ exports.form = function () {
                     label: "Overuse",
                     method: tool.createCheckBox,
                     options: { },
-                    validation: [ "bool" ]
+                    validation: new validations.Boolean()
                 }
             },
 
@@ -64,9 +64,9 @@ exports.form = function () {
                 details: {
                     label: "MaxDiskSpace",
                     method: tool.createTextBox,
-                    options: { suffix: " MB"},
-                    validation: [ "int", "gte" , 0 ]
-                }
+                    options: { suffix: " MB"}
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
             { name: "plan_traffic",
@@ -75,6 +75,7 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { suffix: " MB/month"}
                 }
+//                validation : new validations.Int( { gte : 0 })
             },
 
             { name: "plan_memory",

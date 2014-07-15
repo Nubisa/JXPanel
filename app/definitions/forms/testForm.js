@@ -26,7 +26,6 @@ exports.form = function () {
                     options: { required: true, description : "Some description 2"}
                 },
                 validation:new validations.String(3)
-
             },
 
             {

@@ -73,10 +73,13 @@ exports.Labels = {
 
     "ValueRequired" : "This field is required.",
     "ValueInvalid" : "The value for the field is invalid.",
+    "ValueInvalidBoolean" : "The value is supposed to be boolean.",
+    "ValueInvalidInteger" : "The value is supposed to be integer.",
 
     "RequiresMinimumLength": "Minimum string length for this control must be %s.",
     "RequiresMaximumLength": "Maximum string length for this control must be %s.",
 
+    "ValueShouldBe": "The value should be %s.",
 
     // Pages
     "Subscription" : "Subscription Management",
