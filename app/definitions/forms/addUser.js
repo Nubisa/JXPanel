@@ -6,6 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
+var validations = require('./../validations');
 
 
 exports.form = function () {
@@ -23,7 +24,7 @@ exports.form = function () {
                 details: {
                     label: "UserContactName",
                     method: tool.createTextBox,
-                    options: { required: true, description: "Some description 2"}
+                    options: { required: true }
                 }
             },
 
@@ -33,7 +34,8 @@ exports.form = function () {
                     label: "UserEmailAddress",
                     method: tool.createTextBox,
                     options: { required: true }
-                }
+                },
+                validation : new validations.Email()
             },
 
             {
@@ -50,7 +52,7 @@ exports.form = function () {
                 details: {
                     label: "UserPanelLanguage",
                     method: tool.createComboBox,
-                    options: { values: ["EN"], description: "Some description" }
+                    options: { values: ["EN"]}
                 }
             },
 
@@ -71,34 +73,30 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { required: true, password: true },
                     value_table: false
-                }
+                },
+                validation : new validations.String(5)
             },
 
             {"END": 1}
         ];
     };
 
-    func.prototype.apply = function (active_user, cb) {
+    func.prototype.apply = function (active_user, params, cb) {
 
-        var userForm = active_user.session.forms[this.name];
-        var _controls = this.controls;
-
-
-        for (var name in _controls) {
-            var ctrl = _controls[name];
-            if (ctrl.options) {
-                if (ctrl.options.required && (!userForm || !userForm[name])) {
-                    cb(form_lang.Get(active_user.lang, "ValueRequired") + ": `" + form_lang.Get(active_user.lang, ctrl.label) + "`.");
-                    return;
-                }
-            }
+        var _controls = {};
+        for(var a in this.controls) {
+            var name = this.controls[a].name;
+            if (name) _controls[name] = this.controls[a].details;
         }
 
+        var values = params.controls;
+
         var addUser = function() {
-            // if arrived here - required fields are non empty
 
             var errors = [];
-            var len = userForm;
+            var len = 0;
+            for (var name in values) len++;
+
             var _cb = function (err) {
                 len--;
                 if (err) {
@@ -112,22 +110,25 @@ exports.form = function () {
             };
 
             var crypto = require('crypto');
-            var encrypted = crypto.createHash('md5').update(userForm["person_password"]).digest('hex').toString();
+            var encrypted = crypto.createHash('md5').update(values["person_password"]).digest('hex').toString();
 
-
-            sqlite.User.AddNew(sqlite.db, { username : userForm["person_username"], password : encrypted }, function(err, id) {
-                for (var name in userForm) {
+            sqlite.User.AddNew(sqlite.db, { username : values["person_username"], password : encrypted }, function(err, id) {
+                for (var name in values) {
                     // only for defined columns
                     if (_controls[name]) {
-                        sqlite.User.AddNewFieldValue2(sqlite.db, id, name, userForm[name], _cb);
+                        var addValue = _controls[name].value_table !== false;
+                        if (addValue) {
+                            console.log("adding", name, values[name]);
+                            sqlite.User.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                        }
                     }
                 }
             });
         };
 
-        sqlite.User.Get(sqlite.db, { username : userForm["person_username"]}, function(err, rows) {
+        sqlite.User.Get(sqlite.db, { username : values["person_username"]}, function(err, rows) {
             if (!err && rows && rows.length) {
-                cb("User already exists.")
+                cb(form_lang.Get(active_user.lang, "UserAlreadyExists"));
             } else {
                 addUser();
             }
