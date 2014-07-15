@@ -203,29 +203,22 @@ exports.form = function () {
         ];
     };
 
-    func.prototype.apply = function (active_user, cb) {
+    func.prototype.apply = function (active_user, params, cb) {
 
-        var userForm = active_user.session.forms[this.name];
-        var _controls = this.controls;
-
-
-        for (var name in _controls) {
-            var ctrl = _controls[name];
-//            console.log(name, name, "value", userForm[name]);
-            if (ctrl.options) {
-                if (ctrl.options.required && (!userForm || !userForm[name])) {
-                    cb(form_lang.Get(active_user.lang, "ValueRequired") + ": `" + form_lang.Get(active_user.lang, ctrl.label) + "`.");
-//                    console.log("NO VALUE");
-                    return;
-                }
-            }
+        var _controls = {};
+        for(var a in this.controls) {
+            var name = this.controls[a].name;
+            if (name) _controls[name] = this.controls[a].details;
         }
+
+        var values = params.controls;
 
         var addPlan = function () {
             // if arrived here - required fields are non empty
 
             var errors = [];
-            var len = userForm;
+            var len = 0;
+            for (var name in values) len++;
             var _cb = function (err) {
                 len--;
                 if (err) {
@@ -238,27 +231,27 @@ exports.form = function () {
 
             };
 
-            sqlite.Plan.AddNew(sqlite.db, { plan_name: userForm["plan_name"] }, function (err, id) {
+            sqlite.Plan.AddNew(sqlite.db, { plan_name: values["plan_name"] }, function (err, id) {
 
                 if (err) {
                     console.error(err);
                 } else {
                     console.log("OK");
                 }
-                for (var name in userForm) {
+                for (var name in values) {
                     // only for defined columns
                     if (_controls[name]) {
                         var addValue = _controls[name].value_table !== false;
                         if (addValue) {
-                            console.log("adding plan value", name, userForm[name]);
-                            sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, userForm[name], _cb);
+                            console.log("adding plan value", name, values[name]);
+                            sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
                         }
                     }
                 }
             });
         };
 
-        sqlite.Plan.Get(sqlite.db, { username: userForm["plan_name"]}, function (err, rows) {
+        sqlite.Plan.Get(sqlite.db, { username: values["plan_name"]}, function (err, rows) {
             if (!err && rows && rows.length) {
                 cb("Plan with this name already exists.")
             } else {

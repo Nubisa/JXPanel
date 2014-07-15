@@ -65,12 +65,18 @@ exports.Labels = {
     "ValueRequired" : "This field is required.",
     "ValueInvalid" : "The value for the field is invalid.",
 
-    "RequiresMinimumLength": "Minimum length for this control must be %s.",
+    "RequiresMinimumLength": "Minimum string length for this control must be %s.",
+    "RequiresMaximumLength": "Maximum string length for this control must be %s.",
 
 
     // Pages
     "Subscription" : "Subscription Management",
     "Users" : "User Management",
+
+    // user form
+    "UserAlreadyExists" : "User with this name already exists.",
+    "EmailInvalid" : "Invalid e-mail address.",
+
 
     // Plan
     "PlanName" : "Plan name",
@@ -102,7 +108,14 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
 
 
-    "testForm": "Test Form1"
+    "testForm": "Test Form",
+
+
+    // DB
+    "DBNotOpened" : "Database is not opened.",
+
+    // datatables
+    "UnknownDataTable" : "Unknown table name."
 };
 
 
