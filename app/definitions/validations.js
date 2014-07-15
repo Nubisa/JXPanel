@@ -27,3 +27,22 @@ exports.String = function (minSize, maxSize) {
         return {result: true};
     };
 };
+
+
+exports.Email = function () {
+
+    this.validate = function (env, active_user, val) {
+
+        // todo: better email validation
+        var regexp = /.+\@.+\..+/;
+        var ret = regexp.exec(val);
+
+//        console.log("email validation", req);
+
+        if (ret === null) {
+            return {result: false, msg: form_lang.Get(active_user.lang, "EmailInvalid", null)};
+        } else {
+            return {result: true};
+        }
+    };
+};
