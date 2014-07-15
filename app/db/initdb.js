@@ -14,11 +14,14 @@ var path = require("path");
 var createFields = function (db, table, controls) {
 
     var fields = [];
-    for (var name in controls) {
-        if (controls[name].value_table === false) {
+    for (var id in controls) {
+        var ctrl = controls[id];
+        if (!ctrl.name) continue;
+
+        if (ctrl.details.value_table === false) {
             continue;
         }
-        var json = { field_name: name };
+        var json = { field_name: ctrl.name };
         fields.push(json);
     }
 
