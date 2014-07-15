@@ -14,6 +14,14 @@ exports.Labels = {
     "Account":"Account",
     "Home":"Home",
 
+    "serverManagement":"Server Management",
+    "help":"Help",
+    "logout":"Logout",
+    "fileManager":"File Manager",
+    "codeEditor":"Code Editor",
+    "serviceManagement":"Service Management",
+    "stats":"Server Stats",
+    "users":"Users",
 
     "MSBrowserOutOfDate": "Your browser is out of date, please update your browser by going to www.microsoft.com/download",
     "SessionExpired": "The user session is expired. Please login again!",

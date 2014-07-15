@@ -205,6 +205,7 @@
 					}
 				});
                 $("#login-form").submit(function(e){
+                   document.getElementById("btnSubmit").disabled = "disabled";
                    var uname = document.getElementById("username{{utils.dateNow}}").value;
                    var pwd = document.getElementById("password{{utils.dateNow}}").value;
                    if(!jxcore.IsConnected){
@@ -218,6 +219,8 @@
                                     '<div class="note">'
                                     +'<span style="color:red">' + result.err + '</span>'
                                     '</div>';
+
+                                   document.getElementById("btnSubmit").disabled = null;
                                }else{
                                     location.href = result.url;
                                }
