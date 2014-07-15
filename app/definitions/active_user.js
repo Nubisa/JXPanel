@@ -13,20 +13,20 @@ var newUser = function(session_id){
     };
 };
 
-exports.getUser = function(sessionId, createNew)
+exports.loginUser = function(sessionId, params){
+    users[sessionId] = newUser(sessionId);
+    users[sessionId].username = params.username;
+
+    users[sessionId].nameTitle = params.username; // TODO change it!!!
+};
+
+exports.getUser = function(sessionId)
 {
     console.log("active_user::getUser", sessionId);
 
     if(!users[sessionId]){
         console.log("active_user::getUser not_exist");
-        if(!createNew){
-            return null;
-        }
-
-        console.log("active_user::getUser creating", sessionId);
-        //bring from DB etc...
-
-        users[sessionId] = newUser(sessionId);
+        return null;
     }
 
     return users[sessionId];
@@ -41,6 +41,11 @@ exports.getForm = function(sessionId, form_name){
 
 exports.hasPermission = function(sessionId, file){
     console.log("active_user::hasPermission", sessionId, file); // file path
+    if(file != "../ui//index.html"){
+        if(!users[sessionId]){
+            return false;
+        }
+    }
 
     return true;
 };

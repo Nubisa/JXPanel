@@ -15,6 +15,22 @@ var checkUser = function(env){
 };
 
 
+methods.tryLogin = function(env, params){
+    var pam = require('authenticate-pam');
+
+    pam.authenticate(params.username, params.password, function(err) {
+        if(err) {
+            server.sendCallBack(env, {err: form_lang.Get(params.lang, "CredentialsFailed")});
+        }
+        else {
+            _active_user.loginUser(env.SessionID, params);
+            server.sendCallBack(env, {url: "/dashboard.html"});
+        }
+    });
+
+};
+
+
 var sessionAdd = function(env, active_user, params){
     var active_user = checkUser(env);
 

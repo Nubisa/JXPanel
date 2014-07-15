@@ -58,7 +58,7 @@
 
 		<header id="header">
             <div id="logo-group">
-                <span id="logo"> <img src="img/logo.png" alt="SmartAdmin"> </span>
+                <span id="logo"> <img src="img/logo.png" alt="{{defaults.panelName}}"> </span>
             </div>
 		</header>
 
@@ -90,7 +90,7 @@
 					</div>
 					<div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
 						<div class="well no-padding">
-							<form action="index.html" id="login-form" class="smart-form client-form" method="post">
+							<form id="login-form" class="smart-form client-form" method="post">
 								<header>
 									{{label.SignIn}}
 								</header>
@@ -100,25 +100,23 @@
 									<section>
 										<label class="label">{{label.Username}}</label>
 										<label class="input"> <i class="icon-append fa fa-user"></i>
-											<input type="text" name="username">
+											<input type="text" id="username{{utils.dateNow}}" name="username">
 											<b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i> {{label.UsernameEnter}}</b></label>
 									</section>
 
 									<section>
 										<label class="label">{{label.Password}}</label>
 										<label class="input"> <i class="icon-append fa fa-lock"></i>
-											<input type="password" name="password">
+											<input type="password" id="password{{utils.dateNow}}" name="password">
 											<b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i> {{label.PasswordEnter}}</b> </label>
 										<div class="note">
 											<a href="../__htmls/forgotpassword.html">{{label.PasswordForgot}}</a>
 										</div>
+                                        <span id="notify">
+
+                                        </span>
 									</section>
 
-									<section>
-										<label class="checkbox">
-											<input type="checkbox" name="remember" checked="">
-											<i></i>{{label.StaySignedIn}}</label>
-									</section>
 								</fieldset>
 								<footer>
 									<button type="submit" class="btn btn-primary">
@@ -158,12 +156,12 @@
 		
 		<!-- JQUERY MASKED INPUT -->
 		<script src="js/plugin/masked-input/jquery.maskedinput.min.js"></script>
-		
-		<!--[if IE 8]>
-			
-			<h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
-			
-		<![endif]-->
+
+        <!--[if IE 8]>
+
+        <h1>{{label.MSBrowserOutOfDate}}</h1>
+
+        <![endif]-->
 
 		<!-- MAIN APP JS FILE -->
 		<script src="js/app.min.js"></script>
@@ -186,32 +184,48 @@
 					// Rules for form validation
 					rules : {
 						username : {
-							required : true//,
-//							email : false
+							required : true
 						},
 						password : {
 							required : true,
-							minlength : 3,
-							maxlength : 20
+							minlength : 4,
+							maxlength : 64
 						}
 					},
-
-					// Messages for form validation
 					messages : {
 						username : {
-							required : '{{label.UsernameEnterRequired}}'//,
-							//email : 'Please enter a VALID email address'
+							required : '{{label.UsernameEnterRequired}}'
 						},
 						password : {
 							required : '{{label.PasswordEnterRequired}}'
 						}
 					},
-
-					// Do not change code below
 					errorPlacement : function(error, element) {
 						error.insertAfter(element.parent());
 					}
 				});
+                $("#login-form").submit(function(e){
+                   var uname = document.getElementById("username{{utils.dateNow}}").value;
+                   var pwd = document.getElementById("password{{utils.dateNow}}").value;
+                   if(!jxcore.IsConnected){
+                       location.reload();
+                   }else{
+                       setTimeout(function(){
+                           jxcore.Call("tryLogin", {username:uname, password:pwd, lang:"EN"}, function(result){
+
+                               if(result.err){
+                                document.getElementById('notify').innerHTML =
+                                    '<div class="note">'
+                                    +'<span style="color:red">' + result.err + '</span>'
+                                    '</div>';
+                               }else{
+                                    location.href = result.url;
+                               }
+                           });
+                       }, 100);
+                   }
+                   return false;
+                });
 			});
 		</script>
 

@@ -2,47 +2,51 @@ var smart_replace = require('./smart_search').replace;
 var site_defaults = require('../definitions/site_defaults');
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
+var page_utils = require('./page_utils');
 var fs = require('fs');
 
-var takeValue = function(active_user, obj, val){
-    if(!obj[active_user.lang]){
-        obj[active_user.lang] = {};
+var takeValue = function(lang, obj, val){
+    if(!obj[lang]){
+        obj[lang] = {};
     }
 
-    var lang_exists = !obj[active_user.lang][val];
-    var lang;
+    var lang_exists = !obj[lang][val];
+
+    var _lang;
     if(!lang_exists){
         lang_exists = site_defaults["EN"][val];
-        lang = "EN";
+        _lang = "EN";
     }
     else
-        lang = active_user.lang;
+        _lang = lang;
 
     if(!lang_exists)
         return "";
     else
-        return obj[lang][val];
+        return obj[_lang][val];
 };
 
 var smart_rule = [
     {from:"{{defaults.$$}}", to:"$$", "$":function(val, gl){
-        return takeValue(gl.active_user, site_defaults, val);}
+        return takeValue(gl.lang, site_defaults, val);}
     },
     {from:"{{user.$$}}", to:"$$", "$":function(val, gl){
         var active_user = gl.active_user;
+        if(!active_user){
+            return "";
+        }
+
         return !active_user[val] ? "":active_user[val];}
     },
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
-        var active_user = gl.active_user;
-        var res = form_lang.Get(active_user.lang, val);
+        var res = form_lang.Get(gl.lang, val);
         return !res?"":res;}
     },
     {from:"{{forms.$$}}", to:"$$", "$":function(val, gl){
         return _active_user.getForm(gl.sessionId, val);}
     },
     {from:"{{toSub.##:$$}}", to:"@@", "@!":function(first, second, gl){
-            var active_user = gl.active_user;
-            var res = form_lang.Get(active_user.lang, second);
+            var res = form_lang.Get(gl.lang, second);
             res = !res?"":res;
             gl[first] = " - " + res;
         }
@@ -65,18 +69,28 @@ var smart_rule = [
     {from:"{{datatable.$$}}", to:"$$", "$":function(val, gl){
         return _active_user.getDataTable(gl.sessionId, val);}
     },
+    {from:"{{utils.$$}}", to:"$$", "$":function(val, gl){
+            return page_utils[val](gl);
+        }
+    }
 ];
 
 var apply_smart = function(file, req, res, data){
     console.log("apply_smart::SessionId", req.session);
     var sessionId = (!req.session)?null:req.session.id;
 
+    var _user = _active_user.getUser(sessionId);
+    var _lang = "EN";
+    if(_user && _user.lang)
+        _lang = _user.lang;
+
+    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang};
+
     if(!_active_user.hasPermission(sessionId, file)){
-        res.write(form_lang.Get("EN", "Access Denied"));
+        res.write("<html><script>location.href='/index.html';</script></html>");
         return;
     }
 
-    smart_rule.globals = {"sessionId":sessionId, "active_user": _active_user.getUser(sessionId, true)};
     data = smart_replace(data, smart_rule);
     res.write(data);
 };
