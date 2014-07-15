@@ -19,7 +19,7 @@ exports.Get = function(lang, val, notNull, arrParams){
         str = langs[lang][val];
     }
 
-    if(langs.EN[val])
+    if(!str && langs.EN[val])
         str = langs.EN[val];
 
     if(!str)

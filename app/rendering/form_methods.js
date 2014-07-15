@@ -14,9 +14,9 @@ var checkUser = function(env){
     return active_user;
 };
 
+var pam = require('authenticate-pam');
 
 methods.tryLogin = function(env, params){
-    var pam = require('authenticate-pam');
 
     pam.authenticate(params.username, params.password, function(err) {
         if(err) {

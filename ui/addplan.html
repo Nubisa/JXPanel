@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    {{view.header}} {{toSub.pageTitle:Empty}}
+    {{view.header}} - {{toSub.pageTitle:DataPlans}}
 </head>
 <body class="smart-style-3 fixed-navigation fixed-header fixed-ribbon fixed-page-footer">
 <!-- possible classes: minified, fixed-ribbon, fixed-header, fixed-width-->
@@ -50,14 +50,19 @@
 
         <!-- breadcrumb -->
         <ol class="breadcrumb">
-            <li>{{label.Home}}</li><li>{{label.Dashboard}}</li>
+            <li>{{label.Home}}</li><li>{{label.DataPlans}}</li>
         </ol>
 
     </div>
     <!-- END RIBBON -->
 
     <!-- MAIN CONTENT -->
-    <div id="content">
+    <div id="content" style="padding-top:20px">
+
+        {{view.topMessage}}
+            {{toSub.topMessageTitle:DataPlans}}
+            {{toSub.topMessageHeader:DataPlansHeader}}
+            {{toSub.topMessageContent:DataPlansContent}}
 
         <div class="row">
             <!-- RENDER UNDER RIBON -->

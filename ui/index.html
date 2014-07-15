@@ -119,7 +119,7 @@
 
 								</fieldset>
 								<footer>
-									<button type="submit" class="btn btn-primary">
+									<button id="btnSubmit" type="submit" class="btn btn-primary" disabled>
                                         {{label.SignIn}}
 									</button>
 								</footer>
@@ -170,7 +170,7 @@
         <script>
             document.onjxready = function () {
                 jxcore.Start(function (status) {
-
+                    delete document.getElementById("btnSubmit").disabled;
                 });
             };
         </script>

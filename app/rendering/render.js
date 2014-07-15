@@ -115,6 +115,7 @@ var apply_smart = function(file, req, res, data){
         smart_rule.globals.reset = false;
         data = smart_replace(data, smart_rule);
     }
+
     res.write(data);
 };
 

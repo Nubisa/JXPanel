@@ -41,6 +41,12 @@ exports.Labels = {
     "PasswordEnter" : "Enter your password",
     "PasswordEnterRequired" : "Please enter your password",
 
+    "DataPlans": "Hosting Plans",
+    "DataPlansHeader": "Customize the options",
+    "DataPlansContent": "Fill the below inputs to create a new hosting plan. You can use a hosting plan for multiple users.",
+
+    "addPlan": "Add a new hosting plan",
+
     "CredentialsFailed": "Incorrect username and/or password",
     "WelcomeDashboard": "Welcome %s!",
 
