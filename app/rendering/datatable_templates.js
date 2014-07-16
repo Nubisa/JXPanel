@@ -7,21 +7,65 @@ var form_lang = require('../definitions/form_lang');
 var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
+var sqlite = require("./../db/sqlite.js");
 
 
-var getHTML = function (active_user, tableName, cb) {
+var getTable = function(table_name) {
+    var tableFileName = path.join(__dirname, "../definitions/datatables/" + table_name + ".js");
 
-    var tableFileName = path.join(__dirname, "../definitions/datatables/" + tableName + ".js");
+    if (fs.existsSync(tableFileName))
+        return require(tableFileName);
 
-    if (!fs.existsSync(tableFileName)) {
-        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
-        returnl
+    return null;
+};
+
+
+var getData = function(active_user, table, json, cb) {
+
+    if (!sqlite.db) {
+        cb(form_lang.Get(active_user.lang, "DBNotOpened"));
+        return;
     }
 
-    var table = require(tableFileName);
+    table.settings.dbTable.GetAll(sqlite.db, json, function(err, rows) {
+        if (err)
+            cb(err)
+        else {
+//            console.log("getData rows", rows);
+            cb(false, rows);
+        }
+    });
+};
 
-    var columns = table.columns;
-    table.getData(active_user, function(err, rows) {
+
+var getForm = function(table) {
+
+    var fname = path.join(__dirname, '../definitions/forms/' + table.settings.addForm + ".js");
+
+    if (fs.existsSync(fname)) {
+        return require(fname).form();
+    }
+};
+
+var getHTML = function (active_user, table, cb) {
+
+    var columns = table.settings.columns;
+    var form = getForm(table);
+
+    if (!form) {
+        cb("Cannot find form.");
+        return;
+    }
+
+    // getting form control display names
+    var formControls = {};
+    for(var i in form.controls) {
+        var ctrl = form.controls[i];
+        if (ctrl.name)
+            formControls[ctrl.name] = ctrl.details;
+    }
+
+    getData(active_user, table, null, function(err, rows) {
 
         if (err) {
             cb(err);
@@ -35,14 +79,32 @@ var getHTML = function (active_user, tableName, cb) {
 
         var thead = [];
         var tbody = [];
+        var dbNames = {};
+        // searching for display names and dbNames of controls
         for (var a in columns) {
-            thead.push("<td>" + columns[a] + "</td>")
+            var displayName = columns[a];
+            if (displayName == "_checkbox") displayName = "";
+            if (displayName == "_id") displayName = "ID";
+
+            if (formControls[columns[a]]) {
+                displayName = form_lang.Get(active_user.lang, formControls[displayName].label);
+                dbNames[columns[a]] = formControls[columns[a]].dbName || columns[a];
+            }
+
+            thead.push("<td>" + displayName + "</td>")
         }
 
         for (var y = 0, len = rows.length; y < len; y++) {
             tbody.push("<tr>");
             for (var x in columns) {
-                tbody.push("<td>" + rows[y][x] + "</td>");
+                var colName = dbNames[columns[x]] || columns[x];
+                var val = '<a href="#" onclick="jxEditRow(\''+  rows[y]["ID"] +'\'); return false;">' + rows[y][colName] + '</a>';
+                if (colName === "_checkbox")
+                    val = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
+                else if (colName === "_id")
+                    val = y + 1;
+
+                tbody.push("<td>" + val + "</td>");
             }
             tbody.push("</tr>");
         }
@@ -52,16 +114,22 @@ var getHTML = function (active_user, tableName, cb) {
     });
 };
 
-exports.render = function (sessionId, tableName, cb) {
+exports.render = function (sessionId, table_name, cb) {
 
     var active_user = _active_user.getUser(sessionId);
+
+    var table = getTable(table_name);
+    if (!table) {
+        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
+        return;
+    }
 
     if (!cb) {
         // sync return
         var containerFile = path.join(__dirname, "../definitions/datatables/datatable.html");
         if (fs.existsSync(containerFile)) {
             var widget = fs.readFileSync(containerFile).toString();
-            logic.globals = { name: tableName, contents: "<thead><tr><td></td></tr></thead><tbody><tr><td></td></tr></tbody>", active_user: active_user};
+            logic.globals = { name: table_name, contents: "<thead><tr><td></td></tr></thead><tbody><tr><td></td></tr></tbody>", active_user: active_user, table : table};
             var result = rep(widget, logic);
 
             return result;
@@ -70,7 +138,7 @@ exports.render = function (sessionId, tableName, cb) {
         }
     } else {
         // async return
-        getHTML(active_user, tableName, function(err, str) {
+        getHTML(active_user, table, function(err, str) {
             cb(err, str)
         });
     }
@@ -89,6 +157,79 @@ var logic = [
         if (val == "id")
             return gl.name;
 
+        if (val == "buttons") {
+            var containerFile = path.join(__dirname, "../definitions/datatables/" + gl.name + "_buttons.html");
+            if (fs.existsSync(containerFile)) {
+                var txt = fs.readFileSync(containerFile).toString();
+                return rep(txt, logic);
+            } else
+                return "";
+        }
+
         return form_lang.Get(gl.lang, gl[val], true);
     }}
 ];
+
+
+
+// removes ids from main table (e.g. user_table) and all records from data_value_table
+exports.remove = function (sessionId, table_name, ids, cb) {
+
+//    console.log("!!datatable remove", table_name, ids);
+
+    var active_user = _active_user.getUser(sessionId);
+
+    var table = getTable(table_name);
+    if (!table) {
+        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
+        return;
+    }
+
+    if (!ids) {
+        cb(form_lang.Get(active_user.lang, "EmptySelection"));
+        return;
+    }
+
+    if (!sqlite.db) {
+        cb(form_lang.Get(active_user.lang, "DBNotOpened"));
+        return;
+    }
+
+    table.dbTable.Delete(sqlite.db, { "ID" : ids }, cb);
+};
+
+exports.edit = function (sessionId, table_name, id, cb) {
+    var active_user = _active_user.getUser(sessionId);
+
+    var table = getTable(table_name);
+    if (!table) {
+        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
+        return;
+    }
+
+    if (!id) {
+        cb(form_lang.Get(active_user.lang, "EmptySelection"));
+        return;
+    }
+
+    getData(active_user, table, { id : id }, function(err, rows) {
+        if (!err) {
+
+            if (rows.length > 0) {
+                active_user.session.edits = active_user.session.edits || {};
+                active_user.session.edits[table.settings.addForm] = rows[0];
+
+            console.log("storing rows in edits", rows);
+
+                // sending url to the browser for redirecting to edit form
+                cb(false, table.settings.addFormURL);
+            } else {
+                cb(form_lang.Get(active_user.lang, "EmptySelection"));
+            }
+
+        } else {
+            cb(err);
+        }
+    });
+
+};

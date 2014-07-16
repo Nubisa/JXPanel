@@ -33,8 +33,8 @@ exports.Labels = {
     "UnknownForm" : "Unknown form",
 
     // Form names
-    "addUser" : "Add new user",
-    "addSubscription" : "Add new subscription",
+    "addUser" : "Add New User",
+    "addSubscription" : "Add New Subscription",
 
     // login page
     "SignIn" : "Sign In",
@@ -83,7 +83,10 @@ exports.Labels = {
 
     // Pages
     "Subscription" : "Subscription Management",
+
     "Users" : "User Management",
+    "UsersHeader": "Customize the options",
+    "UsersListContent": "Create new users and manage their options.",
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
@@ -128,7 +131,9 @@ exports.Labels = {
 
     // datatables
     "UnknownDataTable" : "Unknown table name.",
-
+    "EmptySelection" : "Select the rows first.",
+    "RemoveSelected" : "Remove selected",
+    "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
 
     //charts
     "DiskUsageInformation": "Disk Usage Information",

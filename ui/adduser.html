@@ -50,7 +50,7 @@
 
         <!-- breadcrumb -->
         <ol class="breadcrumb">
-            <li>{{label.Home}}</li><li>{{label.Dashboard}}</li>
+            <li>{{label.Home}}</li><li>{{label.Users}}</li>
         </ol>
 
     </div>
@@ -60,12 +60,11 @@
     <div id="content" style="padding-top:10px">
 
         {{view.topMessage}}
-            {{toSub.topMessageTitle:Dashboard}}
-            {{toSub.topMessageHeader:defaults_dashboardTitle}}
-            {{toSub.topMessageContent:defaults_dashboardMessage}}
+            {{toSub.topMessageTitle:Users}}
+            {{toSub.topMessageHeader:UsersHeader}}
+            {{toSub.topMessageContent:UsersContent}}
 
-        <div class="row">
-            <!-- RENDER UNDER RIBON -->
+            <p id="jxFormMessage"></p>
 
             <!-- widget grid -->
             <section id="widget-grid" class="">
@@ -74,9 +73,6 @@
                         {{forms.addUser}}
 
             </section>
-
-        </div>
-        <!-- end widget grid -->
 
     </div>
     <!-- END MAIN CONTENT -->

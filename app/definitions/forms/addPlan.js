@@ -38,6 +38,9 @@ exports.form = function () {
 
         this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
 
+        this.onSubmitSuccess = "plans.html";
+        this.onSubmitCancel = "plans.html";
+
         this.controls = [
             {"BEGIN": "User Details"},
 

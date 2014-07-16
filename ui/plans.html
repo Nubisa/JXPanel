@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    {{view.header}} - {{toSub.pageTitle:DataPlans}}
+    {{view.header}} {{toSub.pageTitle:DataPlans}}
 </head>
 <body class="smart-style-3 fixed-navigation fixed-header fixed-ribbon fixed-page-footer">
 <!-- possible classes: minified, fixed-ribbon, fixed-header, fixed-width-->
@@ -61,16 +61,15 @@
 
         {{view.topMessage}}
             {{toSub.topMessageTitle:DataPlans}}
-            {{toSub.topMessageHeader:DataPlansHeader}}
-            {{toSub.topMessageContent:DataPlansContent}}
+            {{toSub.topMessageHeader:PlansHeader}}
+            {{toSub.topMessageContent:PlansContent}}
 
             <p id="jxFormMessage"></p>
 
             <!-- widget grid -->
             <section id="widget-grid" class="">
 
-
-                {{forms.addPlan}}
+                  {{datatable.plans}}
 
             </section>
 

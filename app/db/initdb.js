@@ -6,9 +6,18 @@
 // adds field definitions based on forms definitions
 
 
-var sqlite = require("./sqlite");
 var fs = require("fs");
 var path = require("path");
+
+var recreate = process.argv[process.argv.length-1] == "true";
+
+if (recreate) {
+    fs.unlinkSync("./dbfile.db");
+}
+
+
+var sqlite = require("./sqlite");
+
 
 
 var createFields = function (db, table, controls) {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    {{view.header}} - {{toSub.pageTitle:DataPlans}}
+    {{view.header}} {{toSub.pageTitle:Users}}
 </head>
 <body class="smart-style-3 fixed-navigation fixed-header fixed-ribbon fixed-page-footer">
 <!-- possible classes: minified, fixed-ribbon, fixed-header, fixed-width-->
@@ -50,7 +50,7 @@
 
         <!-- breadcrumb -->
         <ol class="breadcrumb">
-            <li>{{label.Home}}</li><li>{{label.DataPlans}}</li>
+            <li>{{label.Home}}</li><li>{{label.Users}}</li>
         </ol>
 
     </div>
@@ -60,17 +60,16 @@
     <div id="content" style="padding-top:10px">
 
         {{view.topMessage}}
-            {{toSub.topMessageTitle:DataPlans}}
-            {{toSub.topMessageHeader:DataPlansHeader}}
-            {{toSub.topMessageContent:DataPlansContent}}
+            {{toSub.topMessageTitle:Users}}
+            {{toSub.topMessageHeader:UsersHeader}}
+            {{toSub.topMessageContent:UsersListContent}}
 
             <p id="jxFormMessage"></p>
 
             <!-- widget grid -->
             <section id="widget-grid" class="">
 
-
-                {{forms.addPlan}}
+                  {{datatable.users}}
 
             </section>
 

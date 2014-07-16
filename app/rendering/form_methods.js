@@ -109,7 +109,7 @@ methods.sessionApply = function(env, params){
         if (err) {
             server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
         } else {
-            server.sendCallBack(env, "OK");
+            server.sendCallBack(env, {err: false});
         }
     });
 };
@@ -117,11 +117,24 @@ methods.sessionApply = function(env, params){
 
 methods.getTableData = function(env, params) {
 
-    if (params.dt) {
-        datatables.render(env.SessionID, params.dt, function(err, str) {
-            server.sendCallBack(env, str);
-        });
-    }
+    datatables.render(env.SessionID, params.dt, function(err, str) {
+        server.sendCallBack(env, str);
+    });
+};
+
+
+methods.removeFromTableData = function(env, params) {
+
+    datatables.remove(env.SessionID, params.dt, params.ids, function(err) {
+        server.sendCallBack(env, {err : err });
+    });
+};
+
+methods.editTableData = function(env, params) {
+
+    datatables.edit(env.SessionID, params.dt, params.id, function(err, url) {
+        server.sendCallBack(env, {err : err, url : url});
+    });
 };
 
 module.exports = methods;

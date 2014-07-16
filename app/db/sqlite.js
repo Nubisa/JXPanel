@@ -5,6 +5,7 @@
 
 var sqlite3 = require('sqlite3');
 var fs = require('fs');
+var util = require("util");
 
 var counter = 1;
 
@@ -23,45 +24,68 @@ var data_value_table = "data_value_table";
 
 var tables = {};
 tables[subscription_table] = {
-    "ID": { type: "CHAR(20)", required: true, primary: true },
-    "subscription_name": { type: "TEXT", required: true, unique: true},
-    "owner_user_ids": { type: "TEXT" }
+    fields : {
+        "ID": { type: "CHAR(20)", required: true, primary: true },
+        "subscription_name": { type: "TEXT", required: true, unique: true},
+        "owner_user_ids": { type: "TEXT" }
+    }
 };
 
 tables[plan_table] = {
-    "ID": { type: "CHAR(20)", required: true, primary: true },
-    "plan_name": { type: "TEXT", required: true, unique: true}
+    fields : {
+        "ID": { type: "CHAR(20)", required: true, primary: true },
+        "plan_name": { type: "TEXT", required: true, unique: true}
+    },
+    view : {
+        name : "vPlans"
+    }
 };
 
 
 tables[user_table] = {
-    "ID": { type: "CHAR(20)", required: true, primary: true},
-    "subscription_table_id": { type: "CHAR(20)", required: false },
-    "username": { type: "TEXT", required: true, unique: true},
-    "password": { type: "TEXT", required: true }
+    fields : {
+        "ID": { type: "CHAR(20)", required: true, primary: true},
+        "subscription_table_id": { type: "CHAR(20)", required: false },
+        "username": { type: "TEXT", required: true, unique: true},
+        "password": { type: "TEXT", required: true }
+    },
+    view : {
+        name : "vUsers"
+    }
 };
 
 tables[domain_table] = {
-    "ID": { type: "CHAR(20)", required: true, primary: true },
-    "subscription_table_id": { type: "CHAR(20)", required: true },
-    "domain_name": { type: "TEXT", required: true, unique: true }
+    fields : {
+        "ID": { type: "CHAR(20)", required: true, primary: true },
+        "subscription_table_id": { type: "CHAR(20)", required: true },
+        "domain_name": { type: "TEXT", required: true, unique: true }
+    },
+    view : {
+        name : "vDomains"
+    }
 };
 
 tables[data_field_table] = {
-    "ID": { type: "CHAR(20)", required: true, primary: true },
-    "table_name": { type: "TEXT", required: true, unique1: true },
-    "field_name": { type: "TEXT", required: true, unique1: true },
-    "field_type": { type: "TEXT"},
-    "default_value_rules": { type: "TEXT"},
-    "default_value": { type: "TEXT"}
+    fields : {
+        "ID": { type: "CHAR(20)", required: true, primary: true },
+        "table_name": { type: "TEXT", required: true, unique1: true },
+        "field_name": { type: "TEXT", required: true, unique1: true },
+        "field_type": { type: "TEXT"},
+        "default_value_rules": { type: "TEXT"},
+        "default_value": { type: "TEXT"}
+    }
 };
 
 tables[data_value_table] = {
-    "ID": { type: "CHAR(20)", required: true, primary: true},
-    "data_field_table_id": { type: "CHAR(20)", required: true, unique1: true },
-    "owner_table_id": { type: "INTEGER", required: true, unique1: true },
-    "value": { type: "TEXT" }
+    fields : {
+        "ID": { type: "CHAR(20)", required: true, primary: true},
+        "data_field_table_id": { type: "CHAR(20)", required: true, unique1: true },
+        "owner_table_id": { type: "INTEGER", required: true, unique1: true },
+        "value": { type: "TEXT" }
+    }
 };
+
+
 
 
 // ########## private methods
@@ -76,16 +100,16 @@ var getCreateTableQuery = function (table_name) {
     var uniques = {};
     var sql = [];
 
-    for (var field_name in tables[table_name]) {
-        var field = tables[table_name][field_name];
+    for (var field_name in tables[table_name].fields) {
+        var field = tables[table_name].fields[field_name];
         if (field.unique1) {
             if (!uniques[table_name]) uniques[table_name] = [];
             uniques[table_name].push(field_name);
         }
     }
 
-    for (var field_name in tables[table_name]) {
-        var field = tables[table_name][field_name];
+    for (var field_name in tables[table_name].fields) {
+        var field = tables[table_name].fields[field_name];
         var str = field_name + " " + field.type;
 
         if (field.primary) str += " PRIMARY KEY NOT NULL";
@@ -112,10 +136,21 @@ var getCreateTableQuery = function (table_name) {
 };
 
 
+var getCreateViewQuery = function (view_name, table_name) {
+
+    var sql = "CREATE VIEW " + view_name + " AS "
+        + "SELECT * FROM data_value_table v JOIN data_field_table f ON v.data_field_table_id = f.ID "
+        + "WHERE f.table_name = '" + table_name + "' AND v.owner_table_id in "
+        + "(SELECT ID FROM " + table_name + ")";
+
+    return sql;
+};
+
+
 // return err string or null if field value is ok
 var checkFieldValue = function (table_name, field_name, json) {
 
-    var fieldDef = tables[table_name][field_name];
+    var fieldDef = tables[table_name].fields[field_name];
 
     if (!fieldDef) {
         return "Field `" + field_name + "` does not exist in table " + table_name;
@@ -127,7 +162,7 @@ var checkFieldValue = function (table_name, field_name, json) {
 
 // return err string or null if fields are ok
 var checkRequiredFields = function (table_name, json) {
-    var fields = tables[table_name];
+    var fields = tables[table_name].fields;
 
     for (var field_name in fields) {
         var fieldDef = fields[field_name];
@@ -145,14 +180,12 @@ var getIfNotExistsQuery = function(table_name) {
 
     var uniques = [];
 
-    for (var field_name in tables[table_name]) {
-        var field = tables[table_name][field_name];
+    for (var field_name in tables[table_name].fields) {
+        var field = tables[table_name].fields[field_name];
         if (field.unique1) {
             uniques[table_name].push(field_name);
         }
     }
-
-
 };
 
 
@@ -233,7 +266,11 @@ var getDeleteQuery = function (table_name, json_where) {
 
     var where = [];
     for (var field in json_where) {
-        where.push(field + " = '" + json_where[field] + "'");
+        if (util.isArray(json_where[field])) {
+            where.push(field + " IN ('" + json_where[field].join("', '") + "')");
+        } else {
+            where.push(field + " = '" + json_where[field] + "'");
+        }
     }
 
     if (!where.length) {
@@ -313,6 +350,7 @@ var deleteRecord = function (table_name, db_object, json_where, cb) {
 var Table = function (table_name) {
 
     var _table_name = table_name;
+    var isCommon = table_name == data_field_table || table_name == data_value_table;
 
     // records in table_name
 
@@ -324,12 +362,78 @@ var Table = function (table_name) {
         getRecord(_table_name, db_object, json, cb)
     };
 
+
+    this.GetAll = function (db_object, json, cb) {
+
+        if (!cb) {
+            throw "The callback is required";
+            return;
+        }
+
+        // getting the main table first
+        getRecord(_table_name, db_object, json, function(err, rows) {
+            if (err) {
+                cb(err);
+            } else {
+
+//                console.log("rows", rows);
+
+                var ids = [];
+                for(var a in rows) {
+                    ids.push(rows[a].ID)
+                }
+
+                var sql = "SELECT * FROM data_value_table v JOIN data_field_table f ON v.data_field_table_id = f.ID "
+                    + "WHERE f.table_name = '" + _table_name + "' AND v.owner_table_id IN ('"+ ids.join("', '") +"')";
+
+                db_object.all(sql, function(err1, rows1) {
+                    if (err1) {
+                        cb(err1);
+                    } else {
+//                        console.log("subrows", rows1);
+
+                        for (var b in rows) {
+                            var id = rows[b].ID;
+                            for (var a in rows1) {
+                                var id1 = rows1[a].owner_table_id;
+
+                                if (id == id1) {
+//                                    console.log("OK", id, id1, rows1[a].field_name,rows1[a].value )
+                                    var fieldName = rows1[a].field_name;
+
+                                    if (!rows[b][fieldName])
+                                        rows[b][fieldName] = rows1[a].value;
+                                }
+                            }
+                        }
+
+
+                        cb(false, rows);
+                    }
+                });
+            }
+        });
+    };
+
+
     this.Update = function (db_object, json, cb) {
         updateRecord(_table_name, db_object, json, cb)
     };
 
     this.Delete = function (db_object, json, cb) {
-        deleteRecord(_table_name, db_object, json, cb)
+
+        if (isCommon) {
+            deleteRecord(_table_name, db_object, json, cb);
+        } else {
+            // this will work properly only if json.ID is present, and this can be array
+            deleteRecord(_table_name, db_object, json, function(err) {
+                if (err) {
+                    if (cb) cb(err);
+                } else {
+                    deleteRecord(data_value_table, db_object, { owner_table_id : json.ID }, cb);
+                };
+            });
+        }
     };
 
     // field rules related to table_name (data_field_table)
@@ -561,20 +665,29 @@ exports.CreateDatabase = function (file_name, cb) {
         return;
     }
 
+    var _cb = function (err) {
+        if (err) {
+            errors.push(err);
+        }
+    };
 
     var errors = [];
 
     db_object.serialize(function () {
+        // creating tables
         for (var table_name in tables) {
             var ret = getCreateTableQuery(table_name);
 
             // ret.sql is array in this case
             for (var id in ret.sql) {
-                db_object.run(ret.sql[id], function (err) {
-                    if (err) {
-                        errors.push(err);
-                    }
-                });
+                db_object.run(ret.sql[id], _cb);
+            }
+        }
+
+        // creating views
+        for (var table_name in tables) {
+            if (tables[table_name].view) {
+                db_object.run(getCreateViewQuery(tables[table_name].view.name, table_name), _cb);
             }
         }
     });

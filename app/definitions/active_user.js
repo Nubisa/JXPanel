@@ -61,7 +61,7 @@ exports.hasPermission = function(sessionId, file){
 
 
 exports.getDataTable = function(sessionId, table_name){
-    console.log("active_user::getDataTable", sessionId, table_name);
+//    console.log("active_user::getDataTable", sessionId, table_name);
 
     return datatables.render(sessionId, table_name);
 };

@@ -16,6 +16,9 @@ exports.form = function () {
 
         this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
 
+        this.onSubmitSuccess = "users.html";
+        this.onSubmitCancel = "users.html";
+
         this.controls = [
             {"BEGIN": "User Details"},
 
@@ -62,7 +65,8 @@ exports.form = function () {
                     label: "Username",
                     method: tool.createTextBox,
                     options: { required: true, values: ["EN"]},
-                    value_table: false
+                    value_table : false,
+                    dbName : "username"
                 }
             },
 
@@ -72,7 +76,8 @@ exports.form = function () {
                     label: "Password",
                     method: tool.createTextBox,
                     options: { required: true, password: true },
-                    value_table: false
+                    value_table: false,
+                    dbName : "password"
                 },
                 validation : new validations.String(5)
             },
@@ -101,7 +106,6 @@ exports.form = function () {
                 len--;
                 if (err) {
                     errors.push(err);
-                    console.error(err);
                 }
                 if (len===0) {
                     cb(null);
@@ -118,10 +122,13 @@ exports.form = function () {
                     if (_controls[name]) {
                         var addValue = _controls[name].value_table !== false;
                         if (addValue) {
-                            console.log("adding", name, values[name]);
+//                            console.log("adding", name, values[name]);
                             sqlite.User.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                            continue;
                         }
                     }
+                    // to decrease the counter and call cb if needed
+                    _cb(false);
                 }
             });
         };
