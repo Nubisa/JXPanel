@@ -57,18 +57,23 @@
     <!-- END RIBBON -->
 
     <!-- MAIN CONTENT -->
-    <div id="content">
+    <div id="content" style="padding-top:10px">
+
+        {{view.topMessage}}
+            {{toSub.topMessageTitle:Dashboard}}
+            {{toSub.topMessageHeader:defaults_dashboardTitle}}
+            {{toSub.topMessageContent:defaults_dashboardMessage}}
 
         <div class="row">
             <!-- RENDER UNDER RIBON -->
 
-        <!-- widget grid -->
-        <section id="widget-grid" class="">
+            <!-- widget grid -->
+            <section id="widget-grid" class="">
 
 
                 {{forms.testForm}}
 
-        </section>
+            </section>
 
         </div>
         <!-- end widget grid -->

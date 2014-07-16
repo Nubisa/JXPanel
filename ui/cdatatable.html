@@ -57,7 +57,12 @@
     <!-- END RIBBON -->
 
     <!-- MAIN CONTENT -->
-    <div id="content">
+    <div id="content" style="padding-top:10px">
+
+        {{view.topMessage}}
+            {{toSub.topMessageTitle:Dashboard}}
+            {{toSub.topMessageHeader:defaults_dashboardTitle}}
+            {{toSub.topMessageContent:defaults_dashboardMessage}}
 
         <div class="row">
             <!-- RENDER UNDER RIBON -->
