@@ -68,7 +68,14 @@ var outputConvert = function(str, expects, fixer){
 
 var getTop = function(){
     var num_cols = 12;
-    var result = jxcore.utils.cmdSync("top -l 1 -ncols "+num_cols);
+    var result;
+    var is_mac = /mac/.test(jxcore.utils.getOS()); 
+    if(is_mac)
+    	result = jxcore.utils.cmdSync("top -l 1 -ncols "+num_cols);
+    else{
+    	result = jxcore.utils.cmdSync("top -n 1 -b");
+	result.out = result.out.replace(/[ ]/g, "  ");
+    }
 
     if(result.exitCode != 0 || !result.out){
         return null;
@@ -98,7 +105,7 @@ var getTop = function(){
         }
     };
 
-    return outputConvert(result.out, num_cols, fixer);
+    return outputConvert(result.out, num_cols, is_mac?fixer:null);
 };
 
 

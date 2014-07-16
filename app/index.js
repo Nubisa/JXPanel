@@ -1,4 +1,13 @@
 /*Copyright Nubisa, Inc. 2014. All Rights Reserved*/
+/*var tools = require('./system_tools');
+
+console.log(jxcore.utils.getOS())
+tools.getTop(function(res){
+	console.log(res);
+});
+
+return;
+*/
 
 var server = require('jxm');
 var render_engine = require('./rendering/render');
