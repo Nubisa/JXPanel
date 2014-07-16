@@ -1,6 +1,6 @@
 var forms = require('../rendering/form_templates');
 var datatables = require('../rendering/datatable_templates');
-
+var charts = require('./charts/charts');
 var users = {};
 
 var newUser = function(session_id){
@@ -38,6 +38,15 @@ exports.getForm = function(sessionId, form_name){
 
     return forms.renderForm(sessionId, form_name);
 };
+
+
+exports.getChart = function(sessionId, chart_name){
+    // TODO check permissions to chart
+    console.log("active_user::getChart", sessionId, chart_name);
+
+    return charts.getChart(sessionId, chart_name);
+};
+
 
 exports.hasPermission = function(sessionId, file){
     console.log("active_user::hasPermission", sessionId, file); // file path

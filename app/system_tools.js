@@ -1,5 +1,4 @@
 var outputConvert = function(str, expects, fixer){
-
     var lines = str.split('\n');
     if(lines.length){
         var obj = {};
@@ -187,6 +186,7 @@ exports.getDiskUsage = function(folder, cb){
     jxcore.tasks.addTask(task, folder, cb);
 };
 
+
 // returns objected version of top results { PID: [ array of PIDs] , ...... }
 exports.getTopSync = getTop;
 exports.getTop = function(cb){
@@ -197,6 +197,7 @@ exports.getTop = function(cb){
 
     jxcore.tasks.addTask(task, null, cb);
 };
+
 
 // returns objected version of "df -h" results { Filesystem: [ array of ..] , ...... }
 exports.getDiskInfoSync = getDiskInfo;

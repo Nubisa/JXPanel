@@ -56,6 +56,10 @@ var smart_rule = [
             return _active_user.getForm(gl.sessionId, val);
         }
     },
+    {from:"{{charts.$$}}", to:"$$", "$":function(val, gl){
+            return _active_user.getChart(gl.sessionId, val);
+        }
+    },
     {from:"{{toSub.##:$$}}", to:"@@", "@!":function(first, second, gl){
             if(second.indexOf("_")>0){
                 gl[first] = "{{" + second.replace("_", ".") + "}}";

@@ -64,19 +64,15 @@
             {{toSub.topMessageHeader:defaults_dashboardTitle}}
             {{toSub.topMessageContent:defaults_dashboardMessage}}
 
+        <section id="widget-grid" class="">
 
         <div class="row">
             <!-- RENDER UNDER RIBON -->
 
-            <!-- widget grid -->
-            <section id="widget-grid" class="">
-
-
-                CONTENT HERE
-
-            </section>
+            {{charts.diskUsageInfo}}
 
         </div>
+        </section>
         <!-- end widget grid -->
 
     </div>
@@ -97,6 +93,7 @@ you can add as many as you like
 <!-- END SHORTCUT AREA -->
 
 {{view.includes}}
+{{view.chartIncludes}}
 
 </body>
 

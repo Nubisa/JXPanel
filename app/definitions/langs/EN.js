@@ -127,7 +127,11 @@ exports.Labels = {
     "DBNotOpened" : "Database is not opened.",
 
     // datatables
-    "UnknownDataTable" : "Unknown table name."
+    "UnknownDataTable" : "Unknown table name.",
+
+
+    //charts
+    "DiskUsageInformation": "Disk Usage Information"
 };
 
 

@@ -115,7 +115,7 @@ exports.renderForm = function(sessionId, formName){
     if (fs.existsSync(containerFile)) {
         var widget = fs.readFileSync(containerFile).toString();
         var _icon = (!activeForm.icon)? "": activeForm.icon;
-        logic.globals = { name: formName, contents: fstr, active_user:active_user, icon:_icon };
+        logic.globals = { name: formName, contents: fstr, active_user:active_user, icon:_icon, lang:active_user.lang };
         var result = rep(widget, logic);
 
         return result;
