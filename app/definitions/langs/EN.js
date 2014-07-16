@@ -131,7 +131,9 @@ exports.Labels = {
 
 
     //charts
-    "DiskUsageInformation": "Disk Usage Information"
+    "DiskUsageInformation": "Disk Usage Information",
+    "ChartsTopCPUInfo": "Process CPU Information",
+    "ChartsTopMemoryInfo": "Process Memory Information"
 };
 
 

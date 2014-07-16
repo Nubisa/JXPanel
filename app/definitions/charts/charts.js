@@ -32,12 +32,24 @@ var logic = [
     }
 ];
 
+var last_sessionId = 0;
+var total_charts = 0;
+
 var renderChart = function(sessionId, chart){
     var str = fs.readFileSync(path.join(__dirname, "../charts/ajaxChart.html")) + "";
     var active_user = _active_user.getUser(sessionId);
     var lang = active_user.lang;
 
-    logic.globals = { name: chart.name, title: chart.title, active_user:active_user, lang:lang };
+    if(last_sessionId != sessionId){
+        last_sessionId = sessionId;
+        total_charts = 0;
+    }
+
+    total_charts %= 99;
+
+    chart.number = total_charts++;
+
+    logic.globals = { name: chart.name, title: chart.title, active_user:active_user, lang:lang, number:chart.number };
 
     if(!active_user.charts){
         active_user.charts = {};
