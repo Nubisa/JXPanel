@@ -185,6 +185,31 @@ exports.form = function () {
                 }
             },
 
+            { name: "domain_plan_id",
+                details: {
+                    label: "PlanID",
+                    method: tool.createComboBox,
+                    options: { required: true, dynamic: true }
+                },
+                dynamicValues : function(cb) {
+
+                    if (!cb)
+                        throw "Callback required.";
+
+                    sqlite.Plan.Get(sqlite.db, null, function (err, rows) {
+                        if (err) {
+                            cb(err)
+                        } else {
+                            var ret = [];
+                            for(var a in rows) {
+                                ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
+                            }
+                            cb(false, ret);
+                        }
+                    });
+                }
+            },
+
 //            { name: "sub_username",
 //                details: {
 //                    label: "Username",
@@ -269,7 +294,7 @@ exports.form = function () {
             } else {
                 addDomain();
             }
-        })
+        });
 
     };
 

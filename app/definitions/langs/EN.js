@@ -107,6 +107,7 @@ exports.Labels = {
 
     // Plan
     "PlanName" : "Plan name",
+    "PlanID" : "Hosting Plan",
     "Overuse" : "Allow overuse",
     "MaxDiskSpace" : "Disk space",
     "MaxDiskSpace_Description" : "Maximum disk usage. Value 0 disables the limit.",

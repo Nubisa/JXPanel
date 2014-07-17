@@ -126,7 +126,7 @@ exports.renderForm = function(sessionId, formName){
         scr += arr[o].js;
     }
 
-    scr += "}";
+    scr += "}; window.jxForms['"+formName+"'].created = true;";
 
     var fstr = tool.begin + html + tool.end + "<script>"+scr+"</script>";
 

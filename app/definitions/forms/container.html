@@ -6,6 +6,7 @@
         }
 
         window.jxForms["{{form.id}}"] = {
+            created: false,
             controls:{},
             apply:function(){
                 var _this = window.jxForms["{{form.id}}"];
@@ -68,6 +69,81 @@
                         }
                     });
                 }
+            },
+
+            loadDynamic: function () {
+                var _this = window.jxForms["{{form.id}}"];
+
+                if (!_this.created) {
+                    setTimeout(_this.loadDynamic, 100);
+                    return;
+                }
+
+                // loading jxm dynamic values
+                var frm = window.jxForms["{{form.id}}"];
+                if (!frm || !frm.controls) return;
+
+                var dynarr = [];
+                for (var a in frm.controls) {
+                    var ctrl = frm.controls[a];
+                    if (typeof ctrl.dynamic !== 'undefined' && ctrl.dynamic !== null) {
+                        dynarr.push(ctrl._t);
+                    }
+                }
+
+//                window.jxAddMessage("info", JSON.stringify(dynarr));
+
+                for (var a in dynarr) {
+                    jxcore.Call('getControlsValues', { form: '{{form.id}}', control: dynarr[a] }, function (param) {
+
+//                        window.jxAddMessage("info", "received values " + JSON.stringify(param));
+//                        window.jxAddMessage("info", "param.control " + JSON.stringify(param.control));
+//                        window.jxAddMessage("info", "param.values " + JSON.stringify(param.values));
+
+                        if (param.err) {
+                            window.jxAddMessage('danger', param.err);
+                        } else {
+                            _this.addToCombo(param.control, param.values);
+                        }
+                    });
+                }
+            },
+            addToCombo : function (ctrl_name, values) {
+                var _this = window.jxForms["{{form.id}}"];
+
+//                window.jxAddMessage("warning", ctrl_name + "." + JSON.stringify(values));
+
+                // finding control id
+                var ctrl_id = null;
+                for (var o in _this.controls)
+                    if (_this.controls[o]._t == ctrl_name)
+                        ctrl_id = o;
+
+                if (!ctrl_id) return;
+                var combo = document.getElementById(ctrl_id);
+                if (!combo) return;
+
+//                window.jxAddMessage("info", "values "  + JSON.stringify(values));
+
+                var selected = false;
+                // adding combo options
+                for (var id in values) {
+                    var item = values[id];
+                    var option = document.createElement('option');
+                    option.text = item.txt;
+                    option.value = item.id;
+
+//                    window.jxAddMessage("danger", item.txt + ", " + JSON.stringify(_this.controls[ctrl_id]));
+                    if (item.id + '' === _this.controls[ctrl_id].dynamic + '') {
+                        option.selected = true;
+                        selected = true;
+                    }
+                    combo.add(option);
+                }
+
+                _this.controls[ctrl_id].dynamic = null;
+                if (!selected)
+                    combo.selectedIndex = 0;
             }
         };
     </script>
@@ -125,3 +201,12 @@
 
 <!--</article>-->
 <!-- WIDGET END -->
+
+
+<script>
+
+    window.jxTemplateReadyForjxm = function() {
+        window.jxForms["{{form.id}}"].loadDynamic();
+    };
+
+</script>

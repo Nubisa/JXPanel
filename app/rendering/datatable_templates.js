@@ -125,7 +125,7 @@ exports.render = function (sessionId, table_name, cb) {
 
     var table = getTable(table_name);
     if (!table) {
-        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
+        if (cb) cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
         return;
     }
 
@@ -203,6 +203,8 @@ exports.remove = function (sessionId, table_name, ids, cb) {
     table.dbTable.Delete(sqlite.db, { "ID" : ids }, cb);
 };
 
+// called when user clicked Apply on the form
+// here record info is stored in session arr and they will be available after automatic panel refresh
 exports.edit = function (sessionId, table_name, id, cb) {
     var active_user = _active_user.getUser(sessionId);
 
@@ -224,8 +226,8 @@ exports.edit = function (sessionId, table_name, id, cb) {
                 active_user.session.edits = active_user.session.edits || {};
                 active_user.session.edits[table.settings.addForm] = rows[0];
 
-            console.log("storing rows in edits", rows);
-
+//                console.log("storing rows in edits", rows);
+//
                 // sending url to the browser for redirecting to edit form
                 cb(false, table.settings.addFormURL);
             } else {
