@@ -84,8 +84,6 @@ exports.renderForm = function(sessionId, formName){
         edits = {};
         for(var i in active_user.session.edits[formName])
             edits[i] = active_user.session.edits[formName][i];
-
-        delete active_user.session.edits[formName];
     }
 //    console.log("EDIT", edits);
 

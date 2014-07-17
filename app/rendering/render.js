@@ -107,6 +107,16 @@ var apply_smart = function(file, req, res, data){
     if(_user && _user.lang)
         _lang = _user.lang;
 
+    if (_user) {
+        console.error("# lastPath", _user.session.lastPath);
+        if (_user.session.edits && _user.session.lastPath !== req.path) {
+            console.error("removing edits");
+            delete _user.session.edits;
+        }
+        _user.session.lastPath = req.path;
+        console.error("# updating lastPath", _user.session.lastPath);
+    }
+
     smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang};
 
     if(!_active_user.hasPermission(sessionId, file)){

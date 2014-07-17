@@ -67,7 +67,7 @@ var getHTML = function (active_user, table, cb) {
     for(var i in form.controls) {
         var ctrl = form.controls[i];
         if (ctrl.name)
-            formControls[ctrl.name] = ctrl.details;
+            formControls[ctrl.name] = ctrl;
     }
 
     getData(active_user, table, null, function(err, rows) {
@@ -77,6 +77,7 @@ var getHTML = function (active_user, table, cb) {
             return;
         }
 
+        // if rows is a string, it might be some err message
         if (rows && rows.trim) {
             cb(rows);
             return;
@@ -91,9 +92,9 @@ var getHTML = function (active_user, table, cb) {
             if (displayName == "_checkbox") displayName = "";
             if (displayName == "_id") displayName = "ID";
 
-            if (formControls[columns[a]]) {
-                displayName = form_lang.Get(active_user.lang, formControls[displayName].label);
-                dbNames[columns[a]] = formControls[columns[a]].dbName || columns[a];
+            if (formControls[columns[a]] && formControls[columns[a]].details) {
+                displayName = form_lang.Get(active_user.lang, formControls[columns[a]].details.label);
+                dbNames[columns[a]] = formControls[columns[a]].details.dbName || columns[a];
             }
 
             thead.push("<td>" + displayName + "</td>")
@@ -226,9 +227,10 @@ exports.edit = function (sessionId, table_name, id, cb) {
                 active_user.session.edits = active_user.session.edits || {};
                 active_user.session.edits[table.settings.addForm] = rows[0];
 
-//                console.log("storing rows in edits", rows);
+                console.log("storing rows in edits", rows);
 //
                 // sending url to the browser for redirecting to edit form
+                active_user.session.lastPath = "/" + table.settings.addFormURL;
                 cb(false, table.settings.addFormURL);
             } else {
                 cb(form_lang.Get(active_user.lang, "EmptySelection"));

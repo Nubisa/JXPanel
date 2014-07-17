@@ -123,6 +123,7 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
         '</div>'
         +'</div>';
 
+    // comparing to true is important
     var dynamic = data.dynamic === true ? "'" + (_value || "") + "'" : null;
     var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"', dynamic: "+ dynamic  +" };";
 

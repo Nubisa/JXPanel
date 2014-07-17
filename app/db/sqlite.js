@@ -383,6 +383,8 @@ var Table = function (table_name) {
                     ids.push(rows[a].ID)
                 }
 
+                // now getting all values from data_value_table
+
                 var sql = "SELECT * FROM data_value_table v JOIN data_field_table f ON v.data_field_table_id = f.ID "
                     + "WHERE f.table_name = '" + _table_name + "' AND v.owner_table_id IN ('"+ ids.join("', '") +"')";
 
@@ -699,6 +701,13 @@ exports.CreateDatabase = function (file_name, cb) {
     });
 };
 
+
+exports.GetAllTablesContents = function() {
+
+    var ret
+
+
+};
 
 
 // just for now

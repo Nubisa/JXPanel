@@ -191,6 +191,11 @@ exports.form = function () {
                     method: tool.createComboBox,
                     options: { required: true, dynamic: true }
                 },
+                dbJoin : {
+                    otherTable : sqlite.Plan,
+                    otherTableID : "ID",
+                    otherTableValue : "plan_name"
+                },
                 dynamicValues : function(cb) {
 
                     if (!cb)
@@ -290,12 +295,14 @@ exports.form = function () {
 
         sqlite.Domain.Get(sqlite.db, { domain_name: values["domain_name"]}, function (err, rows) {
             if (!err && rows && rows.length) {
+                if (active_user.session.edits && active_user.session.edits[this.name] && active_user.session.edits[this.name].ID == rows[0].ID) {
+                    // update
+                }
                 cb("Domain with this name already exists.")
             } else {
                 addDomain();
             }
         });
-
     };
 
     return new func();
