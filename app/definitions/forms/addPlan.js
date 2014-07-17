@@ -238,24 +238,25 @@ exports.form = function () {
             sqlite.Plan.AddNew(sqlite.db, { plan_name: values["plan_name"] }, function (err, id) {
 
                 if (err) {
-                    console.error(err);
+                    if (cb) cb(err);
                 } else {
-                    console.log("OK");
-                }
-                for (var name in values) {
-                    // only for defined columns
-                    if (_controls[name]) {
-                        var addValue = _controls[name].value_table !== false;
-                        if (addValue) {
-                            console.log("adding plan value", name, values[name]);
-                            sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                    for (var name in values) {
+                        // only for defined columns
+                        if (_controls[name]) {
+                            var addValue = _controls[name].value_table !== false;
+                            if (addValue) {
+                                console.log("adding plan value", name, values[name]);
+                                sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                            }
                         }
+                        // to decrease the counter and call cb if needed
+                        _cb(false);
                     }
                 }
             });
         };
 
-        sqlite.Plan.Get(sqlite.db, { username: values["plan_name"]}, function (err, rows) {
+        sqlite.Plan.Get(sqlite.db, { plan_name : values["plan_name"]}, function (err, rows) {
             if (!err && rows && rows.length) {
                 cb("Plan with this name already exists.")
             } else {

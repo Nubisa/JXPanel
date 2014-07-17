@@ -57,7 +57,7 @@ tables[user_table] = {
 tables[domain_table] = {
     fields : {
         "ID": { type: "CHAR(20)", required: true, primary: true },
-        "subscription_table_id": { type: "CHAR(20)", required: true },
+        "subscription_table_id": { type: "CHAR(20)", required: false },
         "domain_name": { type: "TEXT", required: true, unique: true }
     },
     view : {

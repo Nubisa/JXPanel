@@ -60,6 +60,12 @@ setTimeout(function() {
         var mod = require(fname);
         var form = mod.form();
         createFields(sqlite.db, sqlite.Plan, form.controls);
+
+
+        var fname = path.join(__dirname, "../definitions/forms/addDomain");
+        var mod = require(fname);
+        var form = mod.form();
+        createFields(sqlite.db, sqlite.Domain, form.controls);
     } else {
         console.log("DB was not opened");
     }

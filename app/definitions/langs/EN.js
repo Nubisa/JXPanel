@@ -36,6 +36,7 @@ exports.Labels = {
     "addUser" : "Add new user",
     "addSubscription" : "Add new subscription",
     "addPlan": "Add new hosting plan",
+    "addDomain": "Add new domain",
 
     // login page
     "SignIn" : "Sign In",

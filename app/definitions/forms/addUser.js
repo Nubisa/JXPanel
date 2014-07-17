@@ -117,18 +117,23 @@ exports.form = function () {
             var encrypted = crypto.createHash('md5').update(values["person_password"]).digest('hex').toString();
 
             sqlite.User.AddNew(sqlite.db, { username : values["person_username"], password : encrypted }, function(err, id) {
-                for (var name in values) {
-                    // only for defined columns
-                    if (_controls[name]) {
-                        var addValue = _controls[name].value_table !== false;
-                        if (addValue) {
+
+                if (err) {
+                    if (cb) cb(err);
+                } else {
+                    for (var name in values) {
+                        // only for defined columns
+                        if (_controls[name]) {
+                            var addValue = _controls[name].value_table !== false;
+                            if (addValue) {
 //                            console.log("adding", name, values[name]);
-                            sqlite.User.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
-                            continue;
+                                sqlite.User.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                                continue;
+                            }
                         }
+                        // to decrease the counter and call cb if needed
+                        _cb(false);
                     }
-                    // to decrease the counter and call cb if needed
-                    _cb(false);
                 }
             });
         };
