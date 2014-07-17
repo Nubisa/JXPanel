@@ -146,6 +146,7 @@ exports.Labels = {
     "UnknownDataTable" : "Unknown table name.",
     "EmptySelection" : "Select the rows first.",
     "RemoveSelected" : "Remove selected",
+    "RemoveSelectedHeader" : "Warning!",
     "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
 
     //charts

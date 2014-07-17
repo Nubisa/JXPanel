@@ -200,7 +200,7 @@ exports.remove = function (sessionId, table_name, ids, cb) {
         return;
     }
 
-    table.dbTable.Delete(sqlite.db, { "ID" : ids }, cb);
+    table.settings.dbTable.Delete(sqlite.db, { "ID" : ids }, cb);
 };
 
 // called when user clicked Apply on the form
