@@ -37,7 +37,6 @@ var last_sessionId = 0;
 var total_charts = 0;
 
 var renderChart = function(sessionId, chart){
-    var str = fs.readFileSync(path.join(__dirname, "../charts/ajaxChart.html")) + "";
     var active_user = _active_user.getUser(sessionId);
     var lang = active_user.lang;
 
@@ -48,16 +47,22 @@ var renderChart = function(sessionId, chart){
 
     total_charts %= 99;
 
-    chart.number = total_charts++;
-
-    logic.globals = { ch:chart, active_user:active_user, lang:lang };
-
     if(!active_user.charts){
         active_user.charts = {};
     }
     active_user.charts[chart.name] = chart;
 
-    return rep(str, logic);
+
+    var str = fs.readFileSync(path.join(__dirname, "../charts/ajaxChart.html")) + "";
+    chart.number = total_charts++;
+    logic.globals = { ch:chart, active_user:active_user, lang:lang };
+
+    if(chart.render){
+        var finals = chart.render(str, logic);
+        return rep(finals, logic);
+    }
+
+    return rep( rep(str, logic), logic);
 };
 
 exports.defineChartMethods = function(){

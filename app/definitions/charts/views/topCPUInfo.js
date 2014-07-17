@@ -1,3 +1,4 @@
+var chart_methods = require('../chart_methods');
 
 exports.chart = function(){
     function _chart(){
@@ -5,7 +6,7 @@ exports.chart = function(){
         this.title = "ChartsTopCPUInfo";
         this.mediumSize = "8";
         this.smallSize = "12";
-
+        this.height = 300;
         this.type = "Line";
 
         this.options = {

@@ -1,12 +1,14 @@
 var st = require('../../../system_tools');
+var chart_methods = require('../chart_methods');
 
 exports.chart = function(){
   function _chart(){
       this.name = "diskUsageInfo";
       this.title = "DiskUsageInformation";
-      this.mediumSize = "4";
-      this.smallSize = "8";
+      this.mediumSize = "3";
+      this.smallSize = "6";
       this.type = "Pie";
+      this.height = 200;
 
       this.options = {
           //Boolean - Whether we should show a stroke on each segment
@@ -44,17 +46,30 @@ exports.chart = function(){
 
       var addPieData = function(obj, _value, _color, _highlight, _label){
           obj.d.push({value:_value, color:_color, highlight:_highlight, label:_label});
-          obj.l.push(createLabel(_label, _color, _value));
+      };
+
+      var _this = this;
+
+      var createPieData = function(index, data){
+          var pie = {d:[], l:[]};
+          if(!_this.rendered){
+              pie.names = data.filesystem;
+              _this.rendered = true;
+          }
+
+          pie.l.push(createLabel("Mnt.", "#000000", data.filesystem[index]));
+          pie.l.push(createLabel("Cap.", "#000000", data.size[index]));
+          addPieData(pie, parseFloat(data.used[index].match(/[0-9.]+/)[0]), "#F7464A", "#B00000", "Used");
+          addPieData(pie, parseFloat(data.avail[index].match(/[0-9.]+/)[0]), "#00b000", "#46BFBD", "Available");
+
+          return pie;
       };
 
       this.getData = function(env, active_user, params, cb){
-          var _this = this;
+
           st.getDiskInfo(function(data){
-              var pie = {d:[], l:[]};
-              pie.l.push(createLabel("Mnt.", "#000000", data.filesystem[0]));
-              pie.l.push(createLabel("Cap.", "#000000", data.size[0]));
-              addPieData(pie, parseFloat(data.used[0].match(/[0-9.]+/)[0]), "#F7464A", "#B00000", "Used");
-              addPieData(pie, parseFloat(data.avail[0].match(/[0-9.]+/)[0]), "#00b000", "#46BFBD", "Available");
+              var index = params.id;
+              var pie = createPieData(index, data);
 
               console.log("DiskUsageInfo Response");
 
