@@ -70,7 +70,9 @@ exports.defineChartMethods = function(){
         }
 
         var chart = active_user.charts[params.chartName];
-        server.sendCallBack(env, {data:chart.getData(env, active_user, params)});
+        chart.getData(env, active_user, params, function(_data, options){
+            server.sendCallBack(env, {data:_data, options:options});
+        });
     });
 
 };
