@@ -3,6 +3,7 @@ var _active_user = require('../active_user');
 var form_lang = require('../form_lang');
 var rep = require('../../rendering/smart_search').replace;
 var path = require('path');
+var server = require('jxm');
 
 exports.getChart = function(sessionId, chart){
   var chart = require('./views/' + chart).chart();
@@ -25,9 +26,9 @@ var logic = [
         "$":function(val, gl)
         {
             if(val == "id")
-                return gl.name;
+                return gl.ch.name;
 
-            return form_lang.Get(gl.lang, gl[val], true);
+            return form_lang.Get(gl.lang, gl.ch[val], true);
         }
     }
 ];
@@ -49,7 +50,7 @@ var renderChart = function(sessionId, chart){
 
     chart.number = total_charts++;
 
-    logic.globals = { name: chart.name, title: chart.title, active_user:active_user, lang:lang, number:chart.number };
+    logic.globals = { ch:chart, active_user:active_user, lang:lang };
 
     if(!active_user.charts){
         active_user.charts = {};
@@ -57,4 +58,19 @@ var renderChart = function(sessionId, chart){
     active_user.charts[chart.name] = chart;
 
     return rep(str, logic);
+};
+
+exports.defineChartMethods = function(){
+    server.addJSMethod("getChartData", function (env, params) {
+        var active_user = _active_user.getUser(env.SessionID);
+
+        if(!active_user || !params || !params.chartName || !active_user.charts || !active_user.charts[params.chartName]){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var chart = active_user.charts[params.chartName];
+        server.sendCallBack(env, {data:chart.getData(env, active_user, params)});
+    });
+
 };

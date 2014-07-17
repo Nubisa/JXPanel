@@ -212,7 +212,7 @@
                        location.reload();
                    }else{
                        setTimeout(function(){
-                           jxcore.Call("tryLogin", {username:uname, password:pwd, lang:"EN"}, function(result){
+                           jxcore.Call("tryLogin", {username:uname, password:pwd, lang:"EN", url:location.href}, function(result){
 
                                if(result.err){
                                 document.getElementById('notify').innerHTML =

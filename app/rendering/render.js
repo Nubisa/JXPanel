@@ -110,7 +110,7 @@ var apply_smart = function(file, req, res, data){
     smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang};
 
     if(!_active_user.hasPermission(sessionId, file)){
-        res.write("<html><script>location.href='/index.html';</script></html>");
+        res.write("<html><script>location.href='/index.html?t="+file.replace("../ui/","")+"';</script></html>");
         return;
     }
 

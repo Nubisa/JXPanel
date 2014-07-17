@@ -3,6 +3,7 @@ var form_lang = require('../definitions/form_lang');
 var datatables = require('./datatable_templates');
 var util = require("util");
 var server = require('jxm');
+var pam = require('authenticate-pam');
 var methods = {};
 
 var checkUser = function(env){
@@ -16,22 +17,24 @@ var checkUser = function(env){
     return active_user;
 };
 
-var pam = require('authenticate-pam');
-
 methods.tryLogin = function(env, params){
-
     pam.authenticate(params.username, params.password, function(err) {
         if(err) {
             server.sendCallBack(env, {err: form_lang.Get(params.lang, "CredentialsFailed")});
         }
         else {
             _active_user.loginUser(env.SessionID, params);
-            server.sendCallBack(env, {url: "/dashboard.html"});
+            var _url = "/dashboard.html";
+            if(params.url && params.url.indexOf){
+                var ind = params.url.indexOf("t=");
+                if(params.url.length>ind+7){ // something.html
+                    _url = params.url.substr(ind+2, params.url.length-(ind+2)).trim();
+                }
+            }
+            server.sendCallBack(env, {url: _url});
         }
     });
-
 };
-
 
 var sessionAdd = function(env, active_user, params){
     var active_user = checkUser(env);
