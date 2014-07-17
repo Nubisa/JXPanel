@@ -137,4 +137,11 @@ methods.editTableData = function(env, params) {
     });
 };
 
+methods.logout = function(env, params) {
+
+    _active_user.clearUser(env.SessionID);
+    server.sendCallBack(env, {err : false} );
+};
+
+
 module.exports = methods;

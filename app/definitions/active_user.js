@@ -66,4 +66,8 @@ exports.getDataTable = function(sessionId, table_name){
     return datatables.render(sessionId, table_name);
 };
 
+exports.clearUser = function(sessionId) {
+    delete users[sessionId];
+};
+
 //{{user.LABELHERE}}

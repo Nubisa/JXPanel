@@ -36,8 +36,6 @@
         <a href="cform.html"><i class="fa fa-lg fa-fw fa-question"></i>{{label.help}}</a>
     </li>
     <li>
-        <a href="cdatatable.html"><i class="fa fa-lg fa-fw fa-power-off"></i>{{label.logout}}</a>
+        <a href="#" onclick="jxcore.Call('logout', null, function(err) { location.reload(); }); return false;"><i class="fa fa-lg fa-fw fa-power-off"></i>{{label.logout}}</a>
     </li>
-
-
 </ul>
