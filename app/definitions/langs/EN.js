@@ -85,11 +85,19 @@ exports.Labels = {
     // Pages
     "Subscription" : "Subscription Management",
 
-    "Users" : "User Management",
+    "UsersManagement" : "User Management",
     "UsersHeader": "Customize the options",
     "UsersContent": "Create new users and manage their options.",
     "UsersHeaderList": "Customize the options",
     "UsersContentList": "Create new users and manage their options.",
+
+    "Domains" : "Domains",
+    "DomainsManagement" : "Domain Management",
+    "DomainsHeader": "Customize the options",
+    "DomainsContent": "Create new domains and manage their options.",
+    "DomainsHeaderList": "Customize the options",
+    "DomainsContentList": "Create new domains and manage their options.",
+
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
