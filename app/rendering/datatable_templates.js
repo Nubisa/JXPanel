@@ -27,6 +27,11 @@ var getData = function(active_user, table, json, cb) {
         return;
     }
 
+    if (!active_user) {
+        cb(form_lang.Get(active_user.lang, "SessionExpired"));
+        return;
+    }
+
     table.settings.dbTable.GetAll(sqlite.db, json, function(err, rows) {
         if (err)
             cb(err)

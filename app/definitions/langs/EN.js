@@ -33,8 +33,9 @@ exports.Labels = {
     "UnknownForm" : "Unknown form",
 
     // Form names
-    "addUser" : "Add New User",
-    "addSubscription" : "Add New Subscription",
+    "addUser" : "Add new user",
+    "addSubscription" : "Add new subscription",
+    "addPlan": "Add new hosting plan",
 
     // login page
     "SignIn" : "Sign In",
@@ -52,9 +53,9 @@ exports.Labels = {
 
     "DataPlans": "Hosting Plans",
     "DataPlansHeader": "Customize the options",
-    "DataPlansContent": "Fill the below inputs to create a new hosting plan. You can use a hosting plan for multiple users.",
-
-    "addPlan": "Add a new hosting plan",
+    "DataPlansContent": "Fill the below inputs to define a hosting plan. You can use a hosting plan for multiple users.",
+    "DataPlansHeaderList": "Customize the hosting plans",
+    "DataPlansContentList": "Hosting plans are set of rules which define hosting options and limits. You can use a hosting plan for multiple users.",
 
     "CredentialsFailed": "Incorrect username and/or password",
     "WelcomeDashboard": "Welcome %s!",
@@ -86,7 +87,9 @@ exports.Labels = {
 
     "Users" : "User Management",
     "UsersHeader": "Customize the options",
-    "UsersListContent": "Create new users and manage their options.",
+    "UsersContent": "Create new users and manage their options.",
+    "UsersHeaderList": "Customize the options",
+    "UsersContentList": "Create new users and manage their options.",
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
