@@ -57,15 +57,14 @@
     <!-- END RIBBON -->
 
     <!-- MAIN CONTENT -->
-    <div id="content" style="padding-top:20px">
+    <div id="content" style="padding-top:10px">
 
         {{view.topMessage}}
             {{toSub.topMessageTitle:DataPlans}}
             {{toSub.topMessageHeader:DataPlansHeader}}
             {{toSub.topMessageContent:DataPlansContent}}
 
-        <div class="row">
-            <!-- RENDER UNDER RIBON -->
+            <p id="jxFormMessage"></p>
 
             <!-- widget grid -->
             <section id="widget-grid" class="">
@@ -74,9 +73,6 @@
                 {{forms.addPlan}}
 
             </section>
-
-        </div>
-        <!-- end widget grid -->
 
     </div>
     <!-- END MAIN CONTENT -->

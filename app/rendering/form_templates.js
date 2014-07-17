@@ -56,6 +56,12 @@ var logic = [
         if(val == "id")
             return gl.name;
 
+        if (val == "onSubmitSuccess")
+            return gl.form.onSubmitSuccess || "";
+
+        if (val == "onSubmitCancel")
+            return gl.form.onSubmitCancel || "";
+
         return form_lang.Get(gl.lang, gl[val], true);
     }}
 ];
@@ -71,6 +77,17 @@ exports.renderForm = function(sessionId, formName){
 
     var activeForm = require('../definitions/forms/' + formName).form();
     active_user.session.forms[formName].activeInstance = activeForm;
+
+    var edits = null;
+    // copying values for edit form
+    if (active_user.session.edits && active_user.session.edits[formName]) {
+        edits = {};
+        for(var i in active_user.session.edits[formName])
+            edits[i] = active_user.session.edits[formName][i];
+
+        delete active_user.session.edits[formName];
+    }
+//    console.log("EDIT", edits);
 
     var controls = activeForm.controls;
 
@@ -93,7 +110,10 @@ exports.renderForm = function(sessionId, formName){
         var name = controls[i].name;
         var ctrl = controls[i].details;
 
-        arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, null, lang, ctrl.options));
+        var dbname = ctrl.dbName ? ctrl.dbName : name;
+        var val = edits && edits[dbname] ? edits[dbname] : null;
+//        console.log("val for", dbname, ":", val);
+        arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
 
     for(var o in arr)
@@ -115,7 +135,7 @@ exports.renderForm = function(sessionId, formName){
     if (fs.existsSync(containerFile)) {
         var widget = fs.readFileSync(containerFile).toString();
         var _icon = (!activeForm.icon)? "": activeForm.icon;
-        logic.globals = { name: formName, contents: fstr, active_user:active_user, icon:_icon, lang:active_user.lang };
+        logic.globals = { name: formName, contents: fstr, active_user:active_user, icon:_icon, form: activeForm, lang:active_user.lang};
         var result = rep(widget, logic);
 
         return result;

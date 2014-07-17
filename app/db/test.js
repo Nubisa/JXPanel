@@ -87,6 +87,8 @@ var test = function (db) {
 
         if (id == 41) sqlite.User.AddNew(db,  {  }, cb); else
 
+        if (id == 42) sqlite.User.GetAll(db,  { username : "nubisa_krzs" }, cb); else
+
             cb("empty");
     };
 
@@ -95,20 +97,31 @@ var test = function (db) {
 
 
 
-var dbfile = "./dbfile.db";
+//var dbfile = "./dbfile.db";
+//
+//if (fs.existsSync(dbfile)) fs.unlinkSync(dbfile);
+//
+//sqlite.CreateDatabase("./dbfile.db", function (err, db) {
+//    if (err) {
+//        console.error(err);
+//        return;
+//    } else {
+//        console.log("DB created OK.");
+//
+//        test(db);
+//    }
+//
+//});
 
-if (fs.existsSync(dbfile)) fs.unlinkSync(dbfile);
 
-sqlite.CreateDatabase("./dbfile.db", function (err, db) {
-    if (err) {
-        console.error(err);
-        return;
+
+
+// waiting for sqlite to open db file
+setTimeout(function() {
+
+    if (sqlite.db) {
+        test(sqlite.db);
     } else {
-        console.log("DB created OK.");
-
-        test(db);
+        console.log("DB was not opened");
     }
-
-});
-
-
+}, 1000);

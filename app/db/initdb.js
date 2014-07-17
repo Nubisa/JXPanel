@@ -6,9 +6,18 @@
 // adds field definitions based on forms definitions
 
 
-var sqlite = require("./sqlite");
 var fs = require("fs");
 var path = require("path");
+
+var recreate = process.argv[process.argv.length-1] == "true";
+
+if (recreate) {
+    fs.unlinkSync("./dbfile.db");
+}
+
+
+var sqlite = require("./sqlite");
+
 
 
 var createFields = function (db, table, controls) {
@@ -51,6 +60,12 @@ setTimeout(function() {
         var mod = require(fname);
         var form = mod.form();
         createFields(sqlite.db, sqlite.Plan, form.controls);
+
+
+        var fname = path.join(__dirname, "../definitions/forms/addDomain");
+        var mod = require(fname);
+        var form = mod.form();
+        createFields(sqlite.db, sqlite.Domain, form.controls);
     } else {
         console.log("DB was not opened");
     }

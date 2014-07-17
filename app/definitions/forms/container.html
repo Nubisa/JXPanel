@@ -1,4 +1,4 @@
-<article class="col-sm-12 col-md-16 col-lg-12">
+<!--<article class="col-sm-12 col-md-16 col-lg-12">-->
 
     <script>
         if(!window.jxForms){
@@ -59,6 +59,7 @@
                     jxcore.Call('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
                         if(!param.arr)
                             window.jxAddMessage(param.err ? 'danger' : 'success', param.err ? param.err : JSON.stringify(param));
+                            if (!param.err) document.location = "{{form.onSubmitSuccess}}";
                         else
                         {
                             for(var o in param.arr){
@@ -91,11 +92,8 @@
 
             <!-- widget content -->
             <div class="widget-body">
-                <p id="jxFormMessage"></p>
 
                 {{form.contents}}
-
-
 
                 <div class="form-group">
                     <label class="col-md-2 control-label"></label>
@@ -107,7 +105,7 @@
                                     {{label.Apply}}
                         </button>
                         &nbsp;
-                        <button type="button" class="btn btn-labeled btn-danger" onclick="location.reload()">
+                        <button type="button" class="btn btn-labeled btn-danger" onclick="location = '{{form.onSubmitCancel}}';">
                              <span class="btn-label">
                               <i class="glyphicon glyphicon-remove"></i>
                              </span>
@@ -125,21 +123,5 @@
 
     </div>
 
-</article>
+<!--</article>-->
 <!-- WIDGET END -->
-
-
-<script type="text/javascript">
-    window.jxAddMessage = function(type, txt) {
-        var p = document.getElementById('jxFormMessage');
-
-        if (p) {
-            if(!type && !txt){
-                p.innerHTML = "";
-                return;
-            }
-
-            p.innerHTML += "<p class='alert alert-" + type + "' style='padding:3px;margin:2px;'> <strong></strong> " + txt + " </p>";
-        }
-    };
-</script>

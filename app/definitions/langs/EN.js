@@ -35,6 +35,8 @@ exports.Labels = {
     // Form names
     "addUser" : "Add new user",
     "addSubscription" : "Add new subscription",
+    "addPlan": "Add new hosting plan",
+    "addDomain": "Add new domain",
 
     // login page
     "SignIn" : "Sign In",
@@ -52,9 +54,9 @@ exports.Labels = {
 
     "DataPlans": "Hosting Plans",
     "DataPlansHeader": "Customize the options",
-    "DataPlansContent": "Fill the below inputs to create a new hosting plan. You can use a hosting plan for multiple users.",
-
-    "addPlan": "Add a new hosting plan",
+    "DataPlansContent": "Fill the below inputs to define a hosting plan. You can use a hosting plan for multiple users.",
+    "DataPlansHeaderList": "Customize the hosting plans",
+    "DataPlansContentList": "Hosting plans are set of rules which define hosting options and limits. You can use a hosting plan for multiple users.",
 
     "CredentialsFailed": "Incorrect username and/or password",
     "WelcomeDashboard": "Welcome %s!",
@@ -83,7 +85,20 @@ exports.Labels = {
 
     // Pages
     "Subscription" : "Subscription Management",
-    "Users" : "User Management",
+
+    "UsersManagement" : "User Management",
+    "UsersHeader": "Customize the options",
+    "UsersContent": "Create new users and manage their options.",
+    "UsersHeaderList": "Customize the options",
+    "UsersContentList": "Create new users and manage their options.",
+
+    "Domains" : "Domains",
+    "DomainsManagement" : "Domain Management",
+    "DomainsHeader": "Customize the options",
+    "DomainsContent": "Create new domains and manage their options.",
+    "DomainsHeaderList": "Customize the options",
+    "DomainsContentList": "Create new domains and manage their options.",
+
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
@@ -128,7 +143,9 @@ exports.Labels = {
 
     // datatables
     "UnknownDataTable" : "Unknown table name.",
-
+    "EmptySelection" : "Select the rows first.",
+    "RemoveSelected" : "Remove selected",
+    "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
 
     //charts
     "DiskUsageInformation": "Disk Usage Information",

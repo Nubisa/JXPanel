@@ -7,8 +7,8 @@ var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
 
 exports.settings = {
-    columns :[ "_checkbox",  "_id", "plan_name", "plan_cpu", "plan_memory"],
-    dbTable : sqlite.Plan,
-    addForm : "addPlan",
-    addFormURL : "addplan.html"
+    columns :[ "_checkbox",  "_id", "domain_name", "plan_cpu", "plan_memory"],
+    dbTable : sqlite.Domain,
+    addForm : "addDomain",
+    addFormURL : "adddomain.html"
 };

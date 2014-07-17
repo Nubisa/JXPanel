@@ -16,6 +16,9 @@ exports.form = function () {
 
         this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
 
+        this.onSubmitSuccess = "users.html";
+        this.onSubmitCancel = "users.html";
+
         this.controls = [
             {"BEGIN": "User Details"},
 
@@ -62,7 +65,8 @@ exports.form = function () {
                     label: "Username",
                     method: tool.createTextBox,
                     options: { required: true, values: ["EN"]},
-                    value_table: false
+                    value_table : false,
+                    dbName : "username"
                 }
             },
 
@@ -72,7 +76,8 @@ exports.form = function () {
                     label: "Password",
                     method: tool.createTextBox,
                     options: { required: true, password: true },
-                    value_table: false
+                    value_table: false,
+                    dbName : "password"
                 },
                 validation : new validations.String(5)
             },
@@ -101,7 +106,6 @@ exports.form = function () {
                 len--;
                 if (err) {
                     errors.push(err);
-                    console.error(err);
                 }
                 if (len===0) {
                     cb(null);
@@ -113,14 +117,22 @@ exports.form = function () {
             var encrypted = crypto.createHash('md5').update(values["person_password"]).digest('hex').toString();
 
             sqlite.User.AddNew(sqlite.db, { username : values["person_username"], password : encrypted }, function(err, id) {
-                for (var name in values) {
-                    // only for defined columns
-                    if (_controls[name]) {
-                        var addValue = _controls[name].value_table !== false;
-                        if (addValue) {
-                            console.log("adding", name, values[name]);
-                            sqlite.User.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+
+                if (err) {
+                    if (cb) cb(err);
+                } else {
+                    for (var name in values) {
+                        // only for defined columns
+                        if (_controls[name]) {
+                            var addValue = _controls[name].value_table !== false;
+                            if (addValue) {
+//                            console.log("adding", name, values[name]);
+                                sqlite.User.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                                continue;
+                            }
                         }
+                        // to decrease the counter and call cb if needed
+                        _cb(false);
                     }
                 }
             });

@@ -69,6 +69,23 @@
 
 
 <script>
+
+    window.jxAddMessage = function(type, txt) {
+        var p = document.getElementById('jxFormMessage');
+
+        if (p) {
+            if(!type && !txt){
+                p.innerHTML = "";
+                return;
+            }
+
+            p.innerHTML += "<p class='alert alert-" + type + "' style='padding:3px;margin:2px;'> <strong></strong> " + txt + " </p>";
+        } else {
+            alert("Displaing an alert, since there is no jxFormMessage div.\n\n" + txt);
+        }
+    };
+
+
     document.onjxready = function () {
         jxcore.Start(function (status) {
             if (window.jxTemplateReadyForjxm) {
