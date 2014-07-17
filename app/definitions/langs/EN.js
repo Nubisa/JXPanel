@@ -107,6 +107,7 @@ exports.Labels = {
 
     // Plan
     "PlanName" : "Plan name",
+    "PlanID" : "Hosting Plan",
     "Overuse" : "Allow overuse",
     "MaxDiskSpace" : "Disk space",
     "MaxDiskSpace_Description" : "Maximum disk usage. Value 0 disables the limit.",
@@ -145,6 +146,7 @@ exports.Labels = {
     "UnknownDataTable" : "Unknown table name.",
     "EmptySelection" : "Select the rows first.",
     "RemoveSelected" : "Remove selected",
+    "RemoveSelectedHeader" : "Warning!",
     "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
 
     //charts

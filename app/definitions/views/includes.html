@@ -81,8 +81,21 @@
 
             p.innerHTML += "<p class='alert alert-" + type + "' style='padding:3px;margin:2px;'> <strong></strong> " + txt + " </p>";
         } else {
-            alert("Displaing an alert, since there is no jxFormMessage div.\n\n" + txt);
+            alert("Displaying an alert, since there is no jxFormMessage div.\n\n" + txt);
         }
+    };
+
+    window.jxConfirm = function (title, question, cb) {
+
+        if (!cb) return;
+
+        $.SmartMessageBox({
+            title : title,
+            content : question,
+            buttons : '[No][Yes]'
+        }, function(ButtonPressed) {
+            cb(ButtonPressed);
+        });
     };
 
 

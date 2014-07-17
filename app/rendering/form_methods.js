@@ -133,6 +133,7 @@ methods.removeFromTableData = function(env, params) {
     });
 };
 
+// called when user clicked Apply on the form
 methods.editTableData = function(env, params) {
 
     datatables.edit(env.SessionID, params.dt, params.id, function(err, url) {
@@ -144,6 +145,30 @@ methods.logout = function(env, params) {
 
     _active_user.clearUser(env.SessionID);
     server.sendCallBack(env, {err : false} );
+};
+
+
+// async way for getting forms' controls' values (e.g. for combo)
+methods.getControlsValues = function(env, params) {
+
+    var active_user = checkUser(env);
+
+    var activeForm = active_user.session.forms[params.form];
+    var activeInstance = activeForm.activeInstance;
+
+    var found = false;
+    for(var a in activeInstance.controls) {
+        if (activeInstance.controls[a].name && activeInstance.controls[a].name === params.control && activeInstance.controls[a].dynamicValues) {
+            found = true;
+            activeInstance.controls[a].dynamicValues(function(err, ret) {
+                server.sendCallBack(env, {err : false, values : ret, control : params.control } );
+            });
+        }
+    }
+
+    if (!found) {
+        server.sendCallBack(env, {err : "Dynamic values loading method not found for field " + params.control  } );
+    }
 };
 
 

@@ -14,6 +14,8 @@ var getData = function(label, _title, input_id, lang, options) {
     ret.prefix = options.prefix || "";
     ret.required = options.required;
 
+    ret.dynamic = options.dynamic || "";
+
     return ret;
 };
 
@@ -121,7 +123,8 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
         '</div>'
         +'</div>';
 
-    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"'  };";
+    var dynamic = data.dynamic === true ? "'" + (_value || "") + "'" : null;
+    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"', dynamic: "+ dynamic  +" };";
 
     return {html:_html, js:_js};
 };
@@ -161,7 +164,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
     _html +=
         '</div></div>';
 
-    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"'  };";
+    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
 
     return {html:_html, js:_js};
 };
