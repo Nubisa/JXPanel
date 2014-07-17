@@ -110,13 +110,10 @@ var apply_smart = function(file, req, res, data){
         _lang = _user.lang;
 
     if (_user) {
-        console.error("# lastPath", _user.session.lastPath);
         if (_user.session.edits && _user.session.lastPath !== req.path) {
-            console.error("removing edits");
             delete _user.session.edits;
         }
         _user.session.lastPath = req.path;
-        console.error("# updating lastPath", _user.session.lastPath);
     }
 
     smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0 };

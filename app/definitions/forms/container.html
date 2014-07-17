@@ -59,8 +59,11 @@
                 if(!failed){
                     jxcore.Call('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
                         if(!param.arr)
-                            window.jxAddMessage(param.err ? 'danger' : 'success', param.err ? param.err : JSON.stringify(param));
-                            if (!param.err) document.location = "{{form.onSubmitSuccess}}";
+                            if (param.err) {
+                                window.jxAddMessage('danger', param.err);
+                            } else {
+                                document.location = "{{form.onSubmitSuccess}}";
+                            }
                         else
                         {
                             for(var o in param.arr){

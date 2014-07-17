@@ -41,6 +41,10 @@ exports.form = function () {
         this.onSubmitSuccess = "domains.html";
         this.onSubmitCancel = "domains.html";
 
+        this.settings = {
+            dbTable : sqlite.Domain
+        };
+
         this.controls = [
             {"BEGIN": "Domain Details"},
 
@@ -247,6 +251,7 @@ exports.form = function () {
     func.prototype.apply = function (active_user, params, cb) {
 
         var _controls = {};
+        _formName = this.name;
         for(var a in this.controls) {
             var name = this.controls[a].name;
             if (name) _controls[name] = this.controls[a].details;
@@ -254,8 +259,20 @@ exports.form = function () {
 
         var values = params.controls;
 
-        var addDomain = function () {
+        var isUpdate = active_user.session.edits && active_user.session.edits[_formName] && active_user.session.edits[_formName].ID;
+        var json = {};
+        if (isUpdate) {
+            json.ID = active_user.session.edits[_formName].ID;
+        } else {
+            json.domain_name = values["domain_name"];
+        }
+
+        var insertOrUpdate = function (insert) {
             // if arrived here - required fields are non empty
+
+            var method = insert ? sqlite.Domain.AddNew : sqlite.Domain.Update;
+            var method2 = insert ? sqlite.Domain.AddNewFieldValue2 : sqlite.Domain.UpdateFieldValue2;
+
 
             var errors = [];
             var len = 0;
@@ -267,12 +284,18 @@ exports.form = function () {
                     console.error(err);
                 }
                 if (len === 0) {
-                    cb(null);
+                    cb(errors.length ? errors.join(" ") : null  );
                 }
 
             };
 
-            sqlite.Domain.AddNew(sqlite.db, { domain_name: values["domain_name"] }, function (err, id) {
+            var json = {};
+            json.domain_name = values["domain_name"];
+            if (isUpdate) {
+                json.ID = active_user.session.edits[_formName].ID;
+            }
+
+            method(sqlite.db, json, function (err, id) {
 
                 if (err) {
                     if (cb) cb(err);
@@ -283,24 +306,38 @@ exports.form = function () {
                             var addValue = _controls[name].value_table !== false;
                             if (addValue) {
                                 console.log("adding domain value", name, values[name]);
-                                sqlite.Domain.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+                                method2(sqlite.db, isUpdate ? json.ID : id, name, values[name], _cb);
                             }
+                        } else {
+                            // to decrease the counter and call cb if needed
+                            _cb(false);
                         }
                     }
                     // to decrease the counter and call cb if needed
-                    _cb(false);
+//                    _cb(false);
                 }
             });
         };
 
-        sqlite.Domain.Get(sqlite.db, { domain_name: values["domain_name"]}, function (err, rows) {
-            if (!err && rows && rows.length) {
-                if (active_user.session.edits && active_user.session.edits[this.name] && active_user.session.edits[this.name].ID == rows[0].ID) {
-                    // update
-                }
-                cb("Domain with this name already exists.")
+        sqlite.Domain.Get(sqlite.db, json, function (err, rows) {
+            if (err) {
+                if (cb) cb(err);
             } else {
-                addDomain();
+                if (rows && rows.length) {
+                    // row already exists
+                    if (isUpdate) {
+                        insertOrUpdate(false);
+                    } else {
+                        if (cb) cb("Domain with this name already exists.")
+                    }
+                } else {
+                    // row does not exist
+                    if (isUpdate) {
+                        if (cb) cb("Cannot update the record - it does not exist.");
+                    } else {
+                        insertOrUpdate(true);
+                    }
+                }
             }
         });
     };

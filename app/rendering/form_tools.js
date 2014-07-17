@@ -171,4 +171,20 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
 };
 
 
+exports.createHidden = function(label, _title, input_id, _value, lang, options){
+    var data = getData(label, _title, input_id, lang, options);
+
+    _value = _value || "";
+    _title = form_lang.Get(lang, _title) || _title;
+    label = form_lang.Get(lang, label) || label;
+
+    var _type = "hidden";
+    var id = jxcore.utils.uniqueId();
+
+    var _html = '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
+    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
+
+    return {html:_html, js:_js};
+};
+
 exports.end = "</fieldset></form>";
