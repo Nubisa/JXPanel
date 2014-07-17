@@ -2,4 +2,120 @@
 
 <script type="text/javascript">
     window.panelCharts = {};
+    var inter_charts = setInterval(function(){
+        if(typeof $ != 'undefined' && typeof Chart != 'undefined' && typeof jxcore != 'undefined'){
+            if(jxcore.IsConnected){
+                clearInterval(inter_charts);
+
+                setTimeout(function(){
+                    for(var i in window.renderCharts){
+                        new createChart(window.renderCharts[i]);
+                    }
+                },10);
+            }
+        }
+    }, 10);
+
+    var getChartData = function(index, id, cb){
+        jxcore.Call("getChartData", {chartName:id, id:index}, function(ret_val){
+
+            if(ret_val.err){
+                alert(ret_val.err);
+                location.href = "/index.html";
+            }
+            cb(ret_val);
+        });
+    };
+
+    var createChart = function(info){
+        this.name = info.name;
+        var __this = this;
+        __this.type = info.type;
+
+        __this.render = function(index){
+            getChartData(index, __this.name, function(ret_val){
+
+                var infoBox = document.getElementById("info_" + __this.name);
+                infoBox.innerHTML = ret_val.data.l;
+
+                if(!window.panelCharts[__this.name] || !ret_val.data.update){
+
+
+                    var parent = document.getElementById("s" + __this.name);
+
+                    var ctx, width, height;
+                    if(window.panelCharts[__this.name])
+                    {
+                        ctx = document.getElementById(__this.name);
+                        width = parseInt(ctx.style.width);
+                        height = parseInt(ctx.style.height);
+                        parent.removeChild(ctx);
+                    }
+                    else{
+                        width = parent.clientWidth - 20;
+                        height = parent.clientHeight;
+
+                        if(ret_val.data.names){
+                            height -= 25;
+                            var sel = document.createElement("select");
+                            sel.className = "form-control";
+                            var names = ret_val.data.names;
+                            for(var o in names){
+                                var opt = document.createElement("option");
+                                opt.value = o;
+                                opt.innerHTML = names[o];
+                                sel.appendChild(opt);
+                            }
+                            parent.appendChild(sel);
+                            sel.onchange = function(ee){
+                                var _sel = window.panelCharts["sel_" + __this.name];
+                                if(_sel){
+                                    __this.render(_sel.selectedIndex);
+                                }
+                            };
+                            window.panelCharts["sel_" + __this.name] = sel;
+                        }
+                    }
+
+                    ctx = document.createElement('canvas');
+                    ctx.id = __this.name;
+                    ctx.className = "chart";
+                    ctx.width = width;
+                    ctx.height = height;
+
+                    parent.appendChild(ctx);
+
+                    window.panelCharts[__this.name] = new Chart(ctx.getContext("2d"))[__this.type](ret_val.data.d, ret_val.options);
+                }
+                else{
+                    var chart = window.panelCharts[__this.name];
+                    var data = ret_val.data.d;
+
+                    if(data.datasets)
+                    {
+                        for(var o in data.datasets){
+                            chart.addData(data.datasets[o], data.labels[o])
+                        }
+                    }
+                    else
+                    {
+                        for(var o in data){
+                            chart.addData(data[o]);
+                        }
+                    }
+
+                    chart.update();
+                }
+            });
+        };
+
+        document.getElementById("btn_refresh" + __this.name).onmousedown = function(){
+            var _sel = window.panelCharts["sel_" + __this.name];
+            var si = 0;
+            if(_sel)
+                si = _sel.selectedIndex;
+            __this.render(si);
+        };
+        __this.render(0);
+    };
 </script>

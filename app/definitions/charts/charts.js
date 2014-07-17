@@ -5,10 +5,10 @@ var rep = require('../../rendering/smart_search').replace;
 var path = require('path');
 var server = require('jxm');
 
-exports.getChart = function(sessionId, chart){
+exports.getChart = function(sessionId, chart, index){
   var chart = require('./views/' + chart).chart();
 
-  return renderChart(sessionId, chart);
+  return renderChart(sessionId, chart, index);
 };
 
 var logic = [
@@ -33,15 +33,15 @@ var logic = [
     }
 ];
 
-var last_sessionId = 0;
 var total_charts = 0;
 
-var renderChart = function(sessionId, chart){
+var renderChart = function(sessionId, chart, index){
     var active_user = _active_user.getUser(sessionId);
     var lang = active_user.lang;
 
-    if(last_sessionId != sessionId){
-        last_sessionId = sessionId;
+    var base_str = "";
+    if(index === 0){
+        base_str = "<script>window.renderCharts = [];</script>";
         total_charts = 0;
     }
 
@@ -57,12 +57,7 @@ var renderChart = function(sessionId, chart){
     chart.number = total_charts++;
     logic.globals = { ch:chart, active_user:active_user, lang:lang };
 
-    if(chart.render){
-        var finals = chart.render(str, logic);
-        return rep(finals, logic);
-    }
-
-    return rep( rep(str, logic), logic);
+    return base_str + rep(str, logic);
 };
 
 exports.defineChartMethods = function(){

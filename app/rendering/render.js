@@ -57,7 +57,9 @@ var smart_rule = [
         }
     },
     {from:"{{charts.$$}}", to:"$$", "$":function(val, gl){
-            return _active_user.getChart(gl.sessionId, val);
+            var cdata = _active_user.getChart(gl.sessionId, val, gl.chart_index);
+            gl.chart_index ++;
+            return cdata;
         }
     },
     {from:"{{toSub.##:$$}}", to:"@@", "@!":function(first, second, gl){
@@ -117,7 +119,7 @@ var apply_smart = function(file, req, res, data){
         console.error("# updating lastPath", _user.session.lastPath);
     }
 
-    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang};
+    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0 };
 
     if(!_active_user.hasPermission(sessionId, file)){
         res.write("<html><script>location.href='/index.html?t="+file.replace("../ui/","")+"';</script></html>");

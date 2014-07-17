@@ -40,11 +40,11 @@ exports.getForm = function(sessionId, form_name){
 };
 
 
-exports.getChart = function(sessionId, chart_name){
+exports.getChart = function(sessionId, chart_name, index){
     // TODO check permissions to chart
     console.log("active_user::getChart", sessionId, chart_name);
 
-    return charts.getChart(sessionId, chart_name);
+    return charts.getChart(sessionId, chart_name, index);
 };
 
 
