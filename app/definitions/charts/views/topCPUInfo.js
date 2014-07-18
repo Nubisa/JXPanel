@@ -78,6 +78,8 @@ exports.chart = function(){
             ]
         };
 
+        var _this = this;
+
         var createLabel = function(name, color, value){
             return "<span style='color:"+color+";'>"+name+":</span> "+value+" ";
         };
@@ -89,8 +91,7 @@ exports.chart = function(){
         ];
 
         this.getData = function(env, active_user, params, cb){
-            var _this = this;
-            cb({d:this.data, l:this.label}, _this.getOptions(env, active_user, params));
+            cb({d:this.data, l:this.label, btn_ref:true, btn_ply:true}, _this.getOptions(env, active_user, params));
         };
 
         this.getOptions = function(env, active_user, paramms){

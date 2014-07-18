@@ -13,6 +13,7 @@ var server = require('jxm');
 var render_engine = require('./rendering/render');
 var form_methods = require('./rendering/form_methods');
 var charts = require('./definitions/charts/charts');
+var site_defaults = require('./definitions/site_defaults');
 
 server.setApplication("JXPanel", "/", "NUBISA_JX_PANEL_2014");
 
@@ -25,6 +26,8 @@ server.addJSMethod("serverMethod", function (env, params) {
 for(var o in form_methods){
     server.addJSMethod(o, form_methods[o]);
 }
+
+site_defaults.defineMethods();
 
 charts.defineChartMethods();
 

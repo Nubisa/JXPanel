@@ -1,14 +1,16 @@
 var st = require('../../../system_tools');
+var form_lang = require('../../form_lang');
+var _active_user = require('../../active_user');
 var chart_methods = require('../chart_methods');
 
 exports.chart = function(){
   function _chart(){
       this.name = "diskUsageInfo";
       this.title = "DiskUsageInformation";
-      this.mediumSize = "3";
+      this.mediumSize = "4";
       this.smallSize = "6";
       this.type = "Pie";
-      this.height = 200;
+      this.height = 150;
 
       this.options = {
           //Boolean - Whether we should show a stroke on each segment
@@ -50,15 +52,14 @@ exports.chart = function(){
 
       var _this = this;
 
-      var createPieData = function(index, data){
+      var createPieData = function(index, data, lang){
           var pie = {d:[], l:[]};
           if(!_this.rendered){
               pie.names = data.filesystem;
               _this.rendered = true;
           }
 
-          pie.l.push(createLabel("Mnt.", "#000000", data.filesystem[index]));
-          pie.l.push(createLabel("Cap.", "#000000", data.size[index]));
+          pie.l.push(createLabel(form_lang.Get(lang, "Capacity"), "#000000", data.size[index]));
           addPieData(pie, parseFloat(data.used[index].match(/[0-9.]+/)[0]), "#F7464A", "#B00000", "Used");
           addPieData(pie, parseFloat(data.avail[index].match(/[0-9.]+/)[0]), "#00b000", "#46BFBD", "Available");
 
@@ -67,17 +68,27 @@ exports.chart = function(){
 
       this.getData = function(env, active_user, params, cb){
 
-          st.getDiskInfo(function(data){
+          st.getDiskInfo(env, function(_data){
+              var data = _data.res;
+              var _env = _data.e;
+
               var index = params.id;
-              var pie = createPieData(index, data);
+
+              var lang = "EN";
+              if(active_user && active_user.lang)
+                  lang = active_user.lang;
+
+              var pie = createPieData(index, data, lang);
 
               console.log("DiskUsageInfo Response");
 
-              cb(pie, _this.getOptions(env, active_user, params));
+              pie.btn_ref = true;
+
+              cb(pie, _this.getOptions(_env, _active_user.getUser(_env.SessionID), params));
           });
       };
 
-      this.getOptions = function(env, active_user, paramms){
+      this.getOptions = function(env, active_user, params){
           return this.options;
       };
   }

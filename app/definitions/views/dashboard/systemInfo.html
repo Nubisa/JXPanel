@@ -1,0 +1,88 @@
+<article class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+
+    <!-- Widget ID (each widget will need unique ID)-->
+    <div class="jarviswidget jarviswidget-color-blue" id="wid-id-100" data-widget-fullscreenbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
+        <header>
+            <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
+            <h2>{{label.SystemInfo}}</h2>
+
+        </header>
+
+        <!-- widget div-->
+        <div>
+            <!-- end widget edit box -->
+
+            <!-- widget edit box -->
+            <div class="jarviswidget-editbox">
+                <!-- This area used as dropdown edit box -->
+            </div>
+
+            <!-- widget content -->
+            <div class="widget-body no-padding">
+
+                <div  class='note' style="padding:10px;line-height:17px; min-height: 185px" >
+                    <span style='color:#003333'><strong>
+                    {{label.OSname}}:
+                    </strong></span>{{defaults.getOSInfo}}
+
+                    <div id="os_details" style="margin:0px;padding:0px;">
+                        <br/>
+                        <br/>
+                    {{label.Loading}}
+                    </div>
+                </div>
+                <div  class='note' style="padding:10px;padding-top:0px;margin-top:0px;line-height:17px;">
+                <a id="btn_refresh_info" class="btn btn-info btn-xs" >
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <a id="btn_play_info" class="btn btn-info btn-xs" >
+                    <i class="fa fa-play"></i>
+                </a>
+                </div>
+            </div>
+            <!-- end widget content -->
+        </div>
+        <!-- end widget div -->
+    </div>
+    <!-- end widget -->
+</article>
+
+<script type="text/javascript">
+    var renderOSDetails = function(){
+        jxcore.Call('getOSDetails', null, function(ret_val){
+            if(ret_val.err){
+                alert(ret_val.err);
+                location.href = "/index.html";
+                return;
+            }
+            document.getElementById('os_details').innerHTML = ret_val.html;
+        });
+    };
+
+    document.getElementById('btn_refresh_info').onmousedown = function(){
+        renderOSDetails();
+    };
+
+    var btn_play = document.getElementById('btn_play_info');
+    btn_play.onmousedown = function(){
+        if(document._sysInfoInter){
+            clearInterval(document._sysInfoInter);
+            document._sysInfoInter = null;
+            btn_play.innerHTML = '<i class="fa fa-play"></i>';
+            return;
+        }
+        btn_play.innerHTML = '<i class="fa fa-stop"></i>';
+        document._sysInfoInter = setInterval(function(){
+            if(typeof jxcore != 'undefined' && jxcore.IsConnected){
+                renderOSDetails();
+            }
+        },1200);
+    };
+
+    var sysInfoInter = setInterval(function(){
+        if(typeof jxcore != 'undefined' && jxcore.IsConnected){
+            clearInterval(sysInfoInter);
+            renderOSDetails();
+        }
+    },10);
+</script>

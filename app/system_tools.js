@@ -65,7 +65,7 @@ var outputConvert = function(str, expects, fixer){
 };
 
 
-var getTop = function(){
+var getTop = function(is_up){
     var num_cols = 12;
     var result;
     var is_mac = /mac/.test(jxcore.utils.getOS()); 
@@ -77,10 +77,13 @@ var getTop = function(){
     }
 
     if(result.exitCode != 0 || !result.out){
-        return null;
+        return "UnableToRead";
     }
 
     var ln = result.out.indexOf("\n\n") + 2;
+    if(is_up){
+        return result.out.substr(0, ln - 4);
+    }
     result.out = result.out.substr(ln, result.out.length-ln);
 
     var combiner = function(cols, expects){
@@ -112,7 +115,7 @@ var getdiskUsage = function(folder){
     var result = jxcore.utils.cmdSync("du -sh " + folder);
 
     if(result.exitCode != 0 || !result.out){
-        return null;
+        return "UnableToRead";
     }
 
     result = result.out.split('\t');
@@ -139,7 +142,7 @@ var getDiskInfo = function(){
     var result = jxcore.utils.cmdSync("df -h");
 
     if(result.exitCode != 0 || !result.out){
-        return null;
+        return "UnableToRead";
     }
 
     result.out = result.out.toLowerCase().replace("mounted on", "mounted_on");
@@ -174,6 +177,15 @@ var getDiskInfo = function(){
     return outputConvert(result.out, num_cols, fixer);
 };
 
+exports.getOSInfo = function(){
+    var res = jxcore.utils.cmdSync("uname -msrn");
+    if(res.exitCode != 0){
+        return "UnableToRead";
+    }
+
+    return res.out;
+};
+
 
 //returns folder's disk usage in Gb
 exports.getDiskUsageSync = getdiskUsage;
@@ -189,23 +201,23 @@ exports.getDiskUsage = function(folder, cb){
 
 // returns objected version of top results { PID: [ array of PIDs] , ...... }
 exports.getTopSync = getTop;
-exports.getTop = function(cb){
-    var task = function(){
+exports.getTop = function(is_up, env, cb){
+    var task = function(val){
         var ts = require('./system_tools');
-        return ts.getTopSync();
+        return {res:ts.getTopSync(val.b), e:val.e};
     };
 
-    jxcore.tasks.addTask(task, null, cb);
+    jxcore.tasks.addTask(task, {b:is_up, e:env}, cb);
 };
 
 
 // returns objected version of "df -h" results { Filesystem: [ array of ..] , ...... }
 exports.getDiskInfoSync = getDiskInfo;
-exports.getDiskInfo = function(cb){
-    var task = function(){
+exports.getDiskInfo = function(env, cb){
+    var task = function(env){
         var ts = require('./system_tools');
-        return ts.getDiskInfoSync();
+        return {res:ts.getDiskInfoSync(), e:env};
     };
 
-    jxcore.tasks.addTask(task, null, cb);
+    jxcore.tasks.addTask(task, env, cb);
 };

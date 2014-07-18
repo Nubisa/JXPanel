@@ -76,6 +76,7 @@ var smart_rule = [
         }
     },
     {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
+            val = val.replace(/_/g, "/");
             var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
             view = smart_replace(view, smart_rule);
 

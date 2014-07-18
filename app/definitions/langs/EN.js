@@ -100,6 +100,11 @@ exports.Labels = {
     "DomainsContentList": "Create new domains and manage their options.",
 
 
+    "SystemInfo": "System Information",
+    "UnableToRead": "Unable to read this information",
+    "OSname": "OS",
+    "Loading": "Loading...",
+
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
     "EmailInvalid" : "Invalid e-mail address.",
@@ -150,9 +155,10 @@ exports.Labels = {
     "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
 
     //charts
-    "DiskUsageInformation": "Disk Usage Information",
-    "ChartsTopCPUInfo": "Process CPU Information",
-    "ChartsTopMemoryInfo": "Process Memory Information"
+    "DiskUsageInformation": "Disk Usage",
+    "ChartsTopCPUInfo": "Process CPU",
+    "ChartsTopMemoryInfo": "Process Memory",
+    "Capacity": "Capacity"
 };
 
 

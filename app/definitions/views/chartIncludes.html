@@ -22,7 +22,9 @@
             if(ret_val.err){
                 alert(ret_val.err);
                 location.href = "/index.html";
+                return;
             }
+
             cb(ret_val);
         });
     };
@@ -38,8 +40,16 @@
                 var infoBox = document.getElementById("info_" + __this.name);
                 infoBox.innerHTML = ret_val.data.l;
 
-                if(!window.panelCharts[__this.name] || !ret_val.data.update){
 
+                if(!ret_val.data.btn_ref){
+                    document.getElementById("btn_refresh" + __this.name).style.display = "none";
+                }
+
+                if(!ret_val.data.btn_ply){
+                    document.getElementById("btn_play"+ __this.name).style.display = "none";
+                }
+
+                if(!window.panelCharts[__this.name] || !ret_val.data.update){
 
                     var parent = document.getElementById("s" + __this.name);
 
@@ -49,11 +59,19 @@
                         ctx = document.getElementById(__this.name);
                         width = parseInt(ctx.style.width);
                         height = parseInt(ctx.style.height);
+                        window.panelCharts[__this.name].destroy();
                         parent.removeChild(ctx);
+
+                        var _width = parent.clientWidth - 20;
+                        var _height = parent.clientHeight;
+
+                        width *= _width / __this.o_width;
+                        __this.o_width = _width;
                     }
                     else{
                         width = parent.clientWidth - 20;
                         height = parent.clientHeight;
+                        __this.o_width = width;
 
                         if(ret_val.data.names){
                             height -= 25;
@@ -116,6 +134,18 @@
                 si = _sel.selectedIndex;
             __this.render(si);
         };
+
+        __this.rCount = 0;
+
+        utils.addEvent(window, "resize", function(){
+            __this.rCount++;
+            if(__this.rCount===1){
+                setTimeout(function(a__this){
+                    a__this.rCount = 0;
+                    document.getElementById("btn_refresh" + a__this.name).onmousedown();
+                }, 500, __this);
+            }
+        });
         __this.render(0);
     };
 </script>
