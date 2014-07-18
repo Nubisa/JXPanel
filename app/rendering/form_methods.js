@@ -28,8 +28,10 @@ methods.tryLogin = function(env, params){
             var _url = "/dashboard.html";
             if(params.url && params.url.indexOf){
                 var ind = params.url.indexOf("t=");
-                if(params.url.length>ind+7){ // something.html
-                    _url = params.url.substr(ind+2, params.url.length-(ind+2)).trim();
+                if(params.url.length>ind+7 && ind>0){ // something.html
+                    if(ind>0)
+                        ind += 2;
+                    _url = params.url.substr(ind, params.url.length-(ind)).trim();
                 }
             }
             server.sendCallBack(env, {url: _url});

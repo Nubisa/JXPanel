@@ -10,7 +10,7 @@ exports.chart = function(){
       this.mediumSize = "4";
       this.smallSize = "6";
       this.type = "Pie";
-      this.height = 150;
+      this.height = st.IsOSX? 150:130;
 
       this.options = {
           //Boolean - Whether we should show a stroke on each segment

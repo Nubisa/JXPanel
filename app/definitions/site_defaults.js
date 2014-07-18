@@ -27,12 +27,12 @@ var getOSDetails = function(lang, env){
 
         var details = form_lang.Get(lang, ret_val, true);
 
-        var lst = details.match(/([0-9]+[/]+[0-9]+[/]+[0-9]+)/g);
+        var lst = details.match(/([0-9]+[\/]+[0-9]+[\/]+[0-9]+)/g);
         for(var o in lst){
             details = details.replace(lst[o], "");
         }
 
-        lst = details.match(/([0-9]+[:]+[0-9]+[:]+[0-9]+)/g);
+        lst = details.match(/([0-9]+[:]+[0-9]+[:]*[0-9]*)/g);
         for(var o in lst){
             details = details.replace(lst[o], "");
         }
@@ -50,13 +50,19 @@ var getOSDetails = function(lang, env){
             details = details.replace(lst[o], str);
         }
 
-        lst = details.match(/([ a-zA-Z]+[:]+)/g);
+        lst = details.match(/([ a-zA-Z(())]+[:]+)/g);
 
         for(var o in lst){
             if(lst[o] != "color:"){
                 details = details.replace(lst[o], "<br/><span style='color:#003333'><strong>"+lst[o] + "</strong></span>");
             }
         }
+        
+        if(!system_tools.IsOSX){
+        	details = details.replace(/top[ ]+\-[ ]+up/, "<br/><span style='color:#003333'><strong>Up-time: <strong></span>");
+        }
+        
+        details = details.replace(/,/g, "&nbsp;");
 
         server.sendCallBack(_env, {html:details});
     });
