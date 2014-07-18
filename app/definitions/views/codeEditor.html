@@ -4,21 +4,117 @@
     input, textarea  { -webkit-user-select:text; }
 </style>
 <link rel="stylesheet" href="/cm/codemirror.css">
-<link rel="stylesheet" href="/cm/theme/ambiance.css">
+<link rel="stylesheet" href="/cm/theme/eclipse.css">
 <script src="/cm/codemirror.js"></script>
 <script src="/cm/addon/hint/show-hint.js"></script>
 <script src="/cm/addon/hint/javascript-hint.js"></script>
 <script src="/cm/mode/javascript/javascript.js"></script>
-<script src="/cm/mode/htmlmixed/htmlmixed.js"></script>
+<script src="/cm/addon/fold/foldcode.js"></script>
+<link rel="stylesheet" href="/cm/addon/fold/foldgutter.css" />
+<script src="/cm/addon/fold/foldgutter.js"></script>
+<script src="/cm/addon/fold/brace-fold.js"></script>
+<script src="/cm/addon/fold/xml-fold.js"></script>
+<script src="/cm/addon/fold/comment-fold.js"></script>
+<script src="/cm/mode/xml/xml.js"></script>
 
-<textarea id="_code_editor">
+<div class="row">
+<div class="col-sm-12">
+    <div class="well" style="margin:0px;padding:0px;height:150px;overflow:scroll">
+        <div class="tree smart-form">
+            <ul>
+                <li>
+                    <span><i class="fa fa-lg fa-folder-open"></i> Parent</span>
+                    <ul>
+                        <li>
+                            <span><i class="fa fa-lg fa-plus-circle"></i> Administrators</span>
+                            <ul>
+                                <li style="display:none">
+																	<span> <label class="checkbox inline-block">
+                                                                        <input type="checkbox" name="checkbox-inline">
+                                                                        <i></i>Michael.Jackson</label> </span>
+                                </li>
+                                <li style="display:none">
+																	<span> <label class="checkbox inline-block">
+                                                                        <input type="checkbox" checked="checked" name="checkbox-inline">
+                                                                        <i></i>Sunny.Ahmed</label> </span>
+                                </li>
+                                <li style="display:none">
+																	<span> <label class="checkbox inline-block">
+                                                                        <input type="checkbox" checked="checked" name="checkbox-inline">
+                                                                        <i></i>Jackie.Chan</label> </span>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span><i class="fa fa-lg fa-minus-circle"></i> Child</span>
+                            <ul>
+                                <li>
+                                    <span><i class="icon-leaf"></i> Grand Child</span>
+                                </li>
+                                <li>
+                                    <span><i class="icon-leaf"></i> Grand Child</span>
+                                </li>
+                                <li>
+                                    <span><i class="fa fa-lg fa-plus-circle"></i> Grand Child</span>
+                                    <ul>
+                                        <li style="display:none">
+                                            <span><i class="fa fa-lg fa-plus-circle"></i> Great Grand Child</span>
+                                            <ul>
+                                                <li style="display:none">
+                                                    <span><i class="icon-leaf"></i> Great great Grand Child</span>
+                                                </li>
+                                                <li style="display:none">
+                                                    <span><i class="icon-leaf"></i> Great great Grand Child</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li style="display:none">
+                                            <span><i class="icon-leaf"></i> Great Grand Child</span>
+                                        </li>
+                                        <li style="display:none">
+                                            <span><i class="icon-leaf"></i> Great Grand Child</span>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <span><i class="fa fa-lg fa-folder-open"></i> Parent2</span>
+                    <ul>
+                        <li>
+                            <span><i class="icon-leaf"></i> Child</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
 
+    </div>
+    </div>
+</div>
+
+<div class="row" style="padding-top:10px">
+<div id="holder" class="col-sm-12">
+<div class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:scroll">
+<textarea id="_code_editor" >
+var test = function(){
+  return 5;
+};
+
+test();
 </textarea>
+</div>
+</div>
+
+</div>
 
 <script>
 
     var editorInter = setInterval(function(){
-        if(typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined'){
+        if(typeof $ != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined'){
+            clearInterval(editorInter);
             Init();
         }
     }, 10);
@@ -26,9 +122,29 @@
     var Init = function(){
         var elm_editor = document.getElementById("_code_editor");
         var editor = CodeMirror.fromTextArea(elm_editor, {
-            mode: "text/javascript"
+            mode: "text/javascript",
+            theme: "eclipse",
+            lineNumbers:true,
+            lineWrapping:true,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
         });
-    }
+
+
+        $('.tree > ul').attr('role', 'tree').find('ul').attr('role', 'group');
+        $('.tree').find('li:has(ul)').addClass('parent_li').attr('role', 'treeitem').find(' > span').attr('title', 'Collapse this branch').on('click', function(e) {
+            var children = $(this).parent('li.parent_li').find(' > ul > li');
+            if (children.is(':visible')) {
+                children.hide('fast');
+                $(this).attr('title', 'Expand this branch').find(' > i').removeClass().addClass('fa fa-lg fa-plus-circle');
+            } else {
+                children.show('fast');
+                $(this).attr('title', 'Collapse this branch').find(' > i').removeClass().addClass('fa fa-lg fa-minus-circle');
+            }
+            e.stopPropagation();
+        });
+
+    };
 </script>
 
 
