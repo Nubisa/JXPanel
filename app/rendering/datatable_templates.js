@@ -136,14 +136,13 @@ var getHTML = function (active_user, table, cb) {
 exports.getDataTable = function(rows) {
 
     var cols = rows[0];
-    var colCount = cols.length;
 
     var thead = [];
     var tbody = [];
 
     for(var rowID in rows) {
 
-        if (rowID === 0) {
+        if (rowID + "" === "0") {
             for(var colID in cols) {
                 thead.push("<td>" + cols[colID] + "</td>")
             }
@@ -154,7 +153,7 @@ exports.getDataTable = function(rows) {
             }
             tbody.push("</tr>");
         }
-    };
+    }
 
     return "<thead><tr>" + thead.join("\n") + "</tr></thead>\n<tbody>" + tbody.join("\n") + "</tbody>";
 };
