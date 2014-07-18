@@ -17,7 +17,7 @@ exports.Labels = {
     "serverManagement":"Server Management",
     "help":"Help",
     "logout":"Logout",
-    "logoutQuestion":"Are you sure, that you want to log out?",
+    "logoutQuestion":"Do you really want to log out?",
     "fileManager":"File Manager",
     "codeEditor":"Code Editor",
     "serviceManagement":"Service Management",
