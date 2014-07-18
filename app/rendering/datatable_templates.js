@@ -126,6 +126,13 @@ var getHTML = function (active_user, table, cb) {
 
 // each rows is array of cells
 // first row is column array
+// e.g.
+// [
+//  [ "col1", "col2", "col3" ],      // columns
+//  [ "val1", val2, true ],          // row1
+//  [ "val1", val2, true ]           // row2
+// ]
+
 exports.getDataTable = function(rows) {
 
     var cols = rows[0];
