@@ -59,7 +59,7 @@ exports.form = function () {
                     label: "DomainName",
                     method: tool.createTextBox,
                     options: { required: true, prefix: "www." },
-                    value_table: false
+                    dbTable : "main"
                 }
             },
 //

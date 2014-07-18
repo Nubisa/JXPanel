@@ -112,3 +112,19 @@ exports.Int = function (options) {
         return {result: true};
     };
 };
+
+
+exports.Password = function () {
+
+    this.validate = function (env, active_user, val, vals) {
+
+
+        if (!isNaN(this.min) && val.trim().length < this.min) {
+            return {result: false, msg: form_lang.Get(active_user.lang, "RequiresMinimumLength", null, [this.min])};
+        } else if (!isNaN(this.max) && val.trim().length > this.max) {
+            return {result: false, msg: form_lang.Get(active_user.lang, "RequiresMaximumLength", null, [this.max])};
+        }
+
+        return {result: true};
+    };
+};

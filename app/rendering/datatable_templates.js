@@ -83,8 +83,10 @@ var getHTML = function (active_user, table, cb) {
             return;
         }
 
-        var thead = [];
-        var tbody = [];
+
+        var ret = [];
+        ret.push([]);
+
         var dbNames = {};
         // searching for display names and dbNames of controls
         for (var a in columns) {
@@ -97,11 +99,12 @@ var getHTML = function (active_user, table, cb) {
                 dbNames[columns[a]] = formControls[columns[a]].details.dbName || columns[a];
             }
 
-            thead.push("<td>" + displayName + "</td>")
+            ret[0].push(displayName);
         }
 
         for (var y = 0, len = rows.length; y < len; y++) {
-            tbody.push("<tr>");
+
+            var single_row = [];
             for (var x in columns) {
                 var colName = dbNames[columns[x]] || columns[x];
                 var val = '<a href="#" onclick="jxEditRow(\''+  rows[y]["ID"] +'\'); return false;">' + rows[y][colName] + '</a>';
@@ -110,15 +113,45 @@ var getHTML = function (active_user, table, cb) {
                 else if (colName === "_id")
                     val = y + 1;
 
-                tbody.push("<td>" + val + "</td>");
+                single_row.push(val);
             }
-            tbody.push("</tr>");
+            ret.push(single_row);
         }
 
-        cb(false, "<thead><tr>" + thead.join("\n") + "</tr></thead>\n<tbody>" + tbody.join("\n") + "</tbody>");
+        var html = exports.getDataTable(ret);
+        cb(false, html);
 
     });
 };
+
+// each rows is array of cells
+// first row is column array
+exports.getDataTable = function(rows) {
+
+    var cols = rows[0];
+    var colCount = cols.length;
+
+    var thead = [];
+    var tbody = [];
+
+    for(var rowID in rows) {
+
+        if (rowID === 0) {
+            for(var colID in cols) {
+                thead.push("<td>" + cols[colID] + "</td>")
+            }
+        } else {
+            tbody.push("<tr>");
+            for(var colID in rows[rowID]) {
+                tbody.push("<td>" + rows[rowID][colID] + "</td>");
+            }
+            tbody.push("</tr>");
+        }
+    };
+
+    return "<thead><tr>" + thead.join("\n") + "</tr></thead>\n<tbody>" + tbody.join("\n") + "</tbody>";
+};
+
 
 exports.render = function (sessionId, table_name, cb) {
 

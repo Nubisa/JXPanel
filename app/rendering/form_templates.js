@@ -110,6 +110,9 @@ exports.renderForm = function(sessionId, formName){
 
         var dbname = ctrl.dbName ? ctrl.dbName : name;
         var val = edits && edits[dbname] ? edits[dbname] : null;
+
+        if(ctrl.options)
+            ctrl.options.formName = formName;
 //        console.log("val for", dbname, ":", val);
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
