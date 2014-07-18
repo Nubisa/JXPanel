@@ -11,9 +11,9 @@ var outputConvert = function(str, expects, fixer){
                 lines[i] = lines[i].replace(/\\t/g, " ");
 
                 if(n==0)
-                    cols = lines[i].match(/[a-zA-Z0-9#%//.:+_-]+/g);
+                    cols = lines[i].match(/[a-zA-Z0-9#%\/.:+_-]+/g);
                 else
-                    cols = lines[i].match(/[a-zA-Z0-9#%//.:+_-]+[ ]?[a-zA-Z]*/g);
+                    cols = lines[i].match(/[a-zA-Z0-9#%\/.:+_-]+[ ]?[a-zA-Z]*/g);
 
                 if(!cols)
                     continue;
@@ -64,12 +64,13 @@ var outputConvert = function(str, expects, fixer){
     return {};
 };
 
+exports.IsOSX = /mac/.test(jxcore.utils.getOS());
 
 var getTop = function(is_up){
     var num_cols = 12;
     var result;
-    var is_mac = /mac/.test(jxcore.utils.getOS()); 
-    if(is_mac)
+     
+    if(exports.IsOSX)
     	result = jxcore.utils.cmdSync("top -l 1 -ncols "+num_cols);
     else{
     	result = jxcore.utils.cmdSync("top -n 1 -b");
