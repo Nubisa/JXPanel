@@ -7,7 +7,7 @@ var form_lang = require('../form_lang');
 var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
 var validations = require('./../validations');
-
+var crypto = require('crypto');
 
 exports.form = function () {
 
@@ -84,21 +84,27 @@ exports.form = function () {
                 details: {
                     label: "Password",
                     method: tool.createTextBox,
-                    options: { required_insert: true, password: true },
+                    options: { required_insert: true, password: true, dont_update_null : true },
                     value_table: false,
                     dbName : "password"
                 },
-                validation : new validations.String(5)
+                validation : new validations.String(5),
+                convert : function(value) {
+                    return crypto.createHash('md5').update(value).digest('hex').toString();
+                }
             },
             {
                 name: "person_repeat_password",
                 details: {
                     label: "PasswordRepeat",
                     method: tool.createTextBox,
-                    options: { required: true, password: true },
+                    options: { required_insert: true, password: true, dont_update_null : true  },
                     dbTable: "none"
                 },
-                validation : new validations.String(5)
+                validation : new validations.Password("person_password"),
+                convert : function(value) {
+                    return crypto.createHash('md5').update(value).digest('hex').toString();
+                }
             },
 
             {"END": 1}

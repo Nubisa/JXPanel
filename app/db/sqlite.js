@@ -753,7 +753,7 @@ var Table = function (table_name) {
                 } else {
                     if (rows && rows.length) {
                         // row already exists
-                        if (cb) cb("Record with this field value already exists.");
+                        if (cb) cb("Record with this field value already exists.", _json);
                     } else {
                         // row does not exist
                         _this.AddNew(db_object, stripFields(_table_name, json), function(err, ID) {

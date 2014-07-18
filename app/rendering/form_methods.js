@@ -85,6 +85,11 @@ var sessionAdd = function(env, active_user, params){
 
         if (valids.length) {
            for(var a in valids) {
+
+               if (ctrl.details && ctrl.details.options.dont_update_null && !params.controls[o]) {
+                   continue;
+               }
+
                var res = valids[a].validate(env, active_user, params.controls[o], params.controls);
                if(!res.result){
                    messages.push({control:ctrlDisplayName, msg:res.msg});
@@ -101,7 +106,7 @@ var sessionAdd = function(env, active_user, params){
         return true;
 };
 
-var getFormControlsDetails = function(activeInstance) {
+var getFormControls = function(activeInstance) {
 
     if (!activeInstance)
         throw "Instance of the form is empty.";
@@ -109,7 +114,7 @@ var getFormControlsDetails = function(activeInstance) {
     var ret = {};
     for(var i in activeInstance.controls) {
         if (activeInstance.controls[i].name)
-            ret[activeInstance.controls[i].name] = activeInstance.controls[i].details;
+            ret[activeInstance.controls[i].name] = activeInstance.controls[i];
     }
     return ret;
 };
@@ -125,25 +130,60 @@ methods.sessionApply = function(env, params){
     var activeForm = active_user.session.forms[params.form];
     var activeInstance = activeForm.activeInstance;
 
-    var details = getFormControlsDetails(activeInstance);
+
+    var _controls = getFormControls(activeInstance);
+
+    var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
 
     var json = {};
-    for(var field_name in params.controls) {
+    for (var field_name in params.controls) {
 
-        if (details[field_name] && details[field_name].dbName) {
-            // replacing form controls names into db field names
-            json[details[field_name].dbName] = params.controls[field_name];
-        } else {
-            json[field_name] = params.controls[field_name];
+        var val = params.controls[field_name];
+        if (_controls[field_name]) {
+            var ctrl = _controls[field_name];
+            var det = ctrl.details;
+
+            if (det.options.dont_update_null && !val) {
+                continue;
+            }
+
+            if (det.dbName) {
+                // replacing form controls names into db field names
+                field_name = det.dbName;
+            }
+
+            if (ctrl.convert)
+                json[field_name ] = ctrl.convert(val);
+            else
+                json[field_name] = val;
         }
     }
-    if (_active_user.isRecordUpdating(active_user, params.form)) {
+
+    if (isUpdate) {
         json.ID = active_user.session.edits[params.form].ID;
     }
 
-    activeInstance.settings.dbTable.AddNewOrUpdateAll(sqlite.db, json, activeInstance.settings.json_where, function(err) {
+    activeInstance.settings.dbTable.AddNewOrUpdateAll(sqlite.db, json, activeInstance.settings.json_where, function(err, err2) {
         if (err) {
-            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
+            var str = form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err;
+            if (err2) {
+
+                // err2 may contain json with fields, for which there was a problem.
+                var arr = [];
+                for(var field_name in err2) {
+
+                    for(var i in _controls) {
+                        var ctrl = _controls[i];
+                        if (ctrl.name && (ctrl.name === field_name || (ctrl.details.dbName && ctrl.details.dbName === field_name))) {
+                            field_name = form_lang.Get(active_user.lang, ctrl.details.label);
+                            break;
+                        }
+                    }
+                    arr.push(field_name);
+                }
+                if (arr.length) str += " (" + arr.join(", ") + ")";
+            }
+            server.sendCallBack(env, {err: str});
         } else {
             server.sendCallBack(env, {err: false});
         }
