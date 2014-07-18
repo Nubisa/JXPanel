@@ -85,20 +85,6 @@
         }
     };
 
-    window.jxConfirm = function (title, question, cb) {
-
-        if (!cb) return;
-
-        $.SmartMessageBox({
-            title : title,
-            content : question,
-            buttons : '[No][Yes]'
-        }, function(ButtonPressed) {
-            cb(ButtonPressed);
-        });
-    };
-
-
     document.onjxready = function () {
         jxcore.Start(function (status) {
             if (window.jxTemplateReadyForjxm) {
@@ -125,6 +111,18 @@
             location.reload();
         });
         return false;
+    };
+    utils.jxConfirm = function (title, question, cb) {
+
+        if (!cb) return;
+
+        $.SmartMessageBox({
+            title : title,
+            content : question,
+            buttons : '[No][Yes]'
+        }, function(ButtonPressed) {
+            cb(ButtonPressed);
+        });
     };
 
     $(document).ready(function() {

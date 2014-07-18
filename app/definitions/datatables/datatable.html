@@ -204,7 +204,7 @@
             return;
         }
 
-        window.jxConfirm("{{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedQuestion}}", function(ButtonPressed) {
+        utils.jxConfirm("{{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedInfo}}", function(ButtonPressed) {
 
             if (ButtonPressed === "Yes") {
                 jxcore.Call('removeFromTableData', { dt : '{{datatable.name}}', ids : ids }, function(param) {

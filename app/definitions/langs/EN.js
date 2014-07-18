@@ -155,6 +155,7 @@ exports.Labels = {
     "RemoveSelected" : "Remove selected",
     "RemoveSelectedHeader" : "Warning!",
     "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
+    "RemoveSelectedInfo" : "This operation cannot be undone.",
 
     //charts
     "DiskUsageInformation": "Disk Usage",
