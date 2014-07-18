@@ -31,7 +31,7 @@ methods.tryLogin = function(env, params){
                 if(params.url.length>ind+7 && ind>0){ // something.html
                     if(ind>0)
                         ind += 2;
-                    _url = params.url.substr(ind, params.url.length-(ind+2)).trim();
+                    _url = params.url.substr(ind, params.url.length-(ind)).trim();
                 }
             }
             server.sendCallBack(env, {url: _url});
