@@ -17,6 +17,7 @@ exports.Labels = {
     "serverManagement":"Server Management",
     "help":"Help",
     "logout":"Logout",
+    "logoutQuestion":"Are you sure, that you want to log out?",
     "fileManager":"File Manager",
     "codeEditor":"Code Editor",
     "serviceManagement":"Service Management",
@@ -51,6 +52,7 @@ exports.Labels = {
     "PasswordRepeat" : "Repeat password",
     "PasswordEnter" : "Enter your password",
     "PasswordEnterRequired" : "Please enter your password",
+    "PasswordDoesNotMatch" : "Password does not match",
 
     "DataPlans": "Hosting Plans",
     "DataPlansHeader": "Customize the options",

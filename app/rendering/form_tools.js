@@ -13,9 +13,9 @@ var getData = function(label, _title, input_id, lang, options) {
     ret.description = !desc?options.description:desc;
     ret.prefix = options.prefix || "";
 
+    var isUpdate = options.extra.isUpdate;
 
-
-    ret.required = options.required;
+    ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
 
     ret.dynamic = options.dynamic || "";
 
@@ -66,10 +66,10 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
 
     var id = jxcore.utils.uniqueId();
     if(!options.multiline)
-        _html += '<input id="a'+id+'" class="form-control" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
+        _html += '<input id="a'+id+'" class="form-control" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
     else{
         var _rows = options.rows ? options.rows:5;
-        _html += '<textarea id="a'+id+'" class="form-control" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
+        _html += '<textarea id="a'+id+'" class="form-control" autocomplete="off" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
     }
 
     if(data.description)

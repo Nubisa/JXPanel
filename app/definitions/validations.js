@@ -114,17 +114,16 @@ exports.Int = function (options) {
 };
 
 
-exports.Password = function () {
+exports.Password = function (password_field) {
+
+    var _password_field = password_field;
 
     this.validate = function (env, active_user, val, vals) {
 
-
-        if (!isNaN(this.min) && val.trim().length < this.min) {
-            return {result: false, msg: form_lang.Get(active_user.lang, "RequiresMinimumLength", null, [this.min])};
-        } else if (!isNaN(this.max) && val.trim().length > this.max) {
-            return {result: false, msg: form_lang.Get(active_user.lang, "RequiresMaximumLength", null, [this.max])};
+        if (vals && vals[_password_field] === val) {
+            return {result: true};
+        } else {
+            return {result: false, msg: form_lang.Get(active_user.lang, "PasswordDoesNotMatch", null)};
         }
-
-        return {result: true};
     };
 };
