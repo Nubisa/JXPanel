@@ -8,7 +8,7 @@ exports.chart = function(){
       this.name = "diskUsageInfo";
       this.title = "DiskUsageInformation";
       this.mediumSize = "4";
-      this.smallSize = "6";
+      this.smallSize = "8";
       this.type = "Pie";
       this.height = 150;
 
