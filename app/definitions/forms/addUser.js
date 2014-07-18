@@ -74,7 +74,7 @@ exports.form = function () {
                     label: "Username",
                     method: tool.createTextBox,
                     options: { required: true, values: ["EN"]},
-                    value_table : false,
+                    dbTable : "main",
                     dbName : "username"
                 }
             },
@@ -84,9 +84,19 @@ exports.form = function () {
                 details: {
                     label: "Password",
                     method: tool.createTextBox,
-                    options: { required: true, password: true },
+                    options: { required_insert: true, password: true },
                     value_table: false,
                     dbName : "password"
+                },
+                validation : new validations.String(5)
+            },
+            {
+                name: "person_repeat_password",
+                details: {
+                    label: "PasswordRepeat",
+                    method: tool.createTextBox,
+                    options: { required: true, password: true },
+                    dbTable: "none"
                 },
                 validation : new validations.String(5)
             },

@@ -85,7 +85,7 @@ var sessionAdd = function(env, active_user, params){
 
         if (valids.length) {
            for(var a in valids) {
-               var res = valids[a].validate(env, active_user, params.controls[o]);
+               var res = valids[a].validate(env, active_user, params.controls[o], params.controls);
                if(!res.result){
                    messages.push({control:ctrlDisplayName, msg:res.msg});
                }
@@ -127,8 +127,6 @@ methods.sessionApply = function(env, params){
 
     var details = getFormControlsDetails(activeInstance);
 
-
-    var isUpdate = active_user.session.edits && active_user.session.edits[params.form] && active_user.session.edits[params.form].ID;
     var json = {};
     for(var field_name in params.controls) {
 
@@ -139,7 +137,7 @@ methods.sessionApply = function(env, params){
             json[field_name] = params.controls[field_name];
         }
     }
-    if (isUpdate) {
+    if (_active_user.isRecordUpdating(active_user, params.form)) {
         json.ID = active_user.session.edits[params.form].ID;
     }
 
@@ -150,14 +148,6 @@ methods.sessionApply = function(env, params){
             server.sendCallBack(env, {err: false});
         }
     });
-
-//    activeForm.activeInstance.apply(active_user, params, function (err) {
-//        if (err) {
-//            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
-//        } else {
-//            server.sendCallBack(env, {err: false});
-//        }
-//    });
 };
 
 

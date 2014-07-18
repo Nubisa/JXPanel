@@ -27,7 +27,7 @@ var createFields = function (db, table, controls) {
         var ctrl = controls[id];
         if (!ctrl.name) continue;
 
-        if (ctrl.details.value_table === false) {
+        if (ctrl.details.dbTable && ctrl.details.dbTable !== "main") {
             continue;
         }
         var json = { field_name: ctrl.name };

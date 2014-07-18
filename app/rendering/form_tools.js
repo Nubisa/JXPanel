@@ -12,6 +12,9 @@ var getData = function(label, _title, input_id, lang, options) {
 
     ret.description = !desc?options.description:desc;
     ret.prefix = options.prefix || "";
+
+
+
     ret.required = options.required;
 
     ret.dynamic = options.dynamic || "";

@@ -10,7 +10,7 @@ var newUser = function(session_id){
         lang: "EN",
         session: { forms:{} },
         lastOperation: Date.now() // TODO later clear the users
-    };
+     };
 };
 
 exports.loginUser = function(sessionId, params){
@@ -69,5 +69,12 @@ exports.getDataTable = function(sessionId, table_name){
 exports.clearUser = function(sessionId) {
     delete users[sessionId];
 };
+
+
+exports.isRecordUpdating = function(active_user, formName) {
+    var isUpdate = active_user.session.edits && active_user.session.edits[formName] && active_user.session.edits[formName].ID;
+    return isUpdate;
+}
+
 
 //{{user.LABELHERE}}

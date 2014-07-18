@@ -59,7 +59,7 @@ exports.form = function () {
                     label: "PlanName",
                     method: tool.createTextBox,
                     options: { required: true },
-                    value_table: false
+                    dbTable : "main"
                 }
             },
 
