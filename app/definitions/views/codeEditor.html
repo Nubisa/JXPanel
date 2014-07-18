@@ -16,80 +16,13 @@
 <script src="/cm/addon/fold/xml-fold.js"></script>
 <script src="/cm/addon/fold/comment-fold.js"></script>
 <script src="/cm/mode/xml/xml.js"></script>
+<link rel="stylesheet" href="/css/zTreeStyle.css" />
 
 <div class="row">
 <div class="col-sm-12">
-    <div class="well" style="margin:0px;padding:0px;height:150px;overflow:scroll">
-        <div class="tree smart-form">
-            <ul>
-                <li>
-                    <span><i class="fa fa-lg fa-folder-open"></i> Parent</span>
-                    <ul>
-                        <li>
-                            <span><i class="fa fa-lg fa-plus-circle"></i> Administrators</span>
-                            <ul>
-                                <li style="display:none">
-																	<span> <label class="checkbox inline-block">
-                                                                        <input type="checkbox" name="checkbox-inline">
-                                                                        <i></i>Michael.Jackson</label> </span>
-                                </li>
-                                <li style="display:none">
-																	<span> <label class="checkbox inline-block">
-                                                                        <input type="checkbox" checked="checked" name="checkbox-inline">
-                                                                        <i></i>Sunny.Ahmed</label> </span>
-                                </li>
-                                <li style="display:none">
-																	<span> <label class="checkbox inline-block">
-                                                                        <input type="checkbox" checked="checked" name="checkbox-inline">
-                                                                        <i></i>Jackie.Chan</label> </span>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <span><i class="fa fa-lg fa-minus-circle"></i> Child</span>
-                            <ul>
-                                <li>
-                                    <span><i class="icon-leaf"></i> Grand Child</span>
-                                </li>
-                                <li>
-                                    <span><i class="icon-leaf"></i> Grand Child</span>
-                                </li>
-                                <li>
-                                    <span><i class="fa fa-lg fa-plus-circle"></i> Grand Child</span>
-                                    <ul>
-                                        <li style="display:none">
-                                            <span><i class="fa fa-lg fa-plus-circle"></i> Great Grand Child</span>
-                                            <ul>
-                                                <li style="display:none">
-                                                    <span><i class="icon-leaf"></i> Great great Grand Child</span>
-                                                </li>
-                                                <li style="display:none">
-                                                    <span><i class="icon-leaf"></i> Great great Grand Child</span>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li style="display:none">
-                                            <span><i class="icon-leaf"></i> Great Grand Child</span>
-                                        </li>
-                                        <li style="display:none">
-                                            <span><i class="icon-leaf"></i> Great Grand Child</span>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <span><i class="fa fa-lg fa-folder-open"></i> Parent2</span>
-                    <ul>
-                        <li>
-                            <span><i class="icon-leaf"></i> Child</span>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+    <div class="well" style="margin:0px;padding:0px;height:130px;overflow:scroll">
+
+        <ul id="treeDemo" class="ztree"></ul>
 
     </div>
     </div>
@@ -113,8 +46,13 @@ test();
 <script>
 
     var editorInter = setInterval(function(){
-        if(typeof $ != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined'){
+
+        if(typeof jQuery != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined'){
+            var elm_editor = document.getElementById("_code_editor");
             clearInterval(editorInter);
+            var scr = document.createElement("script");
+            scr.src = "/js/jquery.ztree.core-3.5.min.js";
+            elm_editor.parentNode.appendChild(scr);
             Init();
         }
     }, 10);
@@ -131,19 +69,65 @@ test();
         });
 
 
-        $('.tree > ul').attr('role', 'tree').find('ul').attr('role', 'group');
-        $('.tree').find('li:has(ul)').addClass('parent_li').attr('role', 'treeitem').find(' > span').attr('title', 'Collapse this branch').on('click', function(e) {
-            var children = $(this).parent('li.parent_li').find(' > ul > li');
-            if (children.is(':visible')) {
-                children.hide('fast');
-                $(this).attr('title', 'Expand this branch').find(' > i').removeClass().addClass('fa fa-lg fa-plus-circle');
-            } else {
-                children.show('fast');
-                $(this).attr('title', 'Collapse this branch').find(' > i').removeClass().addClass('fa fa-lg fa-minus-circle');
-            }
-            e.stopPropagation();
-        });
+        var setting = {	};
 
+        var zNodes =[
+            { name:"pNode 01", open:true,
+                children: [
+                    { name:"pNode 11",
+                        children: [
+                            { name:"leaf node 111"},
+                            { name:"leaf node 112"},
+                            { name:"leaf node 113"},
+                            { name:"leaf node 114"}
+                        ]},
+                    { name:"pNode 12",
+                        children: [
+                            { name:"leaf node 121"},
+                            { name:"leaf node 122"},
+                            { name:"leaf node 123"},
+                            { name:"leaf node 124"}
+                        ]},
+                    { name:"pNode 13 - no child", isParent:true}
+                ]},
+            { name:"pNode 02",
+                children: [
+                    { name:"pNode 21", open:true,
+                        children: [
+                            { name:"leaf node 211"},
+                            { name:"leaf node 212"},
+                            { name:"leaf node 213"},
+                            { name:"leaf node 214"}
+                        ]},
+                    { name:"pNode 22",
+                        children: [
+                            { name:"leaf node 221"},
+                            { name:"leaf node 222"},
+                            { name:"leaf node 223"},
+                            { name:"leaf node 224"}
+                        ]},
+                    { name:"pNode 23",
+                        children: [
+                            { name:"leaf node 231"},
+                            { name:"leaf node 232"},
+                            { name:"leaf node 233"},
+                            { name:"leaf node 234"}
+                        ]}
+                ]},
+            { name:"pNode 3 - no child", isParent:true}
+
+        ];
+
+        function createTree(){
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        }
+
+        var loadTreeInter = setInterval(function(){
+            if($.fn.zTree){
+                clearInterval(loadTreeInter);
+                createTree();
+            }
+        }, 10);
     };
 </script>
 
