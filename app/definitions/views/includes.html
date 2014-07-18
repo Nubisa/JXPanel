@@ -120,6 +120,12 @@
         else if (elm.detachEvent)
             elm.detachEvent ('on'+ev, handler);
     };
+    utils.logOut = function() {
+        jxcore.Call('logout', null, function(err) {
+            location.reload();
+        });
+        return false;
+    };
 
     $(document).ready(function() {
 
