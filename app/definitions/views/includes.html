@@ -113,7 +113,7 @@
 
 
         if(type && txt)
-            utils.bubble(type, type, txt, 5000);
+            utils.bubble(type, null, txt, 10000);
 
         return;
 
@@ -133,11 +133,12 @@
     utils.bubble = function(type, title, content, ms) {
 
         var colors = { success : "#8ac38b", danger: "#c26565", warning : "#efe1b3", info : "#d6dde7" };
+        var messages = { success : "{{label.MessageSuccess}}", danger : "{{label.MessageDanger}}", warning : "{{label.MessageWarning}}", info: "{{label.MessageInfo}}", error: "{{label.MessageError}}" };
         colors.error = colors.danger;
 
         var color = colors[type] || colors.info;
         $.smallBox({
-            title : title,
+            title : title || messages[type],
             content : "<i class='fa fa-clock-o'></i> <i>" + content + "</i>",
             color : color, //"#659265",
             iconSmall : "fa fa-check fa-2x fadeInRight animated",

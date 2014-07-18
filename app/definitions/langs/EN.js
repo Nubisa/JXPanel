@@ -24,6 +24,12 @@ exports.Labels = {
     "stats":"Server Stats",
     "users":"Users",
 
+    "MessageSuccess" : "Success",
+    "MessageInfo" : "Info",
+    "MessageDanger" : "Something went wrong...",
+    "MessageError" : "Something went wrong...",
+    "MessageWarning" : "Warning!",
+
     "MSBrowserOutOfDate": "Your browser is out of date, please update your browser by going to www.microsoft.com/download",
     "SessionExpired": "The user session is expired. Please login again!",
 
