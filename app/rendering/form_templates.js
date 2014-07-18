@@ -116,7 +116,7 @@ exports.renderForm = function(sessionId, formName){
             if (ctrl.options.password && edits)
                 val = null;
         }
-        console.error("val for", dbname, ":", val);
+//        console.error("val for", dbname, ":", val);
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
 

@@ -189,7 +189,7 @@
     var addMessage = function(errMessage) {
         var msg = errMessage || "OK";
         var type = errMessage ? "danger" : "success";
-        window.jxAddMessage(type, msg);
+        utils.jxAddMessage(type, msg);
     };
 
     window.jxRemoveRows = function() {
