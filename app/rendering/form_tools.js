@@ -176,7 +176,6 @@ exports.createHidden = function(label, _title, input_id, _value, lang, options){
 
     _value = _value || "";
     _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
 
     var _type = "hidden";
     var id = jxcore.utils.uniqueId();
