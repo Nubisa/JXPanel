@@ -41,6 +41,15 @@ exports.form = function () {
         this.onSubmitSuccess = "plans.html";
         this.onSubmitCancel = "plans.html";
 
+        this.settings = {
+            dbTable : sqlite.Plan,
+            json_where :
+            {
+                insert : ["plan_name"],
+                update: ["ID"]
+            }
+        };
+
         this.controls = [
             {"BEGIN": "User Details"},
 
@@ -207,64 +216,66 @@ exports.form = function () {
         ];
     };
 
-    func.prototype.apply = function (active_user, params, cb) {
 
-        var _controls = {};
-        for(var a in this.controls) {
-            var name = this.controls[a].name;
-            if (name) _controls[name] = this.controls[a].details;
-        }
-
-        var values = params.controls;
-
-        var addPlan = function () {
-            // if arrived here - required fields are non empty
-
-            var errors = [];
-            var len = 0;
-            for (var name in values) len++;
-            var _cb = function (err) {
-                len--;
-                if (err) {
-                    errors.push(err);
-                    console.error(err);
-                }
-                if (len === 0) {
-                    cb(null);
-                }
-
-            };
-
-            sqlite.Plan.AddNew(sqlite.db, { plan_name: values["plan_name"] }, function (err, id) {
-
-                if (err) {
-                    if (cb) cb(err);
-                } else {
-                    for (var name in values) {
-                        // only for defined columns
-                        if (_controls[name]) {
-                            var addValue = _controls[name].value_table !== false;
-                            if (addValue) {
-                                console.log("adding plan value", name, values[name]);
-                                sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
-                            }
-                        }
-                        // to decrease the counter and call cb if needed
-                        _cb(false);
-                    }
-                }
-            });
-        };
-
-        sqlite.Plan.Get(sqlite.db, { plan_name : values["plan_name"]}, function (err, rows) {
-            if (!err && rows && rows.length) {
-                cb("Plan with this name already exists.")
-            } else {
-                addPlan();
-            }
-        })
-
-    };
+    // obsolete
+//    func.prototype.apply = function (active_user, params, cb) {
+//
+//        var _controls = {};
+//        for(var a in this.controls) {
+//            var name = this.controls[a].name;
+//            if (name) _controls[name] = this.controls[a].details;
+//        }
+//
+//        var values = params.controls;
+//
+//        var addPlan = function () {
+//            // if arrived here - required fields are non empty
+//
+//            var errors = [];
+//            var len = 0;
+//            for (var name in values) len++;
+//            var _cb = function (err) {
+//                len--;
+//                if (err) {
+//                    errors.push(err);
+//                    console.error(err);
+//                }
+//                if (len === 0) {
+//                    cb(null);
+//                }
+//
+//            };
+//
+//            sqlite.Plan.AddNew(sqlite.db, { plan_name: values["plan_name"] }, function (err, id) {
+//
+//                if (err) {
+//                    if (cb) cb(err);
+//                } else {
+//                    for (var name in values) {
+//                        // only for defined columns
+//                        if (_controls[name]) {
+//                            var addValue = _controls[name].value_table !== false;
+//                            if (addValue) {
+//                                console.log("adding plan value", name, values[name]);
+//                                sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
+//                            }
+//                        }
+//                        // to decrease the counter and call cb if needed
+//                        _cb(false);
+//                    }
+//                }
+//            });
+//        };
+//
+//        sqlite.Plan.Get(sqlite.db, { plan_name : values["plan_name"]}, function (err, rows) {
+//            if (!err && rows && rows.length) {
+//                cb("Plan with this name already exists.")
+//            } else {
+//                addPlan();
+//            }
+//        })
+//
+//    };
 
     return new func();
 };
