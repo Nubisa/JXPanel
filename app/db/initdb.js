@@ -46,8 +46,9 @@ var createFields = function (db, table, controls) {
 };
 
 
-// waiting for sqlite to open db file
-setTimeout(function() {
+var start = Date.now();
+
+var go = function() {
 
     if (sqlite.db) {
         console.log("DB ready");
@@ -67,7 +68,14 @@ setTimeout(function() {
         var form = mod.form();
         createFields(sqlite.db, sqlite.Domain, form.controls);
     } else {
-        console.log("DB was not opened");
+        if (Date.now() - start < 2000) {
+            setTimeout(go, 50);
+        } else {
+            console.log("DB was not opened");
+        }
     }
-}, 1000);
+};
+
+// waiting for sqlite to open db file
+go();
 

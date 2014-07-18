@@ -147,6 +147,24 @@ var getCreateViewQuery = function (view_name, table_name) {
 };
 
 
+/**
+ * Removes from json fields not belonging to specific table name
+ * @param table_name
+ * @param json
+ */
+var stripFields = function(table_name, json, allowedFields) {
+    var ret = {};
+    for(var field_name in tables[table_name].fields) {
+        if (allowedFields && allowedFields.indexOf(field_name) === -1) {
+            continue;
+        }
+        if (json[field_name])
+            ret[field_name] = json[field_name];
+    }
+    return ret;
+};
+
+
 // return err string or null if field value is ok
 var checkFieldValue = function (table_name, field_name, json) {
 
@@ -351,6 +369,7 @@ var Table = function (table_name) {
 
     var _table_name = table_name;
     var isCommon = table_name == data_field_table || table_name == data_value_table;
+    var _this = this;
 
     // records in table_name
 
@@ -363,6 +382,13 @@ var Table = function (table_name) {
     };
 
 
+    /**
+     * Gets rows from main table as well as rows from data_value_table
+     * @param db_object
+     * @param json
+     * @param cb
+     * @constructor
+     */
     this.GetAll = function (db_object, json, cb) {
 
         if (!cb) {
@@ -449,28 +475,20 @@ var Table = function (table_name) {
     // each item in field arr is json containing one field definition (row of data_field_table)
     this.AddNewFieldRules = function(db_object, fieldsArr, cb) {
 
-        var errors = [];
-        var _cb = function(err) {
-            if (err) errors.push(err);
-        };
+        var sql = [];
 
-        db_object.serialize( function() {
-            for(var id in fieldsArr) {
-                var field = fieldsArr[id];
-                field.table_name = _table_name;
-                var ret = getInsertQuery(data_field_table, field);
-                if (ret.err) {
-                    if (cb) cb(ret.err);
-                    return;
-                }
-                db_object.run(ret.sql, _cb);
+        for(var id in fieldsArr) {
+            var field = fieldsArr[id];
+            field.table_name = _table_name;
+            var ret = getInsertQuery(data_field_table, field);
+            if (ret.err) {
+                if (cb) cb(ret.err);
+                return;
             }
-        });
+            sql.push(ret.sql);
+        }
 
-        db_object.wait(function () {
-            var errStr = errors.length ? errors.join("\n") : null;
-            cb(errStr);
-        });
+        exports.RunMultipleQueries(db_object, sql, cb);
     };
 
 
@@ -620,12 +638,144 @@ var Table = function (table_name) {
         });
     };
 
+    // inserts or updates main record and records from db based on ID
+    // json_where should be { insert: [], update: [] }, where each of arrays contain column name to use for where query,
+    // depending if record is inserted or updated
+
+    // e.g., for inserting or updating a domain
+    // json = { ID: "333333", "domain_name" : "www.kris.com", "domain_plan_id" : "1111111" }
+    // and we call sqlite.Domain.AddNewOrUpdateAll(sqlite.db, json, { insert: [ "domain_name"], update: ["ID"] }, cb);
+
+    this.AddNewOrUpdateAll = function(db_object, json, json_where, cb) {
+
+        var isUpdate = json.ID;
+
+        var insertOrUpdate = function (ID) {
+            // if arrived here - required fields are non empty
+
+            var sql = {};
+            sql.defs = "SELECT * FROM " + data_field_table + " WHERE table_name = '" + _table_name + "'";
+            sql.vals = "SELECT *, v.ID as vID FROM data_value_table v JOIN data_field_table f ON v.data_field_table_id = f.ID "
+                + "WHERE f.table_name = '" + _table_name + "' AND v.owner_table_id = '"+ ID +"'";
+
+            exports.SelectMultipleQueries(db_object, sql, function(err, rows) {
+
+                if (err) {
+                    if (cb) cb(err);
+                    return;
+                }
+
+                var fieldNames = [];
+                for (var i in rows.defs) {
+                    fieldNames.push(rows.defs[i].field_name);
+                }
+
+                var findField = function(field_name, defOrValue) {
+                    var arr = defOrValue ? rows.defs : rows.vals;
+
+                    for (var i in arr) {
+                        if (arr[i].field_name === field_name)
+                            return arr[i];
+                    }
+                    return -1;
+                };
+
+                var queries = [];
+
+                for(var i in fieldNames) {
+                    var field_name = fieldNames[i];
+                    if (!json[field_name]) {
+                        continue;
+                    }
+
+                    var fieldDef = findField(field_name, true);
+                    var fieldVal = findField(field_name, false);
+                    if (fieldVal === -1) {
+                        // insert
+                        var ret = getInsertQuery(data_value_table, { data_field_table_id: fieldDef.ID, owner_table_id: ID, value: json[field_name]});
+                        if (ret.err) {
+                            if (cb) cb(ret.err);
+                        } else {
+                            queries.push(ret.sql)
+                        }
+                    } else {
+                        //update
+                        var ret = getUpdateQuery(data_value_table, { ID: fieldVal.vID, value: json[field_name]});
+                        if (ret.err) {
+                            if (cb) cb(ret.err);
+                        } else {
+                            queries.push(ret.sql)
+                        }
+                    }
+                }
+
+                exports.RunMultipleQueries(db_object, queries, cb);
+            });
+        };
+
+
+        if (isUpdate) {
+            // update
+            var _json = stripFields(_table_name, json, json_where.update);
+
+            // checking if main record exists
+            _this.Get(db_object, _json, function (err, rows) {
+                if (err) {
+                    if (cb) cb(err);
+                } else {
+                    if (rows && rows.length) {
+                        // row already exists
+
+                        _this.Update(db_object, stripFields(_table_name, json), function(err) {
+                            // update the rest
+                            if (err) {
+                                if (cb) cb(err);
+                            } else {
+                                insertOrUpdate(json.ID);
+                            }
+                        });
+                    } else {
+                        // row does not exist
+                        if (cb) cb("Cannot update the record - it does not exist.");
+                    }
+                }
+            });
+
+        } else {
+            // insert
+
+            var _json = stripFields(_table_name, json, json_where.insert);
+
+            // checking if main record exists
+            _this.Get(db_object, _json, function (err, rows) {
+                if (err) {
+                    if (cb) cb(err);
+                } else {
+                    if (rows && rows.length) {
+                        // row already exists
+                        if (cb) cb("Record with this field value already exists.");
+                    } else {
+                        // row does not exist
+                        _this.AddNew(db_object, stripFields(_table_name, json), function(err, ID) {
+                            // insert the rest
+                            if (err) {
+                                if (cb) cb(err);
+                            } else {
+                                insertOrUpdate(ID);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    };
+
 };
 
 
 // ############  public methods
 
-exports.Subscription = new Table(subscription_table);
+//exports.Subscription = new Table(subscription_table);
 exports.Plan = new Table(plan_table);
 exports.User = new Table(user_table);
 exports.Domain = new Table(domain_table);
@@ -667,46 +817,128 @@ exports.CreateDatabase = function (file_name, cb) {
         return;
     }
 
-    var _cb = function (err) {
-        if (err) {
-            errors.push(err);
-        }
-    };
+    var sql = [];
+    for (var table_name in tables) {
+        var ret = getCreateTableQuery(table_name);
+        // ret.sql is array in this case
+        sql = sql.concat(ret.sql);
+    }
 
-    var errors = [];
+    // creating views
+//    for (var table_name in tables) {
+//        if (tables[table_name].view) {
+//            sql.push(getCreateViewQuery(tables[table_name].view.name, table_name));
+//        }
+//    }
 
-    db_object.serialize(function () {
-        // creating tables
-        for (var table_name in tables) {
-            var ret = getCreateTableQuery(table_name);
-
-            // ret.sql is array in this case
-            for (var id in ret.sql) {
-                db_object.run(ret.sql[id], _cb);
-            }
-        }
-
-        // creating views
-        for (var table_name in tables) {
-            if (tables[table_name].view) {
-                db_object.run(getCreateViewQuery(tables[table_name].view.name, table_name), _cb);
-            }
-        }
-    });
-
-
-    db_object.wait(function () {
-        var errStr = errors.length ? errors.join("\n") : null;
-        cb(errStr, errStr ? null : db_object);
+    exports.RunMultipleQueries(db_object, sql, function(err) {
+        cb(err, err ? null : db_object);
     });
 };
 
 
-exports.GetAllTablesContents = function() {
 
-    var ret
+exports.GetAllTablesContents = function(db_object, tablenames,  cb) {
+
+    var ret = {};
+    var errors = [];
+
+    var arr =  [];
+    if (tablenames && tablenames.length) {
+        arr = tablenames;
+    } else {
+        for(var table_name in tables) {
+            arr.push(table_name);
+        }
+    }
+
+    var getNext = function() {
+
+        if (arr.length) {
+            var table_name = arr.shift();
+            db_object.all("SELECT * from " + table_name, function(err, rows) {
+                if (err)
+                    errors.push(err);
+                else
+                    ret[table_name] = rows;
+
+//                setTimeout(getNext, 10);
+                getNext();
+            });
+        } else {
+            var errStr = errors.length ? errors.join(" ") : null;
+            cb(errStr, ret);
+        }
+    };
+
+    getNext();
+};
 
 
+exports.RunMultipleQueries = function (db_object, queries, cb) {
+
+    var errors = [];
+
+    var id = 0;
+    var _cb = function (err) {
+        id++;
+        if (err) (errors.push(err));
+    };
+
+//    console.log("running", queries);
+    db_object.serialize(function () {
+        db_object.run("BEGIN TRANSACTION", _cb);
+        for (var i in queries) {
+            db_object.run(queries[i], _cb);
+        }
+        db_object.run("COMMIT TRANSACTION", _cb);
+    });
+
+    db_object.wait(function () {
+        var errStr = errors.length ? errors.join(" ") : null;
+        cb(errStr);
+    });
+};
+
+/**
+ *
+ * @param db_object
+ * @param queries - can be string array or json containing queries as values, e.g. { sql1 : 'select xxx' }
+ * @param cb
+ * @constructor
+ */
+exports.SelectMultipleQueries = function (db_object, queries, cb) {
+
+    var errors = [];
+    var ret = {};
+
+    var arr = [];
+    var ids = {};
+    // let's remember ids, no matter if queries is an array, or json
+    for(var i in queries) {
+        arr.push(queries[i]);
+        ids[queries[i]] = i;
+    }
+
+    var getNext = function() {
+
+        if (arr.length) {
+            var query = arr.shift();
+            db_object.all(query, function(err, rows) {
+                if (err)
+                    errors.push(err);
+                else
+                    ret[ids[query]] = rows;
+
+                getNext();
+            });
+        } else {
+            var errStr = errors.length ? errors.join(" ") : null;
+            cb(errStr, ret);
+        }
+    };
+
+    getNext();
 };
 
 

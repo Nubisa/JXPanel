@@ -5,6 +5,7 @@ var util = require("util");
 var server = require('jxm');
 var pam = require('authenticate-pam');
 var methods = {};
+var sqlite = require("./../db/sqlite.js");
 
 var checkUser = function(env){
     var active_user = _active_user.getUser(env.SessionID, false);
@@ -100,6 +101,20 @@ var sessionAdd = function(env, active_user, params){
         return true;
 };
 
+var getFormControlsDetails = function(activeInstance) {
+
+    if (!activeInstance)
+        throw "Instance of the form is empty.";
+
+    var ret = {};
+    for(var i in activeInstance.controls) {
+        if (activeInstance.controls[i].name)
+            ret[activeInstance.controls[i].name] = activeInstance.controls[i].details;
+    }
+    return ret;
+};
+
+
 methods.sessionApply = function(env, params){
 
     var active_user = checkUser(env);
@@ -108,13 +123,41 @@ methods.sessionApply = function(env, params){
         return;
 
     var activeForm = active_user.session.forms[params.form];
-    activeForm.activeInstance.apply(active_user, params, function (err) {
+    var activeInstance = activeForm.activeInstance;
+
+    var details = getFormControlsDetails(activeInstance);
+
+
+    var isUpdate = active_user.session.edits && active_user.session.edits[params.form] && active_user.session.edits[params.form].ID;
+    var json = {};
+    for(var field_name in params.controls) {
+
+        if (details[field_name] && details[field_name].dbName) {
+            // replacing form controls names into db field names
+            json[details[field_name].dbName] = params.controls[field_name];
+        } else {
+            json[field_name] = params.controls[field_name];
+        }
+    }
+    if (isUpdate) {
+        json.ID = active_user.session.edits[params.form].ID;
+    }
+
+    activeInstance.settings.dbTable.AddNewOrUpdateAll(sqlite.db, json, activeInstance.settings.json_where, function(err) {
         if (err) {
             server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
         } else {
             server.sendCallBack(env, {err: false});
         }
     });
+
+//    activeForm.activeInstance.apply(active_user, params, function (err) {
+//        if (err) {
+//            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err });
+//        } else {
+//            server.sendCallBack(env, {err: false});
+//        }
+//    });
 };
 
 

@@ -120,7 +120,30 @@ var test = function (db) {
 setTimeout(function() {
 
     if (sqlite.db) {
-        test(sqlite.db);
+//        test(sqlite.db);
+
+        sqlite.GetAllTablesContents(sqlite.db, null, function(err, rows) {
+                console.log(rows);
+        });
+
+//        var sql = [];
+//        sql.push("delete from test");
+//        for(var a = 0; a<10000; a++) sql.push( "insert into test (id, val) VALUES( " + a + " , 's"+a+"')");
+//
+//
+//        sqlite.RunMultipleQueries(sqlite.db, sql, function(err) {
+//            console.log("RunMultipleQueries", err);
+//        });
+
+
+
+//        sqlite.SelectMultipleQueries(sqlite.db, [ "select * from data_field_table" ], function(err, rows) {
+//            console.log("RunMultipleQueries", err, rows);
+//        });
+//        sqlite.SelectMultipleQueries(sqlite.db, { "someid" :"select * from data_field_table" }, function(err, rows) {
+//            console.log("RunMultipleQueries", err, rows);
+//        });
+
     } else {
         console.log("DB was not opened");
     }
