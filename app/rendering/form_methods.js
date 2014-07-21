@@ -167,11 +167,11 @@ methods.sessionApply = function(env, params){
 
     activeInstance.settings.dbTable.AddNewOrUpdateAll(sqlite.db, json, activeInstance.settings.json_where, function(err, err2) {
         if (err) {
-            var str = form_lang.Get(active_user.lang, "Cannot apply the form. ", true) + err;
+            var arr = [];
             if (err2) {
 
                 // err2 may contain json with fields, for which there was a problem.
-                var arr = [];
+                // it comes from AddNewOrUpdateAll (checking insert for main record)
                 for(var field_name in err2) {
 
                     for(var i in _controls) {
@@ -181,13 +181,13 @@ methods.sessionApply = function(env, params){
                             break;
                         }
                     }
-                    arr.push(field_name);
+                    arr.push( {control: field_name, msg: err} );
                 }
-                if (arr.length) str += " (" + arr.join(", ") + ")";
+                if (!arr.length) arr = false;;
             }
-            server.sendCallBack(env, {err: str});
+            server.sendCallBack(env, {arr: arr});
         } else {
-            server.sendCallBack(env, {err: false});
+            server.sendCallBack(env, {arr: false});
         }
     });
 };
