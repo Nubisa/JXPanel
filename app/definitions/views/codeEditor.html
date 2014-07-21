@@ -210,7 +210,8 @@
             if(!fname)
                 fname = "{{label.Empty}}";
 
-            var host_editor = createTab("jx_e_" + (editor_count++), fname);
+            var eid = "jx_e_" + (editor_count++);
+            var host_editor = createTab(eid, fname);
             host_editor.innerHTML = "";
             var elm_editor = document.createElement("textarea");
             elm_editor.id = "_code_editor";
@@ -234,6 +235,7 @@
                 btn.style.cssText = "padding-top:5px;margin-top:5px";
                 btn._name = fname;
                 btn._location = location;
+                btn._eid = eid;
                 btn.onclick = function(){
                     var _this = this;
                     jxcore.Call("saveFile", {up:this._location, src:escape(editors[this._name].getValue())}, function(ret_val){
@@ -246,6 +248,8 @@
                         };
                         utils.bubble("success", "{{label.FileSavedTitle}}", "{{label.FileSavedContent}}", 4000);
                         _this.disabled = "disabled";
+                        var title_holder = document.getElementById('code_editor_title_holder');
+                        title_holder._childs[_this._eid]._a.style.color = "";
                     });
                 };
                 btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
@@ -255,12 +259,16 @@
 
             editors[fname] = CodeMirror.fromTextArea(elm_editor, opts);
             editors[fname].btn = btn;
+            editors[fname]._eid = eid;
             if(_fname){
                 editors[fname].on('change', function(inst, obj){
-                    if(btn.loaded)
-                        btn.disabled = null;
+                    if(inst.btn.loaded){
+                        var title_holder = document.getElementById('code_editor_title_holder');
+                        title_holder._childs[inst._eid]._a.style.color = "red";
+                        inst.btn.disabled = null;
+                    }
                     else
-                        btn.loaded = true;
+                        inst.btn.loaded = true;
                 });
             }
         };
