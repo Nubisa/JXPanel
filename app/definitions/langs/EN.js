@@ -108,6 +108,7 @@ exports.Labels = {
     "DomainsContentList": "Create new domains and manage their options.",
 
 
+    "CodeEditor":"Code Editor",
     "SystemInfo": "System Information",
     "UnableToRead": "Unable to read this information",
     "OSname": "OS",

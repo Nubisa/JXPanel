@@ -20,7 +20,7 @@
 <script src="/cm/addon/selection/active-line.js"></script>
 <link rel="stylesheet" href="/css/zTreeStyle.css" />
 
-<div class="row" style="padding-bottom:5px;">
+<div class="row" style="padding-bottom:20px;">
     <div class="col-sm-12">
         <div id="editor_files" class="well" style="margin:0px;padding:0px;height:115px;overflow:scroll">
 
@@ -28,13 +28,13 @@
     </div>
 </div>
 
-<ul id="code_editor_title_holder" class="nav nav-tabs bordered">
+<ul id="code_editor_title_holder" class="nav nav-tabs">
     <li class="active">
         <a data-toggle="tab"><i class="fa fa-fw fa-file"></i>{{label.Empty}}</a>
     </li>
 </ul>
 
-<div id="code_editor_content_holder" class="tab-content padding-10">
+<div id="code_editor_content_holder" class="tab-content">
     <div class="tab-pane fade active in" id="s1">
         <p>
         <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 400px;overflow:hidden">
@@ -105,7 +105,7 @@
         var div_code_editor = document.createElement("div");
         div_code_editor.id = id + "_code_editor";
         div_code_editor.className = "well";
-        div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border:dotted 1px #ccc;height: 310px;overflow:hidden";
+        div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-right:dotted 1px #ccc;border-bottom:dotted 1px #ccc;border-left:dotted 1px #ccc;height: 310px;overflow:hidden";
         pp.appendChild(div_code_editor);
         div.appendChild(pp);
         content_holder.appendChild(div);
@@ -234,7 +234,7 @@
             else{
                 btn = document.createElement("button");
                 btn.className = "btn btn-success";
-                btn.style.cssText = "padding-top:5px;margin-top:5px";
+                btn.style.cssText = "margin-top:15px";
                 btn._name = fname;
                 btn._location = location;
                 btn._eid = eid;
@@ -266,7 +266,7 @@
                 editors[fname].on('change', function(inst, obj){
                     if(inst.btn.loaded){
                         var title_holder = document.getElementById('code_editor_title_holder');
-                        title_holder._childs[inst._eid]._a.style.color = "red";
+                        title_holder._childs[inst._eid]._a.style.color = "#b00000";
                         inst.btn.disabled = null;
                     }
                     else
