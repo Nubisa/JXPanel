@@ -178,6 +178,13 @@ exports.form = function () {
                 }
             },
 
+            { name: "plan_max_users",
+                details: {
+                    label: "MaxUsers",
+                    method: tool.createCheckBox,
+                    options: {  }
+                }
+            },
 
             // do not remove this yet, may be useful
 //            "sub_domain_name": {

@@ -6,6 +6,10 @@ var server = require('jxm');
 var users = {};
 var path = require('path');
 var fs = require('fs');
+var dbcache = require("./../db/dbcache");
+var sqlite = require("./../db/sqlite");
+
+exports.rootID = "1305444776609";
 
 var newUser = function(session_id){
     return {
@@ -28,6 +32,10 @@ exports.loginUser = function(sessionId, params){
     users[sessionId].username = params.username;
 
     users[sessionId].nameTitle = params.username; // TODO change it!!!
+
+    users[sessionId].user_id = params.user_id;
+
+    users[sessionId].checkHostingPlan = new HostingPlanCheck(users[sessionId]);
 };
 
 exports.getUser = function(sessionId)
@@ -75,6 +83,7 @@ exports.getDataTable = function(sessionId, table_name){
 
     return datatables.render(sessionId, table_name);
 };
+
 
 exports.clearUser = function(sessionId) {
     delete users[sessionId];
@@ -171,5 +180,82 @@ exports.defineMethods = function(){
     });
 };
 
+
+
+
+var HostingPlanCheck = function(active_user) {
+
+    this.active_user = active_user;
+    var _this = this;
+
+    var _user = null;
+    var _plan = null;
+
+
+    var basicCheck = function(cb) {
+        dbcache.refresh(function(err) {
+
+            if (!cb)
+                throw form_lang.Get(active_user.lang, "CallbackRequired");
+
+            if (err) {
+                cb(form_lang.Get(_this.active_user.lang, "DBCannotReadData") + " " + err);
+                return;
+            }
+
+            if (_this.active_user.user_id === exports.rootID) {
+                cb(false);
+                return;
+            }
+
+            _user = dbcache.Get(sqlite.user_table, { ID : _this.active_user.user_id });
+            if (_user.err || !_user.ret) {
+                cb(form_lang.Get(_this.active_user.lang, "DBCannotGetUser") + " " + _user.err);
+                return;
+            }
+            console.log("user", _user);
+
+            if (!_user.ret["plan_table_id"]) {
+                cb(form_lang.Get(_this.active_user.lang, "NoPlan"));
+                return;
+            }
+
+            var _plan =  dbcache.Get("plan_table", { ID : _user.ret["plan_table_id"] });
+            console.log("plan", _plan);
+
+        });
+    };
+
+
+    this.CanAddRecord = function(form_id, cb) {
+
+        var method = null;
+        if (form_id === "addUser") method = this.CanAddUser; else
+        if (form_id === "addPlan") method = this.CanAddPlan; else
+        if (form_id === "addDomain") method = this.CanAddDomain;
+
+        if (!method) {
+            cb(form_lang.Get(_this.active_user.lang, "UnknownForm"));
+        } else {
+            method(cb);
+        }
+    }
+
+    this.CanAddUser = function(cb) {
+
+        basicCheck(function(err) {
+            if (err){
+                cb(err);
+                return;
+            }
+
+            // todo: check fo user limits
+            dbcache.Get(sqlite.data_value_table, {});
+
+            cb(false);
+        });
+    };
+
+};
 
 //{{user.LABELHERE}}

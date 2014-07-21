@@ -93,6 +93,7 @@ exports.form = function () {
                     return crypto.createHash('md5').update(value).digest('hex').toString();
                 }
             },
+
             {
                 name: "person_repeat_password",
                 details: {
@@ -104,6 +105,36 @@ exports.form = function () {
                 validation : new validations.Password("person_password"),
                 convert : function(value) {
                     return crypto.createHash('md5').update(value).digest('hex').toString();
+                }
+            },
+
+            { name: "user_plan_id",
+                details: {
+                    label: "PlanID",
+                    method: tool.createComboBox,
+                    options: { required: true, dynamic: true }
+                },
+                dbJoin : {
+                    otherTable : sqlite.Plan,
+                    otherTableID : "ID",
+                    otherTableValue : "plan_name"
+                },
+                dynamicValues : function(cb) {
+
+                    if (!cb)
+                        throw "Callback required.";
+
+                    sqlite.Plan.Get(sqlite.db, null, function (err, rows) {
+                        if (err) {
+                            cb(err)
+                        } else {
+                            var ret = [];
+                            for(var a in rows) {
+                                ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
+                            }
+                            cb(false, ret);
+                        }
+                    });
                 }
             },
 

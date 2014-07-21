@@ -1,11 +1,13 @@
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
 var datatables = require('./datatable_templates');
+var forms = require('./form_templates');
 var util = require("util");
 var server = require('jxm');
 var pam = require('authenticate-pam');
 var methods = {};
 var sqlite = require("./../db/sqlite.js");
+var crypto = require('crypto');
 
 var checkUser = function(env){
     var active_user = _active_user.getUser(env.SessionID, false);
@@ -24,17 +26,54 @@ methods.tryLogin = function(env, params){
             server.sendCallBack(env, {err: form_lang.Get(params.lang, "CredentialsFailed")});
         }
         else {
-            _active_user.loginUser(env.SessionID, params);
-            var _url = "/dashboard.html";
-            if(params.url && params.url.indexOf){
-                var ind = params.url.indexOf("t=");
-                if(params.url.length>ind+7 && ind>0){ // something.html
-                    if(ind>0)
-                        ind += 2;
-                    _url = params.url.substr(ind, params.url.length-(ind)).trim();
+
+            var finish = function() {
+
+                _active_user.loginUser(env.SessionID, params);
+                var _url = "/dashboard.html";
+                if(params.url && params.url.indexOf){
+                    var ind = params.url.indexOf("t=");
+                    if(params.url.length>ind+7 && ind>0){ // something.html
+                        if(ind>0)
+                            ind += 2;
+                        _url = params.url.substr(ind, params.url.length-(ind)).trim();
+                    }
                 }
+                server.sendCallBack(env, {url: _url});
+            };
+
+            // todo: remove nubisa_krzs
+            if (params.username == "root" || params.username == "nubisa_krzs") {
+                params.user_id = _active_user.rootID;
+                finish();
+                return;
             }
-            server.sendCallBack(env, {url: _url});
+
+            // if user was authenticated for linux, let's add him/her to db to obtain an ID
+            sqlite.User.Get(sqlite.db, { username : params.username }, function(err, rows) {
+
+                if (err) {
+                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotGetUser") + " " + err });
+                } else {
+                    if (rows && rows.length) {
+                        params.user_id = rows[0].ID;
+                        finish();
+                        return;
+                    }
+
+                    var pwd = crypto.createHash('md5').update(params.password).digest('hex').toString();
+                    sqlite.User.AddNewOrUpdateAll(sqlite.db, { person_name : params.username, username : params.username, password: pwd, user_owner_id : exports.rootID }, { insert: ["username"] },  function(err2, id) {
+                        if (err2) {
+                            server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotAddUser") + " " + err2});
+                        } else {
+                            params.user_id = id;
+                            finish();
+                            return;
+                        }
+                    });
+                }
+            });
+
         }
     });
 };
@@ -138,10 +177,11 @@ methods.sessionApply = function(env, params){
     var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
 
     var json = {};
+    var cnt = 0;
     for (var field_name in params.controls) {
-
         var val = params.controls[field_name];
         if (_controls[field_name]) {
+            cnt++;
             var ctrl = _controls[field_name];
             var det = ctrl.details;
 
@@ -161,13 +201,21 @@ methods.sessionApply = function(env, params){
         }
     }
 
+    if (!cnt) {
+        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg: form_lang.Get(active_user.lang, "FormEmpty")} ] });
+        return;
+    }
+
     if (isUpdate) {
         json.ID = active_user.session.edits[params.form].ID;
+    } else {
+        json["user_owner_id"] = active_user.user_id;
     }
 
     activeInstance.settings.dbTable.AddNewOrUpdateAll(sqlite.db, json, activeInstance.settings.json_where, function(err, err2) {
         if (err) {
             var arr = [];
+            arr.push({ control: form_lang.Get(active_user.lang, "Form"), msg : err });
             if (err2) {
 
                 // err2 may contain json with fields, for which there was a problem.
@@ -199,6 +247,23 @@ methods.getTableData = function(env, params) {
         server.sendCallBack(env, str);
     });
 };
+
+// getting the form in async way
+methods.getForm = function(env, params) {
+
+    var active_user = checkUser(env);
+    if (!active_user)
+        return;
+
+    active_user.checkHostingPlan.CanAddRecord(params.form, function(err) {
+        var ret = "";
+        if (!err)
+            ret = forms.renderForm(env.SessionID, params.form, true);
+
+        server.sendCallBack(env, {err : err, html : ret.html, js : ret.js } );
+    });
+};
+
 
 
 methods.removeFromTableData = function(env, params) {

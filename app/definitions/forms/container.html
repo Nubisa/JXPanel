@@ -168,9 +168,11 @@
             <!-- widget content -->
             <div class="widget-body">
 
-                {{form.contents}}
+                <div id="jxform">
+                    {{form.contents}}
+                </div>
 
-                <div class="form-group">
+                <div class="form-group" id="jxform_buttons" style="display: none">
                     <label class="col-md-2 control-label"></label>
                     <div class="col-md-4" style="padding-left: 0px">
                         <button type="button" class="btn btn-labeled btn-primary"  onclick="window.jxForms['{{form.id}}'].apply()">
@@ -205,7 +207,26 @@
 <script>
 
     window.jxTemplateReadyForjxm = function() {
-        window.jxForms["{{form.id}}"].loadDynamic();
+        jxcore.Call('getForm', { form : '{{form.id}}' }, function(param) {
+            var div = document.getElementById('jxform');
+            if (!div) {
+                utils.jxAddMessage("danger", "{{labels.NoDiv}}");
+                return;
+            }
+
+            if (param.err) {
+                utils.jxAddMessage("danger", param.err);
+                div.innerHTML = param.err;
+            } else {
+                $("#jxform_buttons").show();
+                div.innerHTML = param.html;
+
+                var script = document.createElement("script");
+                script.innerHTML = param.js;
+                document.head.appendChild(script);
+                window.jxForms["{{form.id}}"].loadDynamic();
+            }
+        });
     };
 
 </script>

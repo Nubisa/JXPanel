@@ -13,6 +13,7 @@ exports.Labels = {
     "Control Panel":"Control Panel",
     "Account":"Account",
     "Home":"Home",
+    "Form":"Form",
 
     "serverManagement":"Server Management",
     "help":"Help",
@@ -34,10 +35,12 @@ exports.Labels = {
     "SessionExpired": "The user session is expired. Please login again!",
 
     "Access Denied": "You do not have a permission to view this resource.",
+    "CallbackRequired" : "The callback is required.",
 
     //Form
     "Nothing to Apply": "There was nothing to apply. Operation wasn't successful.",
     "UnknownForm" : "Unknown form",
+    "FormEmpty" : "The form does not contain any controls.",
 
     // Form names
     "addUser" : "Add new user",
@@ -150,11 +153,15 @@ exports.Labels = {
     "AppLogWebAccess_Description" : "Will be available on http://yourdomain.com/jxcore_logs/index.txt",
     "AllowSSH" : "SSH",
     "NginxDirectives" : "NGINX directives",
+    "MaxUsers" : "Users",
+    "MaxUsers_Description" : "Maximum amount of users. Value 0 disables the limit.",
 
     "DomainName" : "Domain",
     "DomainName_Description" : "The domain name for you subscription.",
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
+
+    "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
 
 
     "testForm": "Test Form",
@@ -162,6 +169,9 @@ exports.Labels = {
 
     // DB
     "DBNotOpened" : "Database is not opened.",
+    "DBCannotAddUser" : "Cannot add user to database.",
+    "DBCannotGetUser" : "Cannot read user data from database.",
+    "DBCannotReadData" : "Cannot read data from database",
 
     // datatables
     "UnknownDataTable" : "Unknown table name.",
@@ -175,7 +185,11 @@ exports.Labels = {
     "DiskUsageInformation": "Disk Usage",
     "ChartsTopCPUInfo": "Process CPU",
     "ChartsTopMemoryInfo": "Process Memory",
-    "Capacity": "Capacity"
+    "Capacity": "Capacity",
+
+    // html
+    "NoDiv" : "Could not find proper html object.",
+    "NoTemplate" : "Could not find template for the %s."
 };
 
 

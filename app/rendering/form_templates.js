@@ -67,7 +67,7 @@ var logic = [
 ];
 
 
-exports.renderForm = function(sessionId, formName){
+exports.renderForm = function(sessionId, formName, onlyControls){
     var html = "";
     var active_user = _active_user.getUser(sessionId);
 
@@ -77,6 +77,22 @@ exports.renderForm = function(sessionId, formName){
 
     var activeForm = require('../definitions/forms/' + formName).form();
     active_user.session.forms[formName].activeInstance = activeForm;
+
+    // empty form template, without controls
+    if (!onlyControls) {
+        var containerFile = path.join(__dirname, "../definitions/forms/container.html");
+
+        if (!fs.existsSync(containerFile)) {
+            return form_lang.Get(active_user.lang, "NoTemplate", null, [ "form" ]);
+        }
+
+        var widget = fs.readFileSync(containerFile).toString();
+        var _icon = (!activeForm.icon)? "": activeForm.icon;
+        logic.globals = { name: formName, contents: "", active_user:active_user, icon:_icon, form: activeForm, lang:active_user.lang};
+        var result = rep(widget, logic);
+
+        return result;
+    }
 
     var edits = null;
     // copying values for edit form
@@ -131,20 +147,5 @@ exports.renderForm = function(sessionId, formName){
     }
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
-
-    var fstr = tool.begin + html + tool.end + "<script>"+scr+"</script>";
-
-    var containerFile = path.join(__dirname, "../definitions/forms/container.html");
-
-    if (fs.existsSync(containerFile)) {
-        var widget = fs.readFileSync(containerFile).toString();
-        var _icon = (!activeForm.icon)? "": activeForm.icon;
-        logic.globals = { name: formName, contents: fstr, active_user:active_user, icon:_icon, form: activeForm, lang:active_user.lang};
-        var result = rep(widget, logic);
-
-        return result;
-    } else {
-        return fstr;
-    }
-
+    return { html: tool.begin + html + tool.end, js : scr };
 };

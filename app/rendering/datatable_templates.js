@@ -8,6 +8,7 @@ var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
 var sqlite = require("./../db/sqlite.js");
+var dbcache = require("./../db/dbcache.js");
 
 
 var getTable = function(table_name) {
@@ -30,6 +31,12 @@ var getData = function(active_user, table, json, cb) {
     if (!active_user) {
         cb(form_lang.Get(active_user.lang, "SessionExpired"));
         return;
+    }
+
+    // limiting records available only for logged user
+    if (active_user.user_id !== _active_user.rootID ) {
+        json = json || {};
+        json.user_owner_id = active_user.user_id;
     }
 
     table.settings.dbTable.GetAll(sqlite.db, json, function(err, rows) {
@@ -266,8 +273,8 @@ exports.edit = function (sessionId, table_name, id, cb) {
                 active_user.session.edits = active_user.session.edits || {};
                 active_user.session.edits[table.settings.addForm] = rows[0];
 
-                console.log("storing rows in edits", rows);
-//
+//                    console.log("storing rows in edits", rows);
+
                 // sending url to the browser for redirecting to edit form
                 active_user.session.lastPath = "/" + table.settings.addFormURL;
                 cb(false, table.settings.addFormURL);
