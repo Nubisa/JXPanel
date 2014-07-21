@@ -17,11 +17,12 @@
 <script src="/cm/addon/fold/comment-fold.js"></script>
 <script src="/cm/mode/xml/xml.js"></script>
 <script src="/cm/mode/css/css.js"></script>
+<script src="/cm/addon/selection/active-line.js"></script>
 <link rel="stylesheet" href="/css/zTreeStyle.css" />
 
 <div class="row" style="padding-bottom:5px;">
     <div class="col-sm-12">
-        <div id="editor_files" class="well" style="margin:0px;padding:0px;height:130px;overflow:scroll">
+        <div id="editor_files" class="well" style="margin:0px;padding:0px;height:115px;overflow:scroll">
 
         </div>
     </div>
@@ -36,7 +37,7 @@
 <div id="code_editor_content_holder" class="tab-content padding-10">
     <div class="tab-pane fade active in" id="s1">
         <p>
-        <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 320px;overflow:hidden">
+        <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 400px;overflow:hidden">
 
         </div>
         </p>
@@ -100,10 +101,11 @@
         div.id = id;
         div.className = "tab-pane fade active in";
         var pp = document.createElement("p");
+
         var div_code_editor = document.createElement("div");
         div_code_editor.id = id + "_code_editor";
         div_code_editor.className = "well";
-        div_code_editor.style.cssText = "margin:0px;padding:0px;border:dotted 1px #ccc;height: 320px;overflow:hidden";
+        div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border:dotted 1px #ccc;height: 310px;overflow:hidden";
         pp.appendChild(div_code_editor);
         div.appendChild(pp);
         content_holder.appendChild(div);
@@ -214,8 +216,7 @@
             var host_editor = createTab(eid, fname);
             host_editor.innerHTML = "";
             var elm_editor = document.createElement("textarea");
-            elm_editor.id = "_code_editor";
-            elm_editor.height = 300;
+            elm_editor.id = eid + "x_code_editor";
 
             host_editor.appendChild(elm_editor);
             var opts = {
@@ -223,6 +224,7 @@
                 theme: "eclipse",
                 lineNumbers:true,
                 lineWrapping:true,
+                styleActiveLine:true,
                 foldGutter: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
             };
@@ -280,81 +282,83 @@
             }
             return false;
         };
+        var treeClick = function(ev, treeId, treeNode, clickFlag) {
+            var zTree = $.fn.zTree.getZTreeObj(treeId);
+
+            if(zTree.jx_loading){
+                return false;
+            }
+
+            var loc = treeNode.name;
+            var _node = treeNode;
+            while(_node && _node.parentTId){
+                var parent = zTree.getNodeByTId(_node.parentTId);
+                if(parent){
+                    loc = parent.name + "/" + loc;
+                    _node = parent;
+                }
+                else{
+                    _node = null;
+                }
+            }
+
+            if(treeNode.children && treeNode.children.length){
+                zTree.jx_loading = true;
+                getFiles(loc, treeId, treeNode);
+            }else{
+                var _loc = loc.toLowerCase();
+
+                if(checkExtension(_loc, [".js", ".json", ".jxp"])){
+                    getFile(treeNode.name, loc, treeId, "text/javascript");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".css"])){
+                    getFile(treeNode.name, loc, treeId, "css");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".php"])){
+                    loadMode("php/php.js");
+                    getFile(treeNode.name, loc, treeId, "php");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".go"])){
+                    loadMode("go/go.js");
+                    getFile(treeNode.name, loc, treeId, "go");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".md", ".conf", ".ini", ".htaaccess"])){
+                    loadMode("markdown/markdown.js");
+                    getFile(treeNode.name, loc, treeId, "markdown");
+                    return;
+                }
+
+                if(checkExtension(_loc, [ ".htm", ".html", ".xml"])){
+                    getFile(treeNode.name, loc, treeId, "xml");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".coffee"])){
+                    loadMode("coffeescript/coffeescript.js");
+                    getFile(treeNode.name, loc, treeId, "coffeescript");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
+                    getFile(treeNode.name, loc, treeId, "text");
+                    return;
+                }
+
+                utils.bubble("warning", "{{label.FileTypeNotSupportedTitle}}", "{{label.FileTypeNotSupportedContent}}", 4000);
+            }
+        };
         var setting = {
             callback: {
-                onClick: function(ev, treeId, treeNode, clickFlag) {
-                    var zTree = $.fn.zTree.getZTreeObj(treeId);
-
-                    if(zTree.jx_loading){
-                        return false;
-                    }
-
-                    var loc = treeNode.name;
-                    var _node = treeNode;
-                    while(_node && _node.parentTId){
-                        var parent = zTree.getNodeByTId(_node.parentTId);
-                        if(parent){
-                            loc = parent.name + "/" + loc;
-                            _node = parent;
-                        }
-                        else{
-                            _node = null;
-                        }
-                    }
-
-                    if(treeNode.children && treeNode.children.length){
-                        zTree.jx_loading = true;
-                        getFiles(loc, treeId, treeNode);
-                    }else{
-                        var _loc = loc.toLowerCase();
-
-                        if(checkExtension(_loc, [".js", ".json", ".jxp"])){
-                           getFile(treeNode.name, loc, treeId, "text/javascript");
-                           return;
-                        }
-
-                        if(checkExtension(_loc, [".css"])){
-                            getFile(treeNode.name, loc, treeId, "css");
-                            return;
-                        }
-
-                        if(checkExtension(_loc, [".php"])){
-                            loadMode("php/php.js");
-                            getFile(treeNode.name, loc, treeId, "php");
-                            return;
-                        }
-
-                        if(checkExtension(_loc, [".go"])){
-                            loadMode("go/go.js");
-                            getFile(treeNode.name, loc, treeId, "go");
-                            return;
-                        }
-
-                        if(checkExtension(_loc, [".md", ".conf", ".ini", ".htaaccess"])){
-                            loadMode("markdown/markdown.js");
-                            getFile(treeNode.name, loc, treeId, "markdown");
-                            return;
-                        }
-
-                        if(checkExtension(_loc, [ ".htm", ".html", ".xml"])){
-                            getFile(treeNode.name, loc, treeId, "xml");
-                            return;
-                        }
-
-                        if(checkExtension(_loc, [".coffee"])){
-                            loadMode("coffeescript/coffeescript.js");
-                            getFile(treeNode.name, loc, treeId, "coffeescript");
-                            return;
-                        }
-
-                        if(checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
-                            getFile(treeNode.name, loc, treeId, "text");
-                            return;
-                        }
-
-                        utils.bubble("warning", "{{label.FileTypeNotSupportedTitle}}", "{{label.FileTypeNotSupportedContent}}", 4000);
-                    }
-                }
+                onExpand: treeClick,
+                onClick: treeClick
             }
         };
 
