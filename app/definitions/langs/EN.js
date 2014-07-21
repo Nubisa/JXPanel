@@ -109,6 +109,7 @@ exports.Labels = {
 
 
     "CodeEditor":"Code Editor",
+    "CodeEditorTop": "Select source file(s) from below to view and edit on the editor.",
     "SystemInfo": "System Information",
     "UnableToRead": "Unable to read this information",
     "OSname": "OS",
