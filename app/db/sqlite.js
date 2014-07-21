@@ -20,6 +20,13 @@ var data_field_table = "data_field_table";
 var data_value_table = "data_value_table";
 
 
+exports.plan_table = plan_table;
+exports.user_table = user_table;
+exports.domain_table = domain_table;
+
+exports.data_field_table = data_field_table;
+exports.data_value_table = data_value_table;
+
 // ########## table definitions
 
 var tables = {};
@@ -34,7 +41,8 @@ tables[subscription_table] = {
 tables[plan_table] = {
     fields : {
         "ID": { type: "CHAR(20)", required: true, primary: true },
-        "plan_name": { type: "TEXT", required: true, unique: true}
+        "plan_name": { type: "TEXT", required: true, unique: true},
+        "user_owner_id" : { type: "CHAR(20)", required : true, notNull : true }
     },
     view : {
         name : "vPlans"
@@ -45,9 +53,10 @@ tables[plan_table] = {
 tables[user_table] = {
     fields : {
         "ID": { type: "CHAR(20)", required: true, primary: true},
-        "subscription_table_id": { type: "CHAR(20)", required: false },
+        "plan_table_id": { type: "CHAR(20)", required: false },
         "username": { type: "TEXT", required: true, unique: true},
-        "password": { type: "TEXT", required: true }
+        "password": { type: "TEXT", required: true },
+        "user_owner_id" : { type: "CHAR(20)", required : true, notNull : true }
     },
     view : {
         name : "vUsers"
@@ -58,7 +67,8 @@ tables[domain_table] = {
     fields : {
         "ID": { type: "CHAR(20)", required: true, primary: true },
         "subscription_table_id": { type: "CHAR(20)", required: false },
-        "domain_name": { type: "TEXT", required: true, unique: true }
+        "domain_name": { type: "TEXT", required: true, unique: true },
+        "user_owner_id" : { type: "CHAR(20)", required : true, notNull : true }
     },
     view : {
         name : "vDomains"
@@ -114,6 +124,7 @@ var getCreateTableQuery = function (table_name) {
 
         if (field.primary) str += " PRIMARY KEY NOT NULL";
         if (field.unique) str += " NOT NULL UNIQUE";
+        if (field.notNull && str.indexOf("NOT NULL") === -1) str += "NOT NULL";
         columns.push(str);
     }
 
@@ -368,6 +379,8 @@ var deleteRecord = function (table_name, db_object, json_where, cb) {
 var Table = function (table_name) {
 
     var _table_name = table_name;
+    this.table_name = table_name;
+
     var isCommon = table_name == data_field_table || table_name == data_value_table;
     var _this = this;
 
@@ -650,8 +663,8 @@ var Table = function (table_name) {
 
         var isUpdate = json.ID;
 
+        // processes data_value_table and insert particular values i updates them
         var insertOrUpdate = function (ID) {
-            // if arrived here - required fields are non empty
 
             var sql = {};
             sql.defs = "SELECT * FROM " + data_field_table + " WHERE table_name = '" + _table_name + "'";
@@ -715,6 +728,7 @@ var Table = function (table_name) {
 
 
         if (isUpdate) {
+
             // update
             var _json = stripFields(_table_name, json, json_where.update);
 
@@ -950,7 +964,7 @@ exports.CreateDatabase( __dirname + "/dbfile.db", function (err, db) {
     if (!err) {
         exports.db = db;
     } else {
-        console.log("SQLITE, create database err", err);
+        throw "SQLITE, create database error: " + err;
     }
 });
 
