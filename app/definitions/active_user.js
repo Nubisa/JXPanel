@@ -146,7 +146,7 @@ exports.defineMethods = function(){
             return;
         }
 
-        server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp});
+        server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp, fn:params.fn});
     });
 };
 

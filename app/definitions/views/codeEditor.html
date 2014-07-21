@@ -19,26 +19,78 @@
 <script src="/cm/mode/css/css.js"></script>
 <link rel="stylesheet" href="/css/zTreeStyle.css" />
 
-<div class="row">
-<div class="col-sm-12">
-    <div id="editor_files" class="well" style="margin:0px;padding:0px;height:130px;overflow:scroll">
+<div class="row" style="padding-bottom:5px;">
+    <div class="col-sm-12">
+        <div id="editor_files" class="well" style="margin:0px;padding:0px;height:130px;overflow:scroll">
 
-
-
-    </div>
+        </div>
     </div>
 </div>
 
-<div class="row" style="padding-top:10px">
-<div id="holder" class="col-sm-12">
-<div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:scroll">
+<ul id="code_editor_title_holder" class="nav nav-tabs bordered">
+    <li class="active">
+        <a href="#s1" data-toggle="tab"><i class="fa fa-fw fa-lg fa-file"></i>{{label.Empty}}</a>
+    </li>
+</ul>
 
-</div>
-</div>
+<div id="code_editor_content_holder" class="tab-content padding-10">
+    <div class="tab-pane fade active in" id="s1">
+        <p>
+        <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:hidden">
 
+        </div>
+        </p>
+    </div>
 </div>
 
 <script>
+
+    var createTab = function(id, title){
+        var title_holder = document.getElementById('code_editor_title_holder');
+        var content_holder = document.getElementById('code_editor_content_holder');
+
+        if(!title_holder._childs){
+            title_holder._childs = [];
+            title_holder.innerHTML = "";
+            content_holder.innerHTML = "";
+            content_holder._childs = [];
+        }else{
+            for(var o in title_holder._childs){
+                title_holder._childs[o].className = "";
+            }
+
+            for(var o in content_holder._childs){
+                content_holder._childs[o].className = "tab-pane fade";
+            }
+        }
+
+        var div = document.createElement("div");
+        div.id = id;
+        div.className = "tab-pane fade active in";
+        var pp = document.createElement("p");
+        var div_code_editor = document.createElement("div");
+        div_code_editor.id = id + "_code_editor";
+        div_code_editor.className = "well";
+        div_code_editor.style.cssText = "margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:hidden";
+        pp.appendChild(div_code_editor);
+        div.appendChild(pp);
+        content_holder.appendChild(div);
+        div._editor = div_code_editor;
+        content_holder._childs.push(div);
+
+        var li = document.createElement('li');
+        li.className = 'active';
+        var a = document.createElement('a');
+        a.href= "#" + id;
+        a["data-toggle"] = "tab";
+        a.innerHTML = '<i class="fa fa-fw fa-lg fa-file"></i>' + title;
+        li.appendChild(a);
+        li._a = a;
+        title_holder.appendChild(li);
+        title_holder._childs.push(li);
+
+        return div_code_editor;
+    };
 
     var editorInter = setInterval(function(){
 
@@ -53,7 +105,7 @@
     }, 10);
 
     var Init = function(){
-        var editor = null;
+        var editors = {};
 
         var loadMode = function(loc){
             var elm_editor = document.getElementById("_code_editor_host");
@@ -62,20 +114,30 @@
             elm_editor.parentNode.appendChild(scr);
         };
 
-        var createEditor = function(type){
-            var host_editor = document.getElementById("_code_editor_host");
+        var editor_count = 0;
+
+        var createEditor = function(type, _fname){
+            var fname = _fname;
+            if(!fname)
+                fname = "Empty";
+
+            var host_editor = createTab("jx_e_" + (editor_count++), fname);
             host_editor.innerHTML = "";
             var elm_editor = document.createElement("textarea");
             elm_editor.id = "_code_editor";
             host_editor.appendChild(elm_editor);
-            editor = CodeMirror.fromTextArea(elm_editor, {
+            var opts = {
                 mode: type,
                 theme: "eclipse",
                 lineNumbers:true,
                 lineWrapping:true,
                 foldGutter: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
-            });
+            };
+            if(!_fname)
+                opts.readOnly = true;
+
+            editors[fname] = CodeMirror.fromTextArea(elm_editor, opts);
         };
 
         var checkExtension = function(loc, arr){
@@ -114,46 +176,46 @@
                         var _loc = loc.toLowerCase();
 
                         if(checkExtension(_loc, [".js", ".json", ".jxp"])){
-                           getFile(loc, treeId, "text/javascript");
+                           getFile(treeNode.name, loc, treeId, "text/javascript");
                            return;
                         }
 
                         if(checkExtension(_loc, [".css"])){
-                            getFile(loc, treeId, "css");
+                            getFile(treeNode.name, loc, treeId, "css");
                             return;
                         }
 
                         if(checkExtension(_loc, [".php"])){
                             loadMode("php/php.js");
-                            getFile(loc, treeId, "php");
+                            getFile(treeNode.name, loc, treeId, "php");
                             return;
                         }
 
                         if(checkExtension(_loc, [".go"])){
                             loadMode("go/go.js");
-                            getFile(loc, treeId, "go");
+                            getFile(treeNode.name, loc, treeId, "go");
                             return;
                         }
 
                         if(checkExtension(_loc, [".md", ".conf", ".ini", ".htaaccess"])){
                             loadMode("markdown/markdown.js");
-                            getFile(loc, treeId, "markdown");
+                            getFile(treeNode.name, loc, treeId, "markdown");
                             return;
                         }
 
                         if(checkExtension(_loc, [ ".htm", ".html", ".xml"])){
-                            getFile(loc, treeId, "xml");
+                            getFile(treeNode.name, loc, treeId, "xml");
                             return;
                         }
 
                         if(checkExtension(_loc, [".coffee"])){
                             loadMode("coffeescript/coffeescript.js");
-                            getFile(loc, treeId, "coffeescript");
+                            getFile(treeNode.name, loc, treeId, "coffeescript");
                             return;
                         }
 
                         if(checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
-                            getFile(loc, treeId, "text");
+                            getFile(treeNode.name, loc, treeId, "text");
                             return;
                         }
 
@@ -193,11 +255,12 @@
             });
         };
 
-        var getFile = function(location, treeId, type){
-            jxcore.Call("getFile", {up:location, id:treeId, tp:type}, function(ret_val){
+        var getFile = function(fname, location, treeId, type){
+            jxcore.Call("getFile", {up:location, id:treeId, tp:type, fn:fname}, function(ret_val){
 
                 if(ret_val.err){
                     alert(ret_val.err);
+
                     if(ret_val.relogin){
                         location.href = "/index.html";
                     }
@@ -207,8 +270,8 @@
                     return;
                 }
 
-                createEditor(ret_val.tp);
-                editor.setValue(ret_val.source);
+                createEditor(ret_val.tp, ret_val.fn);
+                editors[ret_val.fn].setValue(ret_val.source);
             });
         };
 
@@ -221,8 +284,7 @@
 
             getFiles("/", host.id, null);
 
-            createEditor("text/javascript");
-
+            createEditor("text/javascript", null);
         }
 
         var loadTreeInter = setInterval(function(){
