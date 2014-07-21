@@ -16,13 +16,14 @@
 <script src="/cm/addon/fold/xml-fold.js"></script>
 <script src="/cm/addon/fold/comment-fold.js"></script>
 <script src="/cm/mode/xml/xml.js"></script>
+<script src="/cm/mode/css/css.js"></script>
 <link rel="stylesheet" href="/css/zTreeStyle.css" />
 
 <div class="row">
 <div class="col-sm-12">
-    <div class="well" style="margin:0px;padding:0px;height:130px;overflow:scroll">
+    <div id="editor_files" class="well" style="margin:0px;padding:0px;height:130px;overflow:scroll">
 
-        <ul id="treeDemo" class="ztree"></ul>
+
 
     </div>
     </div>
@@ -30,14 +31,8 @@
 
 <div class="row" style="padding-top:10px">
 <div id="holder" class="col-sm-12">
-<div class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:scroll">
-<textarea id="_code_editor" >
-var test = function(){
-  return 5;
-};
+<div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:scroll">
 
-test();
-</textarea>
 </div>
 </div>
 
@@ -47,8 +42,8 @@ test();
 
     var editorInter = setInterval(function(){
 
-        if(typeof jQuery != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined'){
-            var elm_editor = document.getElementById("_code_editor");
+        if(typeof jQuery != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined' && jxcore.IsConnected){
+            var elm_editor = document.getElementById("_code_editor_host");
             clearInterval(editorInter);
             var scr = document.createElement("script");
             scr.src = "/js/jquery.ztree.core-3.5.min.js";
@@ -58,68 +53,176 @@ test();
     }, 10);
 
     var Init = function(){
-        var elm_editor = document.getElementById("_code_editor");
-        var editor = CodeMirror.fromTextArea(elm_editor, {
-            mode: "text/javascript",
-            theme: "eclipse",
-            lineNumbers:true,
-            lineWrapping:true,
-            foldGutter: true,
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
-        });
+        var editor = null;
 
+        var loadMode = function(loc){
+            var elm_editor = document.getElementById("_code_editor_host");
+            var scr = document.createElement("script");
+            scr.src = "/cm/mode/" + loc;
+            elm_editor.parentNode.appendChild(scr);
+        };
 
-        var setting = {	};
+        var createEditor = function(type){
+            var host_editor = document.getElementById("_code_editor_host");
+            host_editor.innerHTML = "";
+            var elm_editor = document.createElement("textarea");
+            elm_editor.id = "_code_editor";
+            host_editor.appendChild(elm_editor);
+            editor = CodeMirror.fromTextArea(elm_editor, {
+                mode: type,
+                theme: "eclipse",
+                lineNumbers:true,
+                lineWrapping:true,
+                foldGutter: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+            });
+        };
 
-        var zNodes =[
-            { name:"pNode 01", open:true,
-                children: [
-                    { name:"pNode 11",
-                        children: [
-                            { name:"leaf node 111"},
-                            { name:"leaf node 112"},
-                            { name:"leaf node 113"},
-                            { name:"leaf node 114"}
-                        ]},
-                    { name:"pNode 12",
-                        children: [
-                            { name:"leaf node 121"},
-                            { name:"leaf node 122"},
-                            { name:"leaf node 123"},
-                            { name:"leaf node 124"}
-                        ]},
-                    { name:"pNode 13 - no child", isParent:true}
-                ]},
-            { name:"pNode 02",
-                children: [
-                    { name:"pNode 21", open:true,
-                        children: [
-                            { name:"leaf node 211"},
-                            { name:"leaf node 212"},
-                            { name:"leaf node 213"},
-                            { name:"leaf node 214"}
-                        ]},
-                    { name:"pNode 22",
-                        children: [
-                            { name:"leaf node 221"},
-                            { name:"leaf node 222"},
-                            { name:"leaf node 223"},
-                            { name:"leaf node 224"}
-                        ]},
-                    { name:"pNode 23",
-                        children: [
-                            { name:"leaf node 231"},
-                            { name:"leaf node 232"},
-                            { name:"leaf node 233"},
-                            { name:"leaf node 234"}
-                        ]}
-                ]},
-            { name:"pNode 3 - no child", isParent:true}
+        var checkExtension = function(loc, arr){
+            for(var o in arr){
+              if(loc.lastIndexOf(arr[o]) === loc.length - (arr[o].length))
+                return true;
+            }
+            return false;
+        };
+        var setting = {
+            callback: {
+                onClick: function(ev, treeId, treeNode, clickFlag) {
+                    var zTree = $.fn.zTree.getZTreeObj(treeId);
 
-        ];
+                    if(zTree.jx_loading){
+                        return false;
+                    }
+
+                    var loc = treeNode.name;
+                    var _node = treeNode;
+                    while(_node && _node.parentTId){
+                        var parent = zTree.getNodeByTId(_node.parentTId);
+                        if(parent){
+                            loc = parent.name + "/" + loc;
+                            _node = parent;
+                        }
+                        else{
+                            _node = null;
+                        }
+                    }
+
+                    if(treeNode.children && treeNode.children.length){
+                        zTree.jx_loading = true;
+                        getFiles(loc, treeId, treeNode);
+                    }else{
+                        var _loc = loc.toLowerCase();
+
+                        if(checkExtension(_loc, [".js", ".json", ".jxp"])){
+                           getFile(loc, treeId, "text/javascript");
+                           return;
+                        }
+
+                        if(checkExtension(_loc, [".css"])){
+                            getFile(loc, treeId, "css");
+                            return;
+                        }
+
+                        if(checkExtension(_loc, [".php"])){
+                            loadMode("php/php.js");
+                            getFile(loc, treeId, "php");
+                            return;
+                        }
+
+                        if(checkExtension(_loc, [".go"])){
+                            loadMode("go/go.js");
+                            getFile(loc, treeId, "go");
+                            return;
+                        }
+
+                        if(checkExtension(_loc, [".md", ".conf", ".ini", ".htaaccess"])){
+                            loadMode("markdown/markdown.js");
+                            getFile(loc, treeId, "markdown");
+                            return;
+                        }
+
+                        if(checkExtension(_loc, [ ".htm", ".html", ".xml"])){
+                            getFile(loc, treeId, "xml");
+                            return;
+                        }
+
+                        if(checkExtension(_loc, [".coffee"])){
+                            loadMode("coffeescript/coffeescript.js");
+                            getFile(loc, treeId, "coffeescript");
+                            return;
+                        }
+
+                        if(checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
+                            getFile(loc, treeId, "text");
+                            return;
+                        }
+
+                        utils.bubble("warning", "{{label.FileTypeNotSupportedTitle}}", "{{label.FileTypeNotSupportedContent}}", 4000);
+                    }
+                }
+            }
+        };
+
+        var getFiles = function(folder, treeId, treeNode){
+            jxcore.Call("getFiles", {up:folder, id:treeId}, function(ret_val){
+
+                if(ret_val.err){
+                    alert(ret_val.err);
+                    if(ret_val.relogin){
+                        location.href = "/index.html";
+                    }
+                    var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
+                    if(zTree)
+                        zTree.jx_loading = false;
+                    return;
+                }
+
+                if(!treeNode){
+                    $.fn.zTree.init($("#"+treeId), setting, ret_val.nodes);
+                }
+                else{
+                    var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
+
+                    zTree.jx_loading = false;
+                    zTree.removeChildNodes(treeNode);
+
+                    zTree.addNodes(treeNode, ret_val.nodes);
+
+                    zTree.expandNode(treeNode, true, false);
+                }
+            });
+        };
+
+        var getFile = function(location, treeId, type){
+            jxcore.Call("getFile", {up:location, id:treeId, tp:type}, function(ret_val){
+
+                if(ret_val.err){
+                    alert(ret_val.err);
+                    if(ret_val.relogin){
+                        location.href = "/index.html";
+                    }
+                    if(ret_val.reloadTree){
+                        location.href = "/codeEditor.html";
+                    }
+                    return;
+                }
+
+                createEditor(ret_val.tp);
+                editor.setValue(ret_val.source);
+            });
+        };
 
         function createTree(){
-            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+            var files_host = document.getElementById("editor_files");
+            var host = document.createElement("ul");
+            host.id="files_{{defaults.getUniqueId}}";
+            host.className="ztree";
+            files_host.appendChild(host);
+
+            getFiles("/", host.id, null);
+
+            createEditor("text/javascript");
+
         }
 
         var loadTreeInter = setInterval(function(){

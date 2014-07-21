@@ -1,12 +1,22 @@
 var forms = require('../rendering/form_templates');
 var datatables = require('../rendering/datatable_templates');
 var charts = require('./charts/charts');
+var form_lang = require('./form_lang');
+var server = require('jxm');
 var users = {};
+var path = require('path');
+var fs = require('fs');
 
 var newUser = function(session_id){
     return {
         nameTitle: "John Doe",
         sessionId: session_id,
+        homeFolder: function(){
+            // TODO return user's home path (www path)
+
+            var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE; // temporary
+            return home + "/Desktop";
+        },
         lang: "EN",
         session: { forms:{} },
         lastOperation: Date.now() // TODO later clear the users
@@ -74,7 +84,71 @@ exports.clearUser = function(sessionId) {
 exports.isRecordUpdating = function(active_user, formName) {
     var isUpdate = active_user.session.edits && active_user.session.edits[formName] && active_user.session.edits[formName].ID;
     return isUpdate;
-}
+};
+
+
+exports.defineMethods = function(){
+    server.addJSMethod("getFiles", function(env, params){
+        console.log("getFiles", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc;
+        if(params.up == "/"){
+            loc = home;
+        }
+        else{
+            loc = home + path.sep + params.up;
+        }
+
+        var loading = form_lang.Get(active_user.lang, "Loading");
+
+        fs.readdir(loc, function(err, files){
+            if(err){
+                server.sendCallBack(env, {err:err, relogin:false});
+                return;
+            }
+            var _nodes = [];
+            for(var o in files){
+                var fname = loc + path.sep + files[o];
+                var is_dir = fs.statSync(fname).isDirectory();
+                if(is_dir){
+                    _nodes.push({isParent:true, name:files[o], children:[{name:loading}]});
+                }
+                else
+                    _nodes.push({name:files[o]});
+            }
+
+            server.sendCallBack(env, {nodes:_nodes, id:params.id});
+        });
+    });
+
+
+    server.addJSMethod("getFile", function(env, params){
+        console.log("getFile", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc = home + path.sep + params.up;
+
+        if(!fs.existsSync(loc)){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "FileNotFound"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp});
+    });
+};
 
 
 //{{user.LABELHERE}}

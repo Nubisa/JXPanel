@@ -14,6 +14,7 @@ var render_engine = require('./rendering/render');
 var form_methods = require('./rendering/form_methods');
 var charts = require('./definitions/charts/charts');
 var site_defaults = require('./definitions/site_defaults');
+var _active_users = require('./definitions/active_user');
 
 server.setApplication("JXPanel", "/", "NUBISA_JX_PANEL_2014");
 
@@ -28,8 +29,8 @@ for(var o in form_methods){
 }
 
 site_defaults.defineMethods();
-
 charts.defineChartMethods();
+_active_users.defineMethods();
 
 server.linkResourcesFromPath("/", "../ui/");
 

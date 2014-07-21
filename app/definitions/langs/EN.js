@@ -112,6 +112,10 @@ exports.Labels = {
     "UnableToRead": "Unable to read this information",
     "OSname": "OS",
     "Loading": "Loading...",
+    "FileNotFound": "File not found",
+    "FileTypeNotSupportedTitle":"Not Supported",
+    "FileTypeNotSupportedContent":"Editing this file type is not supported.",
+
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",

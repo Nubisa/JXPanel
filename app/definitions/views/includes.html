@@ -132,7 +132,8 @@
     };
     utils.bubble = function(type, title, content, ms) {
 
-        var colors = { success : "#8ac38b", danger: "#c26565", warning : "#efe1b3", info : "#d6dde7" };
+        var colors = { success : "#8ac38b", danger: "#c26565", warning : "#ff9900", info : "#d6dde7" };
+        var m_icons = {success: "fa-check", danger: "fa-exclamation", warning: "fa-exclamation", info :"fa-info"};
         var messages = { success : "{{label.MessageSuccess}}", danger : "{{label.MessageDanger}}", warning : "{{label.MessageWarning}}", info: "{{label.MessageInfo}}", error: "{{label.MessageError}}" };
         colors.error = colors.danger;
 
@@ -141,7 +142,7 @@
             title : title || messages[type],
             content : "<i class='fa fa-clock-o'></i> <i>" + content + "</i>",
             color : color, //"#659265",
-            iconSmall : "fa fa-check fa-2x fadeInRight animated",
+            iconSmall : "fa "+m_icons[type]+" fa-2x fadeInRight animated",
             timeout : ms
         });
     };

@@ -17,6 +17,9 @@ exports.EN = {
     },
     getOSInfo:function(lang, active_user){
         return form_lang.Get(lang, system_tools.getOSInfo(), true);
+    },
+    getUniqueId: function(lang, active_user){
+        return jxcore.utils.uniqueId();
     }
 };
 
