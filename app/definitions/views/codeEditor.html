@@ -29,14 +29,14 @@
 
 <ul id="code_editor_title_holder" class="nav nav-tabs bordered">
     <li class="active">
-        <a href="#s1" data-toggle="tab"><i class="fa fa-fw fa-lg fa-file"></i>{{label.Empty}}</a>
+        <a data-toggle="tab"><i class="fa fa-fw fa-file"></i>{{label.Empty}}</a>
     </li>
 </ul>
 
 <div id="code_editor_content_holder" class="tab-content padding-10">
     <div class="tab-pane fade active in" id="s1">
         <p>
-        <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:hidden">
+        <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 320px;overflow:hidden">
 
         </div>
         </p>
@@ -45,22 +45,54 @@
 
 <script>
 
+    var clearSelection = function(){
+        var title_holder = document.getElementById('code_editor_title_holder');
+        var content_holder = document.getElementById('code_editor_content_holder');
+
+        for(var o in title_holder._childs){
+            if(!title_holder._childs[o])
+                continue;
+            title_holder._childs[o].className = "";
+        }
+
+        for(var o in content_holder._childs){
+            if(!content_holder._childs[o])
+                continue;
+            content_holder._childs[o].className = "tab-pane fade";
+        }
+    };
+
+    var removeTab = function(id){
+        var title_holder = document.getElementById('code_editor_title_holder');
+        var content_holder = document.getElementById('code_editor_content_holder');
+
+        title_holder.count--;
+
+        title_holder.removeChild(title_holder._childs[id]);
+        title_holder._childs[id] = null;
+        delete(title_holder._childs[id]);
+        content_holder.removeChild(content_holder._childs[id]);
+        content_holder._childs[id] = null;
+        delete(content_holder._childs[id]);
+    };
+
     var createTab = function(id, title){
         var title_holder = document.getElementById('code_editor_title_holder');
         var content_holder = document.getElementById('code_editor_content_holder');
 
         if(!title_holder._childs){
-            title_holder._childs = [];
+            title_holder._childs = {};
             title_holder.innerHTML = "";
             content_holder.innerHTML = "";
-            content_holder._childs = [];
+            content_holder._childs = {};
+            title_holder.count = 0;
         }else{
+            clearSelection();
             for(var o in title_holder._childs){
-                title_holder._childs[o].className = "";
-            }
-
-            for(var o in content_holder._childs){
-                content_holder._childs[o].className = "tab-pane fade";
+                if(title_holder._childs[o]._name == "{{label.Empty}}"){
+                    removeTab(o);
+                    break;
+                }
             }
         }
 
@@ -71,23 +103,80 @@
         var div_code_editor = document.createElement("div");
         div_code_editor.id = id + "_code_editor";
         div_code_editor.className = "well";
-        div_code_editor.style.cssText = "margin:0px;padding:0px;border:dotted 1px #ccc;height: 300px;overflow:hidden";
+        div_code_editor.style.cssText = "margin:0px;padding:0px;border:dotted 1px #ccc;height: 320px;overflow:hidden";
         pp.appendChild(div_code_editor);
         div.appendChild(pp);
         content_holder.appendChild(div);
         div._editor = div_code_editor;
-        content_holder._childs.push(div);
+        content_holder._childs[id] = (div);
 
         var li = document.createElement('li');
+        li._name = title;
         li.className = 'active';
         var a = document.createElement('a');
-        a.href= "#" + id;
+        a.style.cursor = "pointer";
+        a._target = id;
+        a.onclick = function(){
+            if(!title_holder._childs[this._target])
+                return false;
+            clearSelection();
+            title_holder._childs[this._target].className = "active";
+            content_holder._childs[this._target].className = "tab-pane fade active in";
+        };
         a["data-toggle"] = "tab";
-        a.innerHTML = '<i class="fa fa-fw fa-lg fa-file"></i>' + title;
+
+        a.innerHTML = '<i class="fa fa-fw fa-file"></i>' + title;
         li.appendChild(a);
         li._a = a;
+
+        var ax = document.createElement('a');
+        ax.style.cursor = "pointer";
+        ax._target = id;
+        ax.onclick = function(){
+            clearSelection();
+            var old = "", break_next = false;
+            for(var o in title_holder._childs){
+                if(!title_holder._childs[o])
+                    continue;
+
+                old = o;
+                if(break_next)
+                    break;
+                if(o == this._target){
+                    if(old === o){
+                        break_next  = true;
+                        continue;
+                    }
+                    break;
+                }
+            }
+
+            removeTab(this._target);
+
+            if(old == this._target && !title_holder.count){
+                createTab("xo" + Date.now(), "{{label.Empty}}");
+            }
+            else{
+                if(!title_holder._childs[old]){
+                    for(var o in title_holder._childs){
+                        old = o;
+                        break;
+                    }
+                }
+
+                title_holder._childs[old].className = "active";
+                content_holder._childs[old].className = "tab-pane fade active in";
+            }
+
+            return false;
+        };
+        ax.innerHTML = '<i class="fa fa-fw fa-times"></i>';
+        a.appendChild(ax);
+
         title_holder.appendChild(li);
-        title_holder._childs.push(li);
+        title_holder._childs[id] = (li);
+
+        title_holder.count++;
 
         return div_code_editor;
     };
@@ -95,7 +184,7 @@
     var editorInter = setInterval(function(){
 
         if(typeof jQuery != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined' && jxcore.IsConnected){
-            var elm_editor = document.getElementById("_code_editor_host");
+            var elm_editor = document.getElementById("code_editor_content_holder");
             clearInterval(editorInter);
             var scr = document.createElement("script");
             scr.src = "/js/jquery.ztree.core-3.5.min.js";
@@ -108,7 +197,7 @@
         var editors = {};
 
         var loadMode = function(loc){
-            var elm_editor = document.getElementById("_code_editor_host");
+            var elm_editor = document.getElementById("code_editor_content_holder");
             var scr = document.createElement("script");
             scr.src = "/cm/mode/" + loc;
             elm_editor.parentNode.appendChild(scr);
@@ -116,15 +205,17 @@
 
         var editor_count = 0;
 
-        var createEditor = function(type, _fname){
+        var createEditor = function(type, _fname, location){
             var fname = _fname;
             if(!fname)
-                fname = "Empty";
+                fname = "{{label.Empty}}";
 
             var host_editor = createTab("jx_e_" + (editor_count++), fname);
             host_editor.innerHTML = "";
             var elm_editor = document.createElement("textarea");
             elm_editor.id = "_code_editor";
+            elm_editor.height = 300;
+
             host_editor.appendChild(elm_editor);
             var opts = {
                 mode: type,
@@ -134,10 +225,44 @@
                 foldGutter: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
             };
+            var btn = null;
             if(!_fname)
                 opts.readOnly = true;
+            else{
+                btn = document.createElement("button");
+                btn.className = "btn btn-success";
+                btn.style.cssText = "padding-top:5px;margin-top:5px";
+                btn._name = fname;
+                btn._location = location;
+                btn.onclick = function(){
+                    var _this = this;
+                    jxcore.Call("saveFile", {up:this._location, src:escape(editors[this._name].getValue())}, function(ret_val){
+                        if(ret_val.err){
+                            alert(ret_val.err);
+                            if(ret_val.relogin){
+                                location.href = "/index.html";
+                            }
+                            return;
+                        };
+                        utils.bubble("success", "{{label.FileSavedTitle}}", "{{label.FileSavedContent}}", 4000);
+                        _this.disabled = "disabled";
+                    });
+                };
+                btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
+                btn.disabled = "disabled";
+                host_editor.parentNode.appendChild(btn);
+            }
 
             editors[fname] = CodeMirror.fromTextArea(elm_editor, opts);
+            editors[fname].btn = btn;
+            if(_fname){
+                editors[fname].on('change', function(inst, obj){
+                    if(btn.loaded)
+                        btn.disabled = null;
+                    else
+                        btn.loaded = true;
+                });
+            }
         };
 
         var checkExtension = function(loc, arr){
@@ -256,6 +381,14 @@
         };
 
         var getFile = function(fname, location, treeId, type){
+            var title_holder = document.getElementById('code_editor_title_holder');
+            for(var o in title_holder._childs){
+                if(title_holder._childs[o]._name == fname){
+                    title_holder._childs[o]._a.onclick();
+                    return;
+                }
+            }
+
             jxcore.Call("getFile", {up:location, id:treeId, tp:type, fn:fname}, function(ret_val){
 
                 if(ret_val.err){
@@ -270,7 +403,7 @@
                     return;
                 }
 
-                createEditor(ret_val.tp, ret_val.fn);
+                createEditor(ret_val.tp, ret_val.fn, ret_val.loc);
                 editors[ret_val.fn].setValue(ret_val.source);
             });
         };

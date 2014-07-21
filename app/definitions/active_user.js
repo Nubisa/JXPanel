@@ -146,7 +146,28 @@ exports.defineMethods = function(){
             return;
         }
 
-        server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp, fn:params.fn});
+        server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp, fn:params.fn, loc:params.up});
+    });
+
+    server.addJSMethod("saveFile", function(env, params){
+        console.log("saveFile", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc = home + path.sep + params.up;
+
+        if(!fs.existsSync(loc)){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "FileNotFound"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        fs.writeFileSync(loc, unescape(params.src));
+        server.sendCallBack(env, {done:true});
     });
 };
 

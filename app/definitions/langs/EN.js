@@ -115,6 +115,8 @@ exports.Labels = {
     "FileNotFound": "File not found",
     "FileTypeNotSupportedTitle":"Not Supported",
     "FileTypeNotSupportedContent":"Editing this file type is not supported.",
+    "FileSavedTitle":"Done!",
+    "FileSavedContent":"File Saved Successfully",
 
 
     // user form
