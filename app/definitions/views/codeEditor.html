@@ -217,7 +217,7 @@
             ax._target = id;
             ax.onclick = function(){
                 clearSelection();
-                var old = "", break_next = false;
+                var old, break_next = false;
                 for(var o in title_holder._childs){
                     if(!title_holder._childs[o])
                         continue;
@@ -412,7 +412,7 @@
                     return;
                 }
 
-                if(loc.indexOf(".")<0 || checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
+                if(loc.indexOf(".")<0 || checkExtension(_loc, [".txt", ".ini", ".bat", ".sh", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
                     getFile(treeNode.name, loc, treeId, "text");
                     return;
                 }
