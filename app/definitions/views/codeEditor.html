@@ -22,168 +22,46 @@
 
 <div class="note">{{label.CodeEditorTop}}</div>
 
-<div class="row" style="padding-bottom:20px;">
+<div id="editor_table_row" class="row" style="padding-bottom:20px;">
     <div class="col-sm-12">
-        <div id="editor_files" class="well" style="margin:0px;padding:0px;height:115px;overflow:scroll">
+        <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;" cellpadding="0" cellspacing="0">
+            <tbody >
+            <tr>
+                    <td style="width:20%;padding-right:5px;vertical-align:top;">
+                        <div id="files_holder" style="max-width:200px;overflow:scroll;">
+                        <div id="editor_files"  style="margin:0px;padding:0px;">
 
-        </div>
-    </div>
-</div>
+                        </div>
+                        </div>
+                    </td>
+                    <td style="width: 2px;background-color:#90947c;"><div style="width:2px;"></div></td>
+                    <td style="width:80%;vertical-align:top;padding-top:5px;padding-left:5px;">
 
-<ul id="code_editor_title_holder" class="nav nav-tabs">
-    <li class="active">
-        <a data-toggle="tab"><i class="fa fa-fw fa-file"></i>{{label.Empty}}</a>
-    </li>
-</ul>
+                        <div id="editor_holder" style="overflow:scroll">
+                            <ul id="code_editor_title_holder" class="nav nav-tabs">
+                                <li class="active">
+                                    <a data-toggle="tab"><i class="fa fa-fw fa-file"></i>{{label.Empty}}</a>
+                                </li>
+                            </ul>
 
-<div id="code_editor_content_holder" class="tab-content">
-    <div class="tab-pane fade active in" id="s1">
-        <p>
-        <div id="_code_editor_host" class="well" style="margin:0px;padding:0px;border:dotted 1px #ccc;height: 400px;overflow:hidden">
+                            <div id="code_editor_content_holder" class="tab-content" style="height:100%">
+                                <div class="tab-pane fade active in" id="s1">
+                                    <p>
+                                    <div id="_code_editor_host" style="margin:0px;padding:0px;border:dotted 1px #ccc;overflow:hidden">
 
-        </div>
-        </p>
+                                    </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script>
-
-    var clearSelection = function(){
-        var title_holder = document.getElementById('code_editor_title_holder');
-        var content_holder = document.getElementById('code_editor_content_holder');
-
-        for(var o in title_holder._childs){
-            if(!title_holder._childs[o])
-                continue;
-            title_holder._childs[o].className = "";
-        }
-
-        for(var o in content_holder._childs){
-            if(!content_holder._childs[o])
-                continue;
-            content_holder._childs[o].className = "tab-pane fade";
-        }
-    };
-
-    var removeTab = function(id){
-        var title_holder = document.getElementById('code_editor_title_holder');
-        var content_holder = document.getElementById('code_editor_content_holder');
-
-        title_holder.count--;
-
-        title_holder.removeChild(title_holder._childs[id]);
-        title_holder._childs[id] = null;
-        delete(title_holder._childs[id]);
-        content_holder.removeChild(content_holder._childs[id]);
-        content_holder._childs[id] = null;
-        delete(content_holder._childs[id]);
-    };
-
-    var createTab = function(id, title){
-        var title_holder = document.getElementById('code_editor_title_holder');
-        var content_holder = document.getElementById('code_editor_content_holder');
-
-        if(!title_holder._childs){
-            title_holder._childs = {};
-            title_holder.innerHTML = "";
-            content_holder.innerHTML = "";
-            content_holder._childs = {};
-            title_holder.count = 0;
-        }else{
-            clearSelection();
-            for(var o in title_holder._childs){
-                if(title_holder._childs[o]._name == "{{label.Empty}}"){
-                    removeTab(o);
-                    break;
-                }
-            }
-        }
-
-        var div = document.createElement("div");
-        div.id = id;
-        div.className = "tab-pane fade active in";
-        var pp = document.createElement("p");
-
-        var div_code_editor = document.createElement("div");
-        div_code_editor.id = id + "_code_editor";
-        div_code_editor.className = "well";
-        div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-right:dotted 1px #ccc;border-bottom:dotted 1px #ccc;border-left:dotted 1px #ccc;height: 310px;overflow:hidden";
-        pp.appendChild(div_code_editor);
-        div.appendChild(pp);
-        content_holder.appendChild(div);
-        div._editor = div_code_editor;
-        content_holder._childs[id] = (div);
-
-        var li = document.createElement('li');
-        li._name = title;
-        li.className = 'active';
-        var a = document.createElement('a');
-        a.style.cursor = "pointer";
-        a._target = id;
-        a.onclick = function(){
-            if(!title_holder._childs[this._target])
-                return false;
-            clearSelection();
-            title_holder._childs[this._target].className = "active";
-            content_holder._childs[this._target].className = "tab-pane fade active in";
-        };
-        a["data-toggle"] = "tab";
-
-        a.innerHTML = '<i class="fa fa-fw fa-file"></i>' + title;
-        li.appendChild(a);
-        li._a = a;
-
-        var ax = document.createElement('a');
-        ax.style.cursor = "pointer";
-        ax._target = id;
-        ax.onclick = function(){
-            clearSelection();
-            var old = "", break_next = false;
-            for(var o in title_holder._childs){
-                if(!title_holder._childs[o])
-                    continue;
-
-                old = o;
-                if(break_next)
-                    break;
-                if(o == this._target){
-                    if(old === o){
-                        break_next  = true;
-                        continue;
-                    }
-                    break;
-                }
-            }
-
-            removeTab(this._target);
-
-            if(old == this._target && !title_holder.count){
-                createTab("xo" + Date.now(), "{{label.Empty}}");
-            }
-            else{
-                if(!title_holder._childs[old]){
-                    for(var o in title_holder._childs){
-                        old = o;
-                        break;
-                    }
-                }
-
-                title_holder._childs[old].className = "active";
-                content_holder._childs[old].className = "tab-pane fade active in";
-            }
-
-            return false;
-        };
-        ax.innerHTML = '<i class="fa fa-fw fa-times"></i>';
-        a.appendChild(ax);
-
-        title_holder.appendChild(li);
-        title_holder._childs[id] = (li);
-
-        title_holder.count++;
-
-        return div_code_editor;
-    };
 
     var editorInter = setInterval(function(){
 
@@ -199,6 +77,173 @@
 
     var Init = function(){
         var editors = {};
+
+        var clearSelection = function(){
+            var title_holder = document.getElementById('code_editor_title_holder');
+            var content_holder = document.getElementById('code_editor_content_holder');
+
+            for(var o in title_holder._childs){
+                if(!title_holder._childs[o])
+                    continue;
+                title_holder._childs[o].className = "";
+            }
+
+            for(var o in content_holder._childs){
+                if(!content_holder._childs[o])
+                    continue;
+                content_holder._childs[o].className = "tab-pane fade";
+            }
+        };
+
+        var removeTab = function(id){
+            var title_holder = document.getElementById('code_editor_title_holder');
+            var content_holder = document.getElementById('code_editor_content_holder');
+
+            title_holder.count--;
+
+            title_holder.removeChild(title_holder._childs[id]);
+            title_holder._childs[id] = null;
+            delete(title_holder._childs[id]);
+            content_holder.removeChild(content_holder._childs[id]);
+            content_holder._childs[id] = null;
+            delete(content_holder._childs[id]);
+        };
+
+        var getDocHeight = function(){
+            var body = document.body;
+            var html = document.documentElement;
+
+            var he = Math.max( body.scrollHeight, body.offsetHeight,
+                    html.clientHeight, html.scrollHeight, html.offsetHeight );
+
+            var row = document.getElementById('editor_table_row');
+            row.style.height = (he-150) + "px";
+            row.style.overflow = 'hidden';
+            document.getElementById('main').style.padding = "0px";
+            document.getElementById('main').style.overflow = "hidden";
+            var tab = document.getElementById('editor_table');
+            tab.style.display = '';
+
+            document.getElementById('files_holder').style.maxHeight = (he-180) + "px";
+            document.getElementById('editor_holder').style.maxHeight = (he-180) + "px";
+            return he-270;
+        };
+
+        utils.addEvent(window, "resize", function(){
+            document.rCount++;
+            if(document.rCount===1){
+                setTimeout(function(){
+                    document.rCount = 0;
+                    getDocHeight();
+                }, 1000);
+            }
+        });
+
+        var createTab = function(id, title){
+            var eh = getDocHeight();
+
+            var title_holder = document.getElementById('code_editor_title_holder');
+            var content_holder = document.getElementById('code_editor_content_holder');
+
+            if(!title_holder._childs){
+                title_holder._childs = {};
+                title_holder.innerHTML = "";
+                content_holder.innerHTML = "";
+                content_holder._childs = {};
+                title_holder.count = 0;
+            }else{
+                clearSelection();
+                for(var o in title_holder._childs){
+                    if(title_holder._childs[o]._name == "{{label.Empty}}"){
+                        removeTab(o);
+                        break;
+                    }
+                }
+            }
+
+            var div = document.createElement("div");
+            div.id = id;
+            div.className = "tab-pane fade active in";
+            var pp = document.createElement("p");
+            var div_code_editor = document.createElement("div");
+            div_code_editor.id = id + "_code_editor";
+            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-right:dotted 1px #ccc;border-bottom:dotted 1px #ccc;border-left:dotted 1px #ccc;height: "+eh+"px;overflow:scroll";
+            pp.appendChild(div_code_editor);
+            div.appendChild(pp);
+            content_holder.appendChild(div);
+            div._editor = div_code_editor;
+            content_holder._childs[id] = (div);
+
+            var li = document.createElement('li');
+            li._name = title;
+            li.className = 'active';
+            var a = document.createElement('a');
+            a.style.cursor = "pointer";
+            a._target = id;
+            a.onclick = function(){
+                if(!title_holder._childs[this._target])
+                    return false;
+                clearSelection();
+                title_holder._childs[this._target].className = "active";
+                content_holder._childs[this._target].className = "tab-pane fade active in";
+            };
+            a["data-toggle"] = "tab";
+
+            a.innerHTML = '<i class="fa fa-fw fa-file"></i>' + title;
+            li.appendChild(a);
+            li._a = a;
+
+            var ax = document.createElement('a');
+            ax.style.cursor = "pointer";
+            ax._target = id;
+            ax.onclick = function(){
+                clearSelection();
+                var old = "", break_next = false;
+                for(var o in title_holder._childs){
+                    if(!title_holder._childs[o])
+                        continue;
+
+                    old = o;
+                    if(break_next)
+                        break;
+                    if(o == this._target){
+                        if(old === o){
+                            break_next  = true;
+                            continue;
+                        }
+                        break;
+                    }
+                }
+
+                removeTab(this._target);
+
+                if(old == this._target && !title_holder.count){
+                    createTab("xo" + Date.now(), "{{label.Empty}}");
+                }
+                else{
+                    if(!title_holder._childs[old]){
+                        for(var o in title_holder._childs){
+                            old = o;
+                            break;
+                        }
+                    }
+
+                    title_holder._childs[old].className = "active";
+                    content_holder._childs[old].className = "tab-pane fade active in";
+                }
+
+                return false;
+            };
+            ax.innerHTML = '<i class="fa fa-fw fa-times"></i>';
+            a.appendChild(ax);
+
+            title_holder.appendChild(li);
+            title_holder._childs[id] = (li);
+
+            title_holder.count++;
+
+            return div_code_editor;
+        };
 
         var loadMode = function(loc){
             var elm_editor = document.getElementById("code_editor_content_holder");
@@ -220,7 +265,6 @@
             var elm_editor = document.createElement("textarea");
             elm_editor.id = eid + "x_code_editor";
 
-            host_editor.appendChild(elm_editor);
             var opts = {
                 mode: type,
                 theme: "eclipse",
@@ -230,13 +274,14 @@
                 foldGutter: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
             };
+
             var btn = null;
             if(!_fname)
                 opts.readOnly = true;
             else{
                 btn = document.createElement("button");
                 btn.className = "btn btn-success";
-                btn.style.cssText = "margin-top:15px";
+                btn.style.cssText = "margin-bottom:2px;margin-top:2px;padding:3px 12px;";
                 btn._name = fname;
                 btn._location = location;
                 btn._eid = eid;
@@ -258,8 +303,10 @@
                 };
                 btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
                 btn.disabled = "disabled";
-                host_editor.parentNode.appendChild(btn);
+                host_editor.parentNode.insertBefore(btn, host_editor.parentNode.firstChild);
             }
+
+            host_editor.appendChild(elm_editor);
 
             editors[fname] = CodeMirror.fromTextArea(elm_editor, opts);
             editors[fname].btn = btn;

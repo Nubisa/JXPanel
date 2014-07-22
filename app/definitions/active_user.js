@@ -239,7 +239,7 @@ var HostingPlanCheck = function(active_user) {
         } else {
             method(cb);
         }
-    }
+    };
 
     this.CanAddUser = function(cb) {
 

@@ -61,16 +61,7 @@ methods.tryLogin = function(env, params){
                         return;
                     }
 
-                    var pwd = crypto.createHash('md5').update(params.password).digest('hex').toString();
-                    sqlite.User.AddNewOrUpdateAll(sqlite.db, { person_name : params.username, username : params.username, password: pwd, user_owner_id : exports.rootID }, { insert: ["username"] },  function(err2, id) {
-                        if (err2) {
-                            server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotAddUser") + " " + err2});
-                        } else {
-                            params.user_id = id;
-                            finish();
-                            return;
-                        }
-                    });
+                    finish();
                 }
             });
 
