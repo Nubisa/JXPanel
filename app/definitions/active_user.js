@@ -108,7 +108,7 @@ exports.defineMethods = function(){
 
         var home = active_user.homeFolder();
         var loc;
-        if(params.up == "/"){
+        if(params.up == "#"){
             loc = home;
         }
         else{
@@ -133,6 +133,10 @@ exports.defineMethods = function(){
                     _nodes.push({name:files[o]});
             }
 
+            if(params.up == "#"){
+                _nodes = {name:'/', children:_nodes, open:true};
+            }
+
             server.sendCallBack(env, {nodes:_nodes, id:params.id});
         });
     });
@@ -151,12 +155,13 @@ exports.defineMethods = function(){
         var loc = home + path.sep + params.up;
 
         if(!fs.existsSync(loc)){
-            server.sendCallBack(env, {err:form_lang.Get("EN", "FileNotFound"), relogin:false, reloadTree:true});
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
             return;
         }
 
         server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp, fn:params.fn, loc:params.up});
     });
+
 
     server.addJSMethod("saveFile", function(env, params){
         console.log("saveFile", params);
@@ -171,11 +176,79 @@ exports.defineMethods = function(){
         var loc = home + path.sep + params.up;
 
         if(!fs.existsSync(loc)){
-            server.sendCallBack(env, {err:form_lang.Get("EN", "FileNotFound"), relogin:false, reloadTree:true});
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
             return;
         }
 
-        fs.writeFileSync(loc, unescape(params.src));
+        try{
+            fs.writeFileSync(loc, unescape(params.src));
+        }
+        catch(e){
+            server.sendCallBack(env, {err:e});
+        }
+        server.sendCallBack(env, {done:true});
+    });
+
+
+    server.addJSMethod("addFileFolder", function(env, params){
+        console.log("addFileFolder", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc = home + path.sep + params.up;
+
+        if(!fs.existsSync(loc)){
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        try{
+            if(params.opt == "File")
+               fs.writeFileSync(loc + path.sep + params.name, "");
+            else
+               fs.mkdirSync(loc + path.sep + params.name);
+        }
+        catch(e){
+            server.sendCallBack(env, {err: e});
+        }
+        server.sendCallBack(env, {done:true});
+    });
+
+
+    server.addJSMethod("removeFileFolder", function(env, params){
+        console.log("removeFileFolder", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc = home + path.sep + params.up;
+
+        if(!fs.existsSync(loc)){
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        try{
+            if(fs.lstatSync(loc).isDirectory()){
+                if(fs.readdirSync(loc).length){
+                    server.sendCallBack(env, {err: {Message:form_lang.Get(active_user.lang, "FolderNotEmpty")}});
+                    return;
+                }
+            }
+            fs.unlinkSync(loc);
+        }
+        catch(e){
+            server.sendCallBack(env, {err: e});
+        }
         server.sendCallBack(env, {done:true});
     });
 };

@@ -34,6 +34,7 @@ _active_users.defineMethods();
 
 server.linkResourcesFromPath("/", "../ui/");
 
+server.mediaserver.noCache = true;
 render_engine.defineRender(server.mediaserver);
 
 server.start();

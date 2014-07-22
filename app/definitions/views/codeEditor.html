@@ -5,6 +5,7 @@
 </style>
 <link rel="stylesheet" href="/cm/codemirror.css">
 <link rel="stylesheet" href="/cm/theme/eclipse.css">
+<script src="/js/file_tools.js"></script>
 <script src="/cm/codemirror.js"></script>
 <script src="/cm/addon/hint/show-hint.js"></script>
 <script src="/cm/addon/hint/javascript-hint.js"></script>
@@ -28,6 +29,21 @@
             <tbody >
             <tr>
                     <td style="width:20%;padding-right:5px;vertical-align:top;">
+                        <a id="btn_add" class="btn btn-info btn-xs">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                        <a id="btn_remove" class="btn btn-info btn-xs">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        <a id="btn_rename" class="btn btn-info btn-xs">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        <a id="btn_download" class="btn btn-info btn-xs">
+                            <i class="fa fa-share-square-o "></i>
+                        </a>
+                        <a id="btn_clone" class="btn btn-info btn-xs">
+                            <i class="fa fa-github"></i>
+                        </a>
                         <div id="files_holder" style="max-width:200px;overflow:scroll;">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
@@ -65,7 +81,7 @@
 
     var editorInter = setInterval(function(){
 
-        if(typeof jQuery != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined' && jxcore.IsConnected){
+        if(typeof jQuery != 'undefined' && typeof init_file_tools != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined' && jxcore.IsConnected){
             var elm_editor = document.getElementById("code_editor_content_holder");
             clearInterval(editorInter);
             var scr = document.createElement("script");
@@ -76,6 +92,8 @@
     }, 10);
 
     var Init = function(){
+        init_file_tools();
+
         var editors = {};
 
         var clearSelection = function(){
@@ -129,6 +147,7 @@
             return he-270;
         };
 
+        document.rCount = 0;
         utils.addEvent(window, "resize", function(){
             document.rCount++;
             if(document.rCount===1){
@@ -326,11 +345,13 @@
 
         var checkExtension = function(loc, arr){
             for(var o in arr){
-              if(loc.lastIndexOf(arr[o]) === loc.length - (arr[o].length))
+              var ind = loc.lastIndexOf(arr[o]);
+              if(ind>0 && ind === loc.length - (arr[o].length))
                 return true;
             }
             return false;
         };
+
         var treeClick = function(ev, treeId, treeNode, clickFlag) {
             var zTree = $.fn.zTree.getZTreeObj(treeId);
 
@@ -338,18 +359,7 @@
                 return false;
             }
 
-            var loc = treeNode.name;
-            var _node = treeNode;
-            while(_node && _node.parentTId){
-                var parent = zTree.getNodeByTId(_node.parentTId);
-                if(parent){
-                    loc = parent.name + "/" + loc;
-                    _node = parent;
-                }
-                else{
-                    _node = null;
-                }
-            }
+            var loc = getPathLocation(treeId, treeNode);
 
             if(treeNode.children && treeNode.children.length){
                 zTree.jx_loading = true;
@@ -396,7 +406,7 @@
                     return;
                 }
 
-                if(checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
+                if(loc.indexOf(".")<0 || checkExtension(_loc, [".txt", ".ini", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
                     getFile(treeNode.name, loc, treeId, "text");
                     return;
                 }
@@ -404,6 +414,7 @@
                 utils.bubble("warning", "{{label.FileTypeNotSupportedTitle}}", "{{label.FileTypeNotSupportedContent}}", 4000);
             }
         };
+
         var setting = {
             callback: {
                 onExpand: treeClick,
@@ -411,11 +422,11 @@
             }
         };
 
-        var getFiles = function(folder, treeId, treeNode){
+        window.getFiles = function(folder, treeId, treeNode){
             jxcore.Call("getFiles", {up:folder, id:treeId}, function(ret_val){
 
                 if(ret_val.err){
-                    alert(ret_val.err);
+                    alert("ERROR : " + JSON.stringify(ret_val.err));
                     if(ret_val.relogin){
                         location.href = "/index.html";
                     }
@@ -453,7 +464,7 @@
             jxcore.Call("getFile", {up:location, id:treeId, tp:type, fn:fname}, function(ret_val){
 
                 if(ret_val.err){
-                    alert(ret_val.err);
+                    alert("ERROR : " + JSON.stringify(ret_val.err));
 
                     if(ret_val.relogin){
                         location.href = "/index.html";
@@ -474,9 +485,11 @@
             var host = document.createElement("ul");
             host.id="files_{{defaults.getUniqueId}}";
             host.className="ztree";
+            host.style.cssText="margin-left: -8px;"
             files_host.appendChild(host);
+            document.treeId = host.id;
 
-            getFiles("/", host.id, null);
+            getFiles("#", host.id, null);
 
             createEditor("text/javascript", null);
         }

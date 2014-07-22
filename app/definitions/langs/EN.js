@@ -122,6 +122,7 @@ exports.Labels = {
     "FileTypeNotSupportedContent":"Editing this file type is not supported.",
     "FileSavedTitle":"Done!",
     "FileSavedContent":"File Saved Successfully",
+    "FolderNotEmpty":"Folder is not empty",
 
 
     // user form
