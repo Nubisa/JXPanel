@@ -256,11 +256,12 @@ methods.getForm = function(env, params) {
         return;
 
     active_user.checkHostingPlan.CanAddRecord(params.form, function(err) {
-        var ret = "";
-        if (!err)
-            ret = forms.renderForm(env.SessionID, params.form, true);
-
-        server.sendCallBack(env, {err : err, html : ret.html, js : ret.js } );
+        if (err) {
+            server.sendCallBack(env, {err : err } );
+        } else {
+            var ret = forms.renderForm(env.SessionID, params.form, true);
+            server.sendCallBack(env, {err : false, html : ret.html, js : ret.js } );
+        }
     });
 };
 
