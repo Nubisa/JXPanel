@@ -243,8 +243,11 @@ exports.defineMethods = function(){
                     server.sendCallBack(env, {err: {Message:form_lang.Get(active_user.lang, "FolderNotEmpty")}});
                     return;
                 }
+                else
+                    fs.rmdirSync(loc);
             }
-            fs.unlinkSync(loc);
+            else
+                fs.unlinkSync(loc);
         }
         catch(e){
             server.sendCallBack(env, {err: e});

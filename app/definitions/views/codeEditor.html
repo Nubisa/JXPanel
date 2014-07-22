@@ -280,6 +280,9 @@
 
             var eid = "jx_e_" + (editor_count++);
             var host_editor = createTab(eid, fname);
+            if(!_fname)
+                return;
+
             host_editor.innerHTML = "";
             var elm_editor = document.createElement("textarea");
             elm_editor.id = eid + "x_code_editor";
@@ -490,7 +493,6 @@
             document.treeId = host.id;
 
             getFiles("#", host.id, null);
-
             createEditor("text/javascript", null);
         }
 
