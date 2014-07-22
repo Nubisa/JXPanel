@@ -254,9 +254,40 @@ exports.defineMethods = function(){
         }
         server.sendCallBack(env, {done:true});
     });
+
+
+    server.addJSMethod("renameFileFolder", function(env, params){
+        console.log("renameFileFolder", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc = home + path.sep + params.up;
+        var locTo = home + path.sep + params.down;
+
+        if(!fs.existsSync(loc)){
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        if(!fs.existsSync(locTo)){
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileExists"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        try{
+            fs.renameSync(loc, locTo);
+        }
+        catch(e){
+            server.sendCallBack(env, {err: e});
+        }
+        server.sendCallBack(env, {done:true});
+    });
 };
-
-
 
 
 var HostingPlanCheck = function(active_user) {

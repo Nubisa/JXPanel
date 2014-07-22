@@ -94,7 +94,7 @@
     var Init = function(){
         init_file_tools();
 
-        var editors = {};
+        window.editors = {};
 
         var clearSelection = function(){
             var title_holder = document.getElementById('code_editor_title_holder');
@@ -261,6 +261,8 @@
 
             title_holder.count++;
 
+            div_code_editor.ax = ax;
+
             return div_code_editor;
         };
 
@@ -309,7 +311,7 @@
                 btn._eid = eid;
                 btn.onclick = function(){
                     var _this = this;
-                    jxcore.Call("saveFile", {up:this._location, src:escape(editors[this._name].getValue())}, function(ret_val){
+                    jxcore.Call("saveFile", {up:this._location, src:escape(editors[this._location].getValue())}, function(ret_val){
                         if(ret_val.err){
                             alert(ret_val.err);
                             if(ret_val.relogin){
@@ -330,11 +332,12 @@
 
             host_editor.appendChild(elm_editor);
 
-            editors[fname] = CodeMirror.fromTextArea(elm_editor, opts);
-            editors[fname].btn = btn;
-            editors[fname]._eid = eid;
+            editors[location] = CodeMirror.fromTextArea(elm_editor, opts);
+            editors[location].btn = btn;
+            editors[location]._eid = eid;
+            editors[location].host = host_editor;
             if(_fname){
-                editors[fname].on('change', function(inst, obj){
+                editors[location].on('change', function(inst, obj){
                     if(inst.btn.loaded){
                         var title_holder = document.getElementById('code_editor_title_holder');
                         title_holder._childs[inst._eid]._a.style.color = "#b00000";
@@ -479,7 +482,7 @@
                 }
 
                 createEditor(ret_val.tp, ret_val.fn, ret_val.loc);
-                editors[ret_val.fn].setValue(ret_val.source);
+                editors[ret_val.loc].setValue(ret_val.source);
             });
         };
 
@@ -493,7 +496,7 @@
             document.treeId = host.id;
 
             getFiles("#", host.id, null);
-            createEditor("text/javascript", null);
+            createEditor("text/javascript", null, null);
         }
 
         var loadTreeInter = setInterval(function(){

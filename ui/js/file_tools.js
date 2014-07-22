@@ -188,6 +188,9 @@ var init_file_tools = function(){
 
         var loc = getPathLocation(document.treeId, nodes[0]);
 
+        var ind = loc.lastIndexOf("/");
+        var locTo = loc.substr(0, ind+1);
+
         $.SmartMessageBox({
             title : "Deleting : "+loc,
             content : "Are you sure ?",
@@ -209,6 +212,83 @@ var init_file_tools = function(){
                     return;
                 }
                 utils.bubble("success", "Successfully Deleted", loc, 4000);
+                if(editors[loc]){
+                    editors[loc].host.ax.onclick();
+                }
+                var parent = zTree.getNodeByTId(nodes[0].parentTId);
+                loc = getPathLocation(document.treeId, parent);
+                getFiles(loc, document.treeId, parent);
+            });
+        });
+    };
+
+
+    var renameFile = function(){
+        if(!document.treeId)
+            return;
+
+        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
+        if(!zTree)
+            return;
+
+        var nodes = zTree.getSelectedNodes();
+        if(!nodes || !nodes.length || !nodes[0].parentTId)
+        {
+            utils.bubble("warning", "Not Selected!", "Select a folder or a file", 4000);
+            return;
+        }
+
+        var loc = getPathLocation(document.treeId, nodes[0]);
+
+        $.SmartMessageBox({
+            title : "Renaming : "+loc,
+            content : "Enter a new name..",
+            input: "text",
+            inputValue : "",
+            placeHolder: "enter a new name",
+            buttons : "[Submit][Cancel]"
+        }, function(ButtonPress, name) {
+            if (ButtonPress == "Cancel") {
+                return 0;
+            }
+            if(!name || !name.trim().length){
+                utils.bubble("warning", "Enter a name..", "Name can not be empty!", 4000);
+                return;
+            }
+
+            if(/[\/\\,;:%#@*!]/.test(name) || name.indexOf("..")>=0){
+                utils.bubble("warning", "Enter a name..", "Name can not contain special characters!", 4000);
+                return;
+            }
+
+            var ind = loc.lastIndexOf("/");
+            var locTo = loc.substr(0, ind+1);
+            locTo += name;
+
+            locTo = locTo.trim();
+            loc = loc.trim();
+
+            if(locTo == loc){
+                utils.bubble("warning", "Enter a name..", "You have entered the same name!", 4000);
+                return;
+            }
+
+            jxcore.Call("renameFileFolder", {up:loc, down:locTo}, function(ret_val){
+                if(ret_val.err){
+                    alert(JSON.stringify(ret_val.err));
+
+                    if(ret_val.relogin){
+                        location.href = "/index.html";
+                    }
+                    if(ret_val.reloadTree){
+                        location.href = "/codeEditor.html";
+                    }
+                    return;
+                }
+                utils.bubble("success", "Successfully Renamed", loc + "  to  " + locTo, 4000);
+                if(editors[loc]){
+                    editors[loc].host.ax.onclick();
+                }
                 var parent = zTree.getNodeByTId(nodes[0].parentTId);
                 loc = getPathLocation(document.treeId, parent);
                 getFiles(loc, document.treeId, parent);
@@ -227,5 +307,8 @@ var init_file_tools = function(){
     };
     btn_remove.onmousedown = function(){
         removeFile();
+    };
+    btn_rename.onmousedown = function(){
+        renameFile();
     };
 };

@@ -123,7 +123,7 @@ exports.Labels = {
     "FileSavedTitle":"Done!",
     "FileSavedContent":"File Saved Successfully",
     "FolderNotEmpty":"Folder is not empty",
-
+    "FileExists":"File already exists",
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
