@@ -147,7 +147,7 @@ var init_file_tools = function(){
                     utils.bubble("danger", "Can't be empty", "You should define a name", 4000);
                 }
                 else{
-                    jxcore.Call("addFileFolder", {up:loc, name:name, opt:selected}, function(ret_val){
+                    toServer("addFileFolder", {up:loc, name:name, opt:selected}, function(ret_val){
                         if(ret_val.err){
                             alert(ret_val.err.toString());
 
@@ -155,7 +155,7 @@ var init_file_tools = function(){
                                 location.href = "/index.html";
                             }
                             if(ret_val.reloadTree){
-                                location.href = "/codeEditor.html";
+                                location.href = "/editor.html";
                             }
                             return;
                         }
@@ -164,7 +164,7 @@ var init_file_tools = function(){
                         }
                         utils.bubble("success", selected + " Created", loc + "/" + name, 4000);
                         getFiles(loc, document.treeId, nodes[0]);
-                    });
+                    }, true);
                 }
             });
         });
@@ -207,7 +207,7 @@ var init_file_tools = function(){
                         location.href = "/index.html";
                     }
                     if(ret_val.reloadTree){
-                        location.href = "/codeEditor.html";
+                        location.href = "/editor.html";
                     }
                     return;
                 }
@@ -273,7 +273,7 @@ var init_file_tools = function(){
                 return;
             }
 
-            jxcore.Call("renameFileFolder", {up:loc, down:locTo}, function(ret_val){
+            toServer("renameFileFolder", {up:loc, down:locTo}, function(ret_val){
                 if(ret_val.err){
                     alert(JSON.stringify(ret_val.err));
 
@@ -281,7 +281,7 @@ var init_file_tools = function(){
                         location.href = "/index.html";
                     }
                     if(ret_val.reloadTree){
-                        location.href = "/codeEditor.html";
+                        location.href = "/editor.html";
                     }
                     return;
                 }
@@ -292,13 +292,34 @@ var init_file_tools = function(){
                 var parent = zTree.getNodeByTId(nodes[0].parentTId);
                 loc = getPathLocation(document.treeId, parent);
                 getFiles(loc, document.treeId, parent);
-            });
+            }, true);
         });
+    };
+
+
+    var refreshTree = function(){
+        if(!document.treeId)
+            return;
+
+        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
+        if(!zTree)
+            return;
+
+        var nodes = zTree.getSelectedNodes();
+        if(!nodes || !nodes.length || !nodes[0].children)
+        {
+            utils.bubble("warning", "Not Selected!", "Select a folder to refresh", 4000);
+            return;
+        }
+
+        var loc = getPathLocation(document.treeId, nodes[0]);
+        getFiles(loc, document.treeId, nodes[0]);
     };
 
     var btn_add = document.getElementById('btn_add');
     var btn_remove = document.getElementById('btn_remove');
     var btn_rename = document.getElementById('btn_rename');
+    var btn_refresh = document.getElementById('btn_refresh');
     var btn_clone = document.getElementById('btn_clone');
     var btn_download = document.getElementById('btn_download');
 
@@ -310,5 +331,8 @@ var init_file_tools = function(){
     };
     btn_rename.onmousedown = function(){
         renameFile();
+    };
+    btn_refresh.onmousedown = function(){
+        refreshTree();
     };
 };

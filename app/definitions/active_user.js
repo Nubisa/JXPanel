@@ -274,7 +274,7 @@ exports.defineMethods = function(){
             return;
         }
 
-        if(!fs.existsSync(locTo)){
+        if(fs.existsSync(locTo)){
             server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileExists"), relogin:false, reloadTree:true});
             return;
         }
