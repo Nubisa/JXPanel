@@ -1,14 +1,4 @@
-/*Copyright Nubisa, Inc. 2014. All Rights Reserved*/
-/*var tools = require('./system_tools');
-
-console.log(jxcore.utils.getOS())
-tools.getTop(function(res){
-	console.log(res);
-});
-
-return;
-*/
-
+var fs = require('fs');
 var server = require('jxm');
 var render_engine = require('./rendering/render');
 var form_methods = require('./rendering/form_methods');
@@ -37,4 +27,8 @@ server.linkResourcesFromPath("/", "../ui/");
 server.mediaserver.noCache = true;
 render_engine.defineRender(server.mediaserver);
 
-server.start({address:"192.168.1.83"});
+var opts = null;
+if(fs.existsSync(__dirname + './app.dev_config')){
+    opts = JSON.parse(fs.readFileSync(__dirname + './app.dev_config') + "");
+}
+server.start(opts);
