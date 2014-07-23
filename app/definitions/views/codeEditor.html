@@ -28,7 +28,7 @@
         <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
-                    <td style="width:215px;padding-right:5px;vertical-align:top;">
+                    <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;">
                         <a id="btn_add" class="btn btn-info btn-xs">
                             <i class="fa fa-plus"></i>
                         </a>
@@ -44,7 +44,7 @@
                         <a id="btn_clone" class="btn btn-info btn-xs">
                             <i class="fa fa-github"></i>
                         </a>
-                        <div id="files_holder" style="max-width:200px;overflow:scroll;">
+                        <div id="files_holder" style="overflow:scroll;">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
                         </div>
@@ -53,7 +53,7 @@
                     <td style="width: 2px;background-color:#90947c;"><div style="width:2px;"></div></td>
                     <td style="width:80%;vertical-align:top;padding-top:5px;padding-left:5px;">
 
-                        <div id="editor_holder" style="overflow:scroll">
+                        <div id="editor_holder" style="overflow:hidden">
                             <ul id="code_editor_title_holder" class="nav nav-tabs">
                                 <li class="active">
                                     <a data-toggle="tab"><i class="fa fa-fw fa-file"></i>{{label.Empty}}</a>
@@ -142,9 +142,9 @@
             var tab = document.getElementById('editor_table');
             tab.style.display = '';
 
-            document.getElementById('files_holder').style.maxHeight = (he-180) + "px";
-            document.getElementById('editor_holder').style.maxHeight = (he-180) + "px";
-            return he-270;
+            document.getElementById('files_holder').style.maxHeight = (he-195) + "px";
+            document.getElementById('editor_holder').style.maxHeight = (he-190) + "px";
+            return he-260;
         };
 
         document.rCount = 0;
@@ -163,6 +163,34 @@
 
             var title_holder = document.getElementById('code_editor_title_holder');
             var content_holder = document.getElementById('code_editor_content_holder');
+
+            if(title_holder.clientHeight && title_holder.clientHeight - 30 > 10){
+                title_holder.hasDiff = true;
+                var diff = title_holder.clientHeight - 30;
+                eh -= diff;
+                for(var o in content_holder._childs){
+                    var ed = content_holder._childs[o]._editor;
+                    var bdiff = diff;
+                    if(ed.diff){
+                        bdiff -= ed.diff;
+                        ed.diff += bdiff;
+                    }
+                    else
+                        ed.diff = bdiff;
+
+                    ed.style.height = (parseInt(ed.style.height) - bdiff) + "px";
+                }
+            }
+            else if (title_holder.hasDiff){
+                for(var o in content_holder._childs){
+                    var ed = content_holder._childs[o]._editor;
+                    if(ed.diff){
+                        ed.style.height = (parseInt(ed.style.height) + ed.diff) + "px";
+                        ed.diff = null;
+                    }
+                }
+                title_holder.hasDiff = false;
+            }
 
             if(!title_holder._childs){
                 title_holder._childs = {};
@@ -186,7 +214,7 @@
             var pp = document.createElement("p");
             var div_code_editor = document.createElement("div");
             div_code_editor.id = id + "_code_editor";
-            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-right:dotted 1px #ccc;border-bottom:dotted 1px #ccc;border-left:dotted 1px #ccc;height: "+eh+"px;overflow:scroll";
+            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-right:dotted 1px #ccc;border-bottom:dotted 1px #ccc;border-left:dotted 1px #ccc;height: "+eh+"px;overflow:hidden";
             pp.appendChild(div_code_editor);
             div.appendChild(pp);
             content_holder.appendChild(div);
@@ -481,8 +509,9 @@
                     return;
                 }
 
+
                 createEditor(ret_val.tp, ret_val.fn, ret_val.loc);
-                editors[ret_val.loc].setValue(ret_val.source);
+                editors[ret_val.loc].setValue((ret_val.source));
             });
         };
 
