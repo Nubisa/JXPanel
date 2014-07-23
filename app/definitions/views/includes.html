@@ -75,6 +75,7 @@
             if (window.jxTemplateReadyForjxm) {
                 window.jxTemplateReadyForjxm();
             }
+            window.shadowWait = 0;
             window.toServer = function(a,b,c,shadow){
                 if(shadow){
                     var div = document.createElement("div");
@@ -88,9 +89,17 @@
                     div.innerHTML = str;
 
                     window.jx_cshadow = c;
+                    window.shadowWait++;
+                    if(window.jx_shadowdiv){
+                        window.jx_shadowdiv.parentNode.removeChild(window.jx_shadowdiv);
+                    }
                     window.jx_shadowdiv = div;
                     c = function(d,e){
-                        window.jx_shadowdiv.parentNode.removeChild(window.jx_shadowdiv);
+                        window.shadowWait--;
+                        if(window.shadowWait===0){
+                            window.jx_shadowdiv.parentNode.removeChild(window.jx_shadowdiv);
+                            window.jx_shadowdiv = null;
+                        }
                         window.jx_cshadow(d,e);
                     };
 

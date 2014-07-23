@@ -34,6 +34,9 @@
             <tbody >
             <tr>
                     <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;padding-top:2px">
+                        <a id="btn_refresh" class="jxbtn btn-info btn-xs">
+                            <i class="fa fa-refresh"></i>
+                        </a>
                         <a id="btn_add" class="jxbtn btn-info btn-xs">
                             <i class="fa fa-plus"></i>
                         </a>
@@ -409,7 +412,13 @@
 
             if(treeNode.children && treeNode.children.length){
                 zTree.jx_loading = true;
-                getFiles(loc, treeId, treeNode);
+
+                if(treeNode.children.length == 1 && treeNode.children[0].name == "{{label.Loading}}"){
+                    getFiles(loc, treeId, treeNode);
+                }
+                else{
+                    zTree.jx_loading = false;
+                }
             }else{
                 var _loc = loc.toLowerCase();
 
@@ -516,7 +525,7 @@
                         location.href = "/index.html";
                     }
                     if(ret_val.reloadTree){
-                        location.href = "/codeEditor.html";
+                        location.href = "/editor.html";
                     }
                     return;
                 }
