@@ -43,12 +43,13 @@ methods.tryLogin = function(env, params){
                 server.sendCallBack(env, {url: _url});
             };
 
+            // todo: for now only root is superuser of the panel
             params.isSudo = params.username === "root";
 
-            finish();
-            return;
+//            finish();
+//            return;
 
-            // if user was authenticated for linux, let's add him/her to db to obtain an ID
+            // if user was authenticated for linux, lets check if he is present in user_table
             dbcache.refresh(function(err) {
 
                 if (err) {
@@ -56,7 +57,7 @@ methods.tryLogin = function(env, params){
                     return;
                 }
 
-                var user = dbcache.Get(sqlite.user_table, { username : params.username });
+                var user = dbcache.Get(sqlite.user_table, { username: params.username});
                 if (user.rec && user.rec.length) {
                     // user exists
                     params.user_id = user.rec[0].ID;
@@ -66,25 +67,28 @@ methods.tryLogin = function(env, params){
 
 
                 if (user.rec.length === 0) {
-                    // first sudo login
 
-                    if (!dbcache.tables[sqlite.plan_table][0]) {
-                        server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotGetPlan")});
-                        return;
-                    }
-
-                    var unlimited_plan_id = dbcache.tables[sqlite.plan_table][0]["ID"];
-
-                    // user does not exist
-                    sqlite.User.AddNewOrUpdateAll(sqlite.db, { person_name : params.username, username : params.username, plan_table_id : unlimited_plan_id }, { insert: ["username"] },  function(err2, id) {
-                          if (err2) {
-                            server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotAddUser") + " " + err2});
-                        } else {
-                            params.user_id = id;
-                            finish();
-                            return;
-                        }
-                    });
+                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
+                    return;
+//                    // first sudo login
+//
+//                    if (!dbcache.tables[sqlite.plan_table][0]) {
+//                        server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotGetPlan")});
+//                        return;
+//                    }
+//
+//                    var unlimited_plan_id = dbcache.tables[sqlite.plan_table][0]["ID"];
+//
+//                    // user does not exist
+//                    sqlite.User.AddNewOrUpdateAll(sqlite.db, { person_name : params.username, username : params.username, plan_table_id : unlimited_plan_id }, { insert: ["username"] },  function(err2, id) {
+//                          if (err2) {
+//                            server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotAddUser") + " " + err2});
+//                        } else {
+//                            params.user_id = id;
+//                            finish();
+//                            return;
+//                        }
+//                    });
                 }
             });
         }

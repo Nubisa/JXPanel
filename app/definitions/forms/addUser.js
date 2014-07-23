@@ -50,14 +50,14 @@ exports.form = function () {
                 validation : new validations.Email()
             },
 
-            {
-                name: "person_subscriptions",
-                details: {
-                    label: "UserSubscriptionAccess",
-                    method: tool.createComboBox,
-                    options: { values: ["ALL"] }
-                }
-            },
+//            {
+//                name: "person_subscriptions",
+//                details: {
+//                    label: "UserSubscriptionAccess",
+//                    method: tool.createComboBox,
+//                    options: { values: ["ALL"] }
+//                }
+//            },
 
             {
                 name: "person_lang",
@@ -86,7 +86,7 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { required_insert: true, password: true, dont_update_null : true },
                     value_table: false,
-                    dbName : "none"
+                    dbTable : "none"
                 },
                 validation : new validations.String(5)
 //                convert : function(value) {
@@ -120,15 +120,15 @@ exports.form = function () {
                     if (!cb)
                         throw "Callback required.";
 
-//                    var where = { "user_owner_id" : active_user.user_id };
-                    var where = active_user.isSudo ? null : { "user_owner_id" : active_user.user_id };
-                    sqlite.Plan.Get(sqlite.db, where, function (err, rows) {
+                    sqlite.Plan.Get(sqlite.db, null, function (err, rows) {
                         if (err) {
                             cb(err)
                         } else {
                             var ret = [];
                             for(var a in rows) {
-                                ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
+                                if (active_user.checkHostingPlan.CanSeeRecord(sqlite.plan_table, rows[a])) {
+                                    ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
+                                }
                             }
                             cb(false, ret);
                         }
