@@ -37,4 +37,4 @@ server.linkResourcesFromPath("/", "../ui/");
 server.mediaserver.noCache = true;
 render_engine.defineRender(server.mediaserver);
 
-server.start();
+server.start({address:"192.168.1.83"});
