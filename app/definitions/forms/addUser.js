@@ -138,8 +138,9 @@ exports.form = function () {
                                 var display_name = dbcache.GetDisplayValue("plan_table_id", "@" + plan_id);
                                 ret.push({ id : '@' + plan_id.replace("@", ""), txt : display_name });
                             }
+                            active_user.checkHostingPlan.basicCheck();
                             for(var a in rows) {
-                                if (active_user.checkHostingPlan.CanSeeRecord(sqlite.plan_table, rows[a])) {
+                                if (active_user.checkHostingPlan.CanSeeRecord(sqlite.plan_table, rows[a], true)) {
                                     ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
                                 }
                             }

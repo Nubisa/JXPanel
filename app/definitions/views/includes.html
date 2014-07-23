@@ -73,9 +73,6 @@
     document.onjxready = function () {
         jxcore.Start(function (status) {
 
-            if (window.jxTemplateReadyForjxm) {
-                window.jxTemplateReadyForjxm();
-            }
             window.shadowWait = 0;
 
             window.toServer = function(a,b,c,shadow){

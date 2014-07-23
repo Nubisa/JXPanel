@@ -296,10 +296,13 @@ var HostingPlanCheck = function(active_user) {
     var _this = this;
 
     var _user = null;
-    // assigned plan to the user
+    // user's hosting plan, assigned by parent user
     var _plan = null;
-    // plans created in frame of assigned plan (_plan)
-    // it is json { ret : array of rows , ids : array of ids }
+    // parent's user hosting plan
+    var _parent_plan = null;
+
+    // plans created by active_user
+    // it's json { ret : array of rows , ids : array of ids }
     var _myPlans = null;
 
 
@@ -351,6 +354,21 @@ var HostingPlanCheck = function(active_user) {
 //        console.log("plan", _plan);
         _plan = plan.rec[0];
 
+        var parent_user = dbcache.GetAll(sqlite.user_table, { ID: _plan["user_owner_id"] });
+        // does not have to be
+        if (parent_user.err) {
+            return form_lang.Get(_this.active_user.lang, "DBCannotGetParentUser") + " " + parent_user.err;
+        }
+
+        if (parent_user.rec && parent_user.rec.length) {
+            var parent_plan = dbcache.GetAll(sqlite.plan_table, { ID: parent_user.rec[0]["plan_table_id"] });
+            if (parent_plan.err || !parent_plan.rec || !parent_plan.rec.length) {
+                return form_lang.Get(_this.active_user.lang, "DBCannotGetParentPlan") + " " + parent_plan.err;
+            }
+            _parent_plan = parent_plan.rec[0];
+        }
+
+
         _myPlans = dbcache.GetAll(sqlite.plan_table, { "user_owner_id": _user["ID"] });
         if (_myPlans.err) {
             return form_lang.Get(_this.active_user.lang, "DBCannotGetPlan") + " " + _myPlans.err;
@@ -395,26 +413,35 @@ var HostingPlanCheck = function(active_user) {
 
             var field = "plan_max_users";
 
-            if (!_plan[field] && _plan[field] + "" !== "0") {
-                // no limit for hosting plan
-                cb(false)
+            var max_users_parent = _parent_plan ? parseInt(_parent_plan[field]) : Number.MAX_VALUE;
+            if (isNaN(max_users_parent)) {
+                cb(form_lang.Get(_this.active_user.lang, "ValueInvalidIntegerOf", null, [field]));
                 return;
             }
 
-            var max_users = parseInt(_plan[field]);
+            var max_users = 0;
+
+            if (!_plan[field] && _plan[field] + "" !== "0") {
+                // no limit for hosting plan
+//                cb(false)
+//                return;
+                max_users = max_users_parent;
+            } else {
+                max_users = parseInt(_plan[field]);
+            }
 
             if (isNaN(max_users)) {
                 cb(form_lang.Get(_this.active_user.lang, "ValueInvalidIntegerOf", null, [field]));
                 return;
             }
 
-            if (max_users === 0) {
+            if (max_users === 0 || max_users_parent === 0) {
                 cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddUsers"));
                 return;
             }
 
-            // let's count, how many users this user has has
-            var users = dbcache.Get(sqlite.user_table, { "user_owner_id" : _user["ID"] });
+            // let's count, how many users this user has
+            var users = dbcache.GetAll(sqlite.user_table, { "plan_table_id" : _user["plan_table_id"] });
             if (users.err) {
                 cb(form_lang.Get(_this.active_user.lang, "DBCannotGetUser"));
                 return;
@@ -525,38 +552,39 @@ var HostingPlanCheck = function(active_user) {
 
 
     // only user, to which hosting plan belongs can edit the record (user_table, domain_table or plan_table)
-    this.CanEditRecord = function(form_id, cb) {
-
-        if (_this.active_user.isSudo) {
-            if (cb) cb(false);
-            return;
-        }
-
-        basicCheckWithRefresh(function(err) {
-            if (err){
-                cb(err);
-                return;
-            }
-
-            if (_plan["user_owner_id"] + "" !== _user["ID"] + "") {
-                cb(form_lang.Get(_this.active_user.lang, "CannotEditRecord"));
-                return;
-            }
-
-            cb(false);
-        });
-    };
+//    this.CanEditRecord = function(form_id, cb) {
+//
+//        if (_this.active_user.isSudo) {
+//            if (cb) cb(false);
+//            return;
+//        }
+//
+//        basicCheckWithRefresh(function(err) {
+//            if (err){
+//                cb(err);
+//                return;
+//            }
+//
+//            if (_plan["user_owner_id"] + "" !== _user["ID"] + "") {
+//                cb(form_lang.Get(_this.active_user.lang, "CannotEditRecord"));
+//                return;
+//            }
+//
+//            cb(false);
+//        });
+//    };
 
     // call this method only inside dbcache.refresh(cb) callback
     // returns true or false
-    this.CanSeeRecord = function (table_name_db, row) {
+    this.CanSeeRecord = function (table_name_db, row, dontRefresh) {
 
         if (_this.active_user.isSudo) {
             return true;
         }
 
         var ID = row["ID"];
-        _this.basicCheck();
+        if (!dontRefresh)
+            _this.basicCheck();
 
         var canSeePlan = function(user_table_row) {
 

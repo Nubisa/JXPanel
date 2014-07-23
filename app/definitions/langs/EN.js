@@ -190,7 +190,9 @@ exports.Labels = {
     "DBNotOpened" : "Database is not opened.",
     "DBCannotAddUser" : "Cannot add user to database.",
     "DBCannotGetUser" : "Cannot read user data from database.",
+    "DBCannotGetParentUser" : "Cannot read parent user data from database.",
     "DBCannotGetPlan" : "Cannot read hosting plan from database.",
+    "DBCannotGetParentPlan" : "Cannot read parent hosting plan from database.",
     "DBCannotReadData" : "Cannot read data from database.",
 
     // datatables
