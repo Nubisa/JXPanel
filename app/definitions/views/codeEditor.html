@@ -137,26 +137,22 @@
             delete(content_holder._childs[id]);
         };
 
-        function wndsize(){
-            var w = 0;var h = 0;
-//IE
+        function windowHeight(){
+            var h;
             if(!window.innerWidth){
                 if(!(document.documentElement.clientWidth == 0)){
-                    //strict mode
-                    w = document.documentElement.clientWidth;h = document.documentElement.clientHeight;
+                    h=document.documentElement.clientHeight;
                 } else{
-                    //quirks mode
-                    w = document.body.clientWidth;h = document.body.clientHeight;
+                    h=document.body.clientHeight;
                 }
             } else {
-                //w3c
-                w = window.innerWidth;h = window.innerHeight;
+                h = window.innerHeight;
             }
-            return {width:w,height:h};
+            return h;
         }
 
         var getDocHeight = function(){
-            var he = parseInt(wndsize().height) - 145;
+            var he = parseInt(windowHeight()) - 145;
 
             var ed_holder = document.getElementById('editor_holder');
 
