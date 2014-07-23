@@ -137,22 +137,8 @@
             delete(content_holder._childs[id]);
         };
 
-        function windowHeight(){
-            var h;
-            if(!window.innerWidth){
-                if(!(document.documentElement.clientWidth == 0)){
-                    h=document.documentElement.clientHeight;
-                } else{
-                    h=document.body.clientHeight;
-                }
-            } else {
-                h = window.innerHeight;
-            }
-            return h;
-        }
-
         var getDocHeight = function(){
-            var he = parseInt(windowHeight()) - 145;
+            var he = utils.getWindowHeight() - 145;
 
             var ed_holder = document.getElementById('editor_holder');
 
