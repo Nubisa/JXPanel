@@ -134,6 +134,8 @@
             var he = Math.max( body.scrollHeight, body.offsetHeight,
                     html.clientHeight, html.scrollHeight, html.offsetHeight );
 
+            var ed_holder = document.getElementById('editor_holder');
+
             var row = document.getElementById('editor_table_row');
             row.style.height = (he-150) + "px";
             row.style.overflow = 'hidden';
@@ -143,7 +145,8 @@
             tab.style.display = '';
 
             document.getElementById('files_holder').style.maxHeight = (he-195) + "px";
-            document.getElementById('editor_holder').style.maxHeight = (he-190) + "px";
+            ed_holder.style.maxHeight = (he-190) + "px";
+            ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
             return he-260;
         };
 
@@ -158,39 +161,41 @@
             }
         });
 
-        var createTab = function(id, title){
+        var tabsResize = function(){
             var eh = getDocHeight();
-
             var title_holder = document.getElementById('code_editor_title_holder');
             var content_holder = document.getElementById('code_editor_content_holder');
 
-            if(title_holder.clientHeight && title_holder.clientHeight - 30 > 10){
+            if(title_holder.clientHeight - 30 > 5){
                 title_holder.hasDiff = true;
                 var diff = title_holder.clientHeight - 30;
                 eh -= diff;
                 for(var o in content_holder._childs){
                     var ed = content_holder._childs[o]._editor;
-                    var bdiff = diff;
-                    if(ed.diff){
-                        bdiff -= ed.diff;
-                        ed.diff += bdiff;
-                    }
-                    else
-                        ed.diff = bdiff;
-
-                    ed.style.height = (parseInt(ed.style.height) - bdiff) + "px";
+                    ed.style.height = parseInt(eh) + "px";
+                }
+                for(var o in editors){
+                    editors[o].refresh();
                 }
             }
             else if (title_holder.hasDiff){
                 for(var o in content_holder._childs){
                     var ed = content_holder._childs[o]._editor;
                     if(ed.diff){
-                        ed.style.height = (parseInt(ed.style.height) + ed.diff) + "px";
-                        ed.diff = null;
+                        ed.style.height = (eh) + "px";
                     }
                 }
                 title_holder.hasDiff = false;
             }
+        };
+
+        var createTab = function(id, title){
+            var eh = getDocHeight();
+
+            var title_holder = document.getElementById('code_editor_title_holder');
+            var content_holder = document.getElementById('code_editor_content_holder');
+
+            setTimeout(tabsResize,1);
 
             if(!title_holder._childs){
                 title_holder._childs = {};
@@ -278,6 +283,8 @@
                     title_holder._childs[old].className = "active";
                     content_holder._childs[old].className = "tab-pane fade active in";
                 }
+
+                setTimeout(tabsResize,1);
 
                 return false;
             };
