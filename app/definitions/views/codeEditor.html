@@ -26,32 +26,34 @@
 <script src="/cm/addon/selection/active-line.js"></script>
 <link rel="stylesheet" href="/css/zTreeStyle.css" />
 
-<div class="note">{{label.CodeEditorTop}}</div>
+<div class="note" style="margin-bottom:4px;">{{label.CodeEditorTop}}</div>
 
-<div id="editor_table_row" class="row" style="padding-bottom:20px;">
-    <div class="col-sm-12">
+<a id="btn_refresh" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-refresh"></i>
+</a>
+<a id="btn_add" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-plus"></i>
+</a>
+<a id="btn_remove" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-times"></i>
+</a>
+<a id="btn_rename" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-pencil"></i>
+</a>
+<a id="btn_download" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-share-square-o "></i>
+</a>
+<a id="btn_clone" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-github"></i>
+</a>
+
+<div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
+    <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;">
         <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
-                    <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;padding-top:2px">
-                        <a id="btn_refresh" class="jxbtn btn-info btn-xs">
-                            <i class="fa fa-refresh"></i>
-                        </a>
-                        <a id="btn_add" class="jxbtn btn-info btn-xs">
-                            <i class="fa fa-plus"></i>
-                        </a>
-                        <a id="btn_remove" class="jxbtn btn-info btn-xs">
-                            <i class="fa fa-times"></i>
-                        </a>
-                        <a id="btn_rename" class="jxbtn btn-info btn-xs">
-                            <i class="fa fa-pencil"></i>
-                        </a>
-                        <a id="btn_download" class="jxbtn btn-info btn-xs">
-                            <i class="fa fa-share-square-o "></i>
-                        </a>
-                        <a id="btn_clone" class="jxbtn btn-info btn-xs">
-                            <i class="fa fa-github"></i>
-                        </a>
+                    <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;">
+
                         <div id="files_holder" style="overflow:scroll;margin-top:5px; border-top: 1px solid #90947c;">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
@@ -135,27 +137,43 @@
             delete(content_holder._childs[id]);
         };
 
-        var getDocHeight = function(){
-            var body = document.body;
-            var html = document.documentElement;
+        function wndsize(){
+            var w = 0;var h = 0;
+//IE
+            if(!window.innerWidth){
+                if(!(document.documentElement.clientWidth == 0)){
+                    //strict mode
+                    w = document.documentElement.clientWidth;h = document.documentElement.clientHeight;
+                } else{
+                    //quirks mode
+                    w = document.body.clientWidth;h = document.body.clientHeight;
+                }
+            } else {
+                //w3c
+                w = window.innerWidth;h = window.innerHeight;
+            }
+            return {width:w,height:h};
+        }
 
-            var he = Math.max( body.scrollHeight, body.offsetHeight,
-                    html.clientHeight, html.scrollHeight, html.offsetHeight );
+        var getDocHeight = function(){
+            var he = parseInt(wndsize().height) - 145;
 
             var ed_holder = document.getElementById('editor_holder');
 
             var row = document.getElementById('editor_table_row');
-            row.style.height = (he-150) + "px";
+            row.style.height = (he-20) + "px";
+            row.style.maxHeight = (he-20) + "px";
             row.style.overflow = 'hidden';
             document.getElementById('main').style.padding = "0px";
             document.getElementById('main').style.overflow = "hidden";
             var tab = document.getElementById('editor_table');
             tab.style.display = '';
 
-            document.getElementById('files_holder').style.maxHeight = (he-195) + "px";
-            ed_holder.style.maxHeight = (he-190) + "px";
+            document.getElementById('files_holder').style.maxHeight = (he-65) + "px";
+            ed_holder.style.maxHeight = (he-60) + "px";
             ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
-            return he-260;
+
+            return he-130;
         };
 
         document.rCount = 0;
@@ -164,7 +182,7 @@
             if(document.rCount===1){
                 setTimeout(function(){
                     document.rCount = 0;
-                    getDocHeight();
+                    tabsResize();
                 }, 1000);
             }
         });
@@ -175,25 +193,23 @@
             var content_holder = document.getElementById('code_editor_content_holder');
 
             if(title_holder.clientHeight - 30 > 5){
-                title_holder.hasDiff = true;
                 var diff = title_holder.clientHeight - 30;
                 eh -= diff;
                 for(var o in content_holder._childs){
                     var ed = content_holder._childs[o]._editor;
                     ed.style.height = parseInt(eh) + "px";
+                    ed.style.maxHeight = parseInt(eh) + "px";
                 }
                 for(var o in editors){
                     editors[o].refresh();
                 }
             }
-            else if (title_holder.hasDiff){
+            else{
                 for(var o in content_holder._childs){
                     var ed = content_holder._childs[o]._editor;
-                    if(ed.diff){
-                        ed.style.height = (eh) + "px";
-                    }
+                    ed.style.height = (eh) + "px";
+                    ed.style.maxHeight = (eh) + "px";
                 }
-                title_holder.hasDiff = false;
             }
         };
 
