@@ -50,14 +50,14 @@ exports.form = function () {
                 validation : new validations.Email()
             },
 
-            {
-                name: "person_subscriptions",
-                details: {
-                    label: "UserSubscriptionAccess",
-                    method: tool.createComboBox,
-                    options: { values: ["ALL"] }
-                }
-            },
+//            {
+//                name: "person_subscriptions",
+//                details: {
+//                    label: "UserSubscriptionAccess",
+//                    method: tool.createComboBox,
+//                    options: { values: ["ALL"] }
+//                }
+//            },
 
             {
                 name: "person_lang",
@@ -86,12 +86,12 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { required_insert: true, password: true, dont_update_null : true },
                     value_table: false,
-                    dbName : "password"
+                    dbTable : "none"
                 },
-                validation : new validations.String(5),
-                convert : function(value) {
-                    return crypto.createHash('md5').update(value).digest('hex').toString();
-                }
+                validation : new validations.String(5)
+//                convert : function(value) {
+//                    return crypto.createHash('md5').update(value).digest('hex').toString();
+//                }
             },
 
             {
@@ -102,24 +102,20 @@ exports.form = function () {
                     options: { required_insert: true, password: true, dont_update_null : true  },
                     dbTable: "none"
                 },
-                validation : new validations.Password("person_password"),
-                convert : function(value) {
-                    return crypto.createHash('md5').update(value).digest('hex').toString();
-                }
+                validation : new validations.Password("person_password")
+//                convert : function(value) {
+//                    return crypto.createHash('md5').update(value).digest('hex').toString();
+//                }
             },
 
-            { name: "user_plan_id",
+            { name: "plan_table_id",
                 details: {
                     label: "PlanID",
                     method: tool.createComboBox,
-                    options: { required: true, dynamic: true }
+                    options: { required: true, dynamic: true },
+                    dbTable : "main"
                 },
-                dbJoin : {
-                    otherTable : sqlite.Plan,
-                    otherTableID : "ID",
-                    otherTableValue : "plan_name"
-                },
-                dynamicValues : function(cb) {
+                dynamicValues : function(active_user, cb) {
 
                     if (!cb)
                         throw "Callback required.";
@@ -130,7 +126,9 @@ exports.form = function () {
                         } else {
                             var ret = [];
                             for(var a in rows) {
-                                ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
+                                if (active_user.checkHostingPlan.CanSeeRecord(sqlite.plan_table, rows[a])) {
+                                    ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
+                                }
                             }
                             cb(false, ret);
                         }

@@ -11,7 +11,7 @@ var counter = 1;
 
 // ########## table names
 
-var subscription_table = "subscription_table";
+//var subscription_table = "subscription_table";
 var plan_table = "plan_table";
 var user_table = "user_table";
 var domain_table = "domain_table";
@@ -30,13 +30,13 @@ exports.data_value_table = data_value_table;
 // ########## table definitions
 
 var tables = {};
-tables[subscription_table] = {
-    fields : {
-        "ID": { type: "CHAR(20)", required: true, primary: true },
-        "subscription_name": { type: "TEXT", required: true, unique: true},
-        "owner_user_ids": { type: "TEXT" }
-    }
-};
+//tables[subscription_table] = {
+//    fields : {
+//        "ID": { type: "CHAR(20)", required: true, primary: true },
+//        "subscription_name": { type: "TEXT", required: true, unique: true},
+//        "owner_user_ids": { type: "TEXT" }
+//    }
+//};
 
 tables[plan_table] = {
     fields : {
@@ -54,9 +54,8 @@ tables[user_table] = {
     fields : {
         "ID": { type: "CHAR(20)", required: true, primary: true},
         "plan_table_id": { type: "CHAR(20)", required: false },
-        "username": { type: "TEXT", required: true, unique: true},
-        "password": { type: "TEXT", required: true },
-        "user_owner_id" : { type: "CHAR(20)", required : true, notNull : true }
+        "username": { type: "TEXT", required: true, unique: true}
+//        "password": { type: "TEXT", required: true }
     },
     view : {
         name : "vUsers"
@@ -66,7 +65,7 @@ tables[user_table] = {
 tables[domain_table] = {
     fields : {
         "ID": { type: "CHAR(20)", required: true, primary: true },
-        "subscription_table_id": { type: "CHAR(20)", required: false },
+//        "plan_table_id": { type: "CHAR(20)", required: true },
         "domain_name": { type: "TEXT", required: true, unique: true },
         "user_owner_id" : { type: "CHAR(20)", required : true, notNull : true }
     },
@@ -722,7 +721,9 @@ var Table = function (table_name) {
                     }
                 }
 
-                exports.RunMultipleQueries(db_object, queries, cb);
+                exports.RunMultipleQueries(db_object, queries, function(err) {
+                    if (cb) cb(err, ID);
+                });
             });
         };
 

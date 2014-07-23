@@ -9,7 +9,6 @@ var fs = require('fs');
 var dbcache = require("./../db/dbcache");
 var sqlite = require("./../db/sqlite");
 
-exports.rootID = "1305444776609";
 
 var newUser = function(session_id){
     return {
@@ -33,6 +32,7 @@ exports.loginUser = function(sessionId, params){
 
     users[sessionId].nameTitle = params.username; // TODO change it!!!
 
+    users[sessionId].isSudo = params.isSudo;
     users[sessionId].user_id = params.user_id;
 
     users[sessionId].checkHostingPlan = new HostingPlanCheck(users[sessionId]);
@@ -296,10 +296,14 @@ var HostingPlanCheck = function(active_user) {
     var _this = this;
 
     var _user = null;
+    // assigned plan to the user
     var _plan = null;
+    // plans created in frame of assigned plan (_plan)
+    // it is json { ret : array of rows , ids : array of ids }
+    var _myPlans = null;
 
 
-    var basicCheck = function(cb) {
+    var basicCheckWithRefresh = function(cb) {
         dbcache.refresh(function(err) {
 
             if (!cb)
@@ -310,31 +314,53 @@ var HostingPlanCheck = function(active_user) {
                 return;
             }
 
-            if (_this.active_user.user_id === exports.rootID) {
-                cb(false);
-                return;
-            }
-
-            _user = dbcache.Get(sqlite.user_table, { ID : _this.active_user.user_id });
-            if (_user.err || !_user.ret) {
-                cb(form_lang.Get(_this.active_user.lang, "DBCannotGetUser") + " " + _user.err);
-                return;
-            }
-            console.log("user", _user);
-
-            if (!_user.ret["plan_table_id"]) {
-                cb(form_lang.Get(_this.active_user.lang, "NoPlan"));
-                return;
-            }
-
-            var _plan =  dbcache.Get("plan_table", { ID : _user.ret["plan_table_id"] });
-            console.log("plan", _plan);
-
+            var err = _this.basicCheck();
+            cb(err);
         });
     };
 
 
+    // returns false on success (which means err = false) or string error
+    // call this method only inside dbcache.refresh(cb) callback
+    this.basicCheck = function () {
+
+        if (_this.active_user.isSudo) {
+            return true;
+        }
+
+        var user = dbcache.GetAll(sqlite.user_table, { ID: _this.active_user.user_id });
+        if (user.err || !user.rec || !user.rec.length) {
+            return form_lang.Get(_this.active_user.lang, "DBCannotGetUser") + " " + user.err;
+        }
+        _user = user.rec[0];
+//        console.log("user", _user);
+
+        if (!_user["plan_table_id"]) {
+            return form_lang.Get(_this.active_user.lang, "NoPlan");
+        }
+
+        var plan = dbcache.GetAll(sqlite.plan_table, { ID: _user["plan_table_id"] });
+        if (plan.err || !plan.rec || !plan.rec.length) {
+            return form_lang.Get(_this.active_user.lang, "DBCannotGetPlan") + " " + plan.err;
+        }
+//        console.log("plan", _plan);
+        _plan = plan.rec[0];
+
+        _myPlans = dbcache.GetAll(sqlite.plan_table, { "user_owner_id": _user["ID"] });
+        if (_myPlans.err) {
+            return form_lang.Get(_this.active_user.lang, "DBCannotGetPlan") + " " + _myPlans.err;
+        }
+
+        return false;
+    };
+
+
     this.CanAddRecord = function(form_id, cb) {
+
+        if (_this.active_user.isSudo) {
+            if (cb) cb(false);
+            return;
+        }
 
         var method = null;
         if (form_id === "addUser") method = this.CanAddUser; else
@@ -350,17 +376,221 @@ var HostingPlanCheck = function(active_user) {
 
     this.CanAddUser = function(cb) {
 
-        basicCheck(function(err) {
+        basicCheckWithRefresh(function(err) {
             if (err){
                 cb(err);
                 return;
             }
 
-            // todo: check fo user limits
-            dbcache.Get(sqlite.data_value_table, {});
+            // if user does not have any plans - needs to add them first
+            if (!_myPlans.rec.length) {
+                cb(form_lang.Get(_this.active_user.lang, "NoPlanOwned"));
+                return;
+            }
+
+            var field = "plan_max_users";
+
+            if (!_plan[field] && _plan[field] + "" !== "0") {
+                // no limit for hosting plan
+                cb(false)
+                return;
+            }
+
+            var max_users = parseInt(_plan[field]);
+
+            if (isNaN(max_users)) {
+                cb(form_lang.Get(_this.active_user.lang, "ValueInvalidIntegerOf", null, [field]));
+                return;
+            }
+
+            if (max_users === 0) {
+                cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddUsers"));
+                return;
+            }
+
+            // let's count, how many users this user has has
+            var users = dbcache.Get(sqlite.user_table, { "user_owner_id" : _user["ID"] });
+            if (users.err) {
+                cb(form_lang.Get(_this.active_user.lang, "DBCannotGetUser"));
+                return;
+            }
+
+            if (users.rec.length >= max_users) {
+                cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddMoreUsers", null, [ max_users ]));
+                return;
+            }
 
             cb(false);
         });
+    };
+
+    this.CanAddPlan = function(cb) {
+
+        basicCheckWithRefresh(function(err) {
+            if (err){
+                cb(err);
+                return;
+            }
+
+            var field = "plan_max_plans";
+
+            if (!_plan[field] && _plan[field] + "" !== "0") {
+                // no limit for hosting plan
+                cb(false)
+                return;
+            }
+
+            var max_plans = parseInt(_plan[field]);
+
+            if (isNaN(max_plans)) {
+                cb(form_lang.Get(_this.active_user.lang, "ValueInvalidIntegerOf", null, [field]));
+                return;
+            }
+
+            if (max_plans === 0) {
+                cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddPlans"));
+                return;
+            }
+
+            if (_myPlans.rec.length >= max_plans) {
+                cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddMorePlans", null, [ max_plans ]));
+                return;
+            }
+
+            cb(false);
+        });
+
+
+    };
+
+    this.CanAddDomain = function(cb) {
+        basicCheckWithRefresh(function(err) {
+            if (err){
+                cb(err);
+                return;
+            }
+
+            var field = "plan_max_domains";
+
+            if (!_plan[field] && _plan[field] + "" !== "0") {
+                // no limit for hosting plan
+                cb(false)
+                return;
+            }
+
+            var max_domains = parseInt(_plan[field]);
+
+            if (isNaN(max_domains)) {
+                cb(form_lang.Get(_this.active_user.lang, "ValueInvalidIntegerOf", null, [field]));
+                return;
+            }
+
+            if (max_domains === 0) {
+                cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddDomains"));
+                return;
+            }
+
+            // let's count, how many domains this user  has
+            var domains = dbcache.Get(sqlite.domain_table, { "user_owner_id" : _user["ID"] });
+            if (domains.err) {
+                cb(form_lang.Get(_this.active_user.lang, "DBCannotGetUser"));
+                return;
+            }
+
+            if (domains.rec.length >= max_domains) {
+                cb(form_lang.Get(_this.active_user.lang, "PlanCannotAddMoreDomains", null, [ max_domains ]));
+                return;
+            }
+
+            cb(false);
+        });
+    };
+
+
+    // call this method only inside dbcache.refresh(cb) callback
+    this.GetRecords = function() {
+        var ret = {};
+        // keep this order
+        ret.err = this.basicCheck();
+        ret.user = _user;
+        ret.plan = _plan;
+        ret.myPlans = _myPlans;
+        return ret;
+    };
+
+
+    // only user, to which hosting plan belongs can edit the record (user_table, domain_table or plan_table)
+    this.CanEditRecord = function(form_id, cb) {
+
+        if (_this.active_user.isSudo) {
+            if (cb) cb(false);
+            return;
+        }
+
+        basicCheckWithRefresh(function(err) {
+            if (err){
+                cb(err);
+                return;
+            }
+
+            if (_plan["user_owner_id"] + "" !== _user["ID"] + "") {
+                cb(form_lang.Get(_this.active_user.lang, "CannotEditRecord"));
+                return;
+            }
+
+            cb(false);
+        });
+    };
+
+    // call this method only inside dbcache.refresh(cb) callback
+    // returns true or false
+    this.CanSeeRecord = function (table_name_db, row) {
+
+        if (_this.active_user.isSudo) {
+            return true;
+        }
+
+        var ID = row["ID"];
+        _this.basicCheck();
+
+        var canSeePlan = function(user_table_row) {
+            // plan which was given by parent user
+//            var allowedPlanIds = [ _plan["ID"] ];
+            var allowedPlanIds = [];
+            // now we add plans, which was created by current user
+            allowedPlanIds = allowedPlanIds.concat(_myPlans.ids);
+
+            if (user_table_row["ID"] == ID && allowedPlanIds.indexOf(user_table_row["plan_table_id"]) !== -1 )
+                return true;
+
+            return false;
+        };
+
+
+        if (table_name_db === sqlite.user_table) {
+
+            // user can see himself/herself
+            if (ID === _this.active_user.user_id)
+                return true;
+
+            return canSeePlan(row);
+        }
+
+
+        if (table_name_db === sqlite.plan_table || table_name_db === sqlite.domain_table) {
+
+            var owner_id = row["user_owner_id"];
+            // user can see his/her own records
+            if (owner_id === _this.active_user.user_id)
+                return true;
+
+            var ret = dbcache.Get(sqlite.user_table, { "ID" : owner_id }, true);
+            if (ret.err || !ret.rec || !ret.rec[owner_id])
+                return false;
+
+//            console.log("canseeplan");
+            return canSeePlan(ret.rec[owner_id]);
+        }
     };
 
 };
