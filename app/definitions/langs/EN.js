@@ -2,6 +2,7 @@ exports.Labels = {
     "Empty":"Empty",
     "Yes":"Yes",
     "No":"No",
+    "PleaseWait":"Please Wait",
     "Apply":"Apply",
     "Cancel":"Cancel",
     "Save":"Save",
