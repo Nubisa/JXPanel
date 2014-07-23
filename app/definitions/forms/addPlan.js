@@ -63,20 +63,32 @@ exports.form = function () {
                 }
             },
 
+            {
+                name: "user_owner_id",
+                details: {
+                    label: "Username",
+                    method: null,
+                    options: { },
+                    dbTable : "main"
+                }
+            },
+
             { name: "plan_overuse",
                 details: {
                     label: "Overuse",
                     method: tool.createCheckBox,
-                    options: { },
-                    validation: new validations.Boolean()
-                }
+                    options: { }
+//                    displayAs : { true : "Allow", false : "Disallow" }
+                },
+                validation: new validations.Boolean()
             },
 
             { name: "plan_disk_space",
                 details: {
                     label: "MaxDiskSpace",
                     method: tool.createTextBox,
-                    options: { suffix: " MB"}
+                    options: { suffix: " MB"},
+                    nullDisplayAs : "ValueUnlimited"
                 },
                 validation: new validations.Int( { gte : 0})
             },
@@ -85,25 +97,30 @@ exports.form = function () {
                 details: {
                     label: "MaxTraffic",
                     method: tool.createTextBox,
-                    options: { suffix: " MB/month"}
-                }
-//                validation : new validations.Int( { gte : 0 })
+                    options: { suffix: " MB/month"},
+                    nullDisplayAs : "ValueUnlimited"
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
             { name: "plan_memory",
                 details: {
                     label: "MaxMemory",
                     method: tool.createTextBox,
-                    options: { }
-                }
+                    options: { },
+                    nullDisplayAs : "ValueUnlimited"
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
             { name: "plan_cpu",
                 details: {
                     label: "MaxCPU",
                     method: tool.createTextBox,
-                    options: { }
-                }
+                    options: { },
+                    nullDisplayAs : "ValueUnlimited"
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
             { name: "plan_cpu_interval",
@@ -111,15 +128,18 @@ exports.form = function () {
                     label: "MaxCPUInterval",
                     method: tool.createTextBox,
                     options: { }
-                }
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
-            { name: "plan_domain_count",
+            { name: "plan_max_domains",
                 details: {
                     label: "MaxDomains",
                     method: tool.createTextBox,
-                    options: { }
-                }
+                    options: { },
+                    nullDisplayAs : "ValueUnlimited"
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
             { name: "plan_ssl",
@@ -181,9 +201,21 @@ exports.form = function () {
             { name: "plan_max_users",
                 details: {
                     label: "MaxUsers",
-                    method: tool.createCheckBox,
-                    options: {  }
-                }
+                    method: tool.createTextBox,
+                    options: {  },
+                    nullDisplayAs : "ValueUnlimited"
+                },
+                validation: new validations.Int( { gte : 0})
+            },
+
+            { name: "plan_max_plans",
+                details: {
+                    label: "MaxPlans",
+                    method: tool.createTextBox,
+                    options: {  },
+                    nullDisplayAs : "ValueUnlimited"
+                },
+                validation: new validations.Int( { gte : 0})
             },
 
             // do not remove this yet, may be useful

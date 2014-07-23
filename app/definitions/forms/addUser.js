@@ -86,12 +86,12 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { required_insert: true, password: true, dont_update_null : true },
                     value_table: false,
-                    dbName : "password"
+                    dbName : "none"
                 },
-                validation : new validations.String(5),
-                convert : function(value) {
-                    return crypto.createHash('md5').update(value).digest('hex').toString();
-                }
+                validation : new validations.String(5)
+//                convert : function(value) {
+//                    return crypto.createHash('md5').update(value).digest('hex').toString();
+//                }
             },
 
             {
@@ -102,29 +102,27 @@ exports.form = function () {
                     options: { required_insert: true, password: true, dont_update_null : true  },
                     dbTable: "none"
                 },
-                validation : new validations.Password("person_password"),
-                convert : function(value) {
-                    return crypto.createHash('md5').update(value).digest('hex').toString();
-                }
+                validation : new validations.Password("person_password")
+//                convert : function(value) {
+//                    return crypto.createHash('md5').update(value).digest('hex').toString();
+//                }
             },
 
-            { name: "user_plan_id",
+            { name: "plan_table_id",
                 details: {
                     label: "PlanID",
                     method: tool.createComboBox,
-                    options: { required: true, dynamic: true }
+                    options: { required: true, dynamic: true },
+                    dbTable : "main"
                 },
-                dbJoin : {
-                    otherTable : sqlite.Plan,
-                    otherTableID : "ID",
-                    otherTableValue : "plan_name"
-                },
-                dynamicValues : function(cb) {
+                dynamicValues : function(active_user, cb) {
 
                     if (!cb)
                         throw "Callback required.";
 
-                    sqlite.Plan.Get(sqlite.db, null, function (err, rows) {
+//                    var where = { "user_owner_id" : active_user.user_id };
+                    var where = active_user.isSudo ? null : { "user_owner_id" : active_user.user_id };
+                    sqlite.Plan.Get(sqlite.db, where, function (err, rows) {
                         if (err) {
                             cb(err)
                         } else {

@@ -123,6 +123,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
         var name = controls[i].name;
         var ctrl = controls[i].details;
+        if (!ctrl.method)
+            continue;
 
         var dbname = ctrl.dbName ? ctrl.dbName : name;
         var val = edits && edits[dbname] ? edits[dbname] : null;

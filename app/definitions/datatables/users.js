@@ -8,7 +8,7 @@ var path = require("path");
 
 
 exports.settings = {
-    columns :[ "_checkbox", "_id", "person_name", "person_email", "person_username" , "user_owner_id"],
+    columns :[ "_checkbox", "_id", "person_name", "person_email", "person_username", "plan_table_id"],
     dbTable : sqlite.User,
     addForm : "addUser",
     addFormURL : "adduser.html"

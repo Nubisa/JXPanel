@@ -51,7 +51,7 @@ exports.Labels = {
     // login page
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
-    "Username" : "User Name",
+    "Username" : "System user name",
     "UsernameEnter" : "Please enter your username",
     "UsernameEnterRequired" : "Please enter valid username",
 
@@ -88,6 +88,9 @@ exports.Labels = {
     "ValueInvalid" : "The value for the field is invalid.",
     "ValueInvalidBoolean" : "The value is supposed to be boolean.",
     "ValueInvalidInteger" : "The value is supposed to be integer.",
+    "ValueInvalidIntegerOf" : "The value of %s is supposed to be integer.",
+    "ValueNotDefined" : "not defined",
+    "ValueUnlimited" : "unlimited",
 
     "RequiresMinimumLength": "Minimum string length for this control must be %s.",
     "RequiresMaximumLength": "Maximum string length for this control must be %s.",
@@ -135,17 +138,17 @@ exports.Labels = {
     "PlanID" : "Hosting Plan",
     "Overuse" : "Allow overuse",
     "MaxDiskSpace" : "Disk space",
-    "MaxDiskSpace_Description" : "Maximum disk usage. Value 0 disables the limit.",
+    "MaxDiskSpace_Description" : "Maximum disk usage. Empty value disables the limit.",
     "MaxTraffic" : "Traffic",
-    "MaxTraffic_Description" : "Maximum amount of transferred data during given period of time. Value 0 disables the limit.",
+    "MaxTraffic_Description" : "Maximum amount of transferred data during given period of time. Empty value disables the limit.",
     "MaxCPU" : "Max CPU",
-    "MaxCPU_Description" : "Maximum CPU usage (percentage) allowed for the application. Value 0 disables the limit.",
+    "MaxCPU_Description" : "Maximum CPU usage (percentage) allowed for the application. Empty value disables the limit.",
     "MaxCPUInterval" : "CPU check interval",
     "MaxCPUInterval_Description" : "Interval (seconds) of Max CPU usage check. Default value is 2.",
-    "MaxMemory" : "Maximum memory limit",
-    "MaxMemory_Description" : "Maximum size of memory (kB), which can be allocated by the application. Value 0 disables the limit.",
-    "MaxDomains" : "Domains",
-    "MaxDomains_Description" : "Maximum amount of domains. Value 0 disables the limit.",
+    "MaxMemory" : "Max memory limit",
+    "MaxMemory_Description" : "Maximum size of memory (kB), which can be allocated by the application. Empty value disables the limit.",
+    "MaxDomains" : "Max domains",
+    "MaxDomains_Description" : "Maximum amount of domains. Empty value disables the limit.",
     "AllowSSL" : "Allow secured SSL port",
     "AllowCustomSocketPort" : "Allow custom socket port",
     "AllowSysExec" : "Allow to spawn/exec child processes",
@@ -154,8 +157,10 @@ exports.Labels = {
     "AppLogWebAccess_Description" : "Will be available on http://yourdomain.com/jxcore_logs/index.txt",
     "AllowSSH" : "SSH",
     "NginxDirectives" : "NGINX directives",
-    "MaxUsers" : "Users",
-    "MaxUsers_Description" : "Maximum amount of users. Value 0 disables the limit.",
+    "MaxUsers" : "Max users",
+    "MaxUsers_Description" : "Maximum amount of users. Empty value disables the limit.",
+    "MaxPlans" : "Max plans",
+    "MaxPlans_Description" : "Maximum amount of hosting plans. Empty value disables the limit.",
 
     "DomainName" : "Domain",
     "DomainName_Description" : "The domain name for you subscription.",
@@ -163,6 +168,15 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
 
     "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
+    "NoPlanOwned" : "You have no hosting plan. Please add one.",
+    "PlanCannotAddUsers" : "This hosting plan does not allow to add any users.",
+    "PlanCannotAddMoreUsers" : "This hosting plan does not allow to add more than %s users.",
+    "PlanCannotAddDomains" : "This hosting plan does not allow to add any domains.",
+    "PlanCannotAddMoreDomains" : "This hosting plan does not allow to add more than %s domains.",
+    "PlanCannotAddPlans" : "This hosting plan does not allow to add any other hosting plans.",
+    "PlanCannotAddMorePlans" : "This hosting plan does not allow to add more than %s hosting plans.",
+
+    "CannotEditRecord" : "You cannot edit this record.",
 
 
     "testForm": "Test Form",
@@ -172,7 +186,8 @@ exports.Labels = {
     "DBNotOpened" : "Database is not opened.",
     "DBCannotAddUser" : "Cannot add user to database.",
     "DBCannotGetUser" : "Cannot read user data from database.",
-    "DBCannotReadData" : "Cannot read data from database",
+    "DBCannotGetPlan" : "Cannot read hosting plan from database.",
+    "DBCannotReadData" : "Cannot read data from database.",
 
     // datatables
     "UnknownDataTable" : "Unknown table name.",

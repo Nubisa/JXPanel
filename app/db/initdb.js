@@ -67,6 +67,19 @@ var go = function() {
         var mod = require(fname);
         var form = mod.form();
         createFields(sqlite.db, sqlite.Domain, form.controls);
+
+        setTimeout(function() {
+            var json = { plan_name : "Unlimited", "user_owner_id" : "root" };
+            sqlite.Plan.AddNewOrUpdateAll(sqlite.db, json, { insert : ["plan_name"], update: ["ID"]}, function(err) {
+                if (err) {
+                    console.log("Cannot add plan", err);
+                } else {
+                    console.log("Plan 'Unlimited' Added");
+                }
+            });
+        }, 2000);
+
+
     } else {
         if (Date.now() - start < 2000) {
             setTimeout(go, 50);

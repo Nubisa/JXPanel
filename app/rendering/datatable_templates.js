@@ -33,18 +33,19 @@ var getData = function(active_user, table, json, cb) {
         return;
     }
 
-    // limiting records available only for logged user
-    if (active_user.user_id !== _active_user.rootID ) {
-        json = json || {};
-        json.user_owner_id = active_user.user_id;
-    }
 
-    table.settings.dbTable.GetAll(sqlite.db, json, function(err, rows) {
-        if (err)
-            cb(err)
+    dbcache.refresh(function(err) {
+        if (err) {
+            cb(err);
+            return;
+        }
+
+        var ret = dbcache.GetAll(table.settings.dbTable.table_name, json);
+        if (ret.err)
+            cb(ret.err)
         else {
-//            console.log("getData rows", rows);
-            cb(false, rows);
+//            console.log("getData rows", ret);
+            cb(false, ret.rec);
         }
     });
 };
@@ -62,6 +63,7 @@ var getForm = function(table) {
 var getHTML = function (active_user, table, cb) {
 
     var columns = table.settings.columns;
+    var table_name_db = table.settings.dbTable.table_name;
     var form = getForm(table);
 
     if (!form) {
@@ -90,11 +92,12 @@ var getHTML = function (active_user, table, cb) {
             return;
         }
 
-
         var ret = [];
         ret.push([]);
 
         var dbNames = {};
+        var plans = dbcache.Get(sqlite.plan_table, null, true).rec;
+        var users = dbcache.Get(sqlite.user_table, null, true).rec;
         // searching for display names and dbNames of controls
         for (var a in columns) {
             var displayName = columns[a];
@@ -111,23 +114,42 @@ var getHTML = function (active_user, table, cb) {
 
         for (var y = 0, len = rows.length; y < len; y++) {
 
+            var ID = rows[y]["ID"];
+            if (!active_user.checkHostingPlan.CanSeeRecord(table_name_db, rows[y]))
+                continue;
+
             var single_row = [];
             for (var x in columns) {
                 var colName = dbNames[columns[x]] || columns[x];
-                var val = '<a href="#" onclick="jxEditRow(\''+  rows[y]["ID"] +'\'); return false;">' + rows[y][colName] + '</a>';
-                if (colName === "_checkbox")
-                    val = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
-                else if (colName === "_id")
-                    val = y + 1;
+                var val = rows[y][colName];
 
-                single_row.push(val);
+                // replacement of id value into display name value
+                if (colName === "plan_table_id" && plans && plans[val]) {
+                    val = plans[val]["plan_name"];
+                } else
+                if (colName === "user_owner_id" && users && users[val]) {
+                    val = users[val]["username"];
+                }
+
+                // null/undefined value replacement into display value
+                if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
+                    if (!val && val != 0 && val !== false)
+                        val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
+                }
+
+                var str  = '<a href="#" onclick="jxEditRow(\''+  rows[y]["ID"] +'\'); return false;">' + val + '</a>';
+                if (colName === "_checkbox")
+                    str = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
+                else if (colName === "_id")
+                    str = y + 1;
+
+                single_row.push(str);
             }
             ret.push(single_row);
         }
 
         var html = exports.getDataTable(ret);
         cb(false, html);
-
     });
 };
 
@@ -266,7 +288,7 @@ exports.edit = function (sessionId, table_name, id, cb) {
         return;
     }
 
-    getData(active_user, table, { id : id }, function(err, rows) {
+    getData(active_user, table, { ID : id }, function(err, rows) {
         if (!err) {
 
             if (rows.length > 0) {

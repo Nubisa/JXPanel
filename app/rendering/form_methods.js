@@ -7,6 +7,7 @@ var server = require('jxm');
 var pam = require('authenticate-pam');
 var methods = {};
 var sqlite = require("./../db/sqlite.js");
+var dbcache = require("./../db/dbcache.js");
 var crypto = require('crypto');
 
 var checkUser = function(env){
@@ -42,29 +43,54 @@ methods.tryLogin = function(env, params){
                 server.sendCallBack(env, {url: _url});
             };
 
-            // todo: remove nubisa_krzs
-            if (params.username == "root" || params.username == "nubisa_krzs") {
-                params.user_id = _active_user.rootID;
-                finish();
-                return;
-            }
+            params.isSudo = params.username === "root";
+
+//            if (params.isSudo) {
+//                finish();
+//                return;
+//            }
 
             // if user was authenticated for linux, let's add him/her to db to obtain an ID
-            sqlite.User.Get(sqlite.db, { username : params.username }, function(err, rows) {
+
+            dbcache.refresh(function(err) {
 
                 if (err) {
-                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotGetUser") + " " + err });
-                } else {
-                    if (rows && rows.length) {
-                        params.user_id = rows[0].ID;
-                        finish();
+                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotReadData") + " " + err });
+                    return;
+                }
+
+                var user = dbcache.Get(sqlite.user_table, { username : params.username });
+                if (user.rec && user.rec.length) {
+                    // user exists
+                    params.user_id = user.rec[0].ID;
+                    finish();
+                    return;
+                }
+
+
+                if (user.rec.length === 0) {
+                    // first sudo login
+
+                    if (!dbcache.tables[sqlite.plan_table][0]) {
+                        server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotGetPlan")});
                         return;
                     }
 
-                    finish();
+                    var unlimited_plan_id = dbcache.tables[sqlite.plan_table][0]["ID"];
+
+                    // user does not exist
+                    sqlite.User.AddNewOrUpdateAll(sqlite.db, { person_name : params.username, username : params.username, plan_table_id : unlimited_plan_id }, { insert: ["username"] },  function(err2, id) {
+                          if (err2) {
+                            server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotAddUser") + " " + err2});
+                        } else {
+                            params.user_id = id;
+                            finish();
+                            return;
+                        }
+                    });
+
                 }
             });
-
         }
     });
 };
@@ -292,7 +318,7 @@ methods.getControlsValues = function(env, params) {
     for(var a in activeInstance.controls) {
         if (activeInstance.controls[a].name && activeInstance.controls[a].name === params.control && activeInstance.controls[a].dynamicValues) {
             found = true;
-            activeInstance.controls[a].dynamicValues(function(err, ret) {
+            activeInstance.controls[a].dynamicValues(active_user, function(err, ret) {
                 server.sendCallBack(env, {err : false, values : ret, control : params.control } );
             });
         }
