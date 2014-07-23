@@ -58,7 +58,7 @@ methods.tryLogin = function(env, params){
                     return;
                 }
 
-                var user = dbcache.Get(sqlite.user_table);
+                var user = dbcache.Get(sqlite.user_table, {username : params.username });
                 if (user.rec && user.rec.length) {
                     // user exists
                     params.user_id = user.rec[0].ID;
@@ -67,7 +67,7 @@ methods.tryLogin = function(env, params){
                 }
 
 
-                if (user.rec.length === 0) {
+                if (dbcache.tables[sqlite.user_table].length === 0) {
 
                     // first sudo login
 

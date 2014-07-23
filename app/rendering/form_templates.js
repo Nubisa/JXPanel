@@ -133,6 +133,9 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             ctrl.options.extra = { formName : formName, isUpdate : !!edits };
             if (ctrl.options.password && edits)
                 val = null;
+
+            if (ctrl.userCannotEditOwnRecord && edits && edits["ID"] === active_user.user_id)
+                ctrl.options.extra.noEditDisplayValue =  edits[dbname + "|display"] ? edits[dbname + "|display"] : val;
         }
 //        console.error("val for", dbname, ":", val);
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
