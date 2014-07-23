@@ -145,6 +145,15 @@ exports.GetAll = function(table_name, json) {
                 ret.rec[rowID][field_name] = table[i]["value"];
             }
         }
+
+        // also for domain_table, we add plan_table_id
+        if (table_name == sqlite.domain_table) {
+            var user_owner_id = ret.rec[rowID]["user_owner_id"];
+            var users = exports.Get(sqlite.user_table, { ID : user_owner_id });
+            if (!users.err && users.rec && users.rec.length) {
+                ret.rec[rowID]["plan_table_id"] = users.rec[0]["plan_table_id"];
+            }
+        }
     }
 
 //    console.log("GetAll", json, ret);
