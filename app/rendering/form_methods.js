@@ -45,13 +45,10 @@ methods.tryLogin = function(env, params){
 
             params.isSudo = params.username === "root";
 
-//            if (params.isSudo) {
-//                finish();
-//                return;
-//            }
+            finish();
+            return;
 
             // if user was authenticated for linux, let's add him/her to db to obtain an ID
-
             dbcache.refresh(function(err) {
 
                 if (err) {
@@ -88,7 +85,6 @@ methods.tryLogin = function(env, params){
                             return;
                         }
                     });
-
                 }
             });
         }
