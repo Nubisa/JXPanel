@@ -28,7 +28,8 @@ server.mediaserver.noCache = true;
 render_engine.defineRender(server.mediaserver);
 
 var opts = null;
-if(fs.existsSync(__dirname + './app.dev_config')){
-    opts = JSON.parse(fs.readFileSync(__dirname + './app.dev_config') + "");
+
+if(fs.existsSync(__dirname + '/app.dev_config')){
+    opts = JSON.parse(fs.readFileSync(__dirname + '/app.dev_config') + "");
 }
 server.start(opts);
