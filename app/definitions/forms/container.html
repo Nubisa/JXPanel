@@ -57,7 +57,7 @@
                 }
 
                 if(!failed){
-                    jxcore.Call('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
+                    window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
 
                         if (param.arr) {
                             for(var o in param.arr){
@@ -66,7 +66,7 @@
                         } else {
                             document.location = "{{form.onSubmitSuccess}}";
                         }
-                    });
+                    }, true);
                 }
             },
 
