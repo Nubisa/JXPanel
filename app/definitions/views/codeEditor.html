@@ -351,7 +351,7 @@
                 btn._eid = eid;
                 btn.onclick = function(){
                     var _this = this;
-                    jxcore.Call("saveFile", {up:this._location, src:escape(editors[this._location].getValue().replace(/\n/g,"\\n"))}, function(ret_val){
+                    jxcore.Call("saveFile", {up:this._location, src:editors[this._location].getValue()}, function(ret_val){
                         if(ret_val.err){
                             alert(ret_val.err);
                             if(ret_val.relogin){

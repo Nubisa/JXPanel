@@ -6,6 +6,8 @@ var charts = require('./definitions/charts/charts');
 var site_defaults = require('./definitions/site_defaults');
 var _active_users = require('./definitions/active_user');
 
+require('http').setMaxHeaderLength(0);
+
 server.setApplication("JXPanel", "/", "NUBISA_JX_PANEL_2014");
 
 server.setConfig("consoleInfo", true);
