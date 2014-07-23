@@ -96,8 +96,6 @@ var getHTML = function (active_user, table, cb) {
         ret.push([]);
 
         var dbNames = {};
-        var plans = dbcache.Get(sqlite.plan_table, null, true).rec;
-        var users = dbcache.Get(sqlite.user_table, null, true).rec;
         // searching for display names and dbNames of controls
         for (var a in columns) {
             var displayName = columns[a];
@@ -112,6 +110,7 @@ var getHTML = function (active_user, table, cb) {
             ret[0].push(displayName);
         }
 
+        var cnt = 1;
         for (var y = 0, len = rows.length; y < len; y++) {
 
             var ID = rows[y]["ID"];
@@ -119,20 +118,15 @@ var getHTML = function (active_user, table, cb) {
                 continue;
 
             var single_row = [];
+
+            if (ID === active_user.user_id)
+                single_row["_class"] = "success";
+
             for (var x in columns) {
                 var colName = dbNames[columns[x]] || columns[x];
                 var val = rows[y][colName];
 
-                // replacement of id value into display name value
-                if (colName === "plan_table_id") {
-                    if (val.slice(0,1) === "@")
-                        val = form_lang.Get(active_user.lang, "PlanDefaultInherited", true);
-                    else if (plans && plans[val])
-                        val = plans[val]["plan_name"];
-                } else
-                if (colName === "user_owner_id" && users && users[val]) {
-                    val = users[val]["username"];
-                }
+                val = dbcache.GetDisplayValue(colName, val);
 
                 // null/undefined value replacement into display value
                 if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
@@ -144,7 +138,7 @@ var getHTML = function (active_user, table, cb) {
                 if (colName === "_checkbox")
                     str = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
                 else if (colName === "_id")
-                    str = y + 1;
+                    str = cnt++;
 
                 single_row.push(str);
             }
@@ -179,7 +173,14 @@ exports.getDataTable = function(rows) {
                 thead.push("<td>" + cols[colID] + "</td>")
             }
         } else {
-            tbody.push("<tr>");
+            var _class = rows[rowID]["_class"] || "";
+            if (!_class)
+                tbody.push('<tr>')
+            else {
+                tbody.push('<tr class="' + _class +'">');
+                delete rows[rowID]["_class"];
+            }
+
             for(var colID in rows[rowID]) {
                 tbody.push("<td>" + rows[rowID][colID] + "</td>");
             }
@@ -295,6 +296,15 @@ exports.edit = function (sessionId, table_name, id, cb) {
         if (!err) {
 
             if (rows.length > 0) {
+
+                //remembering display name of ID values
+                for(var field_name in rows[0]) {
+                    var val = rows[0][field_name];
+                    var display_name = dbcache.GetDisplayValue(field_name, val);
+                    if (display_name !== val)
+                        rows[0][field_name + "|display"] = display_name;
+                }
+
                 active_user.session.edits = active_user.session.edits || {};
                 active_user.session.edits[table.settings.addForm] = rows[0];
 

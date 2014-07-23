@@ -114,7 +114,8 @@ exports.form = function () {
                     label: "PlanID",
                     method: tool.createComboBox,
                     options: { required: true, dynamic: true },
-                    dbTable : "main"
+                    dbTable : "main",
+                    userCannotEditOwnRecord : true
                 },
                 dynamicValues : function(active_user, cb) {
 
@@ -133,7 +134,9 @@ exports.form = function () {
 
                             if (!active_user.isSudo) {
                                 // adding alias for hosting plan given to current user by parent user
-                                ret.push({ id : '@' + basicRecords.user["plan_table_id"].replace("@", ""), txt : form_lang.Get(active_user.lang, "PlanDefaultInherited", true) });
+                                var plan_id = basicRecords.user["plan_table_id"];
+                                var display_name = dbcache.GetDisplayValue("plan_table_id", "@" + plan_id);
+                                ret.push({ id : '@' + plan_id.replace("@", ""), txt : display_name });
                             }
                             for(var a in rows) {
                                 if (active_user.checkHostingPlan.CanSeeRecord(sqlite.plan_table, rows[a])) {

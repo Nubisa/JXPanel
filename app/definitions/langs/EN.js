@@ -14,6 +14,7 @@ exports.Labels = {
     "Account":"Account",
     "Home":"Home",
     "Form":"Form",
+    "Default" : "Default",
 
     "serverManagement":"Server Management",
     "help":"Help",

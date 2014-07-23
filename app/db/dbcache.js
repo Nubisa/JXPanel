@@ -37,6 +37,7 @@ exports.refresh = function(cb) {
 
 
 // gets from single table the record/records which fits json criteria
+// should be called only within dbcache.refresh(cb) callback!
 exports.Get = function(table_name, json, asDict) {
     var ret = { err : false, rec : null};
     var tables = exports.tables;
@@ -102,6 +103,7 @@ exports.Get = function(table_name, json, asDict) {
       ... other fields,
      }
  */
+// should be called only within dbcache.refresh(cb) callback!
 exports.GetFields = function(table_name) {
     var tables = exports.tables;
 
@@ -118,6 +120,7 @@ exports.GetFields = function(table_name) {
 
 
 // gets from single table (main table and also data_value_table) the record/records which fits json criteria
+// should be called only within dbcache.refresh(cb) callback!
 exports.GetAll = function(table_name, json) {
 
     var ret = exports.Get(table_name, json);
@@ -148,5 +151,28 @@ exports.GetAll = function(table_name, json) {
     return ret;
 };
 
+// replacement of id value into display name value
+exports.GetDisplayValue = function(column_name, val) {
 
-exports.Get
+    var tables = exports.tables;
+
+    var plans = exports.Get(sqlite.plan_table, null, true).rec;
+    var users = exports.Get(sqlite.user_table, null, true).rec;
+
+
+    if (column_name === "plan_table_id") {
+        if (val.slice(0,1) === "@") {
+            var display_value = exports.GetDisplayValue(column_name, val.slice(1));
+            return display_value.indexOf("Default (") === -1 ?  "Default (" + display_value + ")" : display_value;
+        }
+
+        if (plans && plans[val])
+            return plans[val]["plan_name"];
+    }
+
+    if (column_name === "user_owner_id" && users && users[val]) {
+        return users[val]["username"];
+    }
+
+    return val;
+};

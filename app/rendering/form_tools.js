@@ -104,6 +104,11 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
 
     var id = jxcore.utils.uniqueId();
 
+    if (options && options.extra && options.extra.noEditDisplayValue) {
+        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div';
+        return {html: _html + v + "</div></div>", js: ""};
+    }
+
     _html += '<select class="form-control" id="a'+id+'"><option>'+form_lang.Get(lang, "ComboNotSelected")+'</option>';
 
     if(options && options.values){

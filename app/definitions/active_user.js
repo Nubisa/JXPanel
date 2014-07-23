@@ -388,10 +388,10 @@ var HostingPlanCheck = function(active_user) {
             }
 
             // if user does not have any plans - needs to add them first
-            if (!_myPlans.rec.length) {
-                cb(form_lang.Get(_this.active_user.lang, "NoPlanOwned"));
-                return;
-            }
+//            if (!_myPlans.rec.length) {
+//                cb(form_lang.Get(_this.active_user.lang, "NoPlanOwned"));
+//                return;
+//            }
 
             var field = "plan_max_users";
 
@@ -556,13 +556,18 @@ var HostingPlanCheck = function(active_user) {
         }
 
         var ID = row["ID"];
-//        _this.basicCheck();
+        _this.basicCheck();
 
         var canSeePlan = function(user_table_row) {
 
             // plan which was given by parent user
-//            var allowedPlanIds = [ _plan["ID"] ];
-            var allowedPlanIds = [];
+            var allowedPlanIds = [ ];
+            if (_plan && _plan["ID"]) {
+//                allowedPlanIds.push(_plan["ID"]);
+                allowedPlanIds.push("@" + _plan["ID"]);
+            }
+
+//            var allowedPlanIds = [];
             // now we add plans, which was created by current user
             if (_myPlans && _myPlans.ids)
                 allowedPlanIds = allowedPlanIds.concat(_myPlans.ids);
