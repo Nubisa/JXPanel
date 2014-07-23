@@ -351,19 +351,19 @@
                 btn._eid = eid;
                 btn.onclick = function(){
                     var _this = this;
-                    jxcore.Call("saveFile", {up:this._location, src:editors[this._location].getValue()}, function(ret_val){
+                    toServer("saveFile", {up:this._location, src:editors[this._location].getValue()}, function(ret_val){
                         if(ret_val.err){
                             alert(ret_val.err);
                             if(ret_val.relogin){
                                 location.href = "/index.html";
                             }
                             return;
-                        };
+                        }
                         utils.bubble("success", "{{label.FileSavedTitle}}", "{{label.FileSavedContent}}", 4000);
                         _this.disabled = "disabled";
                         var title_holder = document.getElementById('code_editor_title_holder');
                         title_holder._childs[_this._eid]._a.style.color = "";
-                    });
+                    }, true);
                 };
                 btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
                 btn.disabled = "disabled";
@@ -469,7 +469,7 @@
         };
 
         window.getFiles = function(folder, treeId, treeNode){
-            jxcore.Call("getFiles", {up:folder, id:treeId}, function(ret_val){
+            toServer("getFiles", {up:folder, id:treeId}, function(ret_val){
 
                 if(ret_val.err){
                     alert("ERROR : " + JSON.stringify(ret_val.err));
@@ -495,7 +495,7 @@
 
                     zTree.expandNode(treeNode, true, false);
                 }
-            });
+            }, true);
         };
 
         var getFile = function(fname, location, treeId, type){
@@ -507,7 +507,7 @@
                 }
             }
 
-            jxcore.Call("getFile", {up:location, id:treeId, tp:type, fn:fname}, function(ret_val){
+            toServer("getFile", {up:location, id:treeId, tp:type, fn:fname}, function(ret_val){
 
                 if(ret_val.err){
                     alert("ERROR : " + JSON.stringify(ret_val.err));
@@ -524,7 +524,7 @@
 
                 createEditor(ret_val.tp, ret_val.fn, ret_val.loc);
                 editors[ret_val.loc].setValue((ret_val.source));
-            });
+            }, true);
         };
 
         function createTree(){

@@ -75,6 +75,30 @@
             if (window.jxTemplateReadyForjxm) {
                 window.jxTemplateReadyForjxm();
             }
+            window.toServer = function(a,b,c,shadow){
+                if(shadow){
+                    var div = document.createElement("div");
+                    div.id = "_MsgBoxBack";
+                    div.className = "divMessageBox animated fadeIn fast";
+                    var str = '<div id="Msg1" class="MessageBoxContainer animated fadeIn fast">'
+                            +'<div class="MessageBoxMiddle">'
+                            +'{{label.PleaseWait}}...'
+                            +'</div></div></div>';
+
+                    div.innerHTML = str;
+
+                    window.jx_cshadow = c;
+                    window.jx_shadowdiv = div;
+                    c = function(d,e){
+                        window.jx_shadowdiv.parentNode.removeChild(window.jx_shadowdiv);
+                        window.jx_cshadow(d,e);
+                    };
+
+                    document.body.appendChild(div);
+                }
+
+                jxcore.Call(a,b,c);
+            };
         });
     };
 
