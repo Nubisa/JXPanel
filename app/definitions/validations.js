@@ -53,7 +53,7 @@ exports.Boolean = function () {
 
         var allowed = [ "1", "0", "true", "false" ];
 
-        var pos = allowed.indexOf("" + val.toLowerCase());
+        var pos = allowed.indexOf("" + val.toString().toLowerCase());
 
         if (pos === -1) {
             return {result: false, msg: form_lang.Get(active_user.lang, "ValueInvalidBoolean", null)};

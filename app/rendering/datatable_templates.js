@@ -124,8 +124,11 @@ var getHTML = function (active_user, table, cb) {
                 var val = rows[y][colName];
 
                 // replacement of id value into display name value
-                if (colName === "plan_table_id" && plans && plans[val]) {
-                    val = plans[val]["plan_name"];
+                if (colName === "plan_table_id") {
+                    if (val.slice(0,1) === "@")
+                        val = form_lang.Get(active_user.lang, "PlanDefaultInherited", true);
+                    else if (plans && plans[val])
+                        val = plans[val]["plan_name"];
                 } else
                 if (colName === "user_owner_id" && users && users[val]) {
                     val = users[val]["username"];

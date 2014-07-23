@@ -169,13 +169,14 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
 
     "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
-    "NoPlanOwned" : "You have no hosting plan. Please add one.",
+    "NoPlanOwned" : "You have no hosting plan of your own. Please add one.",
     "PlanCannotAddUsers" : "This hosting plan does not allow to add any users.",
     "PlanCannotAddMoreUsers" : "This hosting plan does not allow to add more than %s users.",
     "PlanCannotAddDomains" : "This hosting plan does not allow to add any domains.",
     "PlanCannotAddMoreDomains" : "This hosting plan does not allow to add more than %s domains.",
     "PlanCannotAddPlans" : "This hosting plan does not allow to add any other hosting plans.",
     "PlanCannotAddMorePlans" : "This hosting plan does not allow to add more than %s hosting plans.",
+    "PlanDefaultInherited" : "Default (inherited)",
 
     "CannotEditRecord" : "You cannot edit this record.",
 

@@ -339,7 +339,12 @@ var HostingPlanCheck = function(active_user) {
             return form_lang.Get(_this.active_user.lang, "NoPlan");
         }
 
-        var plan = dbcache.GetAll(sqlite.plan_table, { ID: _user["plan_table_id"] });
+        var plan_id = _user["plan_table_id"];
+        if (plan_id.slice(0,1) === "@") {
+            plan_id = plan_id.slice(1);
+        }
+
+        var plan = dbcache.GetAll(sqlite.plan_table, { ID: plan_id });
         if (plan.err || !plan.rec || !plan.rec.length) {
             return form_lang.Get(_this.active_user.lang, "DBCannotGetPlan") + " " + plan.err;
         }
@@ -551,14 +556,16 @@ var HostingPlanCheck = function(active_user) {
         }
 
         var ID = row["ID"];
-        _this.basicCheck();
+//        _this.basicCheck();
 
         var canSeePlan = function(user_table_row) {
+
             // plan which was given by parent user
 //            var allowedPlanIds = [ _plan["ID"] ];
             var allowedPlanIds = [];
             // now we add plans, which was created by current user
-            allowedPlanIds = allowedPlanIds.concat(_myPlans.ids);
+            if (_myPlans && _myPlans.ids)
+                allowedPlanIds = allowedPlanIds.concat(_myPlans.ids);
 
             if (user_table_row["ID"] == ID && allowedPlanIds.indexOf(user_table_row["plan_table_id"]) !== -1 )
                 return true;
