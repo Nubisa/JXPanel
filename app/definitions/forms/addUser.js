@@ -5,6 +5,7 @@
 var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var sqlite = require("./../../db/sqlite.js");
+var dbcache = require("./../../db/dbcache.js");
 var path = require("path");
 var validations = require('./../validations');
 var crypto = require('crypto');
@@ -120,11 +121,20 @@ exports.form = function () {
                     if (!cb)
                         throw "Callback required.";
 
-                    sqlite.Plan.Get(sqlite.db, null, function (err, rows) {
+                    var basicRecords = active_user.checkHostingPlan.GetRecords();
+
+                    dbcache.refresh(function(err) {
                         if (err) {
                             cb(err)
                         } else {
-                            var ret = [];
+                            var plans = dbcache.Get(sqlite.plan_table, null, true);
+                            var rows = plans.rec;
+                            var ret = [ ];
+
+                            if (!active_user.isSudo) {
+                                // adding alias for hosting plan given to current user by parent user
+                                ret.push({ id : '@' + basicRecords.user["plan_table_id"].replace("@", ""), txt : form_lang.Get(active_user.lang, "PlanDefaultInherited", true) });
+                            }
                             for(var a in rows) {
                                 if (active_user.checkHostingPlan.CanSeeRecord(sqlite.plan_table, rows[a])) {
                                     ret.push({ id : rows[a].ID, txt : rows[a].plan_name });
@@ -133,6 +143,7 @@ exports.form = function () {
                             cb(false, ret);
                         }
                     });
+
                 }
             },
 
