@@ -117,7 +117,14 @@
         });
     };
 
-    var utils = {};
+    window.utils = {};
+    utils.setActive = function(name){
+        if(document.getElementById(name)){
+            document.getElementById(name).className = "active";
+        }
+    };
+    utils.setActive("Menu-{{file.name}}");
+
     utils.addEvent = function(elm, ev, handler) {
         if (elm.addEventListener)
             elm.addEventListener (ev, handler, false);

@@ -4,6 +4,7 @@ var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
 var page_utils = require('./page_utils');
 var fs = require('fs');
+var pathModule = require('path');
 
 var takeValue = function(lang, obj, val, active_user){
     if(!obj[lang]){
@@ -62,6 +63,10 @@ var smart_rule = [
             return cdata;
         }
     },
+    {from:"{{file.$$}}", to:"$$", "$":function(val, gl){
+            return gl.file[val];
+        }
+    },
     {from:"{{toSub.##:$$}}", to:"@@", "@!":function(first, second, gl){
             if(second.indexOf("_")>0){
                 gl[first] = "{{" + second.replace("_", ".") + "}}";
@@ -117,7 +122,9 @@ var apply_smart = function(file, req, res, data){
         _user.session.lastPath = req.path;
     }
 
-    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0 };
+    var bname = pathModule.basename(file, ".html");
+
+    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0, file:{name:bname} };
 
     if(!_active_user.hasPermission(sessionId, file)){
         res.write("<html><script>location.href='/index.html?t="+file.replace("../ui/","")+"';</script></html>");
