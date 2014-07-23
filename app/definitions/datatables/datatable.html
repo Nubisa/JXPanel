@@ -207,23 +207,23 @@
         utils.jxConfirm("{{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedInfo}}", function(ButtonPressed) {
 
             if (ButtonPressed === "Yes") {
-                jxcore.Call('removeFromTableData', { dt : '{{datatable.name}}', ids : ids }, function(param) {
+                window.toServer('removeFromTableData', { dt : '{{datatable.name}}', ids : ids }, function(param) {
                     if (!param.err)
                         location.reload();
                     else
                         addMessage(param.err);
-                });
+                }, true);
             }
         });
     };
 
     window.jxEditRow = function(id) {
-        jxcore.Call('editTableData', { dt : '{{datatable.name}}', id : id }, function(param) {
+        window.toServer('editTableData', { dt : '{{datatable.name}}', id : id }, function(param) {
             if (!param.err && param.url)
                 location = param.url;
             else
                 addMessage(param.err);
-        });
+        }, true);
     };
 
 </script>
