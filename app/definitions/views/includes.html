@@ -96,6 +96,7 @@
                     if(window.jx_shadowdiv){
                         window.jx_shadowdiv.parentNode.removeChild(window.jx_shadowdiv);
                     }
+
                     window.jx_shadowdiv = div;
                     c = function(d,e){
                         window.shadowWait--;
@@ -215,13 +216,7 @@
     };
 
     $(document).ready(function() {
-
-        // DO NOT REMOVE : GLOBAL FUNCTIONS!
        pageSetUp();
-
-        /*
-         * PAGE RELATED SCRIPTS
-         */
 
         $(".js-status-update a").click(function() {
             var selText = $(this).text();
@@ -230,10 +225,6 @@
             $this.parents('.dropdown-menu').find('li').removeClass('active');
             $this.parent().addClass('active');
         });
-
-        /*
-         * TODO: add a way to add more todo's to list
-         */
 
         // initialize sortable
         $(function() {
@@ -251,11 +242,8 @@
             if ($(this).prop('checked')) {
                 $this.addClass("complete");
 
-                // remove this if you want to undo a check list once checked
-                //$(this).attr("disabled", true);
                 $(this).parent().hide();
 
-                // once clicked - add class, copy to memory then remove and add to sortable3
                 $this.slideUp(500, function() {
                     $this.clone().prependTo("#sortable3").effect("highlight", {}, 800);
                     $this.remove();
@@ -264,19 +252,14 @@
             } else {
                 // insert undo code here...
             }
-
         })
         // count tasks
         function countTasks() {
-
             $('.todo-group-title').each(function() {
                 var $this = $(this);
                 $this.find(".num-of-tasks").text($this.next().find("li").size());
             });
-
         }
-
-
         if (window.jxTemplateReady) {
             window.jxTemplateReady();
         }
