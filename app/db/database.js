@@ -18,9 +18,12 @@ var ReadDB = function(cb){ // KRIS FILL IN
     sqlite2.ReadDB(function(err, fromSQLite) {
         if (!err) {
             DB = JSON.parse(fromSQLite);
-            Plans = DB.Plans || {};
-            Users = DB.Users || {};
-            Domains = DB.Domains || {};
+            DB.Plans = DB.Plans || {};
+            DB.Users = DB.Users || {};
+            DB.Domains = DB.Domains || {};
+            Plans = DB.Plans;
+            Users = DB.Users;
+            Domains = DB.Domains;
         }
         if (cb) cb(err);
     });
