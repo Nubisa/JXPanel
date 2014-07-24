@@ -18,6 +18,9 @@ var ReadDB = function(cb){ // KRIS FILL IN
     sqlite2.ReadDB(function(err, fromSQLite) {
         if (!err) {
             DB = JSON.parse(fromSQLite);
+            Plans = DB.Plans || {};
+            Users = DB.Users || {};
+            Domains = DB.Domains || {};
         }
         if (cb) cb(err);
     });
@@ -29,8 +32,19 @@ var extend = function(base, ext){
     }
 };
 
-var checkSet = function(name, host, sub){
-    if(!sub[name]){
+var checkSet = function(name, host, sub, allowedValues){
+
+    // false or 0 values may be intentional
+    var allowed = false;
+    if (allowedValues && allowedValues.length) {
+        for(var i in allowedValues)
+            if (allowedValues[i] === sub[name]) {
+                allowed = true;
+                break;
+            }
+    }
+
+    if(!sub[name] && !allowed){
         throw new Error(name + " is required");
     }
     host[name] = sub[name];
@@ -56,8 +70,8 @@ var Plan = function(name, owner_user, opts){
     this.owner = owner_user.name;
     checkSet("maxDomainCount", this, opts);
     checkSet("maxUserCount", this, opts);
-    checkSet("canCreatePlan", this, opts);
-    checkSet("canCreateUser", this, opts);
+    checkSet("canCreatePlan", this, opts, [false]);
+    checkSet("canCreateUser", this, opts, [false]);
     checkSet("planMaximums", this, opts);
 
     this.users = {};
