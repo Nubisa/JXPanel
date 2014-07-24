@@ -10,8 +10,6 @@ var dbFileName = __dirname + "/dbfile.db";
 var db_object = null;
 
 
-//
-
 /**
  * Opens db or creates one if it doesn't exist
  * @param file_name
@@ -61,7 +59,6 @@ var getDatabase = function (file_name, cb) {
         cb(errors.length ? errors.join(" ") : null, db_object);
     });
 };
-
 
 
 var readDB = function (cb) {
@@ -124,7 +121,7 @@ exports.UpdateDB = function (stringToSave, cb) {
     var base64 = null;
     try {
         base64 = new Buffer(stringToSave).toString('base64');
-    } catch(ex) {
+    } catch (ex) {
         if (cb) cb("SQLITE: cannot encode base64. " + ex);
         return;
     }
@@ -141,7 +138,7 @@ exports.UpdateDB = function (stringToSave, cb) {
             db_object = db;
             db_object.run(sql, cb);
         } else {
-            cb("SQLITE: " + err);
+            if (cb) cb("SQLITE: " + err);
         }
     });
 };
