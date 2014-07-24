@@ -5,7 +5,9 @@
 
     .jxbtn{
         border:dotted 1px #65644e;padding:3px;margin-right:2px;padding-left:6px;padding-right:5px;cursor:pointer;
+        background-color:#6699aa;
         text-align: center;
+        z-index:999999;
     }
 </style>
 <link rel="stylesheet" href="/cm/codemirror.css">
@@ -28,28 +30,28 @@
 
 <div class="note" style="margin-bottom:4px;">{{label.CodeEditorTop}}</div>
 
-<a id="btn_refresh" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-refresh"></i>
+<a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-refresh"></i> {{label.Refresh}}
 </a>
-<a id="btn_add" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-plus"></i>
+<a id="btn_add" data-original-title="{{label.AddTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-plus"></i> {{label.Add}}
 </a>
-<a id="btn_remove" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-times"></i>
+<a id="btn_remove" data-original-title="{{label.DeleteTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-times"></i> {{label.Delete}}
 </a>
-<a id="btn_rename" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-pencil"></i>
+<a id="btn_rename" data-original-title="{{label.RenameTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-pencil"></i> {{label.Rename}}
 </a>
-<a id="btn_download" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-share-square-o "></i>
+<a id="btn_download" data-original-title="{{label.DownloadTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-share-square-o "></i> {{label.Download}}
 </a>
-<a id="btn_clone" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-github"></i>
+<a id="btn_clone" data-original-title="{{label.CloneTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-github"></i> {{label.Clone}}
 </a>
 
 <div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
     <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;">
-        <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;" cellpadding="0" cellspacing="0">
+        <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;margin-top:5px;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
                     <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;">
@@ -60,7 +62,7 @@
                         </div>
                         </div>
                     </td>
-                    <td style="width: 2px;background-color:#90947c;"><div style="width:2px;"></div></td>
+                    <td style="width: 1px;background-color:#90947c;padding-top:5px;"><div style="width:1px;"></div></td>
                     <td style="width:80%;vertical-align:top;padding-top:5px;padding-left:5px;">
 
                         <div id="editor_holder" style="overflow:hidden">

@@ -27,6 +27,20 @@ exports.Labels = {
     "stats":"Server Stats",
     "users":"Users",
 
+    "RefreshTooltip":"Refresh selected folder",
+    "AddTooltip":"Add a new file or folder",
+    "DeleteTooltip":"Delete selected file or folder",
+    "RenameTooltip":"Rename selected file or folder",
+    "DownloadTooltip":"Download file or folder",
+    "CloneTooltip":"Clone for Github",
+
+    "Refresh":"Refresh",
+    "Add":"Add",
+    "Delete":"Delete",
+    "Rename":"Rename",
+    "Download":"Download",
+    "Clone":"Clone",
+
     "MessageSuccess" : "Success",
     "MessageInfo" : "Info",
     "MessageDanger" : "Something went wrong...",
