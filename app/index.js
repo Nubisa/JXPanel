@@ -5,6 +5,7 @@ var form_methods = require('./rendering/form_methods');
 var charts = require('./definitions/charts/charts');
 var site_defaults = require('./definitions/site_defaults');
 var _active_users = require('./definitions/active_user');
+var database = require("./db/database");
 
 require('http').setMaxHeaderLength(0);
 
@@ -34,4 +35,11 @@ var opts = null;
 if(fs.existsSync(__dirname + '/app.dev_config')){
     opts = JSON.parse(fs.readFileSync(__dirname + '/app.dev_config') + "");
 }
-server.start(opts);
+
+database.ReadDB(function(err) {
+    if (err)
+        throw err;
+    else
+        server.start(opts);
+});
+

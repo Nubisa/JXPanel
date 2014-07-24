@@ -1,14 +1,26 @@
+
+var sqlite2 = require("./sqlite2");
+
 var DB = {Plans:{}, Users:{}, Domains:{}};
 
 var Plans = DB.Plans, Users = DB.Users, Domains = DB.Domains;
 
 var UpdateDB = function(stringToSave){ // KRIS FILL IN
     //save stringToSave to DB
+    sqlite2.UpdateDB(stringToSave, function(err) {
+        if (err)
+            console.error(err);
+    });
 };
 
-var ReadDB = function(){ // KRIS FILL IN
-    var fromSQLite = {}; // <- read from sqlite
-    DB = JSON.parse(fromSQLite);
+var ReadDB = function(cb){ // KRIS FILL IN
+
+    sqlite2.ReadDB(function(err, fromSQLite) {
+        if (!err) {
+            DB = JSON.parse(fromSQLite);
+        }
+        if (cb) cb(err);
+    });
 };
 
 var extend = function(base, ext){
@@ -25,6 +37,7 @@ var checkSet = function(name, host, sub){
 };
 
 exports.OnSuspend = null;
+exports.ReadDB = ReadDB;
 
 var operation_enum = {
     AddUser:1,
