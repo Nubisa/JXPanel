@@ -5,10 +5,9 @@ var forms = require('./form_templates');
 var util = require("util");
 var server = require('jxm');
 var pam = require('authenticate-pam');
+var database = require("./../db/database");
 var methods = {};
-var sqlite = require("./../db/sqlite.js");
-var dbcache = require("./../db/dbcache.js");
-var crypto = require('crypto');
+
 
 var checkUser = function(env){
     var active_user = _active_user.getUser(env.SessionID, false);
@@ -47,54 +46,8 @@ methods.tryLogin = function(env, params){
 //            params.isSudo = params.username === "root";
             params.isSudo = false
 
-//            finish();
+            finish();
 //            return;
-
-            // if user was authenticated for linux, lets check if he is present in user_table
-            dbcache.refresh(function(err) {
-
-                if (err) {
-                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotReadData") + " " + err });
-                    return;
-                }
-
-                var user = dbcache.Get(sqlite.user_table, {username : params.username });
-                if (user.rec && user.rec.length) {
-                    // user exists
-                    params.user_id = user.rec[0].ID;
-                    finish();
-                    return;
-                }
-
-
-                if (dbcache.tables[sqlite.user_table].length === 0) {
-
-                    // first sudo login
-
-                    if (!dbcache.tables[sqlite.plan_table][0]) {
-                        server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotGetPlan")});
-                        return;
-                    }
-
-                    var unlimited_plan_id = dbcache.tables[sqlite.plan_table][0]["ID"];
-
-                    // user does not exist
-                    sqlite.User.AddNewOrUpdateAll(sqlite.db, { person_name : params.username, username : params.username, plan_table_id : unlimited_plan_id }, { insert: ["username"] },  function(err2, id) {
-                          if (err2) {
-                            server.sendCallBack(env, {err: form_lang.Get(params.lang, "DBCannotAddUser") + " " + err2});
-                        } else {
-                            params.user_id = id;
-                            finish();
-                            return;
-                        }
-                    });
-                } else {
-                    // todo: just for now logging in is allowed for all system authenticated users
-                    finish();
-//                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
-                    return;
-                }
-            });
         }
     });
 };
@@ -108,7 +61,7 @@ var sessionAdd = function(env, active_user, params){
         return false;
     }
 
-    console.log("handling submitted values", params);
+//    console.log("handling submitted values", params);
 
     var sform = active_user.session.forms[params.form].activeInstance;
 
@@ -148,6 +101,7 @@ var sessionAdd = function(env, active_user, params){
         if (valids.length) {
            for(var a in valids) {
 
+               // this is used for not updating field, whenever they have null values
                if (ctrl.details && ctrl.details.options.dont_update_null && !params.controls[o]) {
                    continue;
                }
@@ -210,11 +164,6 @@ methods.sessionApply = function(env, params){
                 continue;
             }
 
-            if (det.dbName) {
-                // replacing form controls names into db field names
-                field_name = det.dbName;
-            }
-
             if (val.trim)
                 val = val.replace(/&#64;/g, "@");
 
@@ -236,34 +185,8 @@ methods.sessionApply = function(env, params){
         json["user_owner_id"] = active_user.user_id;
     }
 
-    activeInstance.settings.dbTable.AddNewOrUpdateAll(sqlite.db, json, activeInstance.settings.json_where, function(err, err2) {
-        if (err) {
-            var arr = [];
-            arr.push({ control: form_lang.Get(active_user.lang, "Form"), msg : err });
-            if (err2) {
-
-                // err2 may contain json with fields, for which there was a problem.
-                // it comes from AddNewOrUpdateAll (checking insert for main record)
-                for(var field_name in err2) {
-
-                    for(var i in _controls) {
-                        var ctrl = _controls[i];
-                        if (ctrl.name && (ctrl.name === field_name || (ctrl.details.dbName && ctrl.details.dbName === field_name))) {
-                            field_name = form_lang.Get(active_user.lang, ctrl.details.label);
-                            break;
-                        }
-                    }
-                    arr.push( {control: field_name, msg: err} );
-                }
-                if (!arr.length) arr = false;;
-            }
-            server.sendCallBack(env, {arr: arr});
-        } else {
-            server.sendCallBack(env, {arr: false});
-        }
-    });
+    // todo: DB insert or update record and call callback
 };
-
 
 methods.getTableData = function(env, params) {
 
@@ -279,14 +202,13 @@ methods.getForm = function(env, params) {
     if (!active_user)
         return;
 
-    active_user.checkHostingPlan.CanAddRecord(params.form, function(err) {
-        if (err) {
-            server.sendCallBack(env, {err : err } );
-        } else {
-            var ret = forms.renderForm(env.SessionID, params.form, true);
-            server.sendCallBack(env, {err : false, html : ret.html, js : ret.js } );
-        }
-    });
+    // todo: DB add record if can and send callback
+
+
+
+    var ret = forms.renderForm(env.SessionID, params.form, true);
+
+    //  server.sendCallBack(env, {err : false, html : ret.html, js : ret.js } );
 };
 
 

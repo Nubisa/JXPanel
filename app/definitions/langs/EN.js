@@ -192,7 +192,7 @@ exports.Labels = {
     "PlanCannotAddMoreDomains" : "This hosting plan does not allow to add more than %s domains.",
     "PlanCannotAddPlans" : "This hosting plan does not allow to add any other hosting plans.",
     "PlanCannotAddMorePlans" : "This hosting plan does not allow to add more than %s hosting plans.",
-    "PlanDefaultInherited" : "Default (inherited)",
+    "PlanCannotDetermineHostingValues" : "Cannot determine hosting values.",
 
     "CannotEditRecord" : "You cannot edit this record.",
 

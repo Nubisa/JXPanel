@@ -5,46 +5,6 @@ var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
 
-exports.addUser_Test = function(sessionId){
-    var lang = _active_user.getUser(sessionId).lang;
-
-    var formName = "addUser_Test";
-
-    var controls = [
-        {
-            name: "person_name",
-            val: tool.createTextBox("Name", "Name", "person_name", null, lang)
-        },
-        {
-            name: "person_surname",
-            val: tool.createTextBox("Surname", "Surname", "person_surname", null, lang)
-        },
-        {
-            name: "person_cat",
-            val: tool.createComboBox("Category", "Category", "person_cat", "Customer", lang, { values : ["Administrator", "Customer"] })
-        },
-        {
-            name: "person_desc",
-            val: tool.createTextArea("Description", "Description", "person_desc", "some text", lang)
-        },
-        {
-            name: "person_fruits",
-            val: tool.createCheckList("Favourite Fruits", "Favourite Fruits", "person_fruits", "banana,mango", lang, { values : ["mango", "apple", "banana", "kiwi"] })
-        },
-        {
-            name: "person_tech",
-            val: tool.createTags("Known technologies", "Known technologies", "person_tech", "html,javascript", lang, { values : ["css", "html", "jquery", "php", "nodejs"] } )
-        },
-        {
-            name: "person_birthday",
-            val: tool.createComboDate("Day of birth", "Day of birth", "person_birthday", "2014-07-11", lang, { format : "YYYY-MM-DD" })
-        }
-
-    ];
-
-    return renderFinal(sessionId, formName, controls);
-};
-
 
 var logic = [
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
@@ -126,16 +86,12 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (!ctrl.method)
             continue;
 
-        var dbname = ctrl.dbName ? ctrl.dbName : name;
-        var val = edits && edits[dbname] ? edits[dbname] : null;
+        // todo: DB add value for editing record
 
         if(ctrl.options) {
             ctrl.options.extra = { formName : formName, isUpdate : !!edits };
             if (ctrl.options.password && edits)
                 val = null;
-
-            if (ctrl.userCannotEditOwnRecord && edits && edits["ID"] === active_user.user_id)
-                ctrl.options.extra.noEditDisplayValue =  edits[dbname + "|display"] ? edits[dbname + "|display"] : val;
         }
 //        console.error("val for", dbname, ":", val);
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));

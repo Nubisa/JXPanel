@@ -7,8 +7,6 @@ var form_lang = require('../definitions/form_lang');
 var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
-var sqlite = require("./../db/sqlite.js");
-var dbcache = require("./../db/dbcache.js");
 
 
 var getTable = function(table_name) {
@@ -23,31 +21,12 @@ var getTable = function(table_name) {
 
 var getData = function(active_user, table, json, cb) {
 
-    if (!sqlite.db) {
-        cb(form_lang.Get(active_user.lang, "DBNotOpened"));
-        return;
-    }
-
     if (!active_user) {
         cb(form_lang.Get(active_user.lang, "SessionExpired"));
         return;
     }
 
-
-    dbcache.refresh(function(err) {
-        if (err) {
-            cb(err);
-            return;
-        }
-
-        var ret = dbcache.GetAll(table.settings.dbTable.table_name, json);
-        if (ret.err)
-            cb(ret.err)
-        else {
-//            console.log("getData rows", ret);
-            cb(false, ret.rec);
-        }
-    });
+    // todo: DB get data and call callback
 };
 
 
@@ -63,7 +42,7 @@ var getForm = function(table) {
 var getHTML = function (active_user, table, cb) {
 
     var columns = table.settings.columns;
-    var table_name_db = table.settings.dbTable.table_name;
+    var table_name_db = "some_table";
     var form = getForm(table);
 
     if (!form) {
@@ -95,29 +74,11 @@ var getHTML = function (active_user, table, cb) {
         var ret = [];
         ret.push([]);
 
-        var dbNames = {};
-        // searching for display names and dbNames of controls
-        for (var a in columns) {
-            var displayName = columns[a];
-            if (displayName == "_checkbox") displayName = "";
-            if (displayName == "_id") displayName = "ID";
-
-            if (formControls[columns[a]] && formControls[columns[a]].details) {
-                displayName = form_lang.Get(active_user.lang, formControls[columns[a]].details.label);
-                dbNames[columns[a]] = formControls[columns[a]].details.dbName || columns[a];
-            }
-
-            ret[0].push(displayName);
-        }
-
-        active_user.checkHostingPlan.basicCheck();
 
         var cnt = 1;
         for (var y = 0, len = rows.length; y < len; y++) {
 
-            var ID = rows[y]["ID"];
-            if (!active_user.checkHostingPlan.CanSeeRecord(table_name_db, rows[y], true))
-                continue;
+
 
             var single_row = [];
 
@@ -125,10 +86,8 @@ var getHTML = function (active_user, table, cb) {
                 single_row["_class"] = "success";
 
             for (var x in columns) {
-                var colName = dbNames[columns[x]] || columns[x];
+                var colName = columns[x];
                 var val = rows[y][colName];
-
-                val = dbcache.GetDisplayValue(colName, val);
 
                 // null/undefined value replacement into display value
                 if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
@@ -197,6 +156,11 @@ exports.getDataTable = function(rows) {
 exports.render = function (sessionId, table_name, cb) {
 
     var active_user = _active_user.getUser(sessionId);
+
+    if (!active_user) {
+        cb(true);
+        return;
+    }
 
     var table = getTable(table_name);
     if (!table) {
@@ -270,12 +234,7 @@ exports.remove = function (sessionId, table_name, ids, cb) {
         return;
     }
 
-    if (!sqlite.db) {
-        cb(form_lang.Get(active_user.lang, "DBNotOpened"));
-        return;
-    }
-
-    table.settings.dbTable.Delete(sqlite.db, { "ID" : ids }, cb);
+    // todo: DB remove record
 };
 
 // called when user clicked Apply on the form
@@ -294,18 +253,11 @@ exports.edit = function (sessionId, table_name, id, cb) {
         return;
     }
 
+    // todo: DB fetch record which will be editing
     getData(active_user, table, { ID : id }, function(err, rows) {
         if (!err) {
 
             if (rows.length > 0) {
-
-                //remembering display name of ID values
-                for(var field_name in rows[0]) {
-                    var val = rows[0][field_name];
-                    var display_name = dbcache.GetDisplayValue(field_name, val);
-                    if (display_name !== val)
-                        rows[0][field_name + "|display"] = display_name;
-                }
 
                 active_user.session.edits = active_user.session.edits || {};
                 active_user.session.edits[table.settings.addForm] = rows[0];

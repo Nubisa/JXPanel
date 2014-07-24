@@ -3,12 +3,12 @@
  */
 
 var form_lang = require('../form_lang');
-var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
 
 exports.settings = {
     columns :[ "_checkbox",  "_id", "domain_name", "user_owner_id", "plan_table_id" ],
-    dbTable : sqlite.Domain,
     addForm : "addDomain",
     addFormURL : "adddomain.html"
 };
+
+

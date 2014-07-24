@@ -4,7 +4,6 @@
 
 var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
-var sqlite = require("./../../db/sqlite.js");
 var path = require("path");
 var validations = require('./../validations');
 
@@ -42,7 +41,6 @@ exports.form = function () {
         this.onSubmitCancel = "plans.html";
 
         this.settings = {
-            dbTable : sqlite.Plan,
             json_where :
             {
                 insert : ["plan_name"],
@@ -58,8 +56,7 @@ exports.form = function () {
                 details: {
                     label: "PlanName",
                     method: tool.createTextBox,
-                    options: { required: true },
-                    dbTable : "main"
+                    options: { required: true }
                 }
             },
 
@@ -68,8 +65,7 @@ exports.form = function () {
                 details: {
                     label: "Username",
                     method: null,
-                    options: { },
-                    dbTable : "main"
+                    options: { }
                 }
             },
 
@@ -205,7 +201,12 @@ exports.form = function () {
                     options: {  },
                     nullDisplayAs : "ValueUnlimited"
                 },
-                validation: new validations.Int( { gte : 0})
+                validation: new function() {
+
+                    this.validate = function (env, active_user, val, vals) {
+                        return {result: false, msg : "Validation not implemented." };
+                    };
+                }
             },
 
             { name: "plan_max_plans",
@@ -254,67 +255,6 @@ exports.form = function () {
             {"END" : 1}
         ];
     };
-
-
-    // obsolete
-//    func.prototype.apply = function (active_user, params, cb) {
-//
-//        var _controls = {};
-//        for(var a in this.controls) {
-//            var name = this.controls[a].name;
-//            if (name) _controls[name] = this.controls[a].details;
-//        }
-//
-//        var values = params.controls;
-//
-//        var addPlan = function () {
-//            // if arrived here - required fields are non empty
-//
-//            var errors = [];
-//            var len = 0;
-//            for (var name in values) len++;
-//            var _cb = function (err) {
-//                len--;
-//                if (err) {
-//                    errors.push(err);
-//                    console.error(err);
-//                }
-//                if (len === 0) {
-//                    cb(null);
-//                }
-//
-//            };
-//
-//            sqlite.Plan.AddNew(sqlite.db, { plan_name: values["plan_name"] }, function (err, id) {
-//
-//                if (err) {
-//                    if (cb) cb(err);
-//                } else {
-//                    for (var name in values) {
-//                        // only for defined columns
-//                        if (_controls[name]) {
-//                            var addValue = _controls[name].value_table !== false;
-//                            if (addValue) {
-//                                console.log("adding plan value", name, values[name]);
-//                                sqlite.Plan.AddNewFieldValue2(sqlite.db, id, name, values[name], _cb);
-//                            }
-//                        }
-//                        // to decrease the counter and call cb if needed
-//                        _cb(false);
-//                    }
-//                }
-//            });
-//        };
-//
-//        sqlite.Plan.Get(sqlite.db, { plan_name : values["plan_name"]}, function (err, rows) {
-//            if (!err && rows && rows.length) {
-//                cb("Plan with this name already exists.")
-//            } else {
-//                addPlan();
-//            }
-//        })
-//
-//    };
 
     return new func();
 };
