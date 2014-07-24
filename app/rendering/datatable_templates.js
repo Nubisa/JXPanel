@@ -7,6 +7,7 @@ var form_lang = require('../definitions/form_lang');
 var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
+var database = require("./../db/database");
 
 
 var getTable = function(table_name) {
@@ -19,15 +20,15 @@ var getTable = function(table_name) {
 };
 
 
-var getData = function(active_user, table, json, cb) {
-
-    if (!active_user) {
-        cb(form_lang.Get(active_user.lang, "SessionExpired"));
-        return;
-    }
-
-    // todo: DB get data and call callback
-};
+//var getData = function(active_user, table, json, cb) {
+//
+//    if (!active_user) {
+//        cb(form_lang.Get(active_user.lang, "SessionExpired"));
+//        return;
+//    }
+//
+//    // todo: DB get data and call callback
+//};
 
 
 var getForm = function(table) {
@@ -39,16 +40,15 @@ var getForm = function(table) {
     }
 };
 
-var getHTML = function (active_user, table, cb) {
+var getHTML = function (active_user, table) {
+
+    var ret = { err : false, html : null };
 
     var columns = table.settings.columns;
-    var table_name_db = "some_table";
     var form = getForm(table);
 
-    if (!form) {
-        cb("Cannot find form.");
-        return;
-    }
+    if (!form)
+        return { err : form_lang.Get(active_user.lang, "UnknownForm") };
 
     // getting form control display names
     var formControls = {};
@@ -57,6 +57,19 @@ var getHTML = function (active_user, table, cb) {
         if (ctrl.name)
             formControls[ctrl.name] = ctrl;
     }
+
+    var data = null;
+    if (table.name == "users")
+        data = database.getUsersByUserName(active_user.username, 1);
+    else if (table.name == "users")
+        data = database.getPlansByUserName(active_user.username, 1);
+    else if (table.name == "users")
+        data = database.getDomainsByUserName(active_user.username, 1);
+    else {
+        return { err : form_lang.Get(active_user.lang, "UnknownDataTable") };
+    }
+
+    return { err : "to be implemented" }
 
     getData(active_user, table, null, function(err, rows) {
 
@@ -182,9 +195,8 @@ exports.render = function (sessionId, table_name, cb) {
         }
     } else {
         // async return
-        getHTML(active_user, table, function(err, str) {
-            cb(err, str)
-        });
+        var ret = getHTML(active_user, table);
+        cb(ret);
     }
 
 };

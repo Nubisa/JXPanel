@@ -178,10 +178,15 @@
 
     window.jxTemplateReadyForjxm = function() {
         jxcore.Call('getTableData', { dt : '{{datatable.name}}' }, function(param) {
-            var table = document.getElementById('dt_basic');
-            if (table) table.innerHTML = param;
 
-            refreshtable();
+            if (param.err) {
+                utils.jxAddMessage("danger", param.err);
+            } else {
+                var table = document.getElementById('dt_basic');
+                if (table) table.innerHTML = param;
+
+                refreshtable();
+            }
         });
     };
 

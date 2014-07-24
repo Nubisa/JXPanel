@@ -30,7 +30,6 @@ exports.loginUser = function(sessionId, params){
 
     users[sessionId].nameTitle = params.username; // TODO change it!!!
 
-    users[sessionId].isSudo = params.isSudo;
     users[sessionId].user_id = params.user_id;
 };
 

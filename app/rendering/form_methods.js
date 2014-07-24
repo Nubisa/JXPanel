@@ -42,12 +42,29 @@ methods.tryLogin = function(env, params){
                 server.sendCallBack(env, {url: _url});
             };
 
-            // todo: for now only root is superuser of the panel
-//            params.isSudo = params.username === "root";
-            params.isSudo = false
+            var unlimited = database.getPlan("Unlimited");
+            if (!unlimited) {
+                // first sudo signing in
+                database.AddPlan(null, "Unlimited", {
+                    maxDomainCount: 1e5,
+                    maxUserCount: 1e5,
+                    canCreatePlan: true,
+                    canCreateUser: true,
+                    planMaximums: {}
+                });
 
-            finish();
-//            return;
+                database.AddUser("Unlimited", params.username, {});
+                finish();
+            }
+
+            // regular user signing in
+            var user = database.getUser(params.username);
+
+            if (!user) {
+                server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
+            } else {
+                finish();
+            }
         }
     });
 };
@@ -190,8 +207,8 @@ methods.sessionApply = function(env, params){
 
 methods.getTableData = function(env, params) {
 
-    datatables.render(env.SessionID, params.dt, function(err, str) {
-        server.sendCallBack(env, str);
+    datatables.render(env.SessionID, params.dt, function(obj) {
+        server.sendCallBack(env, obj);
     });
 };
 
