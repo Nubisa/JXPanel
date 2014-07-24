@@ -74,12 +74,18 @@ var readDB = function (cb) {
             return;
         }
 
+        var err = null;
+        var str = null;
         try {
-            var str = new Buffer(rows[0].value, "base64").toString();
-            cb(false, str);
+            var value = rows[0].value || "";
+            str = new Buffer(value, "base64").toString();
+            if (str.trim() === "")
+                str = "{}";
         } catch (ex) {
-            cb("SQLITE: cannot decode base64. " + ex);
+            err = "SQLITE: cannot decode base64. " + ex;
         }
+
+        cb(err, str);
     });
 };
 
