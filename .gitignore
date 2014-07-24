@@ -3,6 +3,7 @@ logs
 *.log
 
 *.dev_config
+dbfile.db
 
 # Runtime data
 pids
