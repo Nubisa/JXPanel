@@ -110,11 +110,13 @@ var getHTML = function (active_user, table, cb) {
             ret[0].push(displayName);
         }
 
+        active_user.checkHostingPlan.basicCheck();
+
         var cnt = 1;
         for (var y = 0, len = rows.length; y < len; y++) {
 
             var ID = rows[y]["ID"];
-            if (!active_user.checkHostingPlan.CanSeeRecord(table_name_db, rows[y]))
+            if (!active_user.checkHostingPlan.CanSeeRecord(table_name_db, rows[y], true))
                 continue;
 
             var single_row = [];
