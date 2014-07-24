@@ -2,13 +2,6 @@
     /* Prevent copy paste for all elements except text fields */
     *  { -webkit-user-select:none; -webkit-tap-highlight-color:rgba(255, 255, 255, 0); }
     input, textarea  { -webkit-user-select:text; }
-
-    .jxbtn{
-        border:dotted 1px #65644e;padding:3px;margin-right:2px;padding-left:6px;padding-right:5px;cursor:pointer;
-        background-color:#6699aa;
-        text-align: center;
-        z-index:999999;
-    }
 </style>
 <link rel="stylesheet" href="/cm/codemirror.css">
 <link rel="stylesheet" href="/cm/theme/eclipse.css">
@@ -51,19 +44,19 @@
 
 <div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
     <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;">
-        <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;margin-top:5px;" cellpadding="0" cellspacing="0">
+        <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;margin-top:10px;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
                     <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;">
 
-                        <div id="files_holder" style="overflow:scroll;margin-top:5px; border-top: 1px solid #90947c;">
+                        <div id="files_holder" style="overflow:scroll;">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
                         </div>
                         </div>
                     </td>
-                    <td style="width: 1px;background-color:#90947c;padding-top:5px;"><div style="width:1px;"></div></td>
-                    <td style="width:80%;vertical-align:top;padding-top:5px;padding-left:5px;">
+                    <td style="width: 1px;background-color:#f2f2f2;"><div style="width:1px;"></div></td>
+                    <td style="width:80%;vertical-align:top;padding-left:5px;">
 
                         <div id="editor_holder" style="overflow:hidden">
                             <ul id="code_editor_title_holder" class="nav nav-tabs">
@@ -72,10 +65,10 @@
                                 </li>
                             </ul>
 
-                            <div id="code_editor_content_holder" class="tab-content" style="height:100%">
+                            <div id="code_editor_content_holder" class="tab-content">
                                 <div class="tab-pane fade active in" id="s1">
                                     <p>
-                                    <div id="_code_editor_host" style="margin:0px;padding:0px;border:dotted 1px #ccc;overflow:hidden">
+                                    <div id="_code_editor_host" style="margin:0px;padding:0px;overflow:hidden">
 
                                     </div>
                                     </p>
