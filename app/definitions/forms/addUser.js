@@ -6,6 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var path = require("path");
 var validations = require('./../validations');
+var database = require("./../../db/database");
 
 exports.form = function () {
 
@@ -108,13 +109,18 @@ exports.form = function () {
                     options: { required: true, dynamic: true },
                     userCannotEditOwnRecord : true
                 },
-                dynamicValues : function(active_user, cb) {
+                dynamicValues : function(active_user) {
 
-                    if (!cb)
-                        throw "Callback required.";
+                    var plans = database.getPlansByUserName(active_user.username, 1);
+                    var me = database.getUser(active_user.username);
 
                     var ret = [ ];
-                    ret.push({ id : "", txt : "not implemented" });
+                    ret.push({ id : me.plan, txt : me.plan });
+
+                    for(var i in plans) {
+                        ret.push({ id : plans[i].name, txt : plans[i].name });
+                    }
+                    return ret;
                 }
             },
 

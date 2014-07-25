@@ -42,86 +42,85 @@ var getForm = function(table) {
 
 var getHTML = function (active_user, table) {
 
-    var ret = { err : false, html : null };
+    var ret = { err: false, html: null };
 
     var columns = table.settings.columns;
     var form = getForm(table);
 
     if (!form)
-        return { err : form_lang.Get(active_user.lang, "UnknownForm") };
+        return { err: form_lang.Get(active_user.lang, "UnknownForm") };
 
     // getting form control display names
     var formControls = {};
-    for(var i in form.controls) {
+    for (var i in form.controls) {
         var ctrl = form.controls[i];
         if (ctrl.name)
             formControls[ctrl.name] = ctrl;
     }
+
+    var ret = [];
+    ret.push([]);
+
+    var dbNames = {};
+    // searching for display names and dbNames of controls
+    for (var a in columns) {
+        var displayName = columns[a];
+        if (displayName == "_checkbox") displayName = "";
+        if (displayName == "_id") displayName = "ID";
+
+        if (formControls[columns[a]] && formControls[columns[a]].details) {
+            displayName = form_lang.Get(active_user.lang, formControls[columns[a]].details.label);
+            dbNames[columns[a]] = formControls[columns[a]].details.dbName || columns[a];
+        }
+
+        ret[0].push(displayName);
+    }
+
 
     var data = null;
     if (table.name == "users")
         data = database.getUsersByUserName(active_user.username, 1);
     else if (table.name == "users")
         data = database.getPlansByUserName(active_user.username, 1);
-    else if (table.name == "users")
+    else if (table.name == "plans")
         data = database.getDomainsByUserName(active_user.username, 1);
     else {
-        return { err : form_lang.Get(active_user.lang, "UnknownDataTable") };
+        return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
     }
 
-    return { err : "to be implemented" }
-
-    getData(active_user, table, null, function(err, rows) {
-
-        if (err) {
-            cb(err);
-            return;
-        }
-
-        // if rows is a string, it might be some err message
-        if (rows && rows.trim) {
-            cb(rows);
-            return;
-        }
-
-        var ret = [];
-        ret.push([]);
+    console.log("data", data);
 
 
-        var cnt = 1;
-        for (var y = 0, len = rows.length; y < len; y++) {
+    var cnt = 1;
+    for (var i in data) {
 
+        var single_row = [];
 
+        if (ID === active_user.user_id)
+            single_row["_class"] = "success";
 
-            var single_row = [];
+        for (var x in columns) {
+            var colName = columns[x];
+            var val = rows[y][colName];
 
-            if (ID === active_user.user_id)
-                single_row["_class"] = "success";
-
-            for (var x in columns) {
-                var colName = columns[x];
-                var val = rows[y][colName];
-
-                // null/undefined value replacement into display value
-                if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
-                    if (!val && val != 0 && val !== false)
-                        val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
-                }
-
-                var str  = '<a href="#" onclick="jxEditRow(\''+  rows[y]["ID"] +'\'); return false;">' + val + '</a>';
-                if (colName === "_checkbox")
-                    str = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
-                else if (colName === "_id")
-                    str = cnt++;
-
-                single_row.push(str);
+            // null/undefined value replacement into display value
+            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
+                if (!val && val != 0 && val !== false)
+                    val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
             }
-            ret.push(single_row);
-        }
 
-        var html = exports.getDataTable(ret);
-        cb(false, html);
-    });
+            var str = '<a href="#" onclick="jxEditRow(\'' + rows[y]["ID"] + '\'); return false;">' + val + '</a>';
+            if (colName === "_checkbox")
+                str = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
+            else if (colName === "_id")
+                str = cnt++;
+
+            single_row.push(str);
+        }
+        ret.push(single_row);
+    }
+
+    return { err: false, html: exports.getDataTable(ret)};
 };
 
 // each rows is array of cells
@@ -166,23 +165,19 @@ exports.getDataTable = function(rows) {
 };
 
 
-exports.render = function (sessionId, table_name, cb) {
+exports.render = function (sessionId, table_name, getContents) {
 
     var active_user = _active_user.getUser(sessionId);
 
-    if (!active_user) {
-        cb(true);
-        return;
-    }
+    if (!active_user)
+        return { err : form_lang.Get(active_user.lang, "SessionExpired")}
 
     var table = getTable(table_name);
-    if (!table) {
-        if (cb) cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
-        return;
-    }
+    if (!table)
+        return form_lang.Get(active_user.lang, "UnknownDataTable");
 
-    if (!cb) {
-        // sync return
+    if (!getContents) {
+        // general template of the table (without data contents)
         var containerFile = path.join(__dirname, "../definitions/datatables/datatable.html");
         if (fs.existsSync(containerFile)) {
             var widget = fs.readFileSync(containerFile).toString();
@@ -194,11 +189,9 @@ exports.render = function (sessionId, table_name, cb) {
             return form_lang.Get(active_user.lang, "UnknownDataTable");
         }
     } else {
-        // async return
-        var ret = getHTML(active_user, table);
-        cb(ret);
+        // data contents of the table
+        return getHTML(active_user, table);
     }
-
 };
 
 

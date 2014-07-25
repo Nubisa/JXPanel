@@ -86,7 +86,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (!ctrl.method)
             continue;
 
-        // todo: DB add value for editing record
+        var val = null;
 
         if(ctrl.options) {
             ctrl.options.extra = { formName : formName, isUpdate : !!edits };

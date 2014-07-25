@@ -55,6 +55,7 @@ methods.tryLogin = function(env, params){
 
                 database.AddUser("Unlimited", params.username, {});
                 finish();
+                return;
             }
 
             // regular user signing in
@@ -196,20 +197,35 @@ methods.sessionApply = function(env, params){
         return;
     }
 
-    if (isUpdate) {
-        json.ID = active_user.session.edits[params.form].ID;
-    } else {
-        json["user_owner_id"] = active_user.user_id;
-    }
+    var myPlan = database.getUser(active_user.username).plan;
 
-    // todo: DB insert or update record and call callback
+    var name = null;
+    var arr = [];
+    if (params.form === "addUser") {
+        name = json.person_username;
+        delete json.person_username;
+
+        var ret = null;
+        try {
+            ret = database.AddUser(myPlan, json.person_username, json);
+        } catch(ex) {
+            ret = ex.toString();
+        }
+
+        if (ret) {
+            arr.push({ control: form_lang.Get(active_user.lang, "Form"), msg : ret });
+            server.sendCallBack(env, {arr: arr});
+        } else {
+            server.sendCallBack(env, {arr: false});
+        }
+        return;
+    }
 };
 
 methods.getTableData = function(env, params) {
 
-    datatables.render(env.SessionID, params.dt, function(obj) {
-        server.sendCallBack(env, obj);
-    });
+    var obj = datatables.render(env.SessionID, params.dt, true);
+    server.sendCallBack(env, obj)
 };
 
 // getting the form in async way
@@ -219,13 +235,8 @@ methods.getForm = function(env, params) {
     if (!active_user)
         return;
 
-    // todo: DB add record if can and send callback
-
-
-
     var ret = forms.renderForm(env.SessionID, params.form, true);
-
-    //  server.sendCallBack(env, {err : false, html : ret.html, js : ret.js } );
+    server.sendCallBack(env, {err : false, html : ret.html, js : ret.js } );
 };
 
 
@@ -264,9 +275,9 @@ methods.getControlsValues = function(env, params) {
     for(var a in activeInstance.controls) {
         if (activeInstance.controls[a].name && activeInstance.controls[a].name === params.control && activeInstance.controls[a].dynamicValues) {
             found = true;
-            activeInstance.controls[a].dynamicValues(active_user, function(err, ret) {
-                server.sendCallBack(env, {err : false, values : ret, control : params.control } );
-            });
+            var ret = activeInstance.controls[a].dynamicValues(active_user);
+            server.sendCallBack(env, {err : false, values : ret, control : params.control } );
+            return;
         }
     }
 
