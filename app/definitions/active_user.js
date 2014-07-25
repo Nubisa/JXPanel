@@ -8,6 +8,7 @@ var path = require('path');
 var fs = require('fs');
 var exec = require('child_process').exec;
 var downloads = require('./downloads');
+var database = require("../db/database");
 
 var newUser = function(session_id){
     return {
@@ -32,6 +33,18 @@ exports.loginUser = function(sessionId, params){
     users[sessionId].nameTitle = params.username; // TODO change it!!!
 
     users[sessionId].user_id = params.user_id;
+
+    database.errorEngine = new errorEngine(users[sessionId]);
+};
+
+
+var errorEngine = function(active_user) {
+
+    var __active_user = active_user;
+
+    this.getError = function(str, arrParams) {
+        return form_lang.Get(__active_user.lang, str, null, arrParams);
+    };
 };
 
 exports.getUser = function(sessionId)

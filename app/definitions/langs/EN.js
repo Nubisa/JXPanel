@@ -198,6 +198,9 @@ exports.Labels = {
     "PlanCannotAddPlans" : "This hosting plan does not allow to add any other hosting plans.",
     "PlanCannotAddMorePlans" : "This hosting plan does not allow to add more than %s hosting plans.",
     "PlanCannotDetermineHostingValues" : "Cannot determine hosting values.",
+    "PlanParentCannotAddMore" : "Parent hosting plan reached maximum %s count.",
+    "PlanCannotAddMore" : "This hosting plan reached maximum %s count.",
+    "UserSuspended" : "User is suspended",
 
     "CannotEditRecord" : "You cannot edit this record.",
 
@@ -214,6 +217,9 @@ exports.Labels = {
     "DBCannotGetParsentPlan" : "Cannot read parent hosting plan from database.",
     "DBCannotGetDomain" : "Cannot read domain from database.",
     "DBCannotReadData" : "Cannot read data from database.",
+
+    "DBUserCannotCreatePlan" : "User cannot create plan.",
+
 
     "AccessDeniedToRemoveRecord" : "You have no privileges to delete the following %s: %s",
     "AccessDeniedToEditRecord" : "You have no privileges to edit the following %s: %s",

@@ -251,8 +251,6 @@ var logic = [
 ];
 
 
-
-// removes ids from main table (e.g. user_table) and all records from data_value_table
 exports.remove = function (sessionId, table_name, ids) {
 
     var active_user = _active_user.getUser(sessionId);
@@ -264,27 +262,29 @@ exports.remove = function (sessionId, table_name, ids) {
     if (!ids)
         return { err : form_lang.Get(active_user.lang, "EmptySelection") };
 
+    var myPlan = database.getUser(active_user.username).plan;
+
     var method = null;
     var isOwner = null;
     if (table.name == "users") {
         method = database.deleteUser;
-        isOwner = database.isOwnerOfUser;
+        isOwner = function(name) { return database.isOwnerOfUser(myPlan, name) };
     } else
     if (table.name == "plans") {
         method = database.deletePlan;
-        isOwner = database.isOwnerOfPlan;
+        isOwner = function(name) { return database.isOwnerOfPlan(active_user.username, name) };
     } else
     if (table.name == "domains") {
         method = database.deleteDomain;
-        isOwner = database.isOwnerOfDomain;
+        isOwner = function(name) { return database.isOwnerOfDomain(active_user.username, name) };
     } else
-    return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
+        return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
 
     var accessDenied = []
     var errors = [];
     for(var i in ids) {
 
-        if (!isOwner(active_user.username, ids[i])) {
+        if (!isOwner(ids[i])) {
             accessDenied.push(ids[i]);
             continue;
         }

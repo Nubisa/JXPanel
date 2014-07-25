@@ -1,5 +1,6 @@
 
 var sqlite2 = require("./sqlite2");
+var util = require('util');
 
 var DB = {Plans:{}, Users:{}, Domains:{}};
 
@@ -42,6 +43,18 @@ var ReadDB = function(cb){ // KRIS FILL IN
         if (cb) cb(err);
     });
 };
+
+
+exports.errorEngine = null;
+
+var getError = function(str, arrParams) {
+
+    if (exports.errorEngine && exports.errorEngine.getError)
+        return exports.errorEngine.getError(str, arrParams)
+    else
+        return str;
+};
+
 
 var extend = function(base, ext){
     for(var o in ext){
@@ -150,7 +163,7 @@ var Plan = function(name, owner_user, opts, dummy){
             {
                 var res = this.canCreatePlan;
                 if(!res){
-                    return "User can't create plan";
+                    return getError("PlanCannotAddPlans");
                 }
 
                 if(!with_opts.planMaximums){
@@ -158,21 +171,21 @@ var Plan = function(name, owner_user, opts, dummy){
                 }
 
                 if(with_opts.canCreateUser && !this.canCreateUser){
-                    return "User's plan doesn't allow for user creation";
+                    return getError("PlanCannotAddUsers");
                 }
 
                 if(with_opts.maxUserCount>this.maxUserCount){
-                    return "User's plan has " + this.maxUserCount + " maximum users";
+                    return getError("PlanCannotAddMoreUsers", [this.maxUserCount ]);
                 }
 
                 if(with_opts.maxDomainCount>this.maxDomainCount){
-                    return "User's plan has " + this.maxDomainCount + " maximum domains";
+                    return getError("PlanCannotAddMoreDomains", [this.maxDomainCount]);
                 }
 
                 for(var o in with_opts.planMaximums){
                     if(this.planMaximums[o]){
                         if(with_opts.planMaximums[o]>this.planMaximums[o]){
-                            return "User's plan has " + o + " maximum defined as "+this.planMaximums[o];
+                            return getError("PlanCannotAddMore", [o]);
                         }
                     }
                 }
@@ -183,13 +196,13 @@ var Plan = function(name, owner_user, opts, dummy){
             case operation_enum.AddUser:
             {
                 if(this.suspended){
-                    return "User is suspended";
+                    return getError("UserSuspended");
                 }
                 if(!this.canCreateUser){
-                    return "User can't create users";
+                    return getError("PlanCannotAddUsers");
                 }
                 if(_totalUsers(this)>=this.maxUserCount){
-                    return "Hosting plan reached maximum user count";
+                    return getError("PlanCannotAddMore", ["user"]);
                 }
                 var _owner = Users[this.owner];
                 while(_owner){
@@ -197,7 +210,7 @@ var Plan = function(name, owner_user, opts, dummy){
                         break;
                     var _plan = Plans[_owner.plan];
                     if(_totalUsers(_plan)>=_plan.maxUserCount){
-                        return "Parent hosting plan reached maximum user count";
+                        return getError("PlanParentCannotAddMore", ["user"]);
                     }
                     if(!_plan.owner)
                         break;
@@ -209,10 +222,10 @@ var Plan = function(name, owner_user, opts, dummy){
             case operation_enum.AddDomain:
             {
                 if(this.suspended){
-                    return "User is suspended";
+                    return getError("UserSuspended");
                 }
                 if(_totalDomains(this)>=this.maxDomainCount){
-                    return "Hosting plan reached maximum domain count";
+                    return getError("PlanCannotAddMore", ["domain"]);
                 }
                 var _owner = Users[this.owner];
                 while(_owner){
@@ -220,7 +233,7 @@ var Plan = function(name, owner_user, opts, dummy){
                         break;
                     var _plan = Plans[_owner.plan];
                     if(_totalDomains(_plan)>=_plan.maxDomainCount){
-                        return "Parent hosting plan reached maximum domain count";
+                        return getError("PlanParentCannotAddMore", ["domain"]);
                     }
                     if(!_plan.owner)
                         break;
@@ -486,8 +499,8 @@ exports.deletePlan = function(name){
 };
 
 
-exports.isOwnerOfUser = function(who, whom) {
-    var arr = exports.getUsersByUserName(who);
+exports.isOwnerOfUser = function(plan_name, whom) {
+    var arr = exports.getUsersByPlanName(plan_name);
     return arr.indexOf(whom) !== -1;
 };
 

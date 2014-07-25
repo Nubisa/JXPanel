@@ -39,8 +39,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     var activeForm = require('../definitions/forms/' + formName).form();
     active_user.session.forms[formName].activeInstance = activeForm;
 
-    // empty form template, without controls (used when updating the record)
-    // it returns jus a string
+    // empty form template, without controls (used when calling html file for the first time)
+    // it returns just a string
     if (!onlyControls) {
         var containerFile = path.join(__dirname, "../definitions/forms/container.html");
 
@@ -56,11 +56,14 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         return result;
     }
 
-    // thre rest of the code should return object { err, html, js }
+    // the rest of the code should return object { err, html, js }
+    // this part returns controls, after the template was loaded into the browser and called jxcore.Call('getForm')
     var accessDeniedError = function(noun, name) {
         var noun = form_lang.Get(active_user.lang, noun, true);
         return {err : form_lang.Get(active_user.lang, "AccessDeniedToEditRecord", null, [ noun, name ] ) };
     };
+
+    var me = database.getUser(active_user.username);
 
     var isUpdate = null;
     if (_active_user.isRecordUpdating(active_user, formName)) {
@@ -69,7 +72,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         isUpdate.record = null;
 
         if (formName === "addUser") {
-            if (!database.isOwnerOfUser(active_user.username, isUpdate.name))
+            if (!database.isOwnerOfUser(me.plan, isUpdate.name))
                 return accessDeniedError("user", isUpdate.name);
 
             isUpdate.record = database.getUser(isUpdate.name);

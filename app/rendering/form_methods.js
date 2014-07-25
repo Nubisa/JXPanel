@@ -39,6 +39,7 @@ methods.tryLogin = function(env, params){
                         _url = params.url.substr(ind, params.url.length-(ind)).trim();
                     }
                 }
+
                 server.sendCallBack(env, {url: _url});
             };
 
@@ -281,7 +282,7 @@ methods.sessionApply = function(env, params){
     }
 
     if (ret) {
-        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg : ret } ]});
+        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg : form_lang.Get(active_user.lang, ret, true) } ]});
     } else {
         server.sendCallBack(env, {arr: false});
     }
