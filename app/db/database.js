@@ -3,6 +3,7 @@ var sqlite2 = require("./sqlite2");
 
 var DB = {Plans:{}, Users:{}, Domains:{}};
 
+
 var Plans = DB.Plans, Users = DB.Users, Domains = DB.Domains;
 
 var UpdateDB = function(stringToSave){ // KRIS FILL IN
@@ -24,6 +25,9 @@ var ReadDB = function(cb){ // KRIS FILL IN
             Plans = DB.Plans;
             Users = DB.Users;
             Domains = DB.Domains;
+
+            // todo: remove for production
+            exports.DB = DB;
         }
         if (cb) cb(err);
     });
