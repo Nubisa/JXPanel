@@ -332,6 +332,10 @@ var init_file_tools = function(){
         }
 
         var loc = getPathLocation(document.treeId, nodes[0]);
+        if(loc == '/'){
+            utils.bubble("warning", "Opps!", "You can not download the root folder", 4000);
+            return;
+        }
         toServer("downloadFile", {up:loc}, function(ret_val){
             if(ret_val.err){
                 alert(JSON.stringify(ret_val.err));
