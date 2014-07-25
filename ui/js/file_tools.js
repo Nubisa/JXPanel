@@ -345,11 +345,11 @@ var init_file_tools = function(){
                 return;
             }
 
+            var downloadLink = "<a href='"+ret_val.link+"' target='_blank'>"+ret_val.name+"</a>";
+
             $.SmartMessageBox({
                 title : "Download : "+loc,
-                content : "Use below one-time link to download..",
-                input: "text",
-                inputValue : ret_val.link,
+                content : "Use below one-time link to download..<br/><br/>" + downloadLink,
                 buttons : "[Done]"
             }, function(ButtonPress, name) {
                 return 0;
@@ -358,11 +358,43 @@ var init_file_tools = function(){
         }, true);
     };
 
+
+    var uploadFile = function(){
+        if(!document.treeId)
+            return;
+
+        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
+        if(!zTree)
+            return;
+
+        var nodes = zTree.getSelectedNodes();
+        if(!nodes || !nodes.length || !nodes[0].children)
+        {
+            utils.bubble("warning", "Not Selected!", "Select a folder for upload location", 4000);
+            return;
+        }
+
+        var loc = getPathLocation(document.treeId, nodes[0]);
+        var uploadHTML = '<span style="background-color: #f2f2f2;color:#000000;padding:10px;display: block;overflow:hidden;">'
+            +'<iframe scrolling="no" style="width:98%;height:35px;overflow:hidden;border:none;" src="/uploads.html?#'
+            + escape(loc) +'"></iframe></span>';
+
+        $.SmartMessageBox({
+            title : "Download : "+loc,
+            content : "Select a file to upload..<br/><br/>" + uploadHTML,
+            buttons : "[Close]"
+        }, function(ButtonPress, name) {
+            getFiles(loc, document.treeId, nodes[0]);
+            return 0;
+        });
+    };
+
     var btn_add = document.getElementById('btn_add');
     var btn_remove = document.getElementById('btn_remove');
     var btn_rename = document.getElementById('btn_rename');
     var btn_refresh = document.getElementById('btn_refresh');
     var btn_download = document.getElementById('btn_download');
+    var btn_upload = document.getElementById('btn_upload');
 
     btn_add.onmousedown = function(){
        addFile();
@@ -378,5 +410,8 @@ var init_file_tools = function(){
     };
     btn_download.onmousedown = function(){
         downloadFile();
+    };
+    btn_upload.onmousedown = function(){
+        uploadFile();
     };
 };

@@ -6,7 +6,8 @@ var server = require('jxm');
 var users = {};
 var path = require('path');
 var fs = require('fs');
-
+var exec = require('child_process').exec;
+var downloads = require('./downloads');
 
 var newUser = function(session_id){
     return {
@@ -293,19 +294,35 @@ exports.defineMethods = function(){
         }
 
         var home = active_user.homeFolder();
-        var loc = home + path.sep + params.up;
+        if(!fs.existsSync(home + path.sep + "__panel_downloads")){
+            fs.mkdirSync(home + path.sep + "__panel_downloads");
+        }
 
-        if(!fs.existsSync(loc)){
+        var loc = params.up;
+        if(loc && loc.length && loc[0] == '/'){
+            loc = loc.substr(1, loc.length-1);
+        }
+
+        if(!fs.existsSync(home + path.sep + loc)){
             server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
             return;
         }
 
-        var stat = fs.lstatSync(loc);
-        if(stat.isDirectory()){
-
-        }
-
-        server.sendCallBack(env, {done:true});
+        //var stat = fs.lstatSync(loc);
+        var zip_name = "File_" + Date.now() + "_" + jxcore.utils.uniqueId() + ".zip";
+        var zip_location = home + path.sep + "__panel_downloads" + path.sep + zip_name;
+        exec("zip -r " + zip_location + " " + loc, {cwd:home}, function(err, stdout, stderr){
+            if (err !== null) {
+                server.sendCallBack(env, {err:err});
+            }
+            else if(!fs.existsSync(zip_location)){
+                server.sendCallBack(env, {err:stderr || stdout});
+            }
+            else{
+                downloads.list["/" + zip_name] = {count:1, location:zip_location};
+                server.sendCallBack(env, {link:"/" + zip_name, name:zip_name});
+            }
+        });
     });
 };
 

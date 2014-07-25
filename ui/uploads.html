@@ -1,0 +1,18 @@
+<html><body style="margin:0px;padding:0px;">
+<form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
+<input type="file" id="uploadFile" name="uploadFile" />
+<input type="hidden" id="target" name="target" value="" />
+<input type="submit" value="Submit">
+</form>
+<script>
+    var t = document.getElementById('target');
+    var sp = location.href.split('#');
+    if(sp.length>1 && sp[1].trim().length){
+        t.value = sp[1];
+    }
+    else{
+        location.href = "/404";
+    }
+</script>
+</body></html>
+

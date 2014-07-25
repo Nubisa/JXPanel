@@ -32,14 +32,16 @@ exports.Labels = {
     "DeleteTooltip":"Delete selected file or folder",
     "RenameTooltip":"Rename selected file or folder",
     "DownloadTooltip":"Download file or folder",
-    "CloneTooltip":"Clone for Github",
+    "UploadTooltip":"Upload a file to server",
+    "UploadCompleted":'Upload is completed.',
+    "UploadFailed":"Upload operation is failed. Try again.",
 
     "Refresh":"Refresh",
     "Add":"Add",
     "Delete":"Delete",
     "Rename":"Rename",
     "Download":"Download",
-    "Clone":"Clone",
+    "Upload":"Upload",
 
     "MessageSuccess" : "Success",
     "MessageInfo" : "Info",
