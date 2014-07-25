@@ -157,6 +157,7 @@ var Plan = function(name, owner_user, opts, dummy){
         this.suspended = false;
     };
 
+    //todo: this method probably should be also called on UpdateXXX()
     this.CheckOperation = function(_operation_enum, with_opts){
         switch(_operation_enum){
             case operation_enum.AddPlan:
