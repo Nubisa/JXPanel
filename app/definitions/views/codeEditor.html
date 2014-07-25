@@ -38,9 +38,6 @@
 <a id="btn_download" data-original-title="{{label.DownloadTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
     <i class="fa fa-share-square-o "></i> {{label.Download}}
 </a>
-<a id="btn_clone" data-original-title="{{label.CloneTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-github"></i> {{label.Clone}}
-</a>
 
 <div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
     <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;">
@@ -91,6 +88,7 @@
             clearInterval(editorInter);
             var scr = document.createElement("script");
             scr.src = "/js/jquery.ztree.core-3.5.min.js";
+
             elm_editor.parentNode.appendChild(scr);
             Init();
         }
@@ -150,7 +148,7 @@
             ed_holder.style.maxHeight = (he-60) + "px";
             ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
 
-            return he-120;
+            return he-123;
         };
 
         document.rCount = 0;

@@ -6,6 +6,7 @@ var charts = require('./definitions/charts/charts');
 var site_defaults = require('./definitions/site_defaults');
 var _active_users = require('./definitions/active_user');
 var database = require("./db/database");
+var downloads = require("./definitions/downloads")
 
 require('http').setMaxHeaderLength(0);
 
@@ -36,7 +37,10 @@ if(fs.existsSync(__dirname + '/app.dev_config')){
     opts = JSON.parse(fs.readFileSync(__dirname + '/app.dev_config') + "");
 }
 
+server.on('request', downloads.check);
+
 database.ReadDB(function(err) {
+
     if (err)
         throw err;
     else

@@ -316,11 +316,52 @@ var init_file_tools = function(){
         getFiles(loc, document.treeId, nodes[0]);
     };
 
+    var downloadFile = function(){
+        if(!document.treeId)
+            return;
+
+        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
+        if(!zTree)
+            return;
+
+        var nodes = zTree.getSelectedNodes();
+        if(!nodes || !nodes.length)
+        {
+            utils.bubble("warning", "Not Selected!", "Select a folder or a file to download", 4000);
+            return;
+        }
+
+        var loc = getPathLocation(document.treeId, nodes[0]);
+        toServer("downloadFile", {up:loc}, function(ret_val){
+            if(ret_val.err){
+                alert(JSON.stringify(ret_val.err));
+
+                if(ret_val.relogin){
+                    location.href = "/index.html";
+                }
+                if(ret_val.reloadTree){
+                    location.href = "/editor.html";
+                }
+                return;
+            }
+
+            $.SmartMessageBox({
+                title : "Download : "+loc,
+                content : "Use below one-time link to download..",
+                input: "text",
+                inputValue : ret_val.link,
+                buttons : "[Done]"
+            }, function(ButtonPress, name) {
+                return 0;
+            });
+
+        }, true);
+    };
+
     var btn_add = document.getElementById('btn_add');
     var btn_remove = document.getElementById('btn_remove');
     var btn_rename = document.getElementById('btn_rename');
     var btn_refresh = document.getElementById('btn_refresh');
-    var btn_clone = document.getElementById('btn_clone');
     var btn_download = document.getElementById('btn_download');
 
     btn_add.onmousedown = function(){
@@ -334,5 +375,8 @@ var init_file_tools = function(){
     };
     btn_refresh.onmousedown = function(){
         refreshTree();
+    };
+    btn_download.onmousedown = function(){
+        downloadFile();
     };
 };
