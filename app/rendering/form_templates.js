@@ -4,6 +4,7 @@ var form_lang = require('../definitions/form_lang');
 var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
+var database = require("./../db/database");
 
 
 var logic = [
@@ -54,14 +55,24 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         return result;
     }
 
-    var edits = null;
-    // copying values for edit form
-    if (active_user.session.edits && active_user.session.edits[formName]) {
-        edits = {};
-        for(var i in active_user.session.edits[formName])
-            edits[i] = active_user.session.edits[formName][i];
+    var isUpdate = null;
+    if (_active_user.isRecordUpdating(active_user, formName)) {
+        isUpdate = {};
+        isUpdate.name = active_user.session.edits[formName].ID;
+        isUpdate.record = null;
+
+        if (formName === "addUser") isUpdate.record = database.getUser(isUpdate.name); else
+        if (formName === "addPlan") isUpdate.record = database.getPlan(isUpdate.name); else
+        if (formName === "addDomain") isUpdate.record = database.getDomain(isUpdate.name); else
+        return form_lang.Get(active_user.lang, "UnknownForm");
+
+        if (formName === "addPlan" && isUpdate.record.planMaximums) {
+            // copying values for easier display to the form
+            for(var o in isUpdate.record.planMaximums) {
+                isUpdate.record[o] = isUpdate.record.planMaximums[o]
+            }
+        }
     }
-//    console.log("EDIT", edits);
 
     var controls = activeForm.controls;
 
@@ -86,14 +97,18 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (!ctrl.method)
             continue;
 
-        var val = null;
+        var dbname = ctrl.dbName ? ctrl.dbName : name;
+        var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
 
         if(ctrl.options) {
-            ctrl.options.extra = { formName : formName, isUpdate : !!edits };
-            if (ctrl.options.password && edits)
+            ctrl.options.extra = { formName : formName, isUpdate : isUpdate};
+            if (ctrl.options.password && isUpdate)
                 val = null;
         }
-//        console.error("val for", dbname, ":", val);
+
+        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && isUpdate.record["name"] === isUpdate.name)))
+            ctrl.options.extra.noEditDisplayValue = val;
+
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
 

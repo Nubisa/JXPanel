@@ -451,11 +451,11 @@ exports.deleteUser = function(name){
 };
 
 exports.deletePlan = function(name){
-    if(!Plans[plan_name]){
-        throw new Error(plan_name + " plan doesn't exist");
+    if(!Plans[name]){
+        throw new Error(name + " plan doesn't exist");
     }
 
-    var plan = Plans[plan_name];
+    var plan = Plans[name];
 
     var owner = Users[plan.owner];
     if(!owner){

@@ -165,7 +165,7 @@ exports.Labels = {
     "MaxMemory" : "Max memory limit",
     "MaxMemory_Description" : "Maximum size of memory (kB), which can be allocated by the application. Empty value disables the limit.",
     "MaxDomains" : "Max domains",
-    "MaxDomains_Description" : "Maximum amount of domains. Empty value disables the limit.",
+    "MaxDomains_Description" : "Maximum amount of domains. Value 0 disallows to add new domains.",
     "AllowSSL" : "Allow secured SSL port",
     "AllowCustomSocketPort" : "Allow custom socket port",
     "AllowSysExec" : "Allow to spawn/exec child processes",
@@ -175,9 +175,9 @@ exports.Labels = {
     "AllowSSH" : "SSH",
     "NginxDirectives" : "NGINX directives",
     "MaxUsers" : "Max users",
-    "MaxUsers_Description" : "Maximum amount of users. Empty value disables the limit.",
+    "MaxUsers_Description" : "Maximum amount of users. Value 0 disallows to add new users.",
     "MaxPlans" : "Max plans",
-    "MaxPlans_Description" : "Maximum amount of hosting plans. Empty value disables the limit.",
+    "MaxPlans_Description" : "Maximum amount of hosting plans. Empty value disables the limit. Value 0 disallows to add new plans.",
 
     "DomainName" : "Domain",
     "DomainName_Description" : "The domain name for you subscription.",
@@ -207,6 +207,7 @@ exports.Labels = {
     "DBCannotGetParentUser" : "Cannot read parent user data from database.",
     "DBCannotGetPlan" : "Cannot read hosting plan from database.",
     "DBCannotGetParentPlan" : "Cannot read parent hosting plan from database.",
+    "DBCannotGetDomain" : "Cannot read domain from database.",
     "DBCannotReadData" : "Cannot read data from database.",
 
     // datatables

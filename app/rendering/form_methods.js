@@ -53,7 +53,7 @@ methods.tryLogin = function(env, params){
                     planMaximums: {}
                 });
 
-                database.AddUser("Unlimited", params.username, {});
+                database.AddUser("Unlimited", params.username, { person_name : params.username });
                 finish();
                 return;
             }
@@ -154,6 +154,12 @@ var getFormControls = function(activeInstance) {
 };
 
 
+var update = function(base, ext){
+    for(var o in ext){
+        base[o] = ext[o];
+    }
+};
+
 methods.sessionApply = function(env, params){
 
     var active_user = checkUser(env);
@@ -170,6 +176,7 @@ methods.sessionApply = function(env, params){
     var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
 
     var json = {};
+    var planMaximums = {};
     var cnt = 0;
     for (var field_name in params.controls) {
         var val = params.controls[field_name];
@@ -182,6 +189,16 @@ methods.sessionApply = function(env, params){
                 continue;
             }
 
+            if (det.dbName === false) {
+                // dont save to db
+                continue;
+            }
+
+            if (det.dbName) {
+                // replacing form controls names into db field names
+                field_name = det.dbName;
+            }
+
             if (val.trim)
                 val = val.replace(/&#64;/g, "@");
 
@@ -189,36 +206,89 @@ methods.sessionApply = function(env, params){
                 json[field_name] = ctrl.convert(val);
             else
                 json[field_name] = val;
+
+            if (det.definesMax) {
+                planMaximums[field_name] = json[field_name];
+                delete json[field_name];
+            }
         }
     }
 
-    if (!cnt) {
-        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg: form_lang.Get(active_user.lang, "FormEmpty")} ] });
-        return;
-    }
+    var sendError = function(errLabel) {
+        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
+    };
 
-    var myPlan = database.getUser(active_user.username).plan;
+    if (!cnt)
+        return sendError("FormEmpty");
 
-    var name = null;
-    var arr = [];
+    var ret = null;
     if (params.form === "addUser") {
-        name = json.person_username;
-        delete json.person_username;
-
-        var ret = null;
         try {
-            ret = database.AddUser(myPlan, json.person_username, json);
+            if (isUpdate) {
+                var user = database.getUser(json.name);
+                if (!user)
+                    return sendError("DBCannotGetUser");
+
+                update(user, json);
+                ret = database.updateUser(json.name, user);
+            } else {
+                ret = database.AddUser(json.plan, json.name, json);
+            }
         } catch(ex) {
             ret = ex.toString();
         }
+    }
 
-        if (ret) {
-            arr.push({ control: form_lang.Get(active_user.lang, "Form"), msg : ret });
-            server.sendCallBack(env, {arr: arr});
-        } else {
-            server.sendCallBack(env, {arr: false});
+    if (params.form === "addDomain") {
+        try {
+            if (isUpdate) {
+                var domain = database.getDomain(json.name);
+                if (!domain)
+                    return sendError("DBCannotGetDomain");
+
+                update(domain, json);
+                ret = database.updateDomain(json.name, domain);
+            } else {
+                ret = database.AddDomain(active_user.username, json.name, json);
+            }
+        } catch(ex) {
+            ret = ex.toString();
         }
-        return;
+    }
+
+    if (params.form === "addPlan") {
+        try {
+            if (isUpdate) {
+                var plan = database.getPlan(json.name);
+                if (!plan)
+                    return sendError("DBCannotGetPlan");
+
+                update(plan, json);
+                update(plan.planMaximums, planMaximums);
+                ret = database.updatePlan(json.name, plan);
+            } else {
+
+                json.canCreateUser = json.maxUserCount + "" !== "0";
+                //var mu = parseInt(json.maxUserCount)
+                //json.maxUserCount = isNaN(mu) ? 1e5 : mu;
+
+                //var md = parseInt(json.maxDomainCount);
+                //json.maxDomainCount = isNaN(md) ? 1e5 : md;
+
+                json.canCreatePlan = planMaximums.plan_max_plans + "" !== "0";
+                json.planMaximums = planMaximums;
+
+                ret = database.AddPlan(active_user.username, json.name, json);
+            }
+        } catch(ex) {
+            ret = ex.toString();
+        }
+    }
+
+    if (ret) {
+        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg : ret } ]});
+    } else {
+        server.sendCallBack(env, {arr: false});
     }
 };
 
@@ -243,17 +313,15 @@ methods.getForm = function(env, params) {
 
 methods.removeFromTableData = function(env, params) {
 
-    datatables.remove(env.SessionID, params.dt, params.ids, function(err) {
-        server.sendCallBack(env, {err : err });
-    });
+    var ret = datatables.remove(env.SessionID, params.dt, params.ids);
+    server.sendCallBack(env, {err : ret.err });
 };
 
 // called when user clicked Apply on the form
 methods.editTableData = function(env, params) {
 
-    datatables.edit(env.SessionID, params.dt, params.id, function(err, url) {
-        server.sendCallBack(env, {err : err, url : url});
-    });
+    var ret = datatables.edit(env.SessionID, params.dt, params.id);
+    server.sendCallBack(env, {err : ret.err, url : ret.url});
 };
 
 methods.logout = function(env, params) {

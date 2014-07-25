@@ -16,7 +16,6 @@ var getData = function(label, _title, input_id, lang, options) {
     var isUpdate = options.extra.isUpdate;
 
     ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
-
     ret.dynamic = options.dynamic || "";
 
     return ret;
@@ -65,6 +64,12 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
         +'<div class="col-md-10">';
 
     var id = jxcore.utils.uniqueId();
+
+    if (options && options.extra && options.extra.noEditDisplayValue) {
+        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
+        return {html: _html + v + "</div></div>", js: ""};
+    }
+
     if(!options.multiline)
         _html += '<input id="a'+id+'" class="form-control" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
     else{
@@ -105,7 +110,7 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
     var id = jxcore.utils.uniqueId();
 
     if (options && options.extra && options.extra.noEditDisplayValue) {
-        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div';
+        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
         return {html: _html + v + "</div></div>", js: ""};
     }
 
@@ -162,6 +167,12 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
         + '<div class="checkbox"><label>';
 
     var id = jxcore.utils.uniqueId();
+
+    if (options && options.extra && options.extra.noEditDisplayValue) {
+        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
+        return {html: _html + v + "</div></div>", js: ""};
+    }
+
 
     _html += '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
 

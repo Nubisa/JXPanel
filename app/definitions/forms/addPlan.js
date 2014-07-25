@@ -56,7 +56,9 @@ exports.form = function () {
                 details: {
                     label: "PlanName",
                     method: tool.createTextBox,
-                    options: { required: true }
+                    options: { required: true },
+                    dbName: "name",
+                    cannotEdit: true
                 }
             },
 
@@ -65,7 +67,8 @@ exports.form = function () {
                 details: {
                     label: "Username",
                     method: null,
-                    options: { }
+                    options: { },
+                    dbName: "owner"
                 }
             },
 
@@ -84,7 +87,8 @@ exports.form = function () {
                     label: "MaxDiskSpace",
                     method: tool.createTextBox,
                     options: { suffix: " MB"},
-                    nullDisplayAs : "ValueUnlimited"
+                    nullDisplayAs : "ValueUnlimited",
+                    definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
             },
@@ -94,7 +98,8 @@ exports.form = function () {
                     label: "MaxTraffic",
                     method: tool.createTextBox,
                     options: { suffix: " MB/month"},
-                    nullDisplayAs : "ValueUnlimited"
+                    nullDisplayAs : "ValueUnlimited",
+                    definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
             },
@@ -104,7 +109,8 @@ exports.form = function () {
                     label: "MaxMemory",
                     method: tool.createTextBox,
                     options: { },
-                    nullDisplayAs : "ValueUnlimited"
+                    nullDisplayAs : "ValueUnlimited",
+                    definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
             },
@@ -114,7 +120,8 @@ exports.form = function () {
                     label: "MaxCPU",
                     method: tool.createTextBox,
                     options: { },
-                    nullDisplayAs : "ValueUnlimited"
+                    nullDisplayAs : "ValueUnlimited",
+                    definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
             },
@@ -124,16 +131,6 @@ exports.form = function () {
                     label: "MaxCPUInterval",
                     method: tool.createTextBox,
                     options: { }
-                },
-                validation: new validations.Int( { gte : 0})
-            },
-
-            { name: "plan_max_domains",
-                details: {
-                    label: "MaxDomains",
-                    method: tool.createTextBox,
-                    options: { },
-                    nullDisplayAs : "ValueUnlimited"
                 },
                 validation: new validations.Int( { gte : 0})
             },
@@ -194,19 +191,28 @@ exports.form = function () {
                 }
             },
 
+            { name: "plan_max_domains",
+                details: {
+                    label: "MaxDomains",
+                    method: tool.createTextBox,
+                    options: { required : true },
+                    nullDisplayAs : "ValueUnlimited",
+                    dbName: "maxDomainCount"
+//                    definesMax: true
+                },
+                validation: new validations.Int( { gte : 0})
+            },
+
             { name: "plan_max_users",
                 details: {
                     label: "MaxUsers",
                     method: tool.createTextBox,
-                    options: {  },
-                    nullDisplayAs : "ValueUnlimited"
+                    options: { required : true },
+                    nullDisplayAs : "ValueUnlimited",
+                    dbName: "maxUserCount"
+//                    definesMax: true
                 },
-                validation: new function() {
-
-                    this.validate = function (env, active_user, val, vals) {
-                        return {result: false, msg : "Validation not implemented." };
-                    };
-                }
+                validation: new validations.Int( { gte : 0})
             },
 
             { name: "plan_max_plans",
@@ -214,10 +220,12 @@ exports.form = function () {
                     label: "MaxPlans",
                     method: tool.createTextBox,
                     options: {  },
-                    nullDisplayAs : "ValueUnlimited"
+                    nullDisplayAs : "ValueUnlimited",
+                    definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
             },
+
 
             // do not remove this yet, may be useful
 //            "sub_domain_name": {

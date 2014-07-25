@@ -55,7 +55,9 @@ exports.form = function () {
                 details: {
                     label: "DomainName",
                     method: tool.createTextBox,
-                    options: { required: true, prefix: "www." }
+                    options: { required: true, prefix: "www." },
+                    dbName: "name", // alias to `name` in object database.getDomain();
+                    cannotEdit: true
                 }
             },
 
@@ -64,125 +66,10 @@ exports.form = function () {
                 details: {
                     label: "Username",
                     method: null,
-                    options: { }
+                    options: { },
+                    dbName: "owner" // alias to `owner` in object database.getDomain();
                 }
             },
-//
-//            { name: "plan_overuse",
-//                details: {
-//                    label: "Overuse",
-//                    method: tool.createCheckBox,
-//                    options: { },
-//                    validation: new validations.Boolean()
-//                }
-//            },
-//
-//            { name: "plan_disk_space",
-//                details: {
-//                    label: "MaxDiskSpace",
-//                    method: tool.createTextBox,
-//                    options: { suffix: " MB"}
-//                },
-//                validation: new validations.Int( { gte : 0})
-//            },
-//
-//            { name: "plan_traffic",
-//                details: {
-//                    label: "MaxTraffic",
-//                    method: tool.createTextBox,
-//                    options: { suffix: " MB/month"}
-//                }
-////                validation : new validations.Int( { gte : 0 })
-//            },
-//
-//            { name: "plan_memory",
-//                details: {
-//                    label: "MaxMemory",
-//                    method: tool.createTextBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_cpu",
-//                details: {
-//                    label: "MaxCPU",
-//                    method: tool.createTextBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_cpu_interval",
-//                details: {
-//                    label: "MaxCPUInterval",
-//                    method: tool.createTextBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_domain_count",
-//                details: {
-//                    label: "MaxDomains",
-//                    method: tool.createTextBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_ssl",
-//                details: {
-//                    label: "AllowSSL",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_custom_socket",
-//                details: {
-//                    label: "AllowCustomSocketPort",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_sys_exec",
-//                details: {
-//                    label: "AllowSysExec",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_local_native_modules",
-//                details: {
-//                    label: "AllowLocalNativeModules",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_app_log_web_access",
-//                details: {
-//                    label: "AppLogWebAccess",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_ssh",
-//                details: {
-//                    label: "AllowSSH",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-//
-//            { name: "plan_nginx_directives",
-//                details: {
-//                    label: "NginxDirectives",
-//                    method: tool.createTextBox,
-//                    options: { multiline : true }
-//                }
-//            },
-
 
             // do not remove this yet, may be useful
             { name: "sub_ipv4",
@@ -198,31 +85,6 @@ exports.form = function () {
                     options: { required: true, values: ifcv6_list }
                 }
             },
-
-//            { name: "sub_username",
-//                details: {
-//                    label: "Username",
-//                    method: tool.createTextBox,
-//                    options: { required: true, values: ["EN"]}
-//                }
-//            },
-//
-//            {name: "sub_password",
-//                details: {
-//                    label: "Password",
-//                    method: tool.createTextBox,
-//                    options: { required: true, password: true }
-//                }
-//            },
-//
-//            { name: "sub_repeatpassword",
-//                details: {
-//                    label: "PasswordRepeat",
-//                    method: tool.createTextBox,
-//                    options: { required: true, password: true },
-//                    db: false
-//                }
-//            },
 
             {"END" : 1}
         ];
