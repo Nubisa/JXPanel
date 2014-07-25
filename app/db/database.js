@@ -24,6 +24,17 @@ var ReadDB = function(cb){ // KRIS FILL IN
             Plans = DB.Plans;
             Users = DB.Users;
             Domains = DB.Domains;
+            for(var o in Plans){
+                Plans[o] = new Plan(o, null, Plans[o], true);
+            }
+            for(var o in Users){
+                if(!Users[o].subPlans){
+                    Users[o].subPlans = {};
+                }
+                if(!Users[o].domains){
+                    Users[o].domains = {};
+                }
+            }
         }
         if (cb) cb(err);
     });
@@ -68,14 +79,16 @@ var Domain = function(name, owner_user, opts){
     extend(this, opts);
 };
 
-var Plan = function(name, owner_user, opts){
+var Plan = function(name, owner_user, opts, dummy){
     this.name = name;
-    this.owner = owner_user.name;
-    checkSet("maxDomainCount", this, opts);
-    checkSet("maxUserCount", this, opts);
-    checkSet("canCreatePlan", this, opts, [false]);
-    checkSet("canCreateUser", this, opts, [false]);
-    checkSet("planMaximums", this, opts);
+    if(!dummy){
+        this.owner = owner_user.name;
+        checkSet("maxDomainCount", this, opts);
+        checkSet("maxUserCount", this, opts);
+        checkSet("canCreatePlan", this, opts, [false]);
+        checkSet("canCreateUser", this, opts, [false]);
+        checkSet("planMaximums", this, opts);
+    }
 
     this.users = {};
 
