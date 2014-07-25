@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="/css/zTreeStyle.css" />
 
 <div class="note" style="margin-bottom:4px;cursor:default;">{{label.CodeEditorTop}}</div>
-<i class="fa fa-fw fa-align-justify" style="cursor:default;"></i>&nbsp;&nbsp;
+<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #369;"></i>&nbsp;&nbsp;
 <a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
     <i class="fa fa-refresh"></i> {{label.Refresh}}
 </a>
@@ -150,7 +150,7 @@
             ed_holder.style.maxHeight = (he-60) + "px";
             ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
 
-            return he-130;
+            return he-120;
         };
 
         document.rCount = 0;
@@ -220,7 +220,7 @@
             var pp = document.createElement("p");
             var div_code_editor = document.createElement("div");
             div_code_editor.id = id + "_code_editor";
-            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-right:dotted 1px #ccc;border-bottom:dotted 1px #ccc;border-left:dotted 1px #ccc;height: "+eh+"px;overflow:hidden";
+            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-top:dotted 1px #ccc;border-bottom:dotted 1px #ccc;margin-top:2px;height: "+eh+"px;overflow:hidden";
             pp.appendChild(div_code_editor);
             div.appendChild(pp);
             content_holder.appendChild(div);
@@ -339,9 +339,11 @@
             if(!_fname)
                 opts.readOnly = true;
             else{
+                var span = document.createElement("span");
+                span.innerHTML = '<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #369;"></i>&nbsp;&nbsp;';
                 btn = document.createElement("button");
-                btn.className = "btn btn-success";
-                btn.style.cssText = "margin-bottom:2px;margin-top:2px;padding:3px 12px;";
+                btn.className = "btn btn-success jxbtn";
+                btn.style.cssText = "margin-bottom:2px;margin-top:2px;padding:0px 10px;";
                 btn._name = fname;
                 btn._location = location;
                 btn._eid = eid;
@@ -363,7 +365,8 @@
                 };
                 btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
                 btn.disabled = "disabled";
-                host_editor.parentNode.insertBefore(btn, host_editor.parentNode.firstChild);
+                span.appendChild(btn);
+                host_editor.parentNode.insertBefore(span, host_editor.parentNode.firstChild);
             }
 
             host_editor.appendChild(elm_editor);
