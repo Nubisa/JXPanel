@@ -106,7 +106,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
                 val = null;
         }
 
-        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && isUpdate.record["name"] === isUpdate.name)))
+        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && isUpdate.record["name"] === active_user.username)))
             ctrl.options.extra.noEditDisplayValue = val;
 
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));

@@ -173,8 +173,6 @@ methods.sessionApply = function(env, params){
 
     var _controls = getFormControls(activeInstance);
 
-    var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
-
     var json = {};
     var planMaximums = {};
     var cnt = 0;
@@ -221,16 +219,19 @@ methods.sessionApply = function(env, params){
     if (!cnt)
         return sendError("FormEmpty");
 
+    var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
+    var update_name = isUpdate ? active_user.session.edits[params.form].ID : json.name;
+
     var ret = null;
     if (params.form === "addUser") {
         try {
             if (isUpdate) {
-                var user = database.getUser(json.name);
+                var user = database.getUser(update_name);
                 if (!user)
                     return sendError("DBCannotGetUser");
 
                 update(user, json);
-                ret = database.updateUser(json.name, user);
+                ret = database.updateUser(update_name, user);
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
             }
@@ -242,12 +243,12 @@ methods.sessionApply = function(env, params){
     if (params.form === "addDomain") {
         try {
             if (isUpdate) {
-                var domain = database.getDomain(json.name);
+                var domain = database.getDomain(update_name);
                 if (!domain)
                     return sendError("DBCannotGetDomain");
 
                 update(domain, json);
-                ret = database.updateDomain(json.name, domain);
+                ret = database.updateDomain(update_name, domain);
             } else {
                 ret = database.AddDomain(active_user.username, json.name, json);
             }
@@ -259,22 +260,16 @@ methods.sessionApply = function(env, params){
     if (params.form === "addPlan") {
         try {
             if (isUpdate) {
-                var plan = database.getPlan(json.name);
+                var plan = database.getPlan(update_name);
                 if (!plan)
                     return sendError("DBCannotGetPlan");
 
                 update(plan, json);
                 update(plan.planMaximums, planMaximums);
-                ret = database.updatePlan(json.name, plan);
+                ret = database.updatePlan(update_name, plan);
             } else {
 
                 json.canCreateUser = json.maxUserCount + "" !== "0";
-                //var mu = parseInt(json.maxUserCount)
-                //json.maxUserCount = isNaN(mu) ? 1e5 : mu;
-
-                //var md = parseInt(json.maxDomainCount);
-                //json.maxDomainCount = isNaN(md) ? 1e5 : md;
-
                 json.canCreatePlan = planMaximums.plan_max_plans + "" !== "0";
                 json.planMaximums = planMaximums;
 
