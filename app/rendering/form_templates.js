@@ -4,6 +4,7 @@ var form_lang = require('../definitions/form_lang');
 var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
+var database = require("./../db/database");
 
 
 var logic = [
@@ -38,7 +39,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     var activeForm = require('../definitions/forms/' + formName).form();
     active_user.session.forms[formName].activeInstance = activeForm;
 
-    // empty form template, without controls
+    // empty form template, without controls (used when updating the record)
+    // it returns jus a string
     if (!onlyControls) {
         var containerFile = path.join(__dirname, "../definitions/forms/container.html");
 
@@ -54,14 +56,45 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         return result;
     }
 
-    var edits = null;
-    // copying values for edit form
-    if (active_user.session.edits && active_user.session.edits[formName]) {
-        edits = {};
-        for(var i in active_user.session.edits[formName])
-            edits[i] = active_user.session.edits[formName][i];
+    // thre rest of the code should return object { err, html, js }
+    var accessDeniedError = function(noun, name) {
+        var noun = form_lang.Get(active_user.lang, noun, true);
+        return {err : form_lang.Get(active_user.lang, "AccessDeniedToEditRecord", null, [ noun, name ] ) };
+    };
+
+    var isUpdate = null;
+    if (_active_user.isRecordUpdating(active_user, formName)) {
+        isUpdate = {};
+        isUpdate.name = active_user.session.edits[formName].ID;
+        isUpdate.record = null;
+
+        if (formName === "addUser") {
+            if (!database.isOwnerOfUser(active_user.username, isUpdate.name))
+                return accessDeniedError("user", isUpdate.name);
+
+            isUpdate.record = database.getUser(isUpdate.name);
+        } else
+        if (formName === "addPlan") {
+            if (!database.isOwnerOfPlan(active_user.username, isUpdate.name))
+                return accessDeniedError("plan", isUpdate.name);
+
+            isUpdate.record = database.getPlan(isUpdate.name);
+        } else
+        if (formName === "addDomain") {
+            if (!database.isOwnerOfDomain(active_user.username, isUpdate.name))
+                return accessDeniedError("domain", isUpdate.name);
+
+            isUpdate.record = database.getDomain(isUpdate.name);
+        } else
+            return {err : form_lang.Get(active_user.lang, "UnknownForm") };
+
+        if (formName === "addPlan" && isUpdate.record.planMaximums) {
+            // copying values for easier display to the form
+            for(var o in isUpdate.record.planMaximums) {
+                isUpdate.record[o] = isUpdate.record.planMaximums[o]
+            }
+        }
     }
-//    console.log("EDIT", edits);
 
     var controls = activeForm.controls;
 
@@ -86,14 +119,18 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (!ctrl.method)
             continue;
 
-        var val = null;
+        var dbname = ctrl.dbName ? ctrl.dbName : name;
+        var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
 
         if(ctrl.options) {
-            ctrl.options.extra = { formName : formName, isUpdate : !!edits };
-            if (ctrl.options.password && edits)
+            ctrl.options.extra = { formName : formName, isUpdate : isUpdate};
+            if (ctrl.options.password && isUpdate)
                 val = null;
         }
-//        console.error("val for", dbname, ":", val);
+
+        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && isUpdate.record["name"] === active_user.username)))
+            ctrl.options.extra.noEditDisplayValue = val;
+
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
 
@@ -108,5 +145,5 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     }
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
-    return { html: tool.begin + html + tool.end, js : scr };
+    return { err : false, html: tool.begin + html + tool.end, js : scr };
 };

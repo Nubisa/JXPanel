@@ -71,7 +71,9 @@ exports.form = function () {
                 details: {
                     label: "Username",
                     method: tool.createTextBox,
-                    options: { required: true, values: ["EN"]}
+                    options: { required: true },
+                    dbName: "name",  // alias to name in database.getUser() object,
+                    cannotEdit: true
                 }
             },
 
@@ -81,12 +83,9 @@ exports.form = function () {
                     label: "Password",
                     method: tool.createTextBox,
                     options: { required_insert: true, password: true, dont_update_null : true },
-                    value_table: false
+                    dbName: false
                 },
                 validation : new validations.String(5)
-//                convert : function(value) {
-//                    return crypto.createHash('md5').update(value).digest('hex').toString();
-//                }
             },
 
             {
@@ -94,12 +93,10 @@ exports.form = function () {
                 details: {
                     label: "PasswordRepeat",
                     method: tool.createTextBox,
-                    options: { required_insert: true, password: true, dont_update_null : true  }
+                    options: { required_insert: true, password: true, dont_update_null : true  },
+                    dbName: false
                 },
                 validation : new validations.Password("person_password")
-//                convert : function(value) {
-//                    return crypto.createHash('md5').update(value).digest('hex').toString();
-//                }
             },
 
             { name: "plan_table_id",
@@ -107,7 +104,8 @@ exports.form = function () {
                     label: "PlanID",
                     method: tool.createComboBox,
                     options: { required: true, dynamic: true },
-                    userCannotEditOwnRecord : true
+                    dbName: "plan",
+                    cannotEditOwnRecord : true
                 },
                 dynamicValues : function(active_user) {
 
@@ -118,7 +116,7 @@ exports.form = function () {
                     ret.push({ id : me.plan, txt : me.plan });
 
                     for(var i in plans) {
-                        ret.push({ id : plans[i].name, txt : plans[i].name });
+                        ret.push({ id : plans[i], txt : plans[i] });
                     }
                     return ret;
                 }

@@ -73,45 +73,76 @@ var getHTML = function (active_user, table) {
             dbNames[columns[a]] = formControls[columns[a]].details.dbName || columns[a];
         }
 
+        // for virtual fields not defined in form (e.g. on domains list)
+        if (displayName === "plan_table_id")
+            displayName = form_lang.Get(active_user.lang, "PlanID");
+
         ret[0].push(displayName);
     }
 
+    var myPlan = database.getUser(active_user.username).plan
 
     var data = null;
-    if (table.name == "users")
-        data = database.getUsersByUserName(active_user.username, 1);
-    else if (table.name == "users")
+    var method = null;
+    if (table.name == "users") {
+        data = database.getUsersByPlanName(myPlan, 1);
+        method = database.getUser;
+    }
+    else if (table.name == "plans") {
         data = database.getPlansByUserName(active_user.username, 1);
-    else if (table.name == "plans")
+        method = database.getPlan;
+    }
+    else if (table.name == "domains") {
         data = database.getDomainsByUserName(active_user.username, 1);
+        method = database.getDomain;
+    }
     else {
         return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
     }
 
-    console.log("data", data);
-
-
     var cnt = 1;
     for (var i in data) {
 
+        var name = data[i];
+        var record = method(name);
+
+        // empty record?
+        if (!record)
+            continue;
+
+
+        if (table.name == "plans" && record.planMaximums) {
+            // copying values for easier display to the list
+            for(var o in record.planMaximums) {
+                record[o] = record.planMaximums[o]
+            }
+        }
+
         var single_row = [];
 
-        if (ID === active_user.user_id)
+        if (record.name === active_user.username)
             single_row["_class"] = "success";
 
         for (var x in columns) {
-            var colName = columns[x];
-            var val = rows[y][colName];
+            var colName = dbNames[columns[x]] || columns[x];
+            var val = record[colName];
 
             // null/undefined value replacement into display value
             if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
-                if (!val && val != 0 && val !== false)
+                if (!val && val + "" !== "0" && val + "" !== "false" )
                     val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
             }
 
-            var str = '<a href="#" onclick="jxEditRow(\'' + rows[y]["ID"] + '\'); return false;">' + val + '</a>';
+            // virtual column with plan name
+            if (colName === "plan_table_id" && table.name === "domains") {
+                var plan = database.getPlanByDomainName(record.name);
+                if (plan && plan.name) val = plan.name;
+            }
+
+
+            var str = '<a href="#" onclick="jxEditRow(\'' + record.name + '\'); return false;">' + val + '</a>';
             if (colName === "_checkbox")
-                str = '<input type="checkbox" id="jxrow_' + rows[y]["ID"] + '"></input>';
+                str = '<input type="checkbox" id="jxrow_' + record.name + '"></input>';
             else if (colName === "_id")
                 str = cnt++;
 
@@ -222,63 +253,77 @@ var logic = [
 
 
 // removes ids from main table (e.g. user_table) and all records from data_value_table
-exports.remove = function (sessionId, table_name, ids, cb) {
-
-//    console.log("!!datatable remove", table_name, ids);
+exports.remove = function (sessionId, table_name, ids) {
 
     var active_user = _active_user.getUser(sessionId);
 
     var table = getTable(table_name);
-    if (!table) {
-        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
-        return;
+    if (!table)
+        return { err : form_lang.Get(active_user.lang, "UnknownDataTable") };
+
+    if (!ids)
+        return { err : form_lang.Get(active_user.lang, "EmptySelection") };
+
+    var method = null;
+    var isOwner = null;
+    if (table.name == "users") {
+        method = database.deleteUser;
+        isOwner = database.isOwnerOfUser;
+    } else
+    if (table.name == "plans") {
+        method = database.deletePlan;
+        isOwner = database.isOwnerOfPlan;
+    } else
+    if (table.name == "domains") {
+        method = database.deleteDomain;
+        isOwner = database.isOwnerOfDomain;
+    } else
+    return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
+
+    var accessDenied = []
+    var errors = [];
+    for(var i in ids) {
+
+        if (!isOwner(active_user.username, ids[i])) {
+            accessDenied.push(ids[i]);
+            continue;
+        }
+
+        var ret = null;
+        try {
+            ret = method(ids[i]);
+            if (!ret.deleted) {
+                errors.push(ret);
+            }
+        } catch (ex) {
+            errors.push(ex.toString());
+        }
     }
 
-    if (!ids) {
-        cb(form_lang.Get(active_user.lang, "EmptySelection"));
-        return;
+    if (accessDenied.length) {
+        var noun = form_lang.Get(active_user.lang, table.name);
+        var str = form_lang.Get(active_user.lang, "AccessDeniedToRemoveRecord", null, [ noun, accessDenied.join(", ") ] );
+        errors.push(str);
     }
 
-    // todo: DB remove record
+    return { err: errors.length ? errors.join(" ") : false };
 };
 
 // called when user clicked Apply on the form
 // here record info is stored in session arr and they will be available after automatic panel refresh
-exports.edit = function (sessionId, table_name, id, cb) {
+exports.edit = function (sessionId, table_name, id) {
     var active_user = _active_user.getUser(sessionId);
 
     var table = getTable(table_name);
-    if (!table) {
-        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
-        return;
-    }
+    if (!table)
+        return { err : form_lang.Get(active_user.lang, "UnknownDataTable") };
 
-    if (!id) {
-        cb(form_lang.Get(active_user.lang, "EmptySelection"));
-        return;
-    }
+    if (!id)
+        return { err : form_lang.Get(active_user.lang, "EmptySelection") };
 
-    // todo: DB fetch record which will be editing
-    getData(active_user, table, { ID : id }, function(err, rows) {
-        if (!err) {
+    active_user.session.edits = active_user.session.edits || {};
+    active_user.session.edits[table.settings.addForm] = { ID : id };
+    active_user.session.lastPath = "/" + table.settings.addFormURL;
 
-            if (rows.length > 0) {
-
-                active_user.session.edits = active_user.session.edits || {};
-                active_user.session.edits[table.settings.addForm] = rows[0];
-
-//                    console.log("storing rows in edits", rows);
-
-                // sending url to the browser for redirecting to edit form
-                active_user.session.lastPath = "/" + table.settings.addFormURL;
-                cb(false, table.settings.addFormURL);
-            } else {
-                cb(form_lang.Get(active_user.lang, "EmptySelection"));
-            }
-
-        } else {
-            cb(err);
-        }
-    });
-
+    return {err : false, url : table.settings.addFormURL};
 };

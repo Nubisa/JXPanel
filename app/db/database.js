@@ -451,11 +451,11 @@ exports.deleteUser = function(name){
 };
 
 exports.deletePlan = function(name){
-    if(!Plans[plan_name]){
-        throw new Error(plan_name + " plan doesn't exist");
+    if(!Plans[name]){
+        throw new Error(name + " plan doesn't exist");
     }
 
-    var plan = Plans[plan_name];
+    var plan = Plans[name];
 
     var owner = Users[plan.owner];
     if(!owner){
@@ -484,6 +484,24 @@ exports.deletePlan = function(name){
     UpdateDB(JSON.stringify(DB));
     return {deleted:true, plans:arr_plans, users:arr_users, domains:arr_domains};
 };
+
+
+exports.isOwnerOfUser = function(who, whom) {
+    var arr = exports.getUsersByUserName(who);
+    return arr.indexOf(whom) !== -1;
+};
+
+exports.isOwnerOfDomain = function(who, whom) {
+    var arr = exports.getDomainsByUserName(who);
+    return arr.indexOf(whom) !== -1;
+};
+
+exports.isOwnerOfPlan = function(who, whom) {
+    var arr = exports.getPlansByUserName(who);
+    return arr.indexOf(whom) !== -1;
+};
+
+
 
 exports.updateUser = function(name, data){
     if(!Users[name]){
