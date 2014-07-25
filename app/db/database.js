@@ -485,6 +485,24 @@ exports.deletePlan = function(name){
     return {deleted:true, plans:arr_plans, users:arr_users, domains:arr_domains};
 };
 
+
+exports.isOwnerOfUser = function(who, whom) {
+    var arr = exports.getUsersByUserName(who);
+    return arr.indexOf(whom) !== -1;
+};
+
+exports.isOwnerOfDomain = function(who, whom) {
+    var arr = exports.getDomainsByUserName(who);
+    return arr.indexOf(whom) !== -1;
+};
+
+exports.isOwnerOfPlan = function(who, whom) {
+    var arr = exports.getPlansByUserName(who);
+    return arr.indexOf(whom) !== -1;
+};
+
+
+
 exports.updateUser = function(name, data){
     if(!Users[name]){
         throw new Error(name + " user doesnt exist");

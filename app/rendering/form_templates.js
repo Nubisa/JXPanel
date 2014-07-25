@@ -39,7 +39,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     var activeForm = require('../definitions/forms/' + formName).form();
     active_user.session.forms[formName].activeInstance = activeForm;
 
-    // empty form template, without controls
+    // empty form template, without controls (used when updating the record)
+    // it returns jus a string
     if (!onlyControls) {
         var containerFile = path.join(__dirname, "../definitions/forms/container.html");
 
@@ -55,16 +56,37 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         return result;
     }
 
+    // thre rest of the code should return object { err, html, js }
+    var accessDeniedError = function(noun, name) {
+        var noun = form_lang.Get(active_user.lang, noun, true);
+        return {err : form_lang.Get(active_user.lang, "AccessDeniedToEditRecord", null, [ noun, name ] ) };
+    };
+
     var isUpdate = null;
     if (_active_user.isRecordUpdating(active_user, formName)) {
         isUpdate = {};
         isUpdate.name = active_user.session.edits[formName].ID;
         isUpdate.record = null;
 
-        if (formName === "addUser") isUpdate.record = database.getUser(isUpdate.name); else
-        if (formName === "addPlan") isUpdate.record = database.getPlan(isUpdate.name); else
-        if (formName === "addDomain") isUpdate.record = database.getDomain(isUpdate.name); else
-        return form_lang.Get(active_user.lang, "UnknownForm");
+        if (formName === "addUser") {
+            if (!database.isOwnerOfUser(active_user.username, isUpdate.name))
+                return accessDeniedError("user", isUpdate.name);
+
+            isUpdate.record = database.getUser(isUpdate.name);
+        } else
+        if (formName === "addPlan") {
+            if (!database.isOwnerOfPlan(active_user.username, isUpdate.name))
+                return accessDeniedError("plan", isUpdate.name);
+
+            isUpdate.record = database.getPlan(isUpdate.name);
+        } else
+        if (formName === "addDomain") {
+            if (!database.isOwnerOfDomain(active_user.username, isUpdate.name))
+                return accessDeniedError("domain", isUpdate.name);
+
+            isUpdate.record = database.getDomain(isUpdate.name);
+        } else
+            return {err : form_lang.Get(active_user.lang, "UnknownForm") };
 
         if (formName === "addPlan" && isUpdate.record.planMaximums) {
             // copying values for easier display to the form
@@ -123,5 +145,5 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     }
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
-    return { html: tool.begin + html + tool.end, js : scr };
+    return { err : false, html: tool.begin + html + tool.end, js : scr };
 };

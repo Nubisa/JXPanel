@@ -265,13 +265,30 @@ exports.remove = function (sessionId, table_name, ids) {
         return { err : form_lang.Get(active_user.lang, "EmptySelection") };
 
     var method = null;
-    if (table.name == "users") method = database.deleteUser; else
-    if (table.name == "plans") method = database.deletePlan; else
-    if (table.name == "domains") method = database.deleteDomain; else
+    var isOwner = null;
+    if (table.name == "users") {
+        method = database.deleteUser;
+        isOwner = database.isOwnerOfUser;
+    } else
+    if (table.name == "plans") {
+        method = database.deletePlan;
+        isOwner = database.isOwnerOfPlan;
+    } else
+    if (table.name == "domains") {
+        method = database.deleteDomain;
+        isOwner = database.isOwnerOfDomain;
+    } else
     return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
 
+    var accessDenied = []
     var errors = [];
     for(var i in ids) {
+
+        if (!isOwner(active_user.username, ids[i])) {
+            accessDenied.push(ids[i]);
+            continue;
+        }
+
         var ret = null;
         try {
             ret = method(ids[i]);
@@ -281,6 +298,12 @@ exports.remove = function (sessionId, table_name, ids) {
         } catch (ex) {
             errors.push(ex.toString());
         }
+    }
+
+    if (accessDenied.length) {
+        var noun = form_lang.Get(active_user.lang, table.name);
+        var str = form_lang.Get(active_user.lang, "AccessDeniedToRemoveRecord", null, [ noun, accessDenied.join(", ") ] );
+        errors.push(str);
     }
 
     return { err: errors.length ? errors.join(" ") : false };

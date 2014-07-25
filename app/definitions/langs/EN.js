@@ -25,7 +25,8 @@ exports.Labels = {
     "codeEditor":"Code Editor",
     "serviceManagement":"Service Management",
     "stats":"Server Stats",
-    "users":"Users",
+    "UsersUpperCase":"Users",
+    "users":"users",
 
     "RefreshTooltip":"Refresh selected folder",
     "AddTooltip":"Add a new file or folder",
@@ -123,7 +124,8 @@ exports.Labels = {
     "UsersHeaderList": "Customize the options",
     "UsersContentList": "Create new users and manage their options.",
 
-    "Domains" : "Domains",
+    "domains" : "domains",
+    "DomainsUpperCase" : "Domains",
     "DomainsManagement" : "Domain Management",
     "DomainsHeader": "Customize the options",
     "DomainsContent": "Create new domains and manage their options.",
@@ -151,6 +153,7 @@ exports.Labels = {
 
 
     // Plan
+    "plans":"plans",
     "PlanName" : "Plan name",
     "PlanID" : "Hosting Plan",
     "Overuse" : "Allow overuse",
@@ -206,9 +209,12 @@ exports.Labels = {
     "DBCannotGetUser" : "Cannot read user data from database.",
     "DBCannotGetParentUser" : "Cannot read parent user data from database.",
     "DBCannotGetPlan" : "Cannot read hosting plan from database.",
-    "DBCannotGetParentPlan" : "Cannot read parent hosting plan from database.",
+    "DBCannotGetParsentPlan" : "Cannot read parent hosting plan from database.",
     "DBCannotGetDomain" : "Cannot read domain from database.",
     "DBCannotReadData" : "Cannot read data from database.",
+
+    "AccessDeniedToRemoveRecord" : "You have no privileges to delete the following %s: %s",
+    "AccessDeniedToEditRecord" : "You have no privileges to edit the following %s: %s",
 
     // datatables
     "UnknownDataTable" : "Unknown table name.",

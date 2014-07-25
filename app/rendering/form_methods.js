@@ -301,7 +301,7 @@ methods.getForm = function(env, params) {
         return;
 
     var ret = forms.renderForm(env.SessionID, params.form, true);
-    server.sendCallBack(env, {err : false, html : ret.html, js : ret.js } );
+    server.sendCallBack(env, ret);
 };
 
 
