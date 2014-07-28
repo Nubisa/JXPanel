@@ -413,6 +413,11 @@ methods.installNPM = function(env, params) {
         var version = nameAndVersion.slice(pos + 1).trim();
     }
 
+    if (!fs.existsSync(datatables.jxconfig.globalModulePath)) {
+        fs.mkdirSync(datatables.jxconfig.globalModulePath);
+    }
+
+
     var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
 
