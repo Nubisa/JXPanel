@@ -18,6 +18,10 @@ var getData = function(label, _title, input_id, lang, options) {
     ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
     ret.dynamic = options.dynamic || "";
 
+    if (options.value && typeof options.value === "function") {
+        options.value = options.value();
+    }
+
     return ret;
 };
 
@@ -41,7 +45,7 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
 
     var data = getData(label, _title, input_id, lang, options);
 
-    _value = _value || "";
+    _value = _value || options.default || "";
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
@@ -203,6 +207,23 @@ exports.createHidden = function(label, _title, input_id, _value, lang, options){
     var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
 
     return {html:_html, js:_js};
+};
+
+
+exports.createSimpleText = function(label, _title, input_id, _value, lang, options){
+    var data = getData(label, _title, input_id, lang, options);
+
+    _value = _value || options.value || "";
+    _title = form_lang.Get(lang, _title) || _title;
+    label = form_lang.Get(lang, label) || label;
+
+    var _html = '<div class="form-group">'
+        +'<label class="col-md-2 control-label">'+label + '</label>'
+        +'<div class="col-md-10">'
+        +'<div style="margin-top: 7px;">' + _value + '</div>'
+        +'</div></div>';
+
+    return {html: _html, js: ""};
 };
 
 exports.end = "</fieldset></form>";

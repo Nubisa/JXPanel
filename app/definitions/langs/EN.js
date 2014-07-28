@@ -203,6 +203,13 @@ exports.Labels = {
     "DomainName_Description" : "The domain name for you subscription.",
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
+    "JXEnabled" : "JXcore",
+    "JXAppPath" : "Application file path",
+    "JXAppPath_Description" : "The path is relative to domain root folder.",
+
+    // JXcore
+    "JXcoreUpperCase" : "JXcore",
+
 
     "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
     "NoPlanOwned" : "You have no hosting plan of your own. Please add one.",
@@ -255,7 +262,31 @@ exports.Labels = {
 
     // html
     "NoDiv" : "Could not find proper html object.",
-    "NoTemplate" : "Could not find template for the %s."
+    "NoTemplate" : "Could not find template for the %s.",
+
+    "JXcoreUpperCase" : "JXcore",
+    "JXcoreManagement" : "JXcore Management",
+    "JXcoreHeader": "Customize the options",
+
+    "JXcoreConfiguration" : "Configuration",
+    "JXcoreInfo" : " Information",
+    "JXcoreVersion" : " JXcore version",
+    "JXcorePath" : " JXcore path",
+    "JXcoreMonitor" : "JXcore Monitor",
+    "JXcoreMonitorStatus" : "Status ",
+    "JXAppMinPort" : "Minimum app port number",
+    "JXAppMaxPort" : "Maximum app port number",
+    "JXAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
+
+
+    "JXcoreNPMModules" : "NPM Modules",
+    "JXcoreNPMAddModule" : "Install new module",
+    "JXcoreNPMEnterName" : "Please enter a name for NPM module.",
+    "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
+    "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
+    "JXcoreNPMInstalled" : "NPM module successfully installed."
+
+
 };
 
 

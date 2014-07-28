@@ -40,16 +40,8 @@ exports.form = function () {
         this.onSubmitSuccess = "plans.html";
         this.onSubmitCancel = "plans.html";
 
-        this.settings = {
-            json_where :
-            {
-                insert : ["plan_name"],
-                update: ["ID"]
-            }
-        };
-
         this.controls = [
-            {"BEGIN": "User Details"},
+            {"BEGIN": "General"},
 
             {
                 name: "plan_name",
@@ -76,18 +68,27 @@ exports.form = function () {
                 details: {
                     label: "Overuse",
                     method: tool.createCheckBox,
-                    options: { }
-//                    displayAs : { true : "Allow", false : "Disallow" }
+                    options: { },
+                    displayValues : {
+                        "true" : "allow",
+                        "false" : "disallow"
+                    }
                 },
                 validation: new validations.Boolean()
             },
+
+            { END : 1},
+
+            {"BEGIN": "Hosting Plan Limits"},
 
             { name: "plan_disk_space",
                 details: {
                     label: "MaxDiskSpace",
                     method: tool.createTextBox,
                     options: { suffix: " MB"},
-                    nullDisplayAs : "ValueUnlimited",
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
                     definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
@@ -98,18 +99,67 @@ exports.form = function () {
                     label: "MaxTraffic",
                     method: tool.createTextBox,
                     options: { suffix: " MB/month"},
-                    nullDisplayAs : "ValueUnlimited",
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
                     definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
             },
+
+            { name: "plan_max_domains",
+                details: {
+                    label: "MaxDomains",
+                    method: tool.createTextBox,
+                    options: { required : true },
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
+                    dbName: "maxDomainCount"
+//                    definesMax: true
+                },
+                validation: new validations.Int( { gte : 0})
+            },
+
+            { name: "plan_max_users",
+                details: {
+                    label: "MaxUsers",
+                    method: tool.createTextBox,
+                    options: { required : true },
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
+                    dbName: "maxUserCount"
+//                    definesMax: true
+                },
+                validation: new validations.Int( { gte : 0})
+            },
+
+            { name: "plan_max_plans",
+                details: {
+                    label: "MaxPlans",
+                    method: tool.createTextBox,
+                    options: {  },
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
+                    definesMax: true
+                },
+                validation: new validations.Int( { gte : 0})
+            },
+
+            {"END" : 1},
+
+            {"BEGIN": "JXcore application options"},
 
             { name: "plan_memory",
                 details: {
                     label: "MaxMemory",
                     method: tool.createTextBox,
                     options: { },
-                    nullDisplayAs : "ValueUnlimited",
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
                     definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
@@ -120,7 +170,9 @@ exports.form = function () {
                     label: "MaxCPU",
                     method: tool.createTextBox,
                     options: { },
-                    nullDisplayAs : "ValueUnlimited",
+                    displayValues : {
+                        "__EMPTY__" : "@ValueUnlimited"
+                    },
                     definesMax: true
                 },
                 validation: new validations.Int( { gte : 0})
@@ -167,13 +219,17 @@ exports.form = function () {
                 }
             },
 
-            { name: "plan_app_log_web_access",
-                details: {
-                    label: "AppLogWebAccess",
-                    method: tool.createCheckBox,
-                    options: { }
-                }
-            },
+//            { name: "plan_app_log_web_access",
+//                details: {
+//                    label: "AppLogWebAccess",
+//                    method: tool.createCheckBox,
+//                    options: { }
+//                }
+//            },
+
+            {"END" : 1},
+
+            {"BEGIN": "System options"},
 
             { name: "plan_ssh",
                 details: {
@@ -191,40 +247,7 @@ exports.form = function () {
                 }
             },
 
-            { name: "plan_max_domains",
-                details: {
-                    label: "MaxDomains",
-                    method: tool.createTextBox,
-                    options: { required : true },
-                    nullDisplayAs : "ValueUnlimited",
-                    dbName: "maxDomainCount"
-//                    definesMax: true
-                },
-                validation: new validations.Int( { gte : 0})
-            },
 
-            { name: "plan_max_users",
-                details: {
-                    label: "MaxUsers",
-                    method: tool.createTextBox,
-                    options: { required : true },
-                    nullDisplayAs : "ValueUnlimited",
-                    dbName: "maxUserCount"
-//                    definesMax: true
-                },
-                validation: new validations.Int( { gte : 0})
-            },
-
-            { name: "plan_max_plans",
-                details: {
-                    label: "MaxPlans",
-                    method: tool.createTextBox,
-                    options: {  },
-                    nullDisplayAs : "ValueUnlimited",
-                    definesMax: true
-                },
-                validation: new validations.Int( { gte : 0})
-            },
 
 
             // do not remove this yet, may be useful

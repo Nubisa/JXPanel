@@ -8,7 +8,7 @@ var path = require("path");
 exports.name = path.basename(__filename, ".js").toLowerCase();
 
 exports.settings = {
-    columns :[ "_checkbox",  "_id", "plan_name", "plan_disk_space", "plan_cpu", "plan_memory", "plan_max_domains", "plan_max_users", "user_owner_id"],
+    columns :[ "_checkbox",  "_id", "plan_name", "plan_overuse", "plan_disk_space", "plan_cpu", "plan_memory", "plan_max_domains", "plan_max_users", "user_owner_id"],
     addForm : "addPlan",
     addFormURL : "addplan.html"
 };

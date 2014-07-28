@@ -1,3 +1,7 @@
+var fs = require('fs');
+var path = require('path');
+var http = require("http");
+
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
     if(lines.length){
@@ -221,4 +225,23 @@ exports.getDiskInfo = function(env, cb){
     };
 
     jxcore.tasks.addTask(task, env, cb);
+};
+
+
+/**
+ * Removes folder recursively
+ * @param fullDir
+ * @returns {boolean} True, if operation succeeded. False otherwise.
+ */
+exports.rmdirSync = function (fullDir) {
+
+    fullDir = path.normalize(fullDir);
+    if (!fs.existsSync(fullDir)) {
+        return;
+    }
+
+    var cmd = process.platform === 'win32' ? "rmdir /s /q " : "rm -rf ";
+    jxcore.utils.cmdSync(cmd + fullDir);
+
+    return !fs.existsSync(fullDir);
 };

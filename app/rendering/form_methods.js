@@ -7,6 +7,9 @@ var server = require('jxm');
 var pam = require('authenticate-pam');
 var database = require("./../db/database");
 var methods = {};
+var fs = require('fs');
+var path = require('path');
+var system_tools = require('../system_tools');
 
 
 var checkUser = function(env){
@@ -246,8 +249,7 @@ methods.sessionApply = function(env, params){
         } catch(ex) {
             ret = ex.toString();
         }
-    }
-
+    } else
     if (params.form === "addDomain") {
         try {
             if (isUpdate) {
@@ -263,8 +265,7 @@ methods.sessionApply = function(env, params){
         } catch(ex) {
             ret = ex.toString();
         }
-    }
-
+    } else
     if (params.form === "addPlan") {
         try {
             if (isUpdate) {
@@ -286,6 +287,15 @@ methods.sessionApply = function(env, params){
         } catch(ex) {
             ret = ex.toString();
         }
+    } else
+    if (params.form === "jxconfig") {
+        var cfg = {
+            "jx_app_min_port" : json["jx_app_min_port"],
+            "jx_app_max_port" : json["jx_app_max_port"]
+        };
+        database.setConfig(cfg);
+    } else {
+        ret = "UnknownForm";
     }
 
     if (ret) {
@@ -308,16 +318,30 @@ methods.getForm = function(env, params) {
     if (!active_user)
         return;
 
-    var ret = forms.renderForm(env.SessionID, params.form, true);
-    server.sendCallBack(env, ret);
-};
+    if (params.form === "jxconfig") {
+        jxcore.monitor.checkMonitorExists(function(err, txt) {
+            // todo: just for now saving the value somewhere
+            jxcore.monitor.isOnline = !err;
+            var ret = forms.renderForm(env.SessionID, params.form, true);
+            server.sendCallBack(env, ret);
+        });
+    } else {
+        var ret = forms.renderForm(env.SessionID, params.form, true);
+        server.sendCallBack(env, ret);
+    }
 
+};
 
 
 methods.removeFromTableData = function(env, params) {
 
-    var ret = datatables.remove(env.SessionID, params.dt, params.ids);
-    server.sendCallBack(env, {err : ret.err });
+    if (params.dt === "modules") {
+        var ret = uninstallNPM(env, params);
+        server.sendCallBack(env, {err : ret.err });
+    } else {
+        var ret = datatables.remove(env.SessionID, params.dt, params.ids);
+        server.sendCallBack(env, {err : ret.err });
+    }
 };
 
 // called when user clicked Apply on the form
@@ -355,6 +379,48 @@ methods.getControlsValues = function(env, params) {
     if (!found) {
         server.sendCallBack(env, {err : "Dynamic values loading method not found for field " + params.control  } );
     }
+};
+
+
+var uninstallNPM = function(env, params) {
+
+    var failures = [];
+    var active_user = checkUser(env);
+
+    for(var i in params.ids) {
+        var modulesDir = path.normalize(datatables.jxconfig.globalModulePath + "/node_modules/" + params.ids[i]);
+
+        var ok = true;
+        if (fs.existsSync(modulesDir)) {
+            ok = system_tools.rmdirSync(modulesDir);
+        }
+        if (!ok)
+            failures.push(params.ids[i]);
+    }
+
+    return { err : failures.length ? form_lang.Get(active_user.lang, "JXcoreNPMCouldNotUnInstall", true, [ failures.join(", ") ]) : false }
+};
+
+
+methods.installNPM = function(env, params) {
+
+    var nameAndVersion = params;
+    var name = nameAndVersion;
+    var version = "";
+    var pos = nameAndVersion.indexOf("@");
+    if (pos > -1) {
+        var name = nameAndVersion.slice(0, pos).trim();
+        var version = nameAndVersion.slice(pos + 1).trim();
+    }
+
+    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
+    //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
+
+    var ret = jxcore.utils.cmdSync(cmd);
+
+    var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
+
+    server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
 };
 
 

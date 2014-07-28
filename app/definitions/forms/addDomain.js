@@ -39,14 +39,6 @@ exports.form = function () {
         this.onSubmitSuccess = "domains.html";
         this.onSubmitCancel = "domains.html";
 
-        this.settings = {
-            json_where :
-                {
-                    insert : ["domain_name"],
-                    update: ["ID"]
-                }
-        };
-
         this.controls = [
             {"BEGIN": "Domain Details"},
 
@@ -83,6 +75,40 @@ exports.form = function () {
                     label: "IPv6",
                     method: tool.createComboBox,
                     options: { required: true, values: ifcv6_list }
+                }
+            },
+
+            {"END" : 1},
+
+            {"BEGIN": "JXcore options"},
+
+            {
+                name: "jx_enabled",
+                details: {
+                    label: "JXEnabled",
+                    method: tool.createCheckBox,
+                    options: { },
+                    displayValues : {
+                        "true" : '<i class="fa-fw fa fa-check text-success"></i>',
+                        "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
+                    }
+                }
+            },
+
+            {
+                name: "jx_app_path",
+                details: {
+                    label: "JXAppPath",
+                    method: tool.createTextBox,
+                    options: { default : "index.js" }
+                }
+            },
+
+            { name: "jx_app_log_web_access",
+                details: {
+                    label: "AppLogWebAccess",
+                    method: tool.createCheckBox,
+                    options: { }
                 }
             },
 

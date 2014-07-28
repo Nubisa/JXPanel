@@ -1,0 +1,32 @@
+<script>
+    window.jxInstallNPM = function() {
+        utils.jxAskValue("{{label.JXcoreNPMAddModule}}", "{{label.JXcoreNPMEnterName}}", function(ok, value) {
+
+            if (!value) {
+                utils.jxAddMessage('danger', "{{label.JXcoreNPMEnterName}}");
+                return;
+            }
+
+            if (ok) {
+                window.toServer("installNPM", value, function(param) {
+                    if (param.err)
+                        utils.jxAddMessage('danger', "{{label.JXcoreNPMCouldNotInstall}} " + param.err);
+                    else {
+                        document.location.reload();
+//                        utils.jxAddMessage('success', "{{label.JXcoreNPMInstalled}}");
+                    }
+
+                }, true);
+            }
+        });
+        return false;
+    };
+
+</script>
+
+<button class="btn btn-labeled btn-success" onclick="return window.jxInstallNPM();">
+    <span class="btn-label"><i class="glyphicon glyphicon-plus"></i></span> {{label.JXcoreNPMAddModule}}
+</button>
+<button id="jxbtn_remove" class="btn btn-labeled btn-danger" onclick="if (window.jxRemoveRows) window.jxRemoveRows();">
+    <span class="btn-label"><i class="glyphicon glyphicon-remove"></i></span> {{label.RemoveSelected}}
+</button>

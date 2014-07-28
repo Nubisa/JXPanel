@@ -70,13 +70,15 @@ exports.Int = function (options) {
 
     this.validate = function (env, active_user, val) {
 
-        if (!val && (val + "" !== "0")) {
+        if (!val && (val + "" !== "0" || val === "")) {
             return {result: true};
         }
 
         var parsed = parseInt(val);
 
-        if (isNaN(parsed)) {
+        var reg = new RegExp("^\\d+$");
+
+        if (isNaN(parsed) || !reg.test(val)) {
             return {result: false, msg: form_lang.Get(active_user.lang, "ValueInvalidInteger", null)};
         }
 
@@ -84,16 +86,6 @@ exports.Int = function (options) {
         if (this.options) {
             var params = [];
             var err = false;
-
-            if (this.options.lt || this.options.lt === 0) {
-                params.push("less than " + this.options.lt);
-                if (parsed >= this.options.lt) err = true;
-            }
-
-            if (this.options.lte || this.options.lte === 0) {
-                params.push("less than " + this.options.lte + " (or equal)");
-                if (parsed > this.options.lte) err = true;
-            }
 
             if (this.options.gt || this.options.gt === 0) {
                 params.push("greater than " + this.options.gt);
@@ -103,6 +95,16 @@ exports.Int = function (options) {
             if (this.options.gte || this.options.gte === 0) {
                 params.push("greater than " + this.options.gte + " (or equal)");
                 if (parsed < this.options.gte) err = true
+            }
+
+            if (this.options.lt || this.options.lt === 0) {
+                params.push("less than " + this.options.lt);
+                if (parsed >= this.options.lt) err = true;
+            }
+
+            if (this.options.lte || this.options.lte === 0) {
+                params.push("less than " + this.options.lte + " (or equal)");
+                if (parsed > this.options.lte) err = true;
             }
 
             if (err)
@@ -125,5 +127,17 @@ exports.Password = function (password_field) {
         } else {
             return {result: false, msg: form_lang.Get(active_user.lang, "PasswordDoesNotMatch", null)};
         }
+    };
+};
+
+
+exports.MaxPort = function(min_port_field) {
+
+    var _min_port_field = min_port_field;
+
+    this.validate = function (env, active_user, val, vals) {
+
+        var ok = new exports.Int({ gt : vals[_min_port_field], lte : 20000 }).validate(env, active_user, val, vals);
+        return ok;
     };
 };

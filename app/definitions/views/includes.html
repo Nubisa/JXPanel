@@ -185,8 +185,24 @@
             cb(ButtonPressed);
         });
     };
-    utils.jxAddMessage = function(type, txt) {
+    utils.jxAskValue = function(title, question, cb) {
 
+        if (!cb) return;
+
+        $.SmartMessageBox({
+            title : title,
+            content : question,
+            buttons : "[Cancel][Accept]",
+            input : "text",
+            placeholder : "",
+            inputValue : ""
+        }, function(ButtonPress, Value) {
+
+            var ok = ButtonPress === "Accept";
+            cb(ok, Value);
+        });
+    };
+    utils.jxAddMessage = function(type, txt) {
 
         if(type && txt)
             utils.bubble(type, null, txt, 10000);

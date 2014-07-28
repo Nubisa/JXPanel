@@ -18,14 +18,6 @@ exports.form = function () {
         this.onSubmitSuccess = "users.html";
         this.onSubmitCancel = "users.html";
 
-        this.settings = {
-            json_where :
-            {
-                insert : ["username"],
-                update: ["ID"]
-            }
-        };
-
         this.controls = [
             {"BEGIN": "User Details"},
 

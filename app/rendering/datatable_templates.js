@@ -20,17 +20,6 @@ var getTable = function(table_name) {
 };
 
 
-//var getData = function(active_user, table, json, cb) {
-//
-//    if (!active_user) {
-//        cb(form_lang.Get(active_user.lang, "SessionExpired"));
-//        return;
-//    }
-//
-//    // todo: DB get data and call callback
-//};
-
-
 var getForm = function(table) {
 
     var fname = path.join(__dirname, '../definitions/forms/' + table.settings.addForm + ".js");
@@ -127,11 +116,32 @@ var getHTML = function (active_user, table) {
             var colName = dbNames[columns[x]] || columns[x];
             var val = record[colName];
 
-            // null/undefined value replacement into display value
-            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
-                if (!val && val + "" !== "0" && val + "" !== "false" )
-                    val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
+//            // null/undefined value replacement into display value
+//            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
+//                if (!val && val + "" !== "0" && val + "" !== "false" )
+//                    val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
+//            }
+
+            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.displayValues) {
+
+                for (var _val in formControls[columns[x]].details.displayValues) {
+
+                    // null/undefined value replacement into display value
+                    var isEmpty = _val === "__EMPTY__" && val === null || val === undefined || val === "";
+                    // specific value replacement
+                    var isEqual = _val + "" === val + "";
+
+                    if (isEmpty || isEqual) {
+                        var _new_val = formControls[columns[x]].details.displayValues[_val];
+                        // if val is something like "@JXcore" , treat it as label from lang definition.
+                        if (_new_val.length && _new_val.slice(0, 1) === "@") {
+                            _new_val = form_lang.Get(active_user.lang, _new_val.slice(1)) || val;
+                        }
+                        val = _new_val;
+                    }
+                }
             }
+
 
             // virtual column with plan name
             if (colName === "plan_table_id" && table.name === "domains") {
@@ -153,6 +163,70 @@ var getHTML = function (active_user, table) {
 
     return { err: false, html: exports.getDataTable(ret)};
 };
+
+
+// todo: this folder is static just for now
+exports.jxconfig = {};
+exports.jxconfig.globalModulePath = path.join(__dirname, "../../__tmp_module_path");
+
+
+// gets information about npm modules installed in global module path
+var getModules = function(active_user, table) {
+
+    var data = [];
+    try {
+        var modulesDir = path.normalize(exports.jxconfig.globalModulePath + "/node_modules/");
+        var folders = fs.readdirSync(modulesDir);
+
+        for (var a = 0, len = folders.length; a < len; a++) {
+            if (folders[a].slice(0, 1) !== ".") {
+                var file = path.join(modulesDir, "/", folders[a], "/package.json");
+
+                try {
+                    if (fs.existsSync(file)) {
+                        var json = JSON.parse(fs.readFileSync(file));
+                        data.push(json);
+                    }
+                } catch (ex) {
+                }
+            }
+        }
+    } catch (ex) {
+    }
+
+
+    var columns = table.settings.columns;
+    var arr = [];
+    arr.push([]); // columns
+    for (var a in columns) {
+        var displayName = columns[a];
+        if (displayName == "_checkbox") displayName = "";
+        if (displayName == "_id") displayName = "ID";
+        arr[0].push(displayName);
+    }
+
+    var cnt = 1;
+    for (var i in data) {
+
+        var module = data[i];
+
+        var single_row = [];
+        for (var x in columns) {
+            var colName = columns[x];
+            var str = module[colName];
+            if (colName === "_checkbox")
+                str = '<input type="checkbox" id="jxrow_' + module.name + '"></input>';
+            else if (colName === "_id")
+                str = cnt++;
+
+            single_row.push(str);
+        }
+        arr.push(single_row);
+    }
+
+    return { err: false, html: exports.getDataTable(arr)};
+};
+
 
 // each rows is array of cells
 // first row is column array
@@ -221,7 +295,10 @@ exports.render = function (sessionId, table_name, getContents) {
         }
     } else {
         // data contents of the table
-        return getHTML(active_user, table);
+        if (table_name === "modules")
+            return getModules(active_user, table);
+        else
+            return getHTML(active_user, table);
     }
 };
 
