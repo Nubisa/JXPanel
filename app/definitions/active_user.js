@@ -21,6 +21,7 @@ var newUser = function(session_id){
             return home + "/Desktop";
         },
         lang: "EN",
+        uid:"",
         groupIdPrefix: "gr" + jxcore.utils.uniqueId(),
         session: { forms:{} },
         lastOperation: Date.now() // TODO later clear the users
@@ -31,11 +32,21 @@ exports.loginUser = function(env, params){
     var sessionId = env.SessionID;
 
     users[sessionId] = newUser(sessionId);
+    var ret = jxcore.utils.cmdSync("id -u " + params.username);
+    users[sessionId].uid = parseInt(ret.out);
+    if (isNaN(users[sessionId].uid)) {
+        users[sessionId] = null;
+        delete(users[sessionId]);
+        return false;
+    }
+
     users[sessionId].username = params.username;
     users[sessionId].nameTitle = params.username; // TODO change it!!!
     users[sessionId].user_id = params.user_id;
 
     database.errorEngine = new errorEngine(users[sessionId]);
+
+    return true;
 };
 
 
@@ -116,7 +127,7 @@ exports.defineMethods = function(){
         console.log("getFiles", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -161,7 +172,7 @@ exports.defineMethods = function(){
         console.log("getFile", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -188,7 +199,7 @@ exports.defineMethods = function(){
         console.log("saveFile", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -215,7 +226,7 @@ exports.defineMethods = function(){
         console.log("addFileFolder", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -250,7 +261,7 @@ exports.defineMethods = function(){
         console.log("removeFileFolder", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -286,7 +297,7 @@ exports.defineMethods = function(){
         console.log("renameFileFolder", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -318,7 +329,7 @@ exports.defineMethods = function(){
         console.log("downloadFile", params);
 
         var active_user = exports.getUser(env.SessionID);
-        if(!active_user){
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
@@ -340,7 +351,7 @@ exports.defineMethods = function(){
 
         var zip_name = "File_" + Date.now() + "_" + jxcore.utils.uniqueId() + ".zip";
         var zip_location = home + path.sep + "__panel_downloads" + path.sep + zip_name;
-        exec("zip -r " + zip_location + " " + loc, {cwd:home, maxBuffer:1e7}, function(err, stdout, stderr){
+        exec("zip -r " + zip_location + " " + loc, {cwd:home, uid:active_user.uid, maxBuffer:1e7}, function(err, stdout, stderr){
             if (err !== null) {
                 server.sendCallBack(env, {err:"Error" + JSON.stringify( err ) + (stderr || stdout) });
             }

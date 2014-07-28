@@ -37,10 +37,13 @@ methods.tryLogin = function(env, params){
         }
         else {
 
-            var finish = function() {
-
-                _active_user.loginUser(env, params);
+            var finish = function(env, params) {
                 var _url = "/dashboard.html";
+                if(!_active_user.loginUser(env, params)){
+                    server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
+                    return;
+                }
+
                 if(params.url && params.url.indexOf){
                     var ind = params.url.indexOf("t=");
                     if(params.url.length>ind+7 && ind>0){ // something.html
@@ -75,7 +78,7 @@ methods.tryLogin = function(env, params){
             if (!user) {
                 server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
             } else {
-                finish();
+                finish(env, params);
             }
         }
     });

@@ -196,25 +196,32 @@ var Init = function(){
                 arr.push(line);
         }
 
-        for(var o in arr){
-            if(cmd && o == 0 && !arr[o].length){
-                continue;
+        if(cmd){
+            for(var o in arr){
+                if(cmd && o == 0 && !arr[o].length){
+                    continue;
+                }
+                else{
+                    if(params.e)
+                        terminal.error(arr[o]);
+                    else
+                        terminal.echo(arr[o]);
+                }
             }
-            else{
-                if(params.e)
-                    terminal.error(arr[o]);
-                else
-                    terminal.echo(arr[o]);
-            }
+        }else{
+            if(params.e)
+                terminal.error(arr.join('\n'));
+            else
+                terminal.echo(arr.join('\n'));
         }
-
         if(cmd){
             terminal.enable();
             terminal.___disabled = false;
             document.getElementById("btn_stop").style.display = "none";
             terminal.set_prompt(cmd + " {{user.nameTitle}}$> ");
         }
-
+        lines = null;
+        arr = null;
     }
 };
 </script>

@@ -37,6 +37,7 @@ exports.defineMethods = function(){
         var child = require('child_process').execFile('bash', {
             maxBuffer:1e8,
             cwd:home,
+            uid:active_user.uid,
             stdio: [ 'ignore', 1, 2 ]
         });
         child.owner = active_user;

@@ -393,12 +393,52 @@ var init_file_tools = function(){
         });
     };
 
+    var chmod_file = function(){
+        if(!document.treeId)
+            return;
+
+        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
+        if(!zTree)
+            return;
+
+        var nodes = zTree.getSelectedNodes();
+        if(!nodes || !nodes.length)
+        {
+            utils.bubble("warning", "Not Selected!", "Select a folder or a file to update chmod", 4000);
+            return;
+        }
+
+        var loc = getPathLocation(document.treeId, nodes[0]);
+        if(loc == '/'){
+            utils.bubble("warning", "Opps!", "You can not change the root folder", 4000);
+            return;
+        }
+        toServer("chmod_file", {up:loc, to:""}, function(ret_val){
+            if(ret_val.err){
+                alert(JSON.stringify(ret_val.err));
+
+                if(ret_val.relogin){
+                    location.href = "/index.html";
+                }
+                if(ret_val.reloadTree){
+                    location.href = "/editor.html";
+                }
+                return;
+            }
+
+            // bring file info for each tree selection
+
+
+        }, true);
+    };
+
     var btn_add = document.getElementById('btn_add');
     var btn_remove = document.getElementById('btn_remove');
     var btn_rename = document.getElementById('btn_rename');
     var btn_refresh = document.getElementById('btn_refresh');
     var btn_download = document.getElementById('btn_download');
     var btn_upload = document.getElementById('btn_upload');
+    var btn_chmod = document.getElementById('btn_chmod');
 
     btn_add.onmousedown = function(){
        addFile();
@@ -417,5 +457,8 @@ var init_file_tools = function(){
     };
     btn_upload.onmousedown = function(){
         uploadFile();
+    };
+    btn_chmod.onmousedown = function(){
+        chmod_file();
     };
 };
