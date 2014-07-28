@@ -126,17 +126,21 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (!ctrl.method)
             continue;
 
+        ctrl.options = ctrl.options || {};
+
         var dbname = ctrl.dbName ? ctrl.dbName : name;
         var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
 
-        if(ctrl.options) {
-            ctrl.options.extra = { formName : formName, isUpdate : isUpdate};
-            if (ctrl.options.password && isUpdate)
-                val = null;
-        }
+        ctrl.options.extra = { formName : formName, isUpdate : isUpdate, active_user : active_user};
+        if (ctrl.options.password && isUpdate)
+            val = null;
 
         if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && isUpdate.record["name"] === active_user.username)))
             ctrl.options.extra.noEditDisplayValue = val;
+
+        if (ctrl.getValue && typeof ctrl.getValue === "function") {
+            ctrl.options.extra.noEditDisplayValue = ctrl.getValue(active_user);
+        }
 
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
@@ -152,5 +156,13 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     }
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
+
+
+//    var includeHtmlFile = path.join(__dirname, "../definitions/forms/" + formName + "_include.html");
+//    var includeHtml = fs.existsSync(includeHtmlFile) ? fs.readFileSync(includeHtmlFile).toString() : "";
+//
+//    var includeHtmlJS = path.join(__dirname, "../definitions/forms/" + formName + "_include.js");
+//    var includeJS = fs.existsSync(includeHtmlJS) ? fs.readFileSync(includeHtmlJS).toString() : "";
+
     return { err : false, html: tool.begin + html + tool.end, js : scr };
 };

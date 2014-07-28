@@ -239,6 +239,19 @@
         });
     };
 
+    utils.jxMonitorStartStop = function (start) {
+
+        window.toServer("monitorStartStop", { op: start }, function (param) {
+            if (param.err) {
+                utils.jxAddMessage('danger', param.err);
+            } else {
+                document.location.reload();
+            }
+        }, true);
+
+        return false;
+    };
+
     $(document).ready(function() {
        pageSetUp();
 

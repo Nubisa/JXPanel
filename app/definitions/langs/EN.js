@@ -16,6 +16,8 @@ exports.Labels = {
     "Home":"Home",
     "Form":"Form",
     "Default" : "Default",
+    "Online" : "Online",
+    "Offline" : "Offline",
 
     "serverManagement":"Server Management",
     "help":"Help",

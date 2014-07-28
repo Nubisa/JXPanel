@@ -27,6 +27,6 @@
 <button class="btn btn-labeled btn-success" onclick="return window.jxInstallNPM();">
     <span class="btn-label"><i class="glyphicon glyphicon-plus"></i></span> {{label.JXcoreNPMAddModule}}
 </button>
-<button id="jxbtn_remove" class="btn btn-labeled btn-danger" onclick="if (window.jxRemoveRows) window.jxRemoveRows();">
+<button id="jxbtn_remove" class="btn btn-labeled btn-danger" onclick="if (window.jxRemoveRows) return window.jxRemoveRows();">
     <span class="btn-label"><i class="glyphicon glyphicon-remove"></i></span> {{label.RemoveSelected}}
 </button>

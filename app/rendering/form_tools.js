@@ -13,14 +13,13 @@ var getData = function(label, _title, input_id, lang, options) {
     ret.description = !desc?options.description:desc;
     ret.prefix = options.prefix || "";
 
-    var isUpdate = options.extra.isUpdate;
+    var isUpdate = options.extra && options.extra.isUpdate;
 
     ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
     ret.dynamic = options.dynamic || "";
 
-    if (options.value && typeof options.value === "function") {
-        options.value = options.value();
-    }
+    if (options.extra && options.extra.noEditDisplayValue)
+        ret.value = options.extra.noEditDisplayValue;
 
     return ret;
 };
@@ -213,7 +212,7 @@ exports.createHidden = function(label, _title, input_id, _value, lang, options){
 exports.createSimpleText = function(label, _title, input_id, _value, lang, options){
     var data = getData(label, _title, input_id, lang, options);
 
-    _value = _value || options.value || "";
+    _value = _value || data.value || "";
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 

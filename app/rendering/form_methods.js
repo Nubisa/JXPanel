@@ -429,4 +429,27 @@ methods.installNPM = function(env, params) {
 };
 
 
+methods.monitorStartStop = function(env, params) {
+
+    console.log(params);
+
+
+
+    jxcore.monitor.checkMonitorExists(function(err, txt) {
+        var online_before = !err;
+
+        var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
+        jxcore.utils.cmdSync(cmd);
+
+        jxcore.monitor.checkMonitorExists(function(err2, txt2) {
+            var online_after = !err2;
+
+            var err = online_after === online_before;
+            server.sendCallBack(env, {err : err } );
+        });
+    });
+
+};
+
+
 module.exports = methods;

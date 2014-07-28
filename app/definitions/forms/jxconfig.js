@@ -27,7 +27,9 @@ exports.form = function () {
                 details: {
                     label: "JXcoreVersion",
                     method: tool.createSimpleText,
-                    options : { value : process.jxversion }
+                    getValue : function(active_user) {
+                        return process.jxversion;
+                    }
                 }
             },
 
@@ -36,7 +38,9 @@ exports.form = function () {
                 details: {
                     label: "JXcorePath",
                     method: tool.createSimpleText,
-                    options : { value : process.execPath }
+                    getValue : function(active_user) {
+                        return process.execPath;
+                    }
                 }
             },
 
@@ -50,12 +54,17 @@ exports.form = function () {
                 details: {
                     label: "JXcoreMonitorStatus",
                     method: tool.createSimpleText,
-                    options : {
-                        value : function() {
-                            return jxcore.monitor.isOnline
-                                ? '<i class="fa-fw fa fa-check text-success">Online</i>'
-                                : '<i class="fa-fw fa fa-times text-danger">Offline</i>';
-                        }
+                    getValue : function(active_user) {
+
+                        var btnStart = '<button class="btn btn-labeled btn-success" onclick="return utils.jxMonitorStartStop(true);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
+                            + form_lang.Get(active_user.lang, "Start", true) + '</button>';
+
+                        var btnStop = '<button class="btn btn-labeled btn-danger" onclick="return utils.jxMonitorStartStop(false);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
+                            + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
+
+                        return jxcore.monitor.isOnline
+                            ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user, "Online", true) +  btnStop
+                            : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user, "Offline", true) +  btnStart
                     }
                 }
             },
