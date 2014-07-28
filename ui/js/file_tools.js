@@ -244,7 +244,7 @@ var init_file_tools = function(){
             title : "Renaming : "+loc,
             content : "Enter a new name..",
             input: "text",
-            inputValue : "",
+            inputValue : nodes[0].name,
             placeHolder: "enter a new name",
             buttons : "[Submit][Cancel]"
         }, function(ButtonPress, name) {

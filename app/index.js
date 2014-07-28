@@ -7,6 +7,7 @@ var site_defaults = require('./definitions/site_defaults');
 var _active_users = require('./definitions/active_user');
 var database = require("./db/database");
 var downloads = require("./definitions/downloads")
+var terminal = require("./definitions/terminal");
 
 require('http').setMaxHeaderLength(0);
 
@@ -22,6 +23,7 @@ for(var o in form_methods){
     server.addJSMethod(o, form_methods[o]);
 }
 
+terminal.defineMethods();
 site_defaults.defineMethods();
 charts.defineChartMethods();
 _active_users.defineMethods();

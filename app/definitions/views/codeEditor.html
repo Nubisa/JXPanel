@@ -410,7 +410,8 @@
             if(treeNode.children && treeNode.children.length){
                 zTree.jx_loading = true;
 
-                if(treeNode.children.length == 1 && treeNode.children[0].name == "{{label.Loading}}"){
+                if(treeNode.children.length == 1 &&
+                        (treeNode.children[0].name == "{{label.Loading}}" || treeNode.children[0].name == "{{label.Empty}}")){
                     getFiles(loc, treeId, treeNode);
                 }
                 else{
@@ -441,7 +442,19 @@
                     return;
                 }
 
-                if(checkExtension(_loc, [".md", ".conf", ".ini", ".htaaccess"])){
+                if(checkExtension(_loc, [".py"])){
+                    loadMode("python/python.js");
+                    getFile(treeNode.name, loc, treeId, "python");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".rb"])){
+                    loadMode("ruby/ruby.js");
+                    getFile(treeNode.name, loc, treeId, "ruby");
+                    return;
+                }
+
+                if(checkExtension(_loc, [".md", ".mk", ".conf", ".ini", ".htaaccess"])){
                     loadMode("markdown/markdown.js");
                     getFile(treeNode.name, loc, treeId, "markdown");
                     return;
@@ -491,7 +504,7 @@
                 if(!treeNode){
                     $.fn.zTree.init($("#"+treeId), setting, ret_val.nodes);
                 }
-                else{
+                else if(ret_val.nodes && ret_val.nodes.length){
                     var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
 
                     zTree.jx_loading = false;
@@ -500,6 +513,11 @@
                     zTree.addNodes(treeNode, ret_val.nodes);
 
                     zTree.expandNode(treeNode, true, false);
+                }else{
+                    var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
+                    zTree.jx_loading = false;
+                    treeNode.children[0].name = "{{label.Empty}}";
+                    zTree.expandNode(treeNode, false, false);
                 }
             }, true);
         };
@@ -524,6 +542,10 @@
                     if(ret_val.reloadTree){
                         location.href = "/editor.html";
                     }
+                    return;
+                }
+
+                if(ret_val.skip){
                     return;
                 }
 

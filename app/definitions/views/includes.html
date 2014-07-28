@@ -271,6 +271,29 @@
         if (window.jxTemplateReady) {
             window.jxTemplateReady();
         }
+
+        jxcore.OnError = function
+                (a,b){
+            alert("JXM : " + a + " - " + b);
+        };
+
+        window.updateTerminal = function(params){
+            if(window.terminal && !params.reload && window.termx){
+               window.termx(params);
+            }else{
+                toServer("killTerminal", null, function(ret_val){
+                    if(ret_val.err){
+                        alert(ret_val.err);
+                        if(ret_val.relogin){
+                            location.href = "/index.html";
+                        }
+                        return;
+                    }
+                    if(params.reload)
+                        location.href = location.href + "#";
+                });
+            }
+        };
     });
 
 </script>

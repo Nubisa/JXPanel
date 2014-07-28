@@ -21,6 +21,13 @@ var checkUser = function(env){
 };
 
 methods.tryLogin = function(env, params){
+    if(!params || !params.username || !params.password){
+        server.sendCallBack(env, {err: form_lang.Get("EN", "CannotLoginNoUser")});
+        return;
+    }
+
+    params.lang = params.lang || "EN";
+
     pam.authenticate(params.username, params.password, function(err) {
         if(err) {
             server.sendCallBack(env, {err: form_lang.Get(params.lang, "CredentialsFailed")});
@@ -29,7 +36,7 @@ methods.tryLogin = function(env, params){
 
             var finish = function() {
 
-                _active_user.loginUser(env.SessionID, params);
+                _active_user.loginUser(env, params);
                 var _url = "/dashboard.html";
                 if(params.url && params.url.indexOf){
                     var ind = params.url.indexOf("t=");

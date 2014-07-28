@@ -1,0 +1,222 @@
+<style type="text/css">
+    /* Prevent copy paste for all elements except text fields */
+    *  { -webkit-user-select:none; -webkit-tap-highlight-color:rgba(255, 255, 255, 0); }
+    input, textarea  { -webkit-user-select:text; }
+</style>
+<link rel="stylesheet" href="/css/jquery.terminal.css" />
+
+<div class="note" style="margin-bottom:4px;cursor:default;">{{label.TerminalTop}}</div>
+<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #369;"></i>&nbsp;&nbsp;
+<a id="btn_restart" data-original-title="{{label.RestartTerminalTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-refresh"></i> {{label.Restart}}
+</a>
+<a id="btn_stop" data-original-title="{{label.StopOperationTooltip}}" style="display:none" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+    <i class="fa fa-stop"></i> {{label.StopOperation}}
+</a>
+
+
+<div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
+    <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;width:100%">
+        <table id="editor_table" style="display:none;width:100%;padding: 0px;margin:0px;table-layout:fixed;margin-top:10px;" cellpadding="0" cellspacing="0">
+            <tbody >
+            <tr>
+                <td style="vertical-align:top;padding-left:5px;">
+                    <div id="editor_holder" style="width:100%;overflow-y:scroll">
+
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+var editorInter = setInterval(function(){
+
+    if(typeof jQuery != 'undefined' && typeof jxcore != 'undefined' && jxcore.IsConnected){
+        var elm_editor = document.getElementById("editor_table");
+        clearInterval(editorInter);
+        var scr2 = document.createElement("script");
+        scr2.src = "/js/jquery.terminal-min.js";
+        var scr3 = document.createElement("script");
+        scr3.src = "/js/jquery.mousewheel-min.js";
+
+        Init();
+
+        scr2.onload = function(){
+          document.terminalReady();
+        };
+        elm_editor.parentNode.appendChild(scr2);
+        elm_editor.parentNode.appendChild(scr3);
+    }
+}, 10);
+
+var Init = function(){
+
+    var getDocHeight = function(){
+        var he = utils.getWindowHeight() - 145;
+
+        var ed_holder = document.getElementById('editor_holder');
+
+        var row = document.getElementById('editor_table_row');
+        row.style.height = (he-20) + "px";
+        row.style.maxHeight = (he-20) + "px";
+        row.style.overflow = 'hidden';
+        document.getElementById('main').style.padding = "0px";
+        document.getElementById('main').style.overflow = "hidden";
+        var tab = document.getElementById('editor_table');
+        tab.style.display = '';
+        tab.style.height = (he-60) + "px";
+
+        ed_holder.style.height = (he-60) + "px";
+        ed_holder.style.maxHeight = (he-60) + "px";
+        ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
+
+        return he-123;
+    };
+
+    document.rCount = 0;
+    utils.addEvent(window, "resize", function(){
+        document.rCount++;
+        if(document.rCount===1){
+            setTimeout(function(){
+                document.rCount = 0;
+                getDocHeight();
+            }, 1000);
+        }
+    });
+
+    var createTerminal = function(){
+        getDocHeight();
+        var ed_holder = document.getElementById('editor_holder');
+
+        var term = document.createElement("div");
+        term.id = "x_terminal";
+        term.className = "note";
+        term.style.cssText = "background:black;color:white;min-height:98%";
+        ed_holder.appendChild(term);
+        window.terminal = $(term).terminal(function(command, tm) {
+            if(!terminal._g || terminal.___disabled ){
+                terminal.error("{{label.TerminalPleaseWait}}");
+                return;
+            }
+
+            if (command !== '') {
+                terminal.set_prompt("");
+                terminal.___disabled = true;
+                document.getElementById("btn_stop").style.display = "";
+                toServer("sendToTerminal", {g:terminal._g, c:command}, function(ret_val){
+                    if(ret_val.err){
+                        alert(ret_val.err);
+                        if(ret_val.relogin){
+                            location.href = "/index.html";
+                        }
+                        return;
+                    }
+                });
+            } else {
+                terminal.echo('');
+            }
+        }, {
+            greetings: '\x1b[1;32m{{label.TerminalConnectingToServer}}',
+            name: 'js_term',
+            height: ed_holder.clientHeight-20,
+            outputLimit:-1,
+            prompt: ''});
+    };
+
+    document.terminalReady = function(){
+        document.terminalReady = null;
+        createTerminal();
+        connectTerminal();
+    };
+
+    var connectTerminal = function(){
+        toServer("connectToTerminal", null, function(ret_val){
+            if(ret_val.err){
+                alert(ret_val.err);
+                if(ret_val.relogin){
+                    location.href = "/index.html";
+                }
+                return;
+            }
+
+            if(ret_val.reload){
+                connectTerminal();
+                return;
+            }
+
+            terminal.echo("\x1b[1;32m{{label.TerminalConnectedToServer}}");
+            terminal._g = ret_val.g;
+        }, true);
+    };
+
+    document.getElementById("btn_restart").onmousedown = function(){
+        terminal.__disabled = true;
+        terminal.error("{{label.RestartingTerminal}}");
+        terminal.echo('\x1b[1;32m{{label.TerminalConnectingToServer}}');
+        connectTerminal();
+    };
+
+    document.getElementById("btn_stop").onmousedown = function(){
+        terminal.error("{{label.TerminalStopMessage1}}");
+        document.getElementById("btn_stop").style.display = "none";
+        toServer("killTerminal", {create:true}, function(ret_val){
+            if(ret_val.err){
+                alert(ret_val.err);
+                if(ret_val.relogin){
+                    location.href = "/index.html";
+                }
+                return;
+            }
+
+            if(ret_val.reload){
+                connectTerminal();
+                return;
+            }
+
+            terminal.echo("\x1b[1;32m{{label.TerminalStopMessage2}}");
+            terminal.error("{{label.TerminalStopWarning}}");
+        }, true);
+    };
+
+    window.termx = function(params){
+        var lines = params.data.split('\n');
+        var cmd = null;
+        var arr = [];
+        for(var o in lines){
+            var line = lines[o];
+            var mark = line.indexOf("]*****~}");
+            if(line.indexOf("{~*****[") === 0 && mark>7){
+                cmd = line.substr(8, mark - 8);
+            }
+            else
+                arr.push(line);
+        }
+
+        for(var o in arr){
+            if(cmd && o == 0 && !arr[o].length){
+                continue;
+            }
+            else{
+                if(params.e)
+                    terminal.error(arr[o]);
+                else
+                    terminal.echo(arr[o]);
+            }
+        }
+
+        if(cmd){
+            terminal.enable();
+            terminal.___disabled = false;
+            document.getElementById("btn_stop").style.display = "none";
+            terminal.set_prompt(cmd + " {{user.nameTitle}}$> ");
+        }
+
+    }
+};
+</script>
+
+

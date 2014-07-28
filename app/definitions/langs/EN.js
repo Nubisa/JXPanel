@@ -154,6 +154,21 @@ exports.Labels = {
     "EmailInvalid" : "Invalid e-mail address.",
 
 
+    // Terminal
+    "RemoteManagement":"Remote Management",
+    "Restart":"Restart",
+    "RestartTerminalTooltip":"Restart Terminal Instance",
+    "StopOperation":"Stop Operation",
+    "StopOperationTooltip":"Stop Active Operation",
+    "TerminalConnectedToServer":"Terminal Client is Connected",
+    "TerminalConnectingToServer":"Connecting to Server...",
+    "TerminalTop": "Below window represents an interface to server's bash",
+    "TerminalStopWarning":"Detached sub processes created by terminal instance may stay alive",
+    "TerminalStopMessage1":"Canceling the Operation..",
+    "TerminalStopMessage2":"Terminal Tasks are Cancelled",
+    "RestartingTerminal": "Restarting Terminal",
+    "TerminalPleaseWait": "Please wait. Operating...",
+
     // Plan
     "plans":"plans",
     "PlanName" : "Plan name",

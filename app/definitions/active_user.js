@@ -21,17 +21,18 @@ var newUser = function(session_id){
             return home + "/Desktop";
         },
         lang: "EN",
+        groupIdPrefix: "gr" + jxcore.utils.uniqueId(),
         session: { forms:{} },
         lastOperation: Date.now() // TODO later clear the users
      };
 };
 
-exports.loginUser = function(sessionId, params){
+exports.loginUser = function(env, params){
+    var sessionId = env.SessionID;
+
     users[sessionId] = newUser(sessionId);
     users[sessionId].username = params.username;
-
     users[sessionId].nameTitle = params.username; // TODO change it!!!
-
     users[sessionId].user_id = params.user_id;
 
     database.errorEngine = new errorEngine(users[sessionId]);
@@ -95,6 +96,11 @@ exports.getDataTable = function(sessionId, table_name){
 
 
 exports.clearUser = function(sessionId) {
+    if(users[sessionId].terminal){
+        try{
+            users[sessionId].terminal.kill();
+        }catch(e){}
+    }
     delete users[sessionId];
 };
 
@@ -163,6 +169,12 @@ exports.defineMethods = function(){
         var home = active_user.homeFolder();
         var loc = home + path.sep + params.up;
 
+        var is_dir = fs.statSync(loc).isDirectory();
+        if(is_dir){
+            server.sendCallBack(env, {skip:true});
+            return;
+        }
+
         if(!fs.existsSync(loc)){
             server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
             return;
@@ -217,10 +229,15 @@ exports.defineMethods = function(){
         }
 
         try{
+            var target = oc + path.sep + params.name;
+            if(fs.existsSync(target)){
+                server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileExists")});
+                return;
+            }
             if(params.opt == "File")
-               fs.writeFileSync(loc + path.sep + params.name, "");
+               fs.writeFileSync(target, "");
             else
-               fs.mkdirSync(loc + path.sep + params.name);
+               fs.mkdirSync(target);
         }
         catch(e){
             server.sendCallBack(env, {err: e});
@@ -321,15 +338,14 @@ exports.defineMethods = function(){
             return;
         }
 
-        //var stat = fs.lstatSync(loc);
         var zip_name = "File_" + Date.now() + "_" + jxcore.utils.uniqueId() + ".zip";
         var zip_location = home + path.sep + "__panel_downloads" + path.sep + zip_name;
-        exec("zip -r " + zip_location + " " + loc, {cwd:home}, function(err, stdout, stderr){
+        exec("zip -r " + zip_location + " " + loc, {cwd:home, maxBuffer:1e7}, function(err, stdout, stderr){
             if (err !== null) {
-                server.sendCallBack(env, {err:err});
+                server.sendCallBack(env, {err:"Error" + JSON.stringify( err ) + (stderr || stdout) });
             }
             else if(!fs.existsSync(zip_location)){
-                server.sendCallBack(env, {err:stderr || stdout});
+                server.sendCallBack(env, {err: "Output:" + (stderr || stdout)});
             }
             else{
                 downloads.list["/" + zip_name] = {count:1, location:zip_location};
