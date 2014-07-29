@@ -52,19 +52,7 @@ exports.loginUser = function(env, params){
     users[sessionId].nameTitle = params.username; // TODO change it!!!
     users[sessionId].user_id = params.user_id;
 
-    database.errorEngine = new errorEngine(users[sessionId]);
-
     return true;
-};
-
-
-var errorEngine = function(active_user) {
-
-    var __active_user = active_user;
-
-    this.getError = function(str, arrParams) {
-        return form_lang.Get(__active_user.lang, str, null, arrParams);
-    };
 };
 
 exports.getUser = function(sessionId)

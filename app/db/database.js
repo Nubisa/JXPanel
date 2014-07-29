@@ -47,17 +47,6 @@ var ReadDB = function(cb){ // KRIS FILL IN
 };
 
 
-exports.errorEngine = null;
-
-var getError = function(str, arrParams) {
-
-    if (exports.errorEngine && exports.errorEngine.getError)
-        return exports.errorEngine.getError(str, arrParams)
-    else
-        return str;
-};
-
-
 var extend = function(base, ext){
     for(var o in ext){
         base[o] = ext[o];
@@ -166,7 +155,7 @@ var Plan = function(name, owner_user, opts, dummy){
             {
                 var res = this.canCreatePlan;
                 if(!res){
-                    return getError("PlanCannotAddPlans");
+                    return "PlanCannotAddPlans";
                 }
 
                 if(!with_opts.planMaximums){
@@ -174,21 +163,21 @@ var Plan = function(name, owner_user, opts, dummy){
                 }
 
                 if(with_opts.canCreateUser && !this.canCreateUser){
-                    return getError("PlanCannotAddUsers");
+                    return "PlanCannotAddUsers";
                 }
 
                 if(with_opts.maxUserCount>this.maxUserCount){
-                    return getError("PlanCannotAddMoreUsers", [this.maxUserCount ]);
+                    return "PlanCannotAddMoreUsers|" + this.maxUserCount;
                 }
 
                 if(with_opts.maxDomainCount>this.maxDomainCount){
-                    return getError("PlanCannotAddMoreDomains", [this.maxDomainCount]);
+                    return "PlanCannotAddMoreDomains|" + this.maxDomainCount;
                 }
 
                 for(var o in with_opts.planMaximums){
                     if(this.planMaximums[o]){
                         if(with_opts.planMaximums[o]>this.planMaximums[o]){
-                            return getError("PlanCannotAddMore", [o]);
+                            return "PlanCannotAddMore|" + o;
                         }
                     }
                 }
@@ -199,13 +188,13 @@ var Plan = function(name, owner_user, opts, dummy){
             case operation_enum.AddUser:
             {
                 if(this.suspended){
-                    return getError("UserSuspended");
+                    return "UserSuspended";
                 }
                 if(!this.canCreateUser){
-                    return getError("PlanCannotAddUsers");
+                    return "PlanCannotAddUsers";
                 }
                 if(_totalUsers(this)>=this.maxUserCount){
-                    return getError("PlanCannotAddMore", ["user"]);
+                    return "PlanCannotAddMore|user";
                 }
                 var _owner = Users[this.owner];
                 while(_owner){
@@ -213,7 +202,7 @@ var Plan = function(name, owner_user, opts, dummy){
                         break;
                     var _plan = Plans[_owner.plan];
                     if(_totalUsers(_plan)>=_plan.maxUserCount){
-                        return getError("PlanParentCannotAddMore", ["user"]);
+                        return "PlanParentCannotAddMore|user";
                     }
                     if(!_plan.owner)
                         break;
@@ -225,10 +214,10 @@ var Plan = function(name, owner_user, opts, dummy){
             case operation_enum.AddDomain:
             {
                 if(this.suspended){
-                    return getError("UserSuspended");
+                    return "UserSuspended";
                 }
                 if(_totalDomains(this)>=this.maxDomainCount){
-                    return getError("PlanCannotAddMore", ["domain"]);
+                    return "PlanCannotAddMore|domain";
                 }
                 var _owner = Users[this.owner];
                 while(_owner){
@@ -236,7 +225,7 @@ var Plan = function(name, owner_user, opts, dummy){
                         break;
                     var _plan = Plans[_owner.plan];
                     if(_totalDomains(_plan)>=_plan.maxDomainCount){
-                        return getError("PlanParentCannotAddMore", ["domain"]);
+                        return "PlanParentCannotAddMore|domain";
                     }
                     if(!_plan.owner)
                         break;
@@ -462,7 +451,7 @@ exports.deleteUser = function(name){
         subs.domains = subs.plans.concat(res.domains);
     }
     delete(Users[name]);
-
+    UpdateDB(JSON.stringify(DB));
     return subs;
 };
 

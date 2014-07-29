@@ -8,7 +8,9 @@
 
 
 var database = require("./database");
+var sqlite2 = require("./sqlite2");
 var util = require("util");
+var fs = require("fs");
 
 var inspect = function(obj) {
     return util.inspect(obj, { depth : 9 });
@@ -42,6 +44,37 @@ var start = function() {
 };
 
 
+var update_test = function() {
+
+    database.AddPlan(null, "Unlimited", {
+        maxDomainCount: 10,
+        maxUserCount: 10,
+        canCreatePlan: false,
+        canCreateUser: true,
+        planMaximums : {}
+
+    });
+
+    database.AddPlan(null, "Plan1", {
+        maxDomainCount: 10,
+        maxUserCount: 10,
+        canCreatePlan: false,
+        canCreateUser: true,
+        planMaximums : {}
+    });
+
+
+    console.log("addUser Kris", database.AddUser("Unlimited", "Kris", {}));
+    console.log("addUser Kris2", database.AddUser("Unlimited", "Kris2", {}));
+    console.log("getUser Kris2 before update", database.getUser("Kris2"));
+    console.log("getPlan Plan1 before update", database.getPlan("Plan1"));
+    var kris2 = database.getUser("Kris2");
+    kris2.plan = "Plan1";
+    console.log("update Kris2", database.updateUser("Kris2", kris2));
+    console.log("getUser Kris2 after update", database.getUser("Kris2"));
+    console.log("getPlan Plan1 after update", database.getPlan("Plan1"));
+};
+
 //
 //
 //var start2 = function() {
@@ -71,9 +104,14 @@ var start = function() {
 //};
 //
 
+var testdb = __dirname + "/test.db";
+
+sqlite2.SetFileName(testdb);
+// let's work on empty testdb
+if (fs.existsSync(testdb))
+    fs.unlinkSync(testdb);
+
 
 database.ReadDB(function(err) {
-    if (err) console.error(err); else start();
+    if (err) console.error(err); else update_test();
 });
-
-//console.log(database);
