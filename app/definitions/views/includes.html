@@ -134,11 +134,11 @@
                     if (window.lastPing < Date.now() - 6000) {
                         window.pingQ = true;
                         $.SmartMessageBox({
-                            title: "Server is not responding",
-                            content: "Would you like to re-login ?",
-                            buttons: '[No][Yes]'
+                            title: "{{label.ServerNotResponding}}",
+                            content: "{{label.ReloginQuestion}}",
+                            buttons: '[{{label.No}}][{{label.Yes}}]'
                         }, function (ButtonPressed) {
-                            if (ButtonPressed == "Yes") {
+                            if (ButtonPressed == "{{label.Yes}}") {
                                 location.href = "/index.html";
                                 return;
                             }
@@ -215,7 +215,7 @@
         $.SmartMessageBox({
             title : title,
             content : question,
-            buttons : '[No][Yes]'
+            buttons : '[{{label.No}}][{{label.Yes}}]'
         }, function(ButtonPressed) {
             cb(ButtonPressed);
         });

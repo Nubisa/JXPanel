@@ -177,6 +177,9 @@ exports.Labels = {
     "RestartingTerminal": "Restarting Terminal",
     "TerminalPleaseWait": "Please wait. Operating...",
 
+    "ServerNotResponding": "Server is not responding",
+    "ReloginQuestion": "Would you like to re-login ?",
+
     // Plan
     "plans":"plans",
     "PlanName" : "Plan name",

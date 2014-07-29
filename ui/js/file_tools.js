@@ -188,15 +188,12 @@ var init_file_tools = function(){
 
         var loc = getPathLocation(document.treeId, nodes[0]);
 
-        var ind = loc.lastIndexOf("/");
-        var locTo = loc.substr(0, ind+1);
-
         $.SmartMessageBox({
             title : "Deleting : "+loc,
             content : "Are you sure ?",
-            buttons : "[Yes][No]"
+            buttons : "[{{label.Yes}}][{{label.No}}]"
         }, function(ButtonPress, selected) {
-            if (ButtonPress == "No") {
+            if (ButtonPress == "{{label.No}}") {
                 return 0;
             }
             jxcore.Call("removeFileFolder", {up:loc}, function(ret_val){
