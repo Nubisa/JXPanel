@@ -40,6 +40,7 @@ exports.defineMethods = function(){
             cols: 80,
             rows: 30,
             cwd: home,
+            gid: active_user.gid,
             uid: active_user.uid
         });
 
@@ -77,6 +78,9 @@ exports.defineMethods = function(){
 //        child.stderr.on('data', function(data){toClient(this._child, data, true);});
 
         child.on('data', function(data) {
+            if(data.length==4 && ( data.indexOf("[3G")==1 || data.indexOf("[1G")==1 || data.indexOf("[0J")==1 ) )
+                return;
+
             toClient(child, data, false);
         });
         child.on('error', function(data){
@@ -84,7 +88,6 @@ exports.defineMethods = function(){
         });
 
         active_user.terminal = child;
-        active_user.terminal.write('echo "{~*****[$(pwd)]*****~}"\n');
 //        active_user.terminal.stdin.write('echo "{~*****[$(pwd)]*****~}"\n');
         server.sendCallBack(env, {g:active_user.groupIdPrefix});
     };
@@ -125,9 +128,7 @@ exports.defineMethods = function(){
             return;
         }
 
-        active_user.terminal.write(params.c + ';echo "{~*****[$(pwd)]*****~}"\n');
-//        active_user.terminal.stdin.write(params.c + '\necho "{~*****[$(pwd)]*****~}"\n');
-
+        active_user.terminal.write(params.c + '\n');
         server.sendCallBack(env, {done:true});
     });
 };

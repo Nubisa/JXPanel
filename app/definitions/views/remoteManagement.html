@@ -97,6 +97,9 @@ var Init = function(){
         term.className = "note";
         term.style.cssText = "background:black;color:white;min-height:98%";
         ed_holder.appendChild(term);
+
+        window.term_commands = [];
+
         window.terminal = $(term).terminal(function(command, tm) {
             if(!terminal._g || terminal.___disabled ){
                 terminal.error("{{label.TerminalPleaseWait}}");
@@ -104,9 +107,10 @@ var Init = function(){
             }
 
             if (command !== '') {
-                terminal.set_prompt("");
+                //terminal.set_prompt("");
                 terminal.___disabled = true;
                 document.getElementById("btn_stop").style.display = "";
+                term_commands.push(command);
                 toServer("sendToTerminal", {g:terminal._g, c:command}, function(ret_val){
                     if(ret_val.err){
                         alert(ret_val.err);
@@ -124,7 +128,7 @@ var Init = function(){
             name: 'js_term',
             height: ed_holder.clientHeight-20,
             outputLimit:-1,
-            prompt: ''});
+            prompt: ' '});
     };
 
     document.terminalReady = function(){
@@ -182,46 +186,53 @@ var Init = function(){
         }, true);
     };
 
-    window.termx = function(params){
-        var lines = params.data.split('\n');
-        var cmd = null;
-        var arr = [];
-        for(var o in lines){
-            var line = lines[o];
-            var mark = line.indexOf("]*****~}");
-            if(line.indexOf("{~*****[") === 0 && mark>7){
-                cmd = line.substr(8, mark - 8);
-            }
-            else
-                arr.push(line);
-        }
+    window.lines = "";
+    window.linesCount = 0;
 
-        if(cmd){
-            for(var o in arr){
-                if(cmd && o == 0 && !arr[o].length){
-                    continue;
+    window.termx = function(params){
+
+        params.data = params.data.replace(/\r/g, "");
+
+        window.lines += params.data;
+
+        window.linesCount ++;
+        if(window.linesCount == 1){
+            setTimeout(function(){
+                if(window.lines.trim().lastIndexOf("\n") == window.lines.trim().length-2){
+                    window.lines = window.lines.trim().substr(0, window.lines.trim().length-2);
                 }
-                else{
-                    if(params.e)
-                        terminal.error(arr[o]);
-                    else
-                        terminal.echo(arr[o]);
+                for(var o in term_commands){
+                    if(window.lines.indexOf(term_commands[o])===0){
+                        window.lines = window.lines.substr(term_commands[o].length+1);
+                        window.term_commands = [];
+                        break;
+                    }
                 }
-            }
-        }else{
-            if(params.e)
-                terminal.error(arr.join('\n'));
-            else
-                terminal.echo(arr.join('\n'));
+
+                terminal.echo(window.lines);
+                window.lines = null;
+                window.lines = "";
+                window.linesCount = 0;
+
+                var prompt = $('.cmd')[0];
+                var nodes = $('.terminal-output')[0].childNodes;
+
+                while(nodes.length>1)
+                    nodes = nodes[nodes.length - 1].childNodes;
+
+                nodes = nodes[0];
+                var span = document.createElement("span");
+                span.innerHTML = nodes.innerHTML;
+                nodes.parentNode.appendChild(span);
+                setTimeout(function() {
+                    prompt.style.marginTop = "-14px";
+                    prompt.style.position = "absolute";
+                    prompt.style.marginLeft = (parseInt(span.clientWidth)) + "px";
+                    nodes.parentNode.removeChild(span);
+                },0);
+                terminal.___disabled = false;
+            },250);
         }
-        if(cmd){
-            terminal.enable();
-            terminal.___disabled = false;
-            document.getElementById("btn_stop").style.display = "none";
-            terminal.set_prompt(cmd + " {{user.nameTitle}}$> ");
-        }
-        lines = null;
-        arr = null;
     }
 };
 </script>
