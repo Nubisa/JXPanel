@@ -5,6 +5,8 @@
 
 var sqlite2 = require("./sqlite2");
 
+sqlite2.SetFileName(__dirname + "/test2.db")
+
 var str = "test of the string 簎艜薤 佹侁刵 炟砏 輘, 斔櫅檷 藽轚酁 墏 犤繵 觓倎";
 
 

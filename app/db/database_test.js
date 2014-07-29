@@ -104,6 +104,35 @@ var update_test = function() {
 //};
 //
 
+
+var start5 = function() {
+
+
+    var ret = database.AddPlan(null, "Unlimited", {
+        maxDomainCount: 10,
+        maxUserCount: 10,
+        canCreatePlan: true,
+        canCreateUser: true,
+        planMaximums : {}
+    });
+    console.log("addPlan Unlimited for Kris", ret);
+    console.log("addUser Kris", database.AddUser("Unlimited", "Kris", {}));
+
+    var ret = database.AddPlan("Kris", "Plan1", {
+        maxDomainCount: 10,
+        maxUserCount: 10,
+        canCreatePlan: true,
+        canCreateUser: true,
+        planMaximums : {}
+    });
+    console.log("addPlan Plan1 for Kris", ret);
+
+    console.log("addUser Kris2", database.AddUser("Plan1", "Kris2", {}));
+
+    // Kris2 should be displayed
+    console.log("getUsersByUserName Kris", inspect(database.getUsersByUserName("Kris")));
+};
+
 var testdb = __dirname + "/test.db";
 
 sqlite2.SetFileName(testdb);
