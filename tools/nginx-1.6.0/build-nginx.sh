@@ -1,3 +1,4 @@
+#!/bin/sh
 ./configure --prefix=/nginx --with-pcre=pcre-8.33/
 make install
 cp *.js /nginx
