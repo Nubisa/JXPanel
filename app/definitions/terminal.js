@@ -7,9 +7,9 @@ var form_lang = require('./form_lang');
 exports.defineMethods = function(){
 
     var killChild = function(term){
-        term.stdout.removeAllListeners('data');
-        term.stderr.removeAllListeners('data');
-        term.removeAllListeners('close');
+//        term.stdout.removeAllListeners('data');
+//        term.stderr.removeAllListeners('data');
+//        term.removeAllListeners('close');
         term.owner.terminal_restarted = true;
         term.kill();
     };
@@ -31,23 +31,33 @@ exports.defineMethods = function(){
             server.unSubscribeClient(env, active_user.groupIdPrefix + "Term");
             return;
         }
+
         server.subscribeClient(env, active_user.groupIdPrefix + "Term");
         var home = active_user.homeFolder();
 
-        var child = require('child_process').execFile('bash', {
-            maxBuffer:1e8,
-            cwd:home,
-            uid:active_user.uid,
-            stdio: [ 'ignore', 1, 2 ]
+        var child = require('pty.js').spawn('bash', [], {
+            name: 'xterm-color',
+            cols: 80,
+            rows: 30,
+            cwd: home,
+            uid: active_user.uid
         });
+
+
+//        var child = require('child_process').execFile('bash', {
+//            maxBuffer:1e8,
+//            cwd:home,
+//            uid:active_user.uid,
+//            stdio: [ 'ignore', 1, 2 ]
+//        });
         child.owner = active_user;
 
         child.on('exit', function(){
-            if(!this.owner.terminal_restarted){
+            if(!child.owner.terminal_restarted){
                 server.sendToGroup(_child.owner.groupIdPrefix + "Term", "updateTerminal", {reload:true});
             }
             else
-                this.owner.terminal_restarted = false;
+                child.owner.terminal_restarted = false;
         });
 
         child.totalData = 0;
@@ -60,14 +70,22 @@ exports.defineMethods = function(){
             }
             server.sendToGroup(_child.owner.groupIdPrefix + "Term", "updateTerminal", {data:data, e:err});
         };
+//
+//        child.stdout._child = child;
+//        child.stderr._child = child;
+//        child.stdout.on('data', function(data){toClient(this._child, data, false);});
+//        child.stderr.on('data', function(data){toClient(this._child, data, true);});
 
-        child.stdout._child = child;
-        child.stderr._child = child;
-        child.stdout.on('data', function(data){toClient(this._child, data, false);});
-        child.stderr.on('data', function(data){toClient(this._child, data, true);});
+        child.on('data', function(data) {
+            toClient(child, data, false);
+        });
+        child.on('error', function(data){
+            toClient(tchildhis, data, true);
+        });
 
         active_user.terminal = child;
-        active_user.terminal.stdin.write('echo "{~*****[$(pwd)]*****~}"\n');
+        active_user.terminal.write('echo "{~*****[$(pwd)]*****~}"\n');
+//        active_user.terminal.stdin.write('echo "{~*****[$(pwd)]*****~}"\n');
         server.sendCallBack(env, {g:active_user.groupIdPrefix});
     };
 
@@ -107,7 +125,8 @@ exports.defineMethods = function(){
             return;
         }
 
-        active_user.terminal.stdin.write(params.c + '\necho "{~*****[$(pwd)]*****~}"\n');
+        active_user.terminal.write(params.c + ';echo "{~*****[$(pwd)]*****~}"\n');
+//        active_user.terminal.stdin.write(params.c + '\necho "{~*****[$(pwd)]*****~}"\n');
 
         server.sendCallBack(env, {done:true});
     });

@@ -21,7 +21,8 @@ var newUser = function(session_id){
             return home + "/Desktop";
         },
         lang: "EN",
-        uid:"",
+        uid:0,
+        gid:0,
         groupIdPrefix: "gr" + jxcore.utils.uniqueId(),
         session: { forms:{} },
         lastOperation: Date.now() // TODO later clear the users
@@ -35,6 +36,13 @@ exports.loginUser = function(env, params){
     var ret = jxcore.utils.cmdSync("id -u " + params.username);
     users[sessionId].uid = parseInt(ret.out);
     if (isNaN(users[sessionId].uid)) {
+        users[sessionId] = null;
+        delete(users[sessionId]);
+        return false;
+    }
+    ret = jxcore.utils.cmdSync("id -g " + params.username);
+    users[sessionId].gid = parseInt(ret.out);
+    if (isNaN(users[sessionId].gid)) {
         users[sessionId] = null;
         delete(users[sessionId]);
         return false;
