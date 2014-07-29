@@ -124,6 +124,7 @@
             if (window.jxTemplateReadyForjxm) {
                 window.jxTemplateReadyForjxm();
             }
+
             window.pinger = false;
             window.lastPing = Date.now();
             window.pingQ = false;
@@ -245,7 +246,6 @@
         return;
 
         var p = document.getElementById('jxFormMessage');
-
         if (p) {
             if(!type && !txt){
                 p.innerHTML = "";
@@ -254,9 +254,10 @@
 
             p.innerHTML += "<p class='alert alert-" + type + "' style='padding:3px;margin:2px;'> <strong></strong> " + txt + " </p>";
         } else {
-            alert("Displaying an alert, since there is no jxFormMessage div.\n\n" + txt);
+            location.href = location.href + "#";
         }
     };
+
     utils.bubble = function(type, title, content, ms) {
 
         var colors = { success : "#8ac38b", danger: "#c26565", warning : "#ff9900", info : "#d6dde7" };
