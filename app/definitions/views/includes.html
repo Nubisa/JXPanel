@@ -124,6 +124,41 @@
             if (window.jxTemplateReadyForjxm) {
                 window.jxTemplateReadyForjxm();
             }
+            window.pinger = false;
+            window.lastPing = Date.now();
+            window.pingQ = false;
+            if( "{{file.name}}" != "index" ) {
+                setInterval(function () {
+                    if(window.pingQ)
+                        return;
+                    if (window.lastPing < Date.now() - 6000) {
+                        window.pingQ = true;
+                        $.SmartMessageBox({
+                            title: "Server is not responding",
+                            content: "Would you like to re-login ?",
+                            buttons: '[No][Yes]'
+                        }, function (ButtonPressed) {
+                            if (ButtonPressed == "Yes") {
+                                location.href = "/index.html";
+                                return;
+                            }
+                            window.lastPing = Date.now()-2000;
+                            window.pingQ = false;
+                        });
+                    }
+                    if (!window.pinger) {
+                        window.pinger = true;
+                        window.lastPing = Date.now();
+                        toServer("userIn", null, function (ret_val) {
+                            if (ret_val.relogin) {
+                                location.href = "/index.html";
+                                return;
+                            }
+                            window.pinger = false;
+                        }, false);
+                    }
+                }, 2000);
+            }
         });
     };
 

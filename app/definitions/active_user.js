@@ -10,6 +10,20 @@ var exec = require('child_process').exec;
 var downloads = require('./downloads');
 var database = require("../db/database");
 
+// CLEAR USERS BEGIN
+setInterval(function(){
+    var dt = Date.now();
+    for(var o in users){
+        if(users[o]){
+            if(dt> users[o].lastOperation + 600000){ // 10 mins timeout
+                exports.clearUser(o);
+                break;
+            }
+        }
+    }
+},5000);
+// CLEAR USERS END
+
 var newUser = function(session_id){
     return {
         nameTitle: "John Doe",
@@ -75,6 +89,8 @@ exports.getUser = function(sessionId)
         console.log("active_user::getUser not_exist");
         return null;
     }
+
+    users[sessionId].lastOperation = Date.now();
 
     return users[sessionId];
 };
@@ -372,6 +388,14 @@ exports.defineMethods = function(){
                 server.sendCallBack(env, {link:"/" + zip_name, name:zip_name});
             }
         });
+    });
+
+    server.addJSMethod("userIn", function(env, params){
+        if(!users[env.SessionID]){
+            server.sendCallBack(env, {relogin:true});
+            return;
+        }
+        server.sendCallBack(env, {done:true});
     });
 };
 

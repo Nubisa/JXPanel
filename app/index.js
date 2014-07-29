@@ -13,7 +13,7 @@ require('http').setMaxHeaderLength(0);
 
 server.setApplication("JXPanel", "/", "NUBISA_JX_PANEL_2014");
 
-server.setConfig("consoleInfo", true);
+server.setConfig("consoleInfo", false);
 
 server.addJSMethod("serverMethod", function (env, params) {
     server.sendCallBack(env, params + " World!");
