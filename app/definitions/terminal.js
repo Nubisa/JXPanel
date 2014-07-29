@@ -7,9 +7,6 @@ var form_lang = require('./form_lang');
 exports.defineMethods = function(){
 
     var killChild = function(term){
-//        term.stdout.removeAllListeners('data');
-//        term.stderr.removeAllListeners('data');
-//        term.removeAllListeners('close');
         term.owner.terminal_restarted = true;
         term.kill();
     };
@@ -44,13 +41,6 @@ exports.defineMethods = function(){
             uid: active_user.uid
         });
 
-
-//        var child = require('child_process').execFile('bash', {
-//            maxBuffer:1e8,
-//            cwd:home,
-//            uid:active_user.uid,
-//            stdio: [ 'ignore', 1, 2 ]
-//        });
         child.owner = active_user;
 
         child.on('exit', function(){
@@ -63,6 +53,24 @@ exports.defineMethods = function(){
 
         child.totalData = 0;
         var toClient = function(_child, data, err) {
+            if(!data || !data.indexOf)
+                return;
+            if(data.length==4 && ( data.indexOf("[3G")==1 || data.indexOf("[1G")==1 || data.indexOf("[0J")==1 ) )
+            {
+                return;
+            }
+            var ind = data.indexOf("]0;");
+            if(ind >= 0){
+                var ln = data.length;
+                for(var i=0;i<ln;i++){
+                    if(data.charCodeAt(i) == 7){
+                        var str = data.substr(ind, i-ind);
+                        data = data.replace(str, "");
+                        break;
+                    }
+                }
+            }
+
             _child.totalData += data.length;
             if(_child.totalData>1e8){
                 _child.owner.terminal = null;
@@ -71,20 +79,12 @@ exports.defineMethods = function(){
             }
             server.sendToGroup(_child.owner.groupIdPrefix + "Term", "updateTerminal", {data:data, e:err});
         };
-//
-//        child.stdout._child = child;
-//        child.stderr._child = child;
-//        child.stdout.on('data', function(data){toClient(this._child, data, false);});
-//        child.stderr.on('data', function(data){toClient(this._child, data, true);});
 
         child.on('data', function(data) {
-            if(data.length==4 && ( data.indexOf("[3G")==1 || data.indexOf("[1G")==1 || data.indexOf("[0J")==1 ) )
-                return;
-
             toClient(child, data, false);
         });
         child.on('error', function(data){
-            toClient(tchildhis, data, true);
+            toClient(child, data, true);
         });
 
         active_user.terminal = child;
