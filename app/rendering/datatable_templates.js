@@ -70,13 +70,15 @@ var getHTML = function (active_user, table) {
         ret[0].push(displayName);
     }
 
-    var myPlan = database.getUser(active_user.username).plan;
+//    var myPlan = database.getUser(active_user.username).plan;
 
     var data = null;
     var method = null;
     if (table.name == "users") {
-        data = database.getUsersByPlanName(myPlan, 2);
-//        data = database.getUsersByUserName(active_user.username, 1);
+        data = [];
+        // active user
+        data.push(active_user.username);
+        data = data.concat(database.getUsersByUserName(active_user.username, 1));
         method = database.getUser;
     }
     else if (table.name == "plans") {
@@ -347,7 +349,7 @@ exports.remove = function (sessionId, table_name, ids) {
     var isOwner = null;
     if (table.name == "users") {
         method = database.deleteUser;
-        isOwner = function(name) { return database.isOwnerOfUser(myPlan, name) };
+        isOwner = function(name) { return database.isOwnerOfUser(active_user.username, name) };
     } else
     if (table.name == "plans") {
         method = database.deletePlan;

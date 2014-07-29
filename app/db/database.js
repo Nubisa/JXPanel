@@ -497,8 +497,8 @@ exports.deletePlan = function(name){
 };
 
 
-exports.isOwnerOfUser = function(plan_name, whom) {
-    var arr = exports.getUsersByPlanName(plan_name);
+exports.isOwnerOfUser = function(who, whom) {
+    var arr = exports.getUsersByUserName(who);
     return arr.indexOf(whom) !== -1;
 };
 

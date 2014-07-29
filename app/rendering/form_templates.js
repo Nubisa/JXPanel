@@ -63,8 +63,6 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         return {err : form_lang.Get(active_user.lang, "AccessDeniedToEditRecord", null, [ noun, name ] ) };
     };
 
-    var me = database.getUser(active_user.username);
-
     var isUpdate = null;
 
     if (formName === "jxconfig") {
@@ -76,7 +74,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         isUpdate.record = null;
 
         if (formName === "addUser") {
-            if (!database.isOwnerOfUser(me.plan, isUpdate.name))
+            if (!database.isOwnerOfUser(active_user.username, isUpdate.name) && active_user.username !== isUpdate.name)
                 return accessDeniedError("user", isUpdate.name);
 
             isUpdate.record = database.getUser(isUpdate.name);
