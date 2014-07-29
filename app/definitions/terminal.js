@@ -107,9 +107,6 @@ exports.defineMethods = function(){
             killChild(active_user.terminal);
             active_user.terminal = null;
         }
-        if(params.create){
-            createTerminal(env, params);
-        }
 
         server.sendCallBack(env, {done:true});
     });

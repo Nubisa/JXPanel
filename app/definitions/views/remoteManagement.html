@@ -10,9 +10,6 @@
 <a id="btn_restart" data-original-title="{{label.RestartTerminalTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
     <i class="fa fa-refresh"></i> {{label.Restart}}
 </a>
-<a id="btn_stop" data-original-title="{{label.StopOperationTooltip}}" style="display:none" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
-    <i class="fa fa-stop"></i> {{label.StopOperation}}
-</a>
 
 
 <div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
@@ -101,15 +98,12 @@ var Init = function(){
         window.term_commands = [];
 
         window.terminal = $(term).terminal(function(command, tm) {
-            if(!terminal._g || terminal.___disabled ){
+            if(!terminal._g ){
                 terminal.error("{{label.TerminalPleaseWait}}");
                 return;
             }
 
             if (command !== '') {
-                //terminal.set_prompt("");
-                terminal.___disabled = true;
-                document.getElementById("btn_stop").style.display = "";
                 term_commands.push(command);
                 toServer("sendToTerminal", {g:terminal._g, c:command}, function(ret_val){
                     if(ret_val.err){
@@ -162,28 +156,6 @@ var Init = function(){
         terminal.error("{{label.RestartingTerminal}}");
         terminal.echo('\x1b[1;32m{{label.TerminalConnectingToServer}}');
         connectTerminal();
-    };
-
-    document.getElementById("btn_stop").onmousedown = function(){
-        terminal.error("{{label.TerminalStopMessage1}}");
-        document.getElementById("btn_stop").style.display = "none";
-        toServer("killTerminal", {create:true}, function(ret_val){
-            if(ret_val.err){
-                alert(ret_val.err);
-                if(ret_val.relogin){
-                    location.href = "/index.html";
-                }
-                return;
-            }
-
-            if(ret_val.reload){
-                connectTerminal();
-                return;
-            }
-
-            terminal.echo("\x1b[1;32m{{label.TerminalStopMessage2}}");
-            terminal.error("{{label.TerminalStopWarning}}");
-        }, true);
     };
 
     window.lines = "";
