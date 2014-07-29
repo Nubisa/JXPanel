@@ -68,7 +68,7 @@ methods.tryLogin = function(env, params){
                 });
 
                 database.AddUser("Unlimited", params.username, { person_name : params.username });
-                finish();
+                finish(env, params);
                 return;
             }
 
