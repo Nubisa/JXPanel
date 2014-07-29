@@ -1,7 +1,7 @@
 #!/bin/sh
 $(rm -rf /nginx)
+unzip pcre-8.35.zip
 cd pcre-8.35
-make clean
 ./configure
 make
 cd ..
@@ -17,7 +17,5 @@ cd /nginx
 jx compile /nginx/nginx.jxp
 mv /nginx/nginx.jx $DIR/$1_nginx.jx
 cd $DIR
-cd pcre-8.35
-make clean
-cd ..
+rm -rf pcre-8.35
 make clean
