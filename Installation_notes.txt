@@ -1,4 +1,4 @@
 UBUNTU
-    sudo apt-get install build-essential
-    sudo apt-get install unzip
-
+    sudo apt-get install build-essential unzip gcc g++ libpam0g-dev
+    cd app/node_modules/authenticate-pam
+    jx install
