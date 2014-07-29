@@ -106,7 +106,7 @@ exports.ReadDB = function (cb) {
     }
 
     // db not opened yet
-    getDatabase(__dirname + "/dbfile.db", function (err, db) {
+    getDatabase(dbFileName, function (err, db) {
         if (!err) {
             db_object = db;
             readDB(cb);
@@ -147,4 +147,9 @@ exports.UpdateDB = function (stringToSave, cb) {
             if (cb) cb("SQLITE: " + err);
         }
     });
+};
+
+// call this before calling ReadDB or UpdateDB
+exports.SetFileName = function(fileName) {
+    dbFileName = fileName;
 };

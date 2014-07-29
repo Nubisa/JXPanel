@@ -14,6 +14,14 @@ langs.EN = require("./langs/EN.js").Labels;
  */
 exports.Get = function(lang, val, notNull, arrParams){
 
+    if (val.toString().indexOf("|") !== -1) {
+        var arr = val.split("|");
+        val = arr[0];
+        arrParams = [];
+        for (var i = 1, len = arr.length; i < len; i++)
+            arrParams.push(arr[i]);
+    }
+
     var str = null;
     if(langs[lang] && langs[lang][val]){
         str = langs[lang][val];

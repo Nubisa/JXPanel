@@ -1,5 +1,7 @@
 var server = require('jxm');
 var form_lang = require('./form_lang');
+var system_tools = require("./../system_tools");
+var database = require("./../db/database");
 
 
 /**
@@ -139,5 +141,25 @@ exports.MaxPort = function(min_port_field) {
 
         var ok = new exports.Int({ gt : vals[_min_port_field], lte : 20000 }).validate(env, active_user, val, vals);
         return ok;
+    };
+};
+
+
+exports.UserName = function() {
+
+    this.validate = function (env, active_user, val, vals) {
+
+        var reg = new RegExp("^[a-z_][a-z0-9_-]*[$]?$", "i");
+
+        if (!reg.test(val) || val.length >31)
+            return {result: false, msg: form_lang.Get(active_user.lang, "UsernameEnterRequired", true)};
+
+        if (system_tools.systemUserExists(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "UserSystemAlreadyExists", true)};
+
+        if (database.getUser(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "UserAlreadyExists", true)};
+
+        return {result: true};
     };
 };

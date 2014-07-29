@@ -8,6 +8,7 @@ var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
 var database = require("./../db/database");
+var system_tools = require("./../system_tools");
 
 
 var getTable = function(table_name) {
@@ -357,7 +358,7 @@ exports.remove = function (sessionId, table_name, ids) {
     } else
         return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
 
-    var accessDenied = []
+    var accessDenied = [];
     var errors = [];
     for(var i in ids) {
 
@@ -366,14 +367,21 @@ exports.remove = function (sessionId, table_name, ids) {
             continue;
         }
 
+        if (table.name === "users") {
+            var ret1 = system_tools.deleteSystemUser(ids[i]);
+            if (ret1.err) {
+                errors.push(form_lang.Get(active_user.lang, ret1.err, true));
+                continue;
+            }
+        }
+
         var ret = null;
         try {
             ret = method(ids[i]);
-            if (!ret.deleted) {
+            if (!ret.deleted)
                 errors.push(ret);
-            }
         } catch (ex) {
-            errors.push(ex.toString());
+            console.error(ex);
         }
     }
 

@@ -128,6 +128,9 @@ exports.Labels = {
     "UsersHeaderList": "Customize the options",
     "UsersContentList": "Create new users and manage their options.",
 
+    "UsersCannotCreateSystemUser" : "Cannot create system user.",
+    "UsersCannotDeleteSystemUser" : "Cannot delete system user.",
+
     "domains" : "domains",
     "DomainsUpperCase" : "Domains",
     "DomainsManagement" : "Domain Management",
@@ -155,6 +158,7 @@ exports.Labels = {
 
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
+    "UserSystemAlreadyExists" : "System user with this name already exists.",
     "EmailInvalid" : "Invalid e-mail address.",
 
 

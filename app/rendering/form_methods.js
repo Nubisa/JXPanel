@@ -248,6 +248,13 @@ methods.sessionApply = function(env, params){
                 ret = database.updateUser(update_name, user);
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
+                if (!ret) {
+                    var res = system_tools.addSystemUser(json.name, json.password);
+                    if (res.err) {
+                        ret = res.err;
+                        database.deleteUser(json.name);
+                    }
+                }
             }
         } catch(ex) {
             ret = ex.toString();
