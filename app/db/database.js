@@ -476,8 +476,8 @@ exports.deletePlan = function(name){
     var arr_users = exports.getUsersByPlanName(name,1e5);
     var arr_plans = [], arr_domains = [];
     for(var o in arr_users){
-        arr_plans = arr_plans.concat(exports.getPlansByUserName(o, 1e5));
-        arr_domains = arr_domains.concat(exports.getDomainsByUserName(o, 1e5));
+        arr_plans = arr_plans.concat(exports.getPlansByUserName(arr_users[o], 1e5));
+        arr_domains = arr_domains.concat(exports.getDomainsByUserName(arr_users[o], 1e5));
     }
 
     delete(owner.subPlans[name]);
