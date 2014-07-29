@@ -70,12 +70,13 @@ var getHTML = function (active_user, table) {
         ret[0].push(displayName);
     }
 
-    var myPlan = database.getUser(active_user.username).plan
+    var myPlan = database.getUser(active_user.username).plan;
 
     var data = null;
     var method = null;
     if (table.name == "users") {
-        data = database.getUsersByPlanName(myPlan, 1);
+        data = database.getUsersByPlanName(myPlan, 2);
+//        data = database.getUsersByUserName(active_user.username, 1);
         method = database.getUser;
     }
     else if (table.name == "plans") {
@@ -382,6 +383,7 @@ exports.remove = function (sessionId, table_name, ids) {
                 errors.push(ret);
         } catch (ex) {
             console.error(ex);
+            errors.push(form_lang.Get(active_user.lang, "Cannot delete record", true));
         }
     }
 
