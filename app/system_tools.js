@@ -245,3 +245,42 @@ exports.rmdirSync = function (fullDir) {
 
     return !fs.existsSync(fullDir);
 };
+
+
+exports.systemUserExists = function(username) {
+    var ret = jxcore.utils.cmdSync("id -g " + username);
+    return !isNaN(parseInt(ret.out));
+};
+
+
+exports.addSystemUser = function(username, password) {
+
+    if (exports.systemUserExists(username))
+        return { err : "UserAlreadyExists"  };
+
+    // sudo is not working when calling exec, so the current process must be running as root
+    var cmd = "useradd -g jxman -d /nginx/www/" +username + " -M -s /sbin/nologin " + username;
+    cmd += ';echo "'+username + ':' + password + '" | chpasswd -c SHA256';
+
+    var ret = jxcore.utils.cmdSync(cmd);
+
+    if (ret.exitCode)
+        console.error("UsersCannotCreateSystemUser", ret.out.toString().trim());
+
+    return { err : ret.exitCode ? "UsersCannotCreateSystemUser" : false }
+};
+
+
+exports.deleteSystemUser = function(username) {
+
+    if (!exports.systemUserExists(username))
+        return { err : false  };
+
+    var cmd = 'deluser ' + username;
+    var ret = jxcore.utils.cmdSync(cmd);
+
+    if (ret.exitCode)
+        console.error("UsersCannotDeleteSystemUser", ret.out.toString().trim());
+
+    return { err : ret.exitCode ? "UsersCannotDeleteSystemUser" : false }
+};

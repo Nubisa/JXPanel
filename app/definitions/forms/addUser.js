@@ -66,7 +66,8 @@ exports.form = function () {
                     options: { required: true },
                     dbName: "name",  // alias to name in database.getUser() object,
                     cannotEdit: true
-                }
+                },
+                validation : new validations.UserName()
             },
 
             {
