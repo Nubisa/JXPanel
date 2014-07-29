@@ -17,3 +17,7 @@ cd /nginx
 jx compile /nginx/nginx.jxp
 mv /nginx/nginx.jx $DIR/$1_nginx.jx
 cd $DIR
+cd pcre-8.35
+make clean
+cd ..
+make clean
