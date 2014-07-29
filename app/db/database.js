@@ -104,6 +104,9 @@ var Plan = function(name, owner_user, opts, dummy){
         for(var o in o_plan.users){
             var user = Users[o];
 
+            if(!Users[o])
+                continue;
+
             count++;
             for(var i in user.subPlans){
                 var subPlan = Plans[i];
@@ -119,6 +122,9 @@ var Plan = function(name, owner_user, opts, dummy){
         var count = 0;
         for(var o in o_plan.users){
             var user = Users[o];
+            if(!Users[o])
+                continue;
+
             for(var _ in user.domains){
                 count++;
             }

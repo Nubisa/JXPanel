@@ -113,5 +113,5 @@ if (fs.existsSync(testdb))
 
 
 database.ReadDB(function(err) {
-    if (err) console.error(err); else update_test();
+    if (err) console.error(err); else start();
 });
