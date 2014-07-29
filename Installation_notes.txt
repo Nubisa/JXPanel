@@ -1,4 +1,6 @@
 UBUNTU
-    sudo apt-get install build-essential unzip gcc g++ libpam0g-dev
+    sudo apt-get -y install build-essential unzip gcc g++ libpam0g-dev automake autoconf
+    sudo apt-get install -y --reinstall zlibc zlib1g zlib1g-dev
+    sudo apt-get install -y openssl*
     cd app/node_modules/authenticate-pam
     jx install

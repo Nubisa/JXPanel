@@ -1,8 +1,15 @@
 #!/bin/sh
-./configure --prefix=/nginx --with-pcre=pcre-8.33/
+$(rm -rf /nginx)
+cd pcre-8.35
+make clean
+./configure
+make
+cd ..
+make clean
+./configure --prefix=/nginx --with-pcre=pcre-8.35/
 make install
-cp *.js /nginx
-cp *.jxp /nginx
+cp *.js /nginx/
+cp *.jxp /nginx/
 mkdir -p /nginx/logs
 cp *.log /nginx/logs
 DIR="$( cd "$( dirname "$0" )" && pwd )"
