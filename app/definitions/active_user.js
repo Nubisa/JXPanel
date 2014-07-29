@@ -117,6 +117,7 @@ exports.getDataTable = function(sessionId, table_name){
 exports.clearUser = function(sessionId) {
     if(users[sessionId].terminal){
         try{
+            users[sessionId].terminal.terminal_restarted = true; // saying that we killed it
             users[sessionId].terminal.kill();
         }catch(e){}
     }

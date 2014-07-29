@@ -45,7 +45,7 @@ exports.defineMethods = function(){
 
         child.on('exit', function(){
             if(!child.owner.terminal_restarted){
-                server.sendToGroup(_child.owner.groupIdPrefix + "Term", "updateTerminal", {reload:true});
+                server.sendToGroup(child.owner.groupIdPrefix + "Term", "updateTerminal", {reload:true});
             }
             else
                 child.owner.terminal_restarted = false;
