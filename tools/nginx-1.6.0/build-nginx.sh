@@ -11,9 +11,11 @@ make install
 cp *.js /nginx/
 cp *.jxp /nginx/
 mkdir -p /nginx/logs
-cp *.log /nginx/logs
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd /nginx
+cd /nginx/logs
+echo "" > access.log
+echo "" > error.log
+cd ..
 jx compile /nginx/nginx.jxp
 mv /nginx/nginx.jx $DIR/$1_nginx.jx
 cd $DIR
