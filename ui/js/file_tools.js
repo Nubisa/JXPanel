@@ -311,6 +311,24 @@ var init_file_tools = function(){
         });
     };
 
+    var getInfo = function(folder, treeNode, cb){
+        toServer("getFileInfo", {up:folder, id:document.treeId}, function(ret_val){
+
+            if(ret_val.err){
+                alert("ERROR : " + JSON.stringify(ret_val.err));
+                if(ret_val.relogin){
+                    location.href = "/index.html";
+                }
+                var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
+                if(zTree)
+                    zTree.jx_loading = false;
+                return;
+            }
+
+            cb(ret_val.info, folder, ret_val.id, treeNode);
+        }, true);
+    };
+
     var chmod_file = function(){
         if(!document.treeId)
             return;
@@ -331,23 +349,38 @@ var init_file_tools = function(){
             utils.bubble("warning", "Opps!", "You can not change the root folder", 4000);
             return;
         }
-        toServer("chmod_file", {up:loc, to:""}, function(ret_val){
-            if(ret_val.err){
-                alert(JSON.stringify(ret_val.err));
-
-                if(ret_val.relogin){
-                    location.href = "/index.html";
+        getInfo(loc, nodes[0], function(info, path, treeId, treeNode){
+            $.SmartMessageBox({
+                title : "Renaming : "+loc,
+                content : "Enter a new name..",
+                input: "text",
+                inputValue :parseInt(info.mode.toString(8), 10),
+                placeHolder: "enter a new name",
+                buttons : "[{{label.Submit}}][{{label.Cancel}}]"
+            }, function(ButtonPress, name) {
+                if(ButtonPress == "{{label.Cancel}}"){
+                    return 0;
                 }
-                if(ret_val.reloadTree){
-                    location.href = "/editor.html";
-                }
-                return;
-            }
 
-            // bring file info for each tree selection
+                toServer("chmod_file", {up:loc, to:""}, function(ret_val){
+                    if(ret_val.err){
+                        alert(JSON.stringify(ret_val.err));
+
+                        if(ret_val.relogin){
+                            location.href = "/index.html";
+                        }
+                        if(ret_val.reloadTree){
+                            location.href = "/editor.html";
+                        }
+                        return;
+                    }
+
+                    // bring file info for each tree selection
 
 
-        }, true);
+                }, true);
+            });
+        });
     };
 
     var btn_add = document.getElementById('btn_add');

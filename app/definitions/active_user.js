@@ -144,6 +144,37 @@ exports.defineMethods = function(){
     },5000);
 // CLEAR USERS END
 
+    server.addJSMethod("getFileInfo", function(env, params){
+        console.log("getFileInfo", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+        var loc;
+        if(params.up == "")
+            params.up = "#";
+
+        if(params.up == "#"){
+            loc = home;
+        }
+        else{
+            loc = home + path.sep + params.up;
+        }
+
+        fs.lstat(loc, function(err, info){
+            if(err){
+                server.sendCallBack(env, {err:err, relogin:false});
+                return;
+            }
+
+            server.sendCallBack(env, {info:info, id:params.id});
+        });
+    });
+
     server.addJSMethod("getFiles", function(env, params){
         console.log("getFiles", params);
 
