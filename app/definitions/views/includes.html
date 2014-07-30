@@ -152,6 +152,8 @@
             window.pinger = false;
             window.lastPing = Date.now();
             window.pingQ = false;
+            window.pingQCounter = 0;
+
             if( "{{file.name}}" != "index" ) {
                 setInterval(function () {
 
@@ -161,20 +163,26 @@
                     if(window.pingQ)
                         return;
 
-                    if (window.lastPing < Date.now() - 15000) {
-                        window.pingQ = true;
-                        $.SmartMessageBox({
-                            title: "{{label.YouHaveBeenAway}}",
-                            content: "{{label.ReloginQuestion}}",
-                            buttons: '[{{label.No}}][{{label.Yes}}]'
-                        }, function (ButtonPressed) {
-                            if (ButtonPressed == "{{label.Yes}}") {
-                                location.href = "/index.html";
-                                return;
-                            }
-                            window.lastPing = Date.now()-2000;
-                            window.pingQ = false;
-                        });
+                    if (window.lastPing < Date.now() - 8000) {
+                        if(window.pingQCounter == 0){
+                            window.pingQCounter++;
+                            window.lastPing = Date.now();
+                            window.pinger = false;
+                        }else{
+                            window.pingQ = true;
+                            $.SmartMessageBox({
+                                title: "{{label.ServerNotResponding}}",
+                                content: "{{label.ReloginQuestion}}",
+                                buttons: '[{{label.No}}][{{label.Yes}}]'
+                            }, function (ButtonPressed) {
+                                if (ButtonPressed == "{{label.Yes}}") {
+                                    location.href = "/index.html";
+                                    return;
+                                }
+                                window.lastPing = Date.now()-2000;
+                                window.pingQ = false;
+                            });
+                        }
                     }
                     if (!window.pinger) {
                         window.pinger = true;
@@ -183,6 +191,8 @@
                                 location.href = "/index.html";
                                 return;
                             }
+
+                            window.pingQCounter = 0;
                             window.lastPing = Date.now();
                             window.pinger = false;
                         }, false);
@@ -257,13 +267,13 @@
         $.SmartMessageBox({
             title : title,
             content : question,
-            buttons : "[Cancel][Accept]",
+            buttons : "[{{label.Cancel}}][{{label.Accept}}]",
             input : "text",
             placeholder : "",
             inputValue : ""
         }, function(ButtonPress, Value) {
 
-            var ok = ButtonPress === "Accept";
+            var ok = ButtonPress === "{{label.Accept}}";
             cb(ok, Value);
         });
     };

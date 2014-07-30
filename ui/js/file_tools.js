@@ -21,7 +21,6 @@ var init_file_tools = function(){
                 _node = null;
             }
         }
-
         return loc;
     };
 
@@ -35,36 +34,41 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length || !nodes[0].children)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder to add file", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFolder}}", 4000);
             return;
         }
 
         var loc = getPathLocation(document.treeId, nodes[0]);
 
         $.SmartMessageBox({
-            title : "Location : "+loc,
-            content : "Create a new ... ?",
+            title : "{{label.Location}} : "+loc,
+            content : "{{label.CreateNewFileFolder}} ... ?",
             buttons : "[{{label.Cancel}}][{{label.Next}}]",
             input : "select",
-            options: "[File][Folder]",
+            options: "[{{label.File}}][{{label.Folder}}]",
             placeholder : "Select"
         }, function(ButtonPress, selected) {
             if (ButtonPress == "{{label.Cancel}}") {
                 return 0;
             }
+            if(selected == "{{label.File}}")
+                selected = "File";
+            else
+                selected = "Folder";
+
             $.SmartMessageBox({
-                title : "Create a new "+selected + " at "+loc,
-                content : "Name ?",
+                title : "{{label.CreateNewFileFolder}} "+selected + " -> "+loc,
+                content : "{{label.Name}} ?",
                 buttons : "[{{label.Cancel}}][{{label.Next}}]",
                 input : "text",
                 inputValue: "",
-                placeholder : "Name for the "+selected
+                placeholder : "{{label.NameForTheFile}} "+selected
             }, function(ButtonPress, name) {
                 if (ButtonPress == "{{label.Cancel}}") {
                     return 0;
                 }
                 if(!name || !name.trim().length){
-                    utils.bubble("danger", "Can't be empty", "You should define a name", 4000);
+                    utils.bubble("danger", "Oops!", "{{label.MustDefineFileFolderName}}", 4000);
                 }
                 else{
                     toServer("addFileFolder", {up:loc, name:name, opt:selected}, function(ret_val){
@@ -83,7 +87,7 @@ var init_file_tools = function(){
                         getFiles(loc, document.treeId, nodes[0]);
                         if(loc == "/")
                             loc = "";
-                        utils.bubble("success", selected + " Created", loc + "/" + name, 4000);
+                        utils.bubble("success", selected + " {{label.Created}}", loc + "/" + name, 4000);
 
                     }, true);
                 }
@@ -103,17 +107,17 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length || !nodes[0].parentTId)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder or a file", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFileFolder}}", 4000);
             return;
         }
 
         var loc = getPathLocation(document.treeId, nodes[0]);
 
         $.SmartMessageBox({
-            title : "Deleting : "+loc,
-            content : "Are you sure ?",
+            title : "{{label.DeletingFileFolder}} : "+loc,
+            content : "{{label.AreYouSure}}",
             buttons : "[{{label.Yes}}][{{label.No}}]"
-        }, function(ButtonPress, selected) {
+        }, function(ButtonPress) {
             if (ButtonPress == "{{label.No}}") {
                 return 0;
             }
@@ -129,7 +133,7 @@ var init_file_tools = function(){
                     }
                     return;
                 }
-                utils.bubble("success", "Successfully Deleted", loc, 4000);
+                utils.bubble("success", "{{label.FileFolderDeleted}}", loc, 4000);
                 if(editors[loc]){
                     editors[loc].host.ax.onclick();
                 }
@@ -152,30 +156,30 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length || !nodes[0].parentTId)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder or a file", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFileFolder}}", 4000);
             return;
         }
 
         var loc = getPathLocation(document.treeId, nodes[0]);
 
         $.SmartMessageBox({
-            title : "Renaming : "+loc,
-            content : "Enter a new name..",
+            title : "{{label.FileFolderRenaming}} : "+loc,
+            content : "{{label.EnterNewFileFolderName}}..",
             input: "text",
             inputValue : nodes[0].name,
-            placeHolder: "enter a new name",
-            buttons : "[Submit][Cancel]"
+            placeHolder: "{{label.EnterNewFileFolderName}}",
+            buttons : "[{{label.Submit}}][{{label.Cancel}}]"
         }, function(ButtonPress, name) {
-            if (ButtonPress == "Cancel") {
+            if (ButtonPress == "{{label.Cancel}}") {
                 return 0;
             }
             if(!name || !name.trim().length){
-                utils.bubble("warning", "Enter a name..", "Name can not be empty!", 4000);
+                utils.bubble("danger", "Oops!", "{{label.MustDefineFileFolderName}}", 4000);
                 return;
             }
 
             if(/[\/\\,;:%#@*!]/.test(name) || name.indexOf("..")>=0){
-                utils.bubble("warning", "Enter a name..", "Name can not contain special characters!", 4000);
+                utils.bubble("warning", "Oops!", "{{label.NoSpecialCharsFileFolderName}}", 4000);
                 return;
             }
 
@@ -187,7 +191,7 @@ var init_file_tools = function(){
             loc = loc.trim();
 
             if(locTo == loc){
-                utils.bubble("warning", "Enter a name..", "You have entered the same name!", 4000);
+                utils.bubble("warning", "Oops!", "{{label.EnteredSameFileFolderName}}", 4000);
                 return;
             }
 
@@ -203,7 +207,7 @@ var init_file_tools = function(){
                     }
                     return;
                 }
-                utils.bubble("success", "Successfully Renamed", loc + "  to  " + locTo, 4000);
+                utils.bubble("success", "{{label.FileFolderRenamed}}", loc + "  to  " + locTo, 4000);
                 if(editors[loc]){
                     editors[loc].host.ax.onclick();
                 }
@@ -226,7 +230,7 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length || !nodes[0].children)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder to refresh", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFolder}}", 4000);
             return;
         }
 
@@ -245,13 +249,13 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder or a file to download", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFileFolderDownload}}", 4000);
             return;
         }
 
         var loc = getPathLocation(document.treeId, nodes[0]);
         if(loc == '/'){
-            utils.bubble("warning", "Opps!", "You can not download the root folder", 4000);
+            utils.bubble("warning", "Opps!", "{{label.CantDownloadRoot}}", 4000);
             return;
         }
         toServer("downloadFile", {up:loc}, function(ret_val){
@@ -270,10 +274,10 @@ var init_file_tools = function(){
             var downloadLink = "<a href='"+ret_val.link+"' target='_blank'>"+ret_val.name+"</a>";
 
             $.SmartMessageBox({
-                title : "Download : "+loc,
-                content : "Use below one-time link to download..<br/><br/>" + downloadLink,
-                buttons : "[Done]"
-            }, function(ButtonPress, name) {
+                title : "{{label.Download}} : "+loc,
+                content : "{{label.LinkToDownload}}<br/><br/>" + downloadLink,
+                buttons : "[{{label.Done}}]"
+            }, function(ButtonPress) {
                 return 0;
             });
 
@@ -292,7 +296,7 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length || !nodes[0].children)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder for upload location", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFileFolderUpload}}", 4000);
             return;
         }
 
@@ -302,10 +306,10 @@ var init_file_tools = function(){
             + escape(loc) +'"></iframe></span>';
 
         $.SmartMessageBox({
-            title : "Download : "+loc,
-            content : "Select a file to upload..<br/><br/>" + uploadHTML,
-            buttons : "[Close]"
-        }, function(ButtonPress, name) {
+            title : "{{label.Upload}} : "+loc,
+            content : "{{label.SelectFileToUpload}}<br/><br/>" + uploadHTML,
+            buttons : "[{{label.Close}}]"
+        }, function(ButtonPress) {
             getFiles(loc, document.treeId, nodes[0]);
             return 0;
         });
@@ -340,13 +344,13 @@ var init_file_tools = function(){
         var nodes = zTree.getSelectedNodes();
         if(!nodes || !nodes.length)
         {
-            utils.bubble("warning", "Not Selected!", "Select a folder or a file to update chmod", 4000);
+            utils.bubble("warning", "Oops!", "{{label.SelectFileFolderCHMOD}}", 4000);
             return;
         }
 
         var loc = getPathLocation(document.treeId, nodes[0]);
         if(loc == '/'){
-            utils.bubble("warning", "Opps!", "You can not change the root folder", 4000);
+            utils.bubble("warning", "Opps!", "{{label.CantCHMODRoot}}", 4000);
             return;
         }
         getInfo(loc, nodes[0], function(info, path, treeId, treeNode){
@@ -355,11 +359,11 @@ var init_file_tools = function(){
                 file_mode = file_mode.substr(file_mode.length-3, 3);
             }
             $.SmartMessageBox({
-                title : "Renaming : "+loc,
-                content : "Enter a new name..",
+                title : "{{label.CHMODUpdating}} : "+loc,
+                content : "CHMOD..",
                 input: "text",
                 inputValue :file_mode,
-                placeHolder: "enter a new name",
+                placeHolder: "chmod",
                 buttons : "[{{label.Submit}}][{{label.Cancel}}]"
             }, function(ButtonPress, mode) {
                 if(ButtonPress == "{{label.Cancel}}"){
@@ -369,14 +373,14 @@ var init_file_tools = function(){
                 mode = mode.trim();
 
                 if(mode == file_mode){
-                    utils.bubble("warning", "Opps!", "You didn't change the file mode", 4000);
+                    utils.bubble("warning", "Opps!", "{{label.DIDNTChangeCHMOD}}", 4000);
                     return;
                 }
 
                 var nums = mode.match(/[^0-7]/);
 
                 if(mode.length>3 || nums){
-                    utils.bubble("warning", "Opps!", "File Mode needs to be a three digit number (0-7)", 4000);
+                    utils.bubble("warning", "Opps!", "{{label.CHMODSpecialChars}}", 4000);
                     return;
                 }
 
@@ -393,7 +397,7 @@ var init_file_tools = function(){
                         return;
                     }
 
-                    utils.bubble("success", "Ok!", "File mode updated successfully", 4000);
+                    utils.bubble("success", "Ok!", "{{label.CHMODisDone}}", 4000);
                 }, true);
             });
         });
