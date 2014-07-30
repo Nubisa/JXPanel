@@ -9,6 +9,7 @@ var path = require("path");
 var rep = require('./smart_search').replace;
 var database = require("./../db/database");
 var system_tools = require("./../system_tools");
+var site_defaults = require("./../definitions/site_defaults");
 
 
 var getTable = function(table_name) {
@@ -174,7 +175,7 @@ var getModules = function(active_user, table) {
 
     var data = [];
     try {
-        var modulesDir = path.normalize(process.jxconfig.dirNativeModules + "/node_modules/");
+        var modulesDir = path.normalize(site_defaults.dirNativeModules + "/node_modules/");
         var folders = fs.readdirSync(modulesDir);
 
         for (var a = 0, len = folders.length; a < len; a++) {

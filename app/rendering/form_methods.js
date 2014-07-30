@@ -10,6 +10,7 @@ var methods = {};
 var fs = require('fs');
 var path = require('path');
 var system_tools = require('../system_tools');
+var site_defaults = require("./../definitions/site_defaults");
 
 
 var checkUser = function(env){
@@ -395,7 +396,7 @@ var uninstallNPM = function(env, params) {
     var active_user = checkUser(env);
 
     for(var i in params.ids) {
-        var modulesDir = path.normalize(process.jxconfig.dirNativeModules + "/node_modules/" + params.ids[i]);
+        var modulesDir = path.normalize(site_defaults.dirNativeModules + "/node_modules/" + params.ids[i]);
 
         var ok = true;
         if (fs.existsSync(modulesDir)) {
@@ -420,8 +421,8 @@ methods.installNPM = function(env, params) {
         var version = nameAndVersion.slice(pos + 1).trim();
     }
 
-    if (!fs.existsSync(process.jxconfig.dirNativeModules)) {
-        fs.mkdirSync(process.jxconfig.dirNativeModules);
+    if (!fs.existsSync(site_defaults.dirNativeModules)) {
+        fs.mkdirSync(site_defaults.dirNativeModules);
     }
 
     var task = function(cmd) {
@@ -429,9 +430,12 @@ methods.installNPM = function(env, params) {
     };
 
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
-    var cmd = "cd '" + process.jxconfig.dirNativeModules + "'; '" + process.execPath + "' install " + nameAndVersion;
+    var cmd = "cd '" + site_defaults.dirNativeModules + "'; '" + process.execPath + "' install " + nameAndVersion;
     jxcore.tasks.addTask(task, cmd, function() {
-        var expectedModulePath = path.join(process.jxconfig.dirNativeModules, "/node_modules/", name);
+//      task(cmd);
+
+    //jxcore.utils.cmdSync(cmd);
+        var expectedModulePath = path.join(site_defaults.dirNativeModules, "/node_modules/", name);
 
         server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
     });

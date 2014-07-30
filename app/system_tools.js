@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var http = require("http");
 var database = require("./db/database");
+var os_info = require("./install/os_info");
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -305,7 +306,7 @@ exports.installJX = function(cb) {
         exports.rmdirSync(path.dirname(cfg.jxPath));
     }
 
-    var root = process.jxconfig.rootDir;
+    var root = os_info.apps_folder;
 
     var dir = root + "jx_downloaded/";
     if (!fs.existsSync(dir)) {

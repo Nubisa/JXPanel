@@ -1,68 +1,83 @@
+if(!global.jxcore){
+    console.error("This application requires JXcore to run. Please visit http://jxcore.com");
+    return;
+}
+
 var fs = require('fs');
-var server = require('jxm');
-var render_engine = require('./rendering/render');
-var form_methods = require('./rendering/form_methods');
-var charts = require('./definitions/charts/charts');
 var site_defaults = require('./definitions/site_defaults');
-var _active_users = require('./definitions/active_user');
-var database = require("./db/database");
-var downloads = require("./definitions/downloads")
-var terminal = require("./definitions/terminal");
-var path = require("path");
+var icheck = require('./install/install');
 
-require('http').setMaxHeaderLength(0);
-
-server.setApplication("JXPanel", "/", "NUBISA_JX_PANEL_2014");
-
-server.setConfig("consoleInfo", false);
-
-server.addJSMethod("serverMethod", function (env, params) {
-    server.sendCallBack(env, params + " World!");
-});
-
-for(var o in form_methods){
-    server.addJSMethod(o, form_methods[o]);
+if(process.argv[2] == "help"){
+    jxcore.utils.console.log("Command line options for "+site_defaults.EN.panelName);
+    jxcore.utils.console.log("Start: jx index.js");
+    jxcore.utils.console.log("Install: jx index.js install");
+    jxcore.utils.console.log("Uninstall: jx index.js uninstall");
+    jxcore.utils.console.log("ReInstall: jx index.js reinstall");
 }
 
-terminal.defineMethods();
-site_defaults.defineMethods();
-charts.defineChartMethods();
-_active_users.defineMethods();
+if(process.argv[2] == "uninstall" || process.argv[2] == "reinstall"){
+    icheck.uninstall();
 
-server.linkResourcesFromPath("/", "../ui/");
-
-server.mediaserver.noCache = true;
-render_engine.defineRender(server.mediaserver);
-
-var opts = null;
-
-if(fs.existsSync(__dirname + '/app.dev_config')){
-    opts = JSON.parse(fs.readFileSync(__dirname + '/app.dev_config') + "");
+    if(process.argv[2] == "uninstall")
+        return;
 }
 
-server.on('request', downloads.check);
+if(icheck.requireInstallation()){
+    if(process.argv[2] != "install" && process.argv[2] != "reinstall"){
+        jxcore.utils.console.log("To install "+site_defaults.EN.panelName+", use\n" + process.argv[0] + " index install");
+        process.exit(0);
+    }
 
-database.ReadDB(function(err) {
+    jxcore.utils.console.log("Installing "+site_defaults.EN.panelName);
+    icheck.install();
+}
+else {
+    var server = require('jxm');
+    var render_engine = require('./rendering/render');
+    var form_methods = require('./rendering/form_methods');
+    var charts = require('./definitions/charts/charts');
+    var _active_users = require('./definitions/active_user');
+    var database = require("./db/database");
+    var downloads = require("./definitions/downloads")
+    var terminal = require("./definitions/terminal");
 
-    if (err)
-        throw err;
-    else
-        server.start(opts);
-});
+    require('http').setMaxHeaderLength(0);
 
+    server.setApplication("JXPanel", "/", "NUBISA_JX_PANEL_2014");
 
+    server.setConfig("consoleInfo", false);
 
+    server.addJSMethod("serverMethod", function (env, params) {
+        server.sendCallBack(env, params + " World!");
+    });
 
-var jx_opt = {};
+    for(var o in form_methods){
+        server.addJSMethod(o, form_methods[o]);
+    }
 
-jx_opt.rootDir = path.join(__dirname, "../__tmp_jx_root/");
-jx_opt.dirNativeModules = jx_opt.rootDir + "native_modules/";
-jx_opt.dirAppsConfig = jx_opt.rootDir + "app_configs/";
+    terminal.defineMethods();
+    site_defaults.defineMethods();
+    charts.defineChartMethods();
+    _active_users.defineMethods();
 
-// full path to downloaded jx. will be known after downloading
-jx_opt.jxPath = null;
-// version of downloaded jx
-jx_opt.jxv = null;
+    server.linkResourcesFromPath("/", "../ui/");
 
+    server.mediaserver.noCache = true;
+    render_engine.defineRender(server.mediaserver);
 
-process.jxconfig = jx_opt;
+    var opts = null;
+
+    if(fs.existsSync(__dirname + '/app.dev_config')){
+        opts = JSON.parse(fs.readFileSync(__dirname + '/app.dev_config') + "");
+    }
+
+    server.on('request', downloads.check);
+
+    database.ReadDB(function(err) {
+
+        if (err)
+            throw err;
+        else
+            server.start(opts);
+    });
+}

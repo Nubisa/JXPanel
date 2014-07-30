@@ -2,6 +2,8 @@ var form_lang = require('../definitions/form_lang');
 var _active_user = require('../definitions/active_user');
 var system_tools = require('../system_tools');
 var server = require('jxm');
+var os_info = require("./../install/os_info");
+var path = require("path");
 
 // site defaults are only ENGLISH!
 exports.EN = {
@@ -82,5 +84,10 @@ exports.defineMethods = function(){
         getOSDetails(active_user.lang, env);
     });
 };
+
+
+exports.dirNativeModules = path.join(os_info.apps_folder, "native_modules" ) + path.sep;
+
+
 
 //{{defaults.LABELHERE}}
