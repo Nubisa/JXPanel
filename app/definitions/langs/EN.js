@@ -187,6 +187,7 @@ exports.Labels = {
 
     "ServerNotResponding": "Server is not responding",
     "ReloginQuestion": "Would you like to re-login ?",
+    "YouHaveBeenAway": "You've been away",
 
     // Plan
     "plans":"plans",

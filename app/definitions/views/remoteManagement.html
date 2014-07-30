@@ -98,6 +98,11 @@ var Init = function(){
         window.term_commands = [];
 
         window.terminal = $(term).terminal(function(command, tm) {
+            if(terminal.___disabled){
+                terminal.error("Use Restart Button above to Restart the session");
+                return;
+            }
+
             if(!terminal._g ){
                 terminal.error("{{label.TerminalPleaseWait}}");
                 return;
@@ -118,6 +123,7 @@ var Init = function(){
                 terminal.echo('');
             }
         }, {
+            exit:false,
             greetings: '\x1b[1;32m{{label.TerminalConnectingToServer}}',
             name: 'js_term',
             height: ed_holder.clientHeight-20,
@@ -148,11 +154,11 @@ var Init = function(){
 
             terminal.echo("\x1b[1;32m{{label.TerminalConnectedToServer}}");
             terminal._g = ret_val.g;
+            terminal.___disabled = false;
         }, true);
     };
 
     document.getElementById("btn_restart").onmousedown = function(){
-        terminal.__disabled = true;
         terminal.error("{{label.RestartingTerminal}}");
         terminal.echo('\x1b[1;32m{{label.TerminalConnectingToServer}}');
         connectTerminal();
@@ -160,8 +166,15 @@ var Init = function(){
 
     window.lines = "";
     window.linesCount = 0;
+    window.flushCount = 0;
 
     window.termx = function(params){
+
+        if(params.exit){
+            terminal.___disabled = true;
+            terminal.echo("Session is closed");
+            return;
+        }
 
         params.data = params.data.replace(/\r/g, "");
 
@@ -181,12 +194,21 @@ var Init = function(){
                     }
                 }
 
-                terminal.echo(window.lines);
+                terminal.echo(window.lines, {flush:false});
+
+                window.flushCount++;
+
+                if(window.flushCount == 1){
+                    setTimeout(function(){
+                        window.flushCount = 0;
+                        terminal.flush();
+                    },100);
+                }
                 window.lines = null;
                 window.lines = "";
                 window.linesCount = 0;
                 terminal.___disabled = false;
-            },250);
+            },10);
         }
     }
 };
