@@ -5,6 +5,7 @@ var https = require("https");
 var database = require("./install/database");
 var os_info = require("./install/os_info");
 var exec = require('child_process').exec;
+var hosting_tools = require("./hosting_tools");
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -359,11 +360,13 @@ exports.installJX = function(cb) {
                     var ret = jxcore.utils.cmdSync("'" + file + "' -jxv");
                     cfg.jxv = ret.out.toString().trim();
 
+                    // if current jx is different than downloaded, use it
                     if (cfg.jxv !== process.jxversion) {
-                        // if current jx is different than downloaded, use it
                         jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
                         cfg.jxv = process.jxversion;
                     }
+
+                    hosting_tools.saveMonitorConfig(file);
 
                     database.setConfig(cfg);
                     cb(false);
@@ -376,9 +379,3 @@ exports.installJX = function(cb) {
 };
 
 
-exports.isJXValid = function() {
-
-    var cfg = database.getConfig();
-
-    return cfg.jxPath && fs.existsSync(cfg.jxPath);
-};
