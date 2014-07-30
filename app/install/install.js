@@ -22,7 +22,7 @@ var installNGINX = function(){
     }
     ret = jxcore.utils.cmdSync(process.argv[0] + " " + app_folder + sep + "nginx.jx")
     if(ret.out.trim() != "Done"){
-        console.error("Couldn't install nginx jx package", ng_pack, ret);
+        console.error("Couldn't install nginx jx package", app_folder + sep + "nginx.jx", ret);
         process.exit(-1);
     }
     fs.unlinkSync(process.argv[0] + " " + app_folder + sep + "nginx.jx");
