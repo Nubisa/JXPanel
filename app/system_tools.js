@@ -1,8 +1,10 @@
 var fs = require('fs');
 var path = require('path');
 var http = require("http");
+var https = require("https");
 var database = require("./db/database");
 var os_info = require("./install/os_info");
+var exec = require('child_process').exec;
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -290,11 +292,29 @@ exports.deleteSystemUser = function(username) {
 };
 
 
-exports.downloadFile = function (url, destFileName) {
+exports.downloadFile = function (url, localFile, cb) {
 
-    var destFile = fs.createWriteStream(destFileName);
-    var request = http.get(url, function (res) {
-        res.pipe(destFile);
+    if (!cb) {
+        return;
+    }
+
+    var file = null;
+    try {
+        file = fs.createWriteStream(localFile);
+    } catch (ex) {
+        cb(ex.message);
+        return;
+    }
+
+    var request = https.get(url, function (response) {
+        response.pipe(file);
+        file.on('finish', function () {
+            file.close();
+            cb(false);
+        });
+        file.on("error", function (txt) {
+            cb("JXcoreCannotDownload|" + txt);
+        });
     });
 };
 
@@ -306,28 +326,51 @@ exports.installJX = function(cb) {
         exports.rmdirSync(path.dirname(cfg.jxPath));
     }
 
-    var root = os_info.apps_folder;
+    var os_str = os_info.OSInfo().OS_STR;
 
-    var dir = root + "jx_downloaded/";
+    var dir = path.join(os_info.apps_folder, "jx_" + os_str) + path.sep;
     if (!fs.existsSync(dir)) {
-        jxcore.utils.cmdSync("mkdir -p '" + dir + "'");
+        fs.mkdirSync(dir);
     }
 
-    var file = dir + "jx";
-    // for now just copies jx
-    jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
+    var basename = "jx_" + os_str;
+    var zipFile =  path.join(os_info.apps_folder, basename + ".zip");
+    var url = "https://s3.amazonaws.com/nodejx/" + basename + ".zip";
 
-    if (fs.existsSync(file)) {
-        cfg.jxPath = file;
-        var ret = jxcore.utils.cmdSync("'" + file + "' -jxv");
-        cfg.jxv = ret.out.toString().trim();
 
-        database.setConfig(cfg);
-        cb(false);
-    } else {
-        cb("FileDoesNotExist");
-    }
+    exports.downloadFile(url, zipFile, function(err) {
+        if (err) {
+            cb(err);
+            return;
+        }
 
+        // unzipping
+        exec("unzip -u " + zipFile, {cwd:os_info.apps_folder, maxBuffer:1e7}, function(err, stdout, stderr){
+            if (err !== null) {
+                cb("Error" + JSON.stringify( err ) + (stderr || stdout));
+            } else{
+
+                var file = dir + "jx";
+
+                if (fs.existsSync(file)) {
+                    cfg.jxPath = file;
+                    var ret = jxcore.utils.cmdSync("'" + file + "' -jxv");
+                    cfg.jxv = ret.out.toString().trim();
+
+                    if (cfg.jxv !== process.jxversion) {
+                        // if current jx is different than downloaded, use it
+                        jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
+                        cfg.jxv = process.jxversion;
+                    }
+
+                    database.setConfig(cfg);
+                    cb(false);
+                } else {
+                    cb("FileDoesNotExist");
+                }
+            }
+        });
+    });
 };
 
 
