@@ -155,6 +155,10 @@
             window.pingQCounter = 0;
 
             if( "{{file.name}}" != "index" ) {
+                jxcore.OnClose = function(){
+                    window.lastPing = 0;
+                    window.pingQCounter = 1;
+                };
                 setInterval(function () {
 
                     if (window.jx_shadowdiv && window.jx_shadowdiv.jx_increment)
@@ -198,6 +202,12 @@
                         }, false);
                     }
                 }, 2000);
+            }else{
+                jxcore.OnClose = function(){
+                    setTimeout(function(){
+                        location.href = "/index.html?"+Date.now();
+                    },3000);
+                };
             }
         });
     };
