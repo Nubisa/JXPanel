@@ -110,6 +110,14 @@
                     div.innerHTML = str;
                     div.jx_progress = 0;
 
+                    div.jx_increment = function() {
+                        if (window.jx_shadowdiv) {
+                            var dx = (100 - window.jx_shadowdiv.jx_progress) / 2;
+                            window.jx_shadowdiv.jx_progress += parseInt(dx);
+                            $("#jx_pb").width( window.jx_shadowdiv.jx_progress + "%");
+                        }
+                    };
+
                     window.jx_cshadow = c;
                     window.shadowWait++;
                     if(window.jx_shadowdiv){
@@ -127,6 +135,7 @@
                     };
 
                     document.body.appendChild(div);
+                    div.jx_increment();
                 }
 
                 jxcore.Call(a,b,c);
@@ -142,11 +151,8 @@
             if( "{{file.name}}" != "index" ) {
                 setInterval(function () {
 
-                    if (window.jx_shadowdiv) {
-                        var dx = (100 - window.jx_shadowdiv.jx_progress) / 2;
-                        window.jx_shadowdiv.jx_progress += parseInt(dx);
-                        $("#jx_pb").width( window.jx_shadowdiv.jx_progress + "%");
-                    }
+                    if (window.jx_shadowdiv)
+                        window.jx_shadowdiv.jx_increment();
 
                     if(window.pingQ)
                         return;
