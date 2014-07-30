@@ -288,7 +288,7 @@ methods.sessionApply = function(env, params){
         }
 
         if (json.jx_enabled)
-            hosting_tools.runApp(update_name);
+            hosting_tools.appRun(update_name);
     } else
     if (params.form === "addPlan") {
         try {

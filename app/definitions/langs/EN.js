@@ -337,6 +337,8 @@ exports.Labels = {
     "JXcoreMonitorStatus" : "Status ",
     "JXcoreMonitorCannotStart" : "Cannot start JXcore monitor.",
     "JXcoreMonitorCannotStop" : "Cannot stop JXcore monitor.",
+    "JXcoreMonitorStarted" : "JXcore monitor started.",
+    "JXcoreMonitorStoped" : "JXcore monitor stopped.",
 
     "JXcorePleaseInstall" : "Please install JXcore.",
     "JXcoreCannotDownload" : "Cannot download JXcore.",
