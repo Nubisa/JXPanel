@@ -297,6 +297,7 @@ exports.Labels = {
     "JXAppMinPort" : "Minimum app port number",
     "JXAppMaxPort" : "Maximum app port number",
     "JXAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
+    "JXAppSmallPortRange" : "Too small range. You need at least %s ports.",
 
 
     "JXcoreNPMModules" : "NPM Modules",

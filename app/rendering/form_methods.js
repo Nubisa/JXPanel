@@ -300,8 +300,11 @@ methods.sessionApply = function(env, params){
         }
     } else
     if (params.form === "jxconfig") {
-        database.setConfigValue("jx_app_min_port", json["jx_app_min_port"]);
-        database.setConfigValue("jx_app_max_port", json["jx_app_max_port"], true);
+        var min = json["jx_app_min_port"];
+        var max = json["jx_app_max_port"];
+        database.setConfigValue("jx_app_min_port", min);
+        database.setConfigValue("jx_app_max_port", max);
+        database.setPortRange(min,max);
     } else {
         ret = "UnknownForm";
     }

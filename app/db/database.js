@@ -413,6 +413,16 @@ exports.getPlanByDomainName = function(name){
 };
 
 exports.getDomainsByUserName = function(user_name, deep){
+
+    if (user_name === null) {
+        // gets all domains
+        var arr = [];
+        for(var domain in Domains) {
+            arr.push(domain);
+        }
+        return arr;
+    }
+
     if(!Users[user_name]){
         throw new Error(user_name + " user doesn't exist");
     }
@@ -667,6 +677,18 @@ exports.setConfigValue = function(param, value, update) {
 
 exports.getConfigValue = function(param) {
     return Config[param];
+};
+
+// iterating through domains and assigning http/https port
+exports.setPortRange = function(min, max) {
+
+    var current = min;
+    for(var domain in Domains) {
+        var ok = current <= max - 2;
+        Domains[domain].port_http = ok ? current++ : null;
+        Domains[domain].port_https = ok ? current++ : null;
+    }
+    UpdateDB(JSON.stringify(DB));
 };
 
 

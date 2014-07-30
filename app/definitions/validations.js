@@ -139,8 +139,16 @@ exports.MaxPort = function(min_port_field) {
 
     this.validate = function (env, active_user, val, vals) {
 
-        var ok = new exports.Int({ gt : vals[_min_port_field], lte : 20000 }).validate(env, active_user, val, vals);
-        return ok;
+        var min = vals[_min_port_field];
+        var max = val;
+        var ret = new exports.Int({ gt : min, lte : 20000 }).validate(env, active_user, val, vals);
+        if (!ret.result) return ret;
+
+        var domains = database.getDomainsByUserName(null, 1e5);
+        if ((max - min) < domains.length * 2)
+            return {result: false, msg: form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ domains.length * 2 ])};
+
+        return {result : true} ;
     };
 };
 
