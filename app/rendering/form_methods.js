@@ -441,24 +441,53 @@ methods.installNPM = function(env, params) {
 };
 
 
-methods.monitorStartStop = function(env, params) {
+methods.monitorStartStop = function (env, params) {
 
-    console.log(params);
-
-
-
-    jxcore.monitor.checkMonitorExists(function(err, txt) {
+    jxcore.monitor.checkMonitorExists(function (err, txt) {
         var online_before = !err;
+
+        // no point to start monitor, if it's running
+        if (params.op && online_before) {
+            server.sendCallBack(env, {err: false });
+            return;
+        }
+
+        // no point to stop monitor if it's not running
+        if (!params.op && !online_before) {
+            server.sendCallBack(env, {err: false });
+            return;
+        }
+
+
+        var checkAfter = function () {
+            jxcore.monitor.checkMonitorExists(function (err2, txt2) {
+                var online_after = !err2;
+
+                var err = online_after === online_before;
+                server.sendCallBack(env, {err: err ? txt2.toString() : false });
+            });
+        };
+
+        // solution below crashes app, when EADDRINUSE
+        // since it cannot be caught, i don't use it
+//        var method = online_before ? jxcore.monitor.stopMonitor : jxcore.monitor.startMonitor;
+//        try {
+//            method(checkAfter);
+//        } catch (ex) {
+//            server.sendCallBack(env, {err : ex.toString() } );
+//        }
 
         var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
         jxcore.utils.cmdSync(cmd);
+        checkAfter();
 
-        jxcore.monitor.checkMonitorExists(function(err2, txt2) {
-            var online_after = !err2;
+        // the "tasks" way, but it doesn't work!
+        // never returns from the task ???
+//        var task = function (cmd) {
+//            return jxcore.utils.cmdSync(cmd);
+//        };
+//        jxcore.tasks.addTask(task, cmd, checkAfter);
 
-            var err = online_after === online_before;
-            server.sendCallBack(env, {err : err } );
-        });
     });
 
 };
