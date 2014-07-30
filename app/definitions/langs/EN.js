@@ -292,6 +292,7 @@ exports.Labels = {
     "JXcoreMonitor" : "JXcore Monitor",
     "JXcoreMonitorStatus" : "Status ",
     "JXcorePleaseInstall" : "Please install JXcore.",
+    "JXcoreCannotDownload" : "Cannot download JXcore.",
     "JXcoreReinstall_Description" : 'If you reinstall JXcore, all the running node applications will be restarted after updating JXcore binary.',
     "JXAppMinPort" : "Minimum app port number",
     "JXAppMaxPort" : "Maximum app port number",
@@ -304,7 +305,6 @@ exports.Labels = {
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
     "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
     "JXcoreNPMInstalled" : "NPM module successfully installed."
-
 };
 
 

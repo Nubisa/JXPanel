@@ -432,11 +432,8 @@ methods.installNPM = function(env, params) {
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
     var cmd = "cd '" + site_defaults.dirNativeModules + "'; '" + process.execPath + "' install " + nameAndVersion;
     jxcore.tasks.addTask(task, cmd, function() {
-//      task(cmd);
-
-    //jxcore.utils.cmdSync(cmd);
+        var id = process.threadId;
         var expectedModulePath = path.join(site_defaults.dirNativeModules, "/node_modules/", name);
-
         server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
     });
 };
@@ -487,15 +484,11 @@ methods.monitorStartStop = function (env, params) {
 
 //        var cfg = database.getConfig();
         var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
-        jxcore.utils.cmdSync(cmd);
-        checkAfter();
 
-        // the "tasks" way, but it doesn't work!
-        // never returns from the task ???
-//        var task = function (cmd) {
-//            return jxcore.utils.cmdSync(cmd);
-//        };
-//        jxcore.tasks.addTask(task, cmd, checkAfter);
+        var task = function (cmd) {
+            jxcore.utils.cmdSync(cmd);
+        };
+        jxcore.tasks.addTask(task, cmd, checkAfter);
 
     });
 
