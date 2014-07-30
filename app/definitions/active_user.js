@@ -114,6 +114,14 @@ exports.clearUser = function(sessionId) {
     delete users[sessionId];
 };
 
+// called when deleting a user from panel
+exports.clearUserByName = function(username) {
+    for(var sessionId in users) {
+        if (users[sessionId].username === username) {
+            exports.clearUser(sessionId);
+        }
+    }
+};
 
 exports.isRecordUpdating = function(active_user, formName) {
     var isUpdate = active_user.session.edits && active_user.session.edits[formName] && active_user.session.edits[formName].ID;

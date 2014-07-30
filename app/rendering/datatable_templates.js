@@ -370,14 +370,6 @@ exports.remove = function (sessionId, table_name, ids) {
             continue;
         }
 
-        if (table.name === "users") {
-            var ret1 = system_tools.deleteSystemUser(ids[i]);
-            if (ret1.err) {
-                errors.push(form_lang.Get(active_user.lang, ret1.err, true));
-                continue;
-            }
-        }
-
         var ret = null;
         try {
             ret = method(ids[i]);
@@ -385,7 +377,19 @@ exports.remove = function (sessionId, table_name, ids) {
                 errors.push(ret);
         } catch (ex) {
             console.error(ex);
-            errors.push(form_lang.Get(active_user.lang, "Cannot delete record", true));
+            errors.push(form_lang.Get(active_user.lang, "DBCannotRemoveRecord", true, [ ids[i] ]));
+        }
+
+        if (ret.deleted && ret.users) {
+
+            for(var o in ret.users) {
+                _active_user.clearUserByName(ret.users[o]);
+                var ret1 = system_tools.deleteSystemUser(ret.users[o]);
+                if (ret1.err) {
+                    errors.push(form_lang.Get(active_user.lang, ret1.err, true));
+                    continue;
+                }
+            }
         }
     }
 

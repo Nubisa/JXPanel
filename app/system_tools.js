@@ -281,6 +281,8 @@ exports.deleteSystemUser = function(username) {
 
     if (ret.exitCode)
         console.error("UsersCannotDeleteSystemUser", ret.out.toString().trim());
+    else
+        console.log("System user %s was deleted successfully.", username);
 
     return { err : ret.exitCode ? "UsersCannotDeleteSystemUser" : false }
 };

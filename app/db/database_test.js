@@ -135,12 +135,12 @@ var start5 = function() {
 
 var testdb = __dirname + "/test.db";
 
-sqlite2.SetFileName(testdb);
+//sqlite2.SetFileName(testdb);
 // let's work on empty testdb
 if (fs.existsSync(testdb))
     fs.unlinkSync(testdb);
 
 
 database.ReadDB(function(err) {
-    if (err) console.error(err); else start();
+    if (err) console.error(err); else database.fixDatabase();
 });

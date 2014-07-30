@@ -340,6 +340,10 @@ exports.getUsersByPlanName = function(plan_name, deep){
         arr.push(o);
         if(deep>0){
             var user = Users[o];
+
+            if (!user)
+                continue;
+
             for(var i in user.subPlans){
                 arr = arr.concat( exports.getUsersByPlanName(i, deep) );
             }
@@ -456,6 +460,25 @@ exports.deleteUser = function(name){
         subs.users = subs.plans.concat(res.users);
         subs.domains = subs.plans.concat(res.domains);
     }
+
+    // removing the user from any plan he is attached to
+    for (var plan in Plans) {
+        for(var user in Plans[plan].users) {
+            if (user === name) {
+                delete Plans[plan].users[user];
+            }
+        }
+    }
+
+    // removing domains of that user
+    for(var domain in Domains) {
+        var owner = Domains[domain].owner;
+        if (owner === name) {
+            delete(Domains[domain]);
+        }
+    }
+
+
     delete(Users[name]);
     UpdateDB(JSON.stringify(DB));
     return subs;
@@ -634,6 +657,67 @@ exports.setConfig = function(config) {
 
 exports.getConfig = function() {
     return Config;
+};
+
+
+exports.fixDatabase = function() {
+
+    var arr_plans = [], arr_domains = [], arr_users = [];
+    var errors = [];
+
+    var concat = function(ret) {
+        arr_plans = arr_plans.concat(ret.plans);
+        arr_domains = arr_domains.concat(ret.domains);
+        arr_users = arr_users.concat(ret.users);
+    };
+
+    // removing dummy plans (without owner)
+    for(var plan in Plans) {
+
+        var owner = Plans[plan].owner;
+
+        if (!Users[owner] && owner !== SUPER_USER.name) {
+            // plan without owner
+            var ret = exports.deletePlan(plan);
+            if (!ret.deleted)
+                errors.push("Cannot delete plan " + plan);
+
+            concat(ret);
+        } else {
+            // if plan still keeps unexistent users
+            for(var user in Plans[plan].users) {
+                if (!Users[user]) {
+                    delete Plans[plan].users[user];
+                }
+            }
+        }
+    }
+
+    // removing dummy domain (without owner)
+    for(var domain in Domains) {
+        var owner = Domains[domain].owner;
+        if (!Users[owner] && owner !== SUPER_USER.name) {
+            delete Domains[domain];
+            arr_domains.push(domain);
+        }
+    }
+
+
+    // removing dummy users (without a plan)
+    for(var user in Users) {
+        var plan = Users[user].plan;
+        if (!Plans[plan]) {
+            delete Users[user];
+            arr_users.push(user);
+        }
+    }
+
+    if (errors.length) {
+        return null;
+    } else {
+        UpdateDB(JSON.stringify(DB));
+        return { plans: arr_plans, users: arr_users, domains: arr_domains};
+    }
 };
 
 

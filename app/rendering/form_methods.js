@@ -249,7 +249,7 @@ methods.sessionApply = function(env, params){
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
                 if (!ret) {
-                    var res = system_tools.addSystemUser(json.name, json.password);
+                    var res = system_tools.addSystemUser(json.name,  params.controls["person_password"]);
                     if (res.err) {
                         ret = res.err;
                         database.deleteUser(json.name);
@@ -427,36 +427,67 @@ methods.installNPM = function(env, params) {
         fs.mkdirSync(datatables.jxconfig.globalModulePath);
     }
 
+    var task = function(cmd) {
+        jxcore.utils.cmdSync(cmd);
+    };
 
-    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
+    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
+    jxcore.tasks.addTask(task, cmd, function() {
+        var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
 
-    var ret = jxcore.utils.cmdSync(cmd);
-
-    var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
-
-    server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
+        server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
+    });
 };
 
 
-methods.monitorStartStop = function(env, params) {
+methods.monitorStartStop = function (env, params) {
 
-    console.log(params);
-
-
-
-    jxcore.monitor.checkMonitorExists(function(err, txt) {
+    jxcore.monitor.checkMonitorExists(function (err, txt) {
         var online_before = !err;
+
+        // no point to start monitor, if it's running
+        if (params.op && online_before) {
+            server.sendCallBack(env, {err: false });
+            return;
+        }
+
+        // no point to stop monitor if it's not running
+        if (!params.op && !online_before) {
+            server.sendCallBack(env, {err: false });
+            return;
+        }
+
+
+        var checkAfter = function () {
+            jxcore.monitor.checkMonitorExists(function (err2, txt2) {
+                var online_after = !err2;
+
+                var err = online_after === online_before;
+                server.sendCallBack(env, {err: err ? txt2.toString() : false });
+            });
+        };
+
+        // solution below crashes app, when EADDRINUSE
+        // since it cannot be caught, i don't use it
+//        var method = online_before ? jxcore.monitor.stopMonitor : jxcore.monitor.startMonitor;
+//        try {
+//            method(checkAfter);
+//        } catch (ex) {
+//            server.sendCallBack(env, {err : ex.toString() } );
+//        }
 
         var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
         jxcore.utils.cmdSync(cmd);
+        checkAfter();
 
-        jxcore.monitor.checkMonitorExists(function(err2, txt2) {
-            var online_after = !err2;
+        // the "tasks" way, but it doesn't work!
+        // never returns from the task ???
+//        var task = function (cmd) {
+//            return jxcore.utils.cmdSync(cmd);
+//        };
+//        jxcore.tasks.addTask(task, cmd, checkAfter);
 
-            var err = online_after === online_before;
-            server.sendCallBack(env, {err : err } );
-        });
     });
 
 };
