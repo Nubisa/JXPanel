@@ -1,0 +1,42 @@
+{
+	"name": "nginx",
+	"version": "1.0",
+	"author": "",
+	"description": "",
+	"company": "",
+	"website": "",
+	"package": null,
+	"startup": "start.js",
+	"execute": "start.js",
+	"extract": true,
+	"output": "nginx.jx",
+	"files": [
+		"start.js",
+		"stop.js"
+	],
+	"assets": [
+		"conf/fastcgi.conf",
+		"conf/fastcgi.conf.default",
+		"conf/fastcgi_params",
+		"conf/fastcgi_params.default",
+		"conf/koi-utf",
+		"conf/koi-win",
+		"conf/mime.types",
+		"conf/mime.types.default",
+		"conf/nginx.conf",
+		"conf/nginx.conf.default",
+		"conf/scgi_params",
+		"conf/scgi_params.default",
+		"conf/uwsgi_params",
+		"conf/uwsgi_params.default",
+		"conf/win-utf",
+		"html/50x.html",
+		"html/index.html",
+		"logs/access.log",
+		"logs/error.log",
+		"sbin/nginx"
+	],
+	"preInstall": null,
+	"library": true,
+	"fs_reach_sources": true
+}
