@@ -10,20 +10,6 @@ var exec = require('child_process').exec;
 var downloads = require('./downloads');
 var database = require("../db/database");
 
-// CLEAR USERS BEGIN
-setInterval(function(){
-    var dt = Date.now();
-    for(var o in users){
-        if(users[o]){
-            if(dt> users[o].lastOperation + 600000){ // 10 mins timeout
-                exports.clearUser(o);
-                break;
-            }
-        }
-    }
-},5000);
-// CLEAR USERS END
-
 var newUser = function(session_id){
     return {
         nameTitle: "John Doe",
@@ -136,6 +122,20 @@ exports.isRecordUpdating = function(active_user, formName) {
 
 
 exports.defineMethods = function(){
+    // CLEAR USERS BEGIN
+    setInterval(function(){
+        var dt = Date.now();
+        for(var o in users){
+            if(users[o]){
+                if(dt> users[o].lastOperation + 600000){ // 10 mins timeout
+                    exports.clearUser(o);
+                    break;
+                }
+            }
+        }
+    },5000);
+// CLEAR USERS END
+
     server.addJSMethod("getFiles", function(env, params){
         console.log("getFiles", params);
 
