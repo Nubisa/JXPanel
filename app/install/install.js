@@ -1,11 +1,13 @@
 var fs = require('fs');
 var pathModule = require('path');
 var os_info = require('./os_info').OSInfo();
-
+var nginx = require('./nginx');
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
 var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored from git
 var tools_folder = pathModule.join(__dirname, "../../tools"); // ignored from git
+
+exports.apps_folder = app_folder;
 
 exports.requireInstallation = function(){
     var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored from git
@@ -20,18 +22,20 @@ var installNGINX = function(){
         console.error("Couldn't locate nginx jx package", ng_pack);
         process.exit(-1);
     }
+    process.chdir(app_folder);
     ret = jxcore.utils.cmdSync(process.argv[0] + " " + app_folder + sep + "nginx.jx")
-    if(ret.out.trim() != "Done"){
-        console.error("Couldn't install nginx jx package", app_folder + sep + "nginx.jx", ret);
+    if(ret.out.trim().indexOf("Done")<0 || ret.exitCode != 0){
+        console.error("Couldn't install nginx jx package", app_folder + sep + "nginx.jx", ret.out);
         process.exit(-1);
     }
-    fs.unlinkSync(process.argv[0] + " " + app_folder + sep + "nginx.jx");
+    fs.unlinkSync( app_folder + sep + "nginx.jx");
 
-//    console.log("Starting NGINX");
-//    var ng = process.cwd()+"/nginx/sbin/nginx";
-//    jxcore.utils.cmdSync("chmod 755 "+ng);
-//    jxcore.utils.cmdSync("service nginx stop");
-//    console.log(jxcore.utils.cmdSync("sudo "+ng+" -p "+process.cwd() + "/nginx"));
+    nginx.prepare();
+    var res = nginx.start();
+    if(res){
+        console.error(res.out);
+        process.exit(res.exitCode);
+    }
 };
 
 var prepareUserGroup = function(){
@@ -67,4 +71,22 @@ exports.install = function(){
     fs.mkdirSync(app_folder);
 
     installNGINX();
+};
+
+exports.uninstall = function(){
+    if(fs.existsSync(app_folder))
+    {
+        clog("Uninstalling the previous installation", "red");
+        var res = nginx.stop();
+        if(res){
+            console.error(res.out);
+        }
+
+        res = jxcore.utils.cmdSync("rm -rf "+app_folder);
+        if(res.exitCode != 0){
+            console.error(res.out);
+            process.exit(res.exitCode);
+            return;
+        }
+    }
 };

@@ -3,15 +3,35 @@ if(!global.jxcore){
     return;
 }
 
+var fs = require('fs');
 var site_defaults = require('./definitions/site_defaults');
 var icheck = require('./install/install');
 
+if(process.argv[2] == "help"){
+    jxcore.utils.console.log("Command line options for "+site_defaults.EN.panelName);
+    jxcore.utils.console.log("Start: jx index.js");
+    jxcore.utils.console.log("Install: jx index.js install");
+    jxcore.utils.console.log("Uninstall: jx index.js uninstall");
+    jxcore.utils.console.log("ReInstall: jx index.js reinstall");
+}
+
+if(process.argv[2] == "uninstall" || process.argv[2] == "reinstall"){
+    icheck.uninstall();
+
+    if(process.argv[2] == "uninstall")
+        return;
+}
+
 if(icheck.requireInstallation()){
+    if(process.argv[2] != "install" && process.argv[2] != "reinstall"){
+        jxcore.utils.console.log("To install "+site_defaults.EN.panelName+", use\n" + process.argv[0] + " index install");
+        process.exit(0);
+    }
+
     jxcore.utils.console.log("Installing "+site_defaults.EN.panelName);
     icheck.install();
 }
 else {
-    var fs = require('fs');
     var server = require('jxm');
     var render_engine = require('./rendering/render');
     var form_methods = require('./rendering/form_methods');
