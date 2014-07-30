@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var http = require("http");
+var database = require("./db/database");
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -285,4 +286,53 @@ exports.deleteSystemUser = function(username) {
         console.log("System user %s was deleted successfully.", username);
 
     return { err : ret.exitCode ? "UsersCannotDeleteSystemUser" : false }
+};
+
+
+exports.downloadFile = function (url, destFileName) {
+
+    var destFile = fs.createWriteStream(destFileName);
+    var request = http.get(url, function (res) {
+        res.pipe(destFile);
+    });
+};
+
+// also reinstalls if already is installed
+exports.installJX = function(cb) {
+
+    var cfg = database.getConfig();
+    if (cfg.jxPath && fs.existsSync(cfg.jxPath)) {
+        exports.rmdirSync(path.dirname(cfg.jxPath));
+    }
+
+    var root = process.jxconfig.rootDir;
+
+    var dir = root + "jx_downloaded/";
+    if (!fs.existsSync(dir)) {
+        jxcore.utils.cmdSync("mkdir -p '" + dir + "'");
+    }
+
+    var file = dir + "jx";
+    // for now just copies jx
+    jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
+
+    if (fs.existsSync(file)) {
+        cfg.jxPath = file;
+        var ret = jxcore.utils.cmdSync("'" + file + "' -jxv");
+        cfg.jxv = ret.out.toString().trim();
+
+        database.setConfig(cfg);
+        cb(false);
+    } else {
+        cb("FileDoesNotExist");
+    }
+
+};
+
+
+exports.isJXValid = function() {
+
+    var cfg = database.getConfig();
+
+    return cfg.jxPath && fs.existsSync(cfg.jxPath);
 };

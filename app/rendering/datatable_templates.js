@@ -169,17 +169,12 @@ var getHTML = function (active_user, table) {
 };
 
 
-// todo: this folder is static just for now
-exports.jxconfig = {};
-exports.jxconfig.globalModulePath = path.join(__dirname, "../../__tmp_module_path");
-
-
 // gets information about npm modules installed in global module path
 var getModules = function(active_user, table) {
 
     var data = [];
     try {
-        var modulesDir = path.normalize(exports.jxconfig.globalModulePath + "/node_modules/");
+        var modulesDir = path.normalize(process.jxconfig.dirNativeModules + "/node_modules/");
         var folders = fs.readdirSync(modulesDir);
 
         for (var a = 0, len = folders.length; a < len; a++) {

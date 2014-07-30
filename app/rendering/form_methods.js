@@ -299,11 +299,8 @@ methods.sessionApply = function(env, params){
         }
     } else
     if (params.form === "jxconfig") {
-        var cfg = {
-            "jx_app_min_port" : json["jx_app_min_port"],
-            "jx_app_max_port" : json["jx_app_max_port"]
-        };
-        database.setConfig(cfg);
+        database.setConfigValue("jx_app_min_port", json["jx_app_min_port"]);
+        database.setConfigValue("jx_app_max_port", json["jx_app_max_port"], true);
     } else {
         ret = "UnknownForm";
     }
@@ -398,7 +395,7 @@ var uninstallNPM = function(env, params) {
     var active_user = checkUser(env);
 
     for(var i in params.ids) {
-        var modulesDir = path.normalize(datatables.jxconfig.globalModulePath + "/node_modules/" + params.ids[i]);
+        var modulesDir = path.normalize(process.jxconfig.dirNativeModules + "/node_modules/" + params.ids[i]);
 
         var ok = true;
         if (fs.existsSync(modulesDir)) {
@@ -423,8 +420,8 @@ methods.installNPM = function(env, params) {
         var version = nameAndVersion.slice(pos + 1).trim();
     }
 
-    if (!fs.existsSync(datatables.jxconfig.globalModulePath)) {
-        fs.mkdirSync(datatables.jxconfig.globalModulePath);
+    if (!fs.existsSync(process.jxconfig.dirNativeModules)) {
+        fs.mkdirSync(process.jxconfig.dirNativeModules);
     }
 
     var task = function(cmd) {
@@ -432,9 +429,9 @@ methods.installNPM = function(env, params) {
     };
 
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
-    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
+    var cmd = "cd '" + process.jxconfig.dirNativeModules + "'; '" + process.execPath + "' install " + nameAndVersion;
     jxcore.tasks.addTask(task, cmd, function() {
-        var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
+        var expectedModulePath = path.join(process.jxconfig.dirNativeModules, "/node_modules/", name);
 
         server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
     });
@@ -442,6 +439,13 @@ methods.installNPM = function(env, params) {
 
 
 methods.monitorStartStop = function (env, params) {
+
+//    var active_user = checkUser(env);
+//
+//    if (!system_tools.isJXValid()) {
+//        server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "JXcorePathInvalid", true)});
+//        return;
+//    }
 
     jxcore.monitor.checkMonitorExists(function (err, txt) {
         var online_before = !err;
@@ -477,6 +481,7 @@ methods.monitorStartStop = function (env, params) {
 //            server.sendCallBack(env, {err : ex.toString() } );
 //        }
 
+//        var cfg = database.getConfig();
         var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
         jxcore.utils.cmdSync(cmd);
         checkAfter();
@@ -491,6 +496,20 @@ methods.monitorStartStop = function (env, params) {
     });
 
 };
+
+
+methods.jxInstall = function (env, params) {
+
+    var active_user = checkUser(env);
+
+    system_tools.installJX(function(err) {
+        if (err)
+            err = form_lang.Get(active_user.lang, err, true);
+
+        server.sendCallBack(env, { err : err });
+    });
+};
+
 
 
 module.exports = methods;

@@ -275,9 +275,9 @@
         });
     };
 
-    utils.jxMonitorStartStop = function (start) {
+    utils.jxCall = function (method_name, value) {
 
-        window.toServer("monitorStartStop", { op: start }, function (param) {
+        window.toServer(method_name, { op: value }, function (param) {
             if (param.err) {
                 utils.jxAddMessage('danger', param.err);
             } else {
@@ -287,6 +287,16 @@
 
         return false;
     };
+
+
+    utils.jxMonitorStartStop = function (start) {
+        return utils.jxCall("monitorStartStop", start);
+    };
+
+    utils.jxInstall = function () {
+        return utils.jxCall("jxInstall", true);
+    };
+
 
     $(document).ready(function() {
        pageSetUp();

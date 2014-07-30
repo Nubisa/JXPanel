@@ -659,6 +659,16 @@ exports.getConfig = function() {
     return Config;
 };
 
+exports.setConfigValue = function(param, value, update) {
+    Config[param] = value;
+    if (update)
+        UpdateDB(JSON.stringify(DB));
+};
+
+exports.getConfigValue = function(param) {
+    return Config[param];
+};
+
 
 exports.fixDatabase = function() {
 
