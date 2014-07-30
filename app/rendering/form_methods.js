@@ -249,7 +249,7 @@ methods.sessionApply = function(env, params){
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
                 if (!ret) {
-                    var res = system_tools.addSystemUser(json.name, json.password);
+                    var res = system_tools.addSystemUser(json.name,  params.controls["person_password"]);
                     if (res.err) {
                         ret = res.err;
                         database.deleteUser(json.name);

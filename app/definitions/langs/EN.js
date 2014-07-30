@@ -252,7 +252,7 @@ exports.Labels = {
     "DBCannotReadData" : "Cannot read data from database.",
 
     "DBUserCannotCreatePlan" : "User cannot create plan.",
-
+    "DBCannotRemoveRecord" : "Cannot remove record %s.",
 
     "AccessDeniedToRemoveRecord" : "You have no privileges to delete the following %s: %s",
     "AccessDeniedToEditRecord" : "You have no privileges to edit the following %s: %s",
