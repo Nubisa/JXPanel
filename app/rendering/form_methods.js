@@ -427,15 +427,17 @@ methods.installNPM = function(env, params) {
         fs.mkdirSync(datatables.jxconfig.globalModulePath);
     }
 
+    var task = function(cmd) {
+        jxcore.utils.cmdSync(cmd);
+    };
 
-    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
+    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
+    jxcore.tasks.addTask(task, cmd, function() {
+        var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
 
-    var ret = jxcore.utils.cmdSync(cmd);
-
-    var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
-
-    server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
+        server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
+    });
 };
 
 
