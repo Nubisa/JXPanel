@@ -2,6 +2,7 @@ var server = require('jxm');
 var form_lang = require('./form_lang');
 var system_tools = require("./../system_tools");
 var database = require("./../install/database");
+var site_defaults = require("./site_defaults");
 
 
 /**
@@ -141,7 +142,7 @@ exports.MaxPort = function(min_port_field) {
 
         var min = vals[_min_port_field];
         var max = val;
-        var ret = new exports.Int({ gt : min, lte : 20000 }).validate(env, active_user, val, vals);
+        var ret = new exports.Int({ gt : min, lte : site_defaults.defaultAppMaxPort }).validate(env, active_user, val, vals);
         if (!ret.result) return ret;
 
         var domains = database.getDomainsByUserName(null, 1e5);

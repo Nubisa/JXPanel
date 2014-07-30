@@ -116,7 +116,7 @@ var apply_smart = function(file, req, res, data){
         _lang = _user.lang;
 
     if (_user) {
-        if (_user.session.edits && _user.session.lastPath !== req.path) {
+        if (_user.session.edits && _user.session.lastPath !== req.path && req.path.slice(-5) === ".html") {
             delete _user.session.edits;
         }
         _user.session.lastPath = req.path;

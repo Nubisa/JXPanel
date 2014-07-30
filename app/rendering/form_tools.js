@@ -216,13 +216,17 @@ exports.createSimpleText = function(label, _title, input_id, _value, lang, optio
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
+    var id = jxcore.utils.uniqueId();
+
     var _html = '<div class="form-group">'
         +'<label class="col-md-2 control-label">'+label + '</label>'
         +'<div class="col-md-10">'
         +'<div style="margin-top: 7px;">' + _value + '</div>'
         +'</div></div>';
 
-    return {html: _html, js: ""};
+    var js = "";
+
+    return {html: _html, js: js};
 };
 
 exports.end = "</fieldset></form>";
