@@ -253,6 +253,13 @@ exports.defineMethods = function(){
         }
 
         var home = active_user.homeFolder();
+        if(params.up[0] == "/"){
+            if(params.up.length>1)
+                params.up = params.up.substr(1);
+            else
+                params.up = "";
+        }
+
         var loc = home + path.sep + params.up;
 
         if(!fs.existsSync(loc)){
