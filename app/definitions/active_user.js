@@ -29,6 +29,14 @@ var newUser = function(session_id){
      };
 };
 
+var markFile = function(target, uid, gid){
+    var res = jxcore.utils.cmdSync("chown -R " + uid + ":" + gid + " " + target);
+    if(res.exitCode != 0){
+        return res.out;
+    }
+    return null;;
+};
+
 exports.loginUser = function(env, params){
     var sessionId = env.SessionID;
 
@@ -246,7 +254,16 @@ exports.defineMethods = function(){
             return;
         }
 
-        server.sendCallBack(env, {source:fs.readFileSync(loc)+"", id:params.id, tp:params.tp, fn:params.fn, loc:params.up});
+        var src;
+        try{
+            src = fs.readFileSync(loc) + "";
+        }
+        catch(e){
+            server.sendCallBack(env, {err:e});
+            return;
+        }
+
+        server.sendCallBack(env, {source:src, id:params.id, tp:params.tp, fn:params.fn, loc:params.up});
     });
 
 
@@ -272,7 +289,16 @@ exports.defineMethods = function(){
         }
         catch(e){
             server.sendCallBack(env, {err:e});
+            return;
         }
+
+        var res = markFile(loc, active_user.uid, active_user.gid);
+
+        if(res && res.exitCode != 0){
+            server.sendCallBack(env, {err:res.out});
+            return;
+        }
+
         server.sendCallBack(env, {done:true});
     });
 
@@ -314,7 +340,16 @@ exports.defineMethods = function(){
         }
         catch(e){
             server.sendCallBack(env, {err: e});
+            return;
         }
+
+        var res = markFile(target, active_user.uid, active_user.gid);
+
+        if(res && res.exitCode != 0){
+            server.sendCallBack(env, {err:res.out});
+            return;
+        }
+
         server.sendCallBack(env, {done:true});
     });
 
@@ -350,6 +385,7 @@ exports.defineMethods = function(){
         }
         catch(e){
             server.sendCallBack(env, {err: e});
+            return;
         }
         server.sendCallBack(env, {done:true});
     });
@@ -383,7 +419,16 @@ exports.defineMethods = function(){
         }
         catch(e){
             server.sendCallBack(env, {err: e});
+            return;
         }
+
+        var res = markFile(locTo, active_user.uid, active_user.gid);
+
+        if(res && res.exitCode != 0){
+            server.sendCallBack(env, {err:res.out});
+            return;
+        }
+
         server.sendCallBack(env, {done:true});
     });
 
@@ -427,8 +472,42 @@ exports.defineMethods = function(){
         });
     });
 
+    server.addJSMethod("chFile", function(env, params){
+        console.log("chFile", params);
+
+        var active_user = exports.getUser(env.SessionID);
+        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
+            server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var home = active_user.homeFolder();
+
+        var loc = params.up;
+        if(loc && loc.length && loc[0] == '/'){
+            loc = loc.substr(1, loc.length-1);
+        }
+
+        var target = home + path.sep + loc;
+        if(!fs.existsSync(target)){
+            server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
+            return;
+        }
+
+        var res = jxcore.utils.cmdSync("chmod " + params.to + " " + target);
+        if(res.exitCode == 0)
+            res = markFile(target, active_user.uid, active_user.gid);
+
+        if(res && res.exitCode != 0){
+            server.sendCallBack(env, {err:res.out});
+            return;
+        }
+
+        server.sendCallBack(env, {done:true});
+    });
+
     server.addJSMethod("userIn", function(env, params){
-        if(!users[env.SessionID]){
+        if(!env.SessionID || !users[env.SessionID]){
             server.sendCallBack(env, {relogin:true});
             return;
         }

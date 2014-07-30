@@ -350,19 +350,37 @@ var init_file_tools = function(){
             return;
         }
         getInfo(loc, nodes[0], function(info, path, treeId, treeNode){
+            var file_mode = parseInt(info.mode.toString(8), 10) + "";
+            if(file_mode.length > 3){
+                file_mode = file_mode.substr(file_mode.length-3, 3);
+            }
             $.SmartMessageBox({
                 title : "Renaming : "+loc,
                 content : "Enter a new name..",
                 input: "text",
-                inputValue :parseInt(info.mode.toString(8), 10),
+                inputValue :file_mode,
                 placeHolder: "enter a new name",
                 buttons : "[{{label.Submit}}][{{label.Cancel}}]"
-            }, function(ButtonPress, name) {
+            }, function(ButtonPress, mode) {
                 if(ButtonPress == "{{label.Cancel}}"){
                     return 0;
                 }
 
-                toServer("chmod_file", {up:loc, to:""}, function(ret_val){
+                mode = mode.trim();
+
+                if(mode == file_mode){
+                    utils.bubble("warning", "Opps!", "You didn't change the file mode", 4000);
+                    return;
+                }
+
+                var nums = mode.match(/[^0-7]/);
+
+                if(mode.length>3 || nums){
+                    utils.bubble("warning", "Opps!", "File Mode needs to be a three digit number (0-7)", 4000);
+                    return;
+                }
+
+                toServer("chFile", {up:loc, to:mode}, function(ret_val){
                     if(ret_val.err){
                         alert(JSON.stringify(ret_val.err));
 
@@ -375,9 +393,7 @@ var init_file_tools = function(){
                         return;
                     }
 
-                    // bring file info for each tree selection
-
-
+                    utils.bubble("success", "Ok!", "File mode updated successfully", 4000);
                 }, true);
             });
         });
