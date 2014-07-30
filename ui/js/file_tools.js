@@ -1,84 +1,4 @@
 var init_file_tools = function(){
-    var askPassword = function(username, cb){
-        $.SmartMessageBox({
-            title : "<strong>" + username.toUpperCase() + ",</strong>",
-            content : "And now please provide the password:",
-            buttons : "[Cancel][Next]",
-            input : "password",
-            inputValue: "",
-            placeholder : "Password"
-        }, function(ButtonPress, passwd) {
-            if (ButtonPress == "Cancel") {
-                return 0;
-            };
-            cb(passwd);
-        });
-    };
-
-    var askURL = function(cb){
-        $.SmartMessageBox({
-            title : "Clone Repository",
-            content : "Enter the link to repository",
-            buttons : "[Cancel][Next]",
-            input : "text",
-            inputValue: "",
-            placeholder : "i.e. https://github.com/Nubisa/jxm.git"
-        }, function(ButtonPress, link) {
-            if (ButtonPress == "Cancel") {
-                return 0;
-            }
-            cb(link);
-        });
-    };
-
-    var askUsername = function(cb){
-        $.SmartMessageBox({
-            title : "Clone a Repository",
-            content : "Enter your username",
-            buttons : "[Cancel][Next]",
-            input : "text",
-            inputValue: "",
-            placeholder : "Leave empty if its a public repository"
-        }, function(ButtonPress, username) {
-            if (ButtonPress == "Cancel") {
-                return 0;
-            }
-            cb(username);
-        });
-    };
-
-    var cloneRepo = function(){
-        var cloneIt = function(details){
-            askURL(function(url){
-                if(url && url.length){
-                    details.url = url;
-                    alert(JSON.stringify(details));
-                }
-                else{
-                    utils.bubble("danger", "Missing URL", "You should enter URL");
-                }
-            });
-        };
-        askUsername(function(uname){
-            var details = {};
-            if(uname && uname.length){
-                details.username = uname;
-                askPassword(uname, function(password){
-                    if(password && password.length){
-                        details.password = password;
-                        cloneIt(details);
-                    }
-                    else{
-                        utils.bubble("danger", "Missing Password", "You should enter password");
-                    }
-                });
-            }
-            else{
-                cloneIt(details);
-            }
-        });
-    };
-
     window.getPathLocation = function(treeId, treeNode){
         var zTree = $.fn.zTree.getZTreeObj(treeId);
 
@@ -124,23 +44,23 @@ var init_file_tools = function(){
         $.SmartMessageBox({
             title : "Location : "+loc,
             content : "Create a new ... ?",
-            buttons : "[Cancel][Next]",
+            buttons : "[{{label.Cancel}}][{{label.Next}}]",
             input : "select",
             options: "[File][Folder]",
             placeholder : "Select"
         }, function(ButtonPress, selected) {
-            if (ButtonPress == "Cancel") {
+            if (ButtonPress == "{{label.Cancel}}") {
                 return 0;
             }
             $.SmartMessageBox({
                 title : "Create a new "+selected + " at "+loc,
                 content : "Name ?",
-                buttons : "[Cancel][Next]",
+                buttons : "[{{label.Cancel}}][{{label.Next}}]",
                 input : "text",
                 inputValue: "",
                 placeholder : "Name for the "+selected
             }, function(ButtonPress, name) {
-                if (ButtonPress == "Cancel") {
+                if (ButtonPress == "{{label.Cancel}}") {
                     return 0;
                 }
                 if(!name || !name.trim().length){
@@ -159,11 +79,12 @@ var init_file_tools = function(){
                             }
                             return;
                         }
-                        if(loc == "/"){
-                            loc = "";
-                        }
-                        utils.bubble("success", selected + " Created", loc + "/" + name, 4000);
+
                         getFiles(loc, document.treeId, nodes[0]);
+                        if(loc == "/")
+                            loc = "";
+                        utils.bubble("success", selected + " Created", loc + "/" + name, 4000);
+
                     }, true);
                 }
             });

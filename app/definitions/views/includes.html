@@ -156,7 +156,8 @@
 
                     if(window.pingQ)
                         return;
-                    if (window.lastPing < Date.now() - 6000) {
+
+                    if (window.lastPing < Date.now() - 7000) {
                         window.pingQ = true;
                         $.SmartMessageBox({
                             title: "{{label.ServerNotResponding}}",
@@ -173,12 +174,12 @@
                     }
                     if (!window.pinger) {
                         window.pinger = true;
-                        window.lastPing = Date.now();
                         toServer("userIn", null, function (ret_val) {
                             if (ret_val.relogin) {
                                 location.href = "/index.html";
                                 return;
                             }
+                            window.lastPing = Date.now();
                             window.pinger = false;
                         }, false);
                     }
@@ -359,7 +360,8 @@
             } else {
                 // insert undo code here...
             }
-        })
+        });
+
         // count tasks
         function countTasks() {
             $('.todo-group-title').each(function() {
@@ -367,6 +369,7 @@
                 $this.find(".num-of-tasks").text($this.next().find("li").size());
             });
         }
+
         if (window.jxTemplateReady) {
             window.jxTemplateReady();
         }

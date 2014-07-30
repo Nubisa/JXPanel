@@ -5,6 +5,7 @@ exports.Labels = {
     "PleaseWait":"Please Wait",
     "Apply":"Apply",
     "Cancel":"Cancel",
+    "Next":"Next",
     "Save":"Save",
     "Logout":"Logout",
     "Login":"Login",

@@ -155,6 +155,9 @@ exports.defineMethods = function(){
 
         var home = active_user.homeFolder();
         var loc;
+        if(params.up == "")
+            params.up = "#";
+
         if(params.up == "#"){
             loc = home;
         }
@@ -181,7 +184,7 @@ exports.defineMethods = function(){
             }
 
             if(params.up == "#"){
-                _nodes = {name:'/', children:_nodes, open:true};
+                _nodes = [{name:'/', children:_nodes, open:true}];
             }
 
             server.sendCallBack(env, {nodes:_nodes, id:params.id});

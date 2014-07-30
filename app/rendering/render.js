@@ -126,7 +126,7 @@ var apply_smart = function(file, req, res, data){
 
     smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0, file:{name:bname} };
 
-    if(!_active_user.hasPermission(sessionId, file)){
+    if(pathModule.extname(file) != '.js' && !_active_user.hasPermission(sessionId, file)){
         res.write("<html><script>location.href='/index.html?t="+file.replace("../ui/","")+"';</script></html>");
         return;
     }
@@ -142,6 +142,16 @@ var apply_smart = function(file, req, res, data){
 
 exports.defineRender = function(ms){
     ms.on('.html', function(file, req, res, cb){
+        var temp = template();
+        temp.response = res;
+        temp.render = apply_smart;
+        temp.callback = cb;
+        temp.file = file.path;
+        temp.request = req;
+        file.pipe(temp);
+    });
+
+    ms.on('.js', function(file, req, res, cb){
         var temp = template();
         temp.response = res;
         temp.render = apply_smart;
