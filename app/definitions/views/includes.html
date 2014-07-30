@@ -86,18 +86,37 @@
 
             window.shadowWait = 0;
 
-            window.toServer = function(a,b,c,shadow){
+            window.toServer = function(a,b,c,shadow, progress){
                 if(shadow){
+
+                    var progressBar = "";
+                    if (progress) {
+                        progressBar =
+                                '<div class="progress" rel="tooltip" data-original-title="0%" data-placement="top" style="margin-top: 10px;">'
+                                + '<div id="jx_pb" style="width: 0%;" class="progress-bar bg-color-teal"></div></div>';
+                    }
+
                     var div = document.createElement("div");
                     div.id = "_MsgBoxBack";
                     div.className = "divMessageBox animated fadeIn fast";
                     div.style.cssText = "background: none repeat scroll 0 0 rgba(200, 200, 200, 0.6);"
                     var str = '<div id="Msg1" class="MessageBoxContainer animated fadeIn fast">'
                             +'<div class="MessageBoxMiddle" style="font-size:120%">'
-                            +'<strong><i class="fa fa-lg fa-fw fa-clock-o"></i>{{label.PleaseWait}}...</strong>'
+                            +'<strong><i class="fa fa-lg fa-fw fa-clock-o"></i>{{label.PleaseWait}}...</strong>' + progressBar
                             +'</div></div></div>';
 
+
+
                     div.innerHTML = str;
+                    div.jx_progress = 0;
+
+                    div.jx_increment = function() {
+                        if (window.jx_shadowdiv) {
+                            var dx = (100 - window.jx_shadowdiv.jx_progress) / 2;
+                            window.jx_shadowdiv.jx_progress += parseInt(dx);
+                            $("#jx_pb").width( window.jx_shadowdiv.jx_progress + "%");
+                        }
+                    };
 
                     window.jx_cshadow = c;
                     window.shadowWait++;
@@ -116,6 +135,7 @@
                     };
 
                     document.body.appendChild(div);
+                    div.jx_increment();
                 }
 
                 jxcore.Call(a,b,c);
@@ -130,6 +150,10 @@
             window.pingQ = false;
             if( "{{file.name}}" != "index" ) {
                 setInterval(function () {
+
+                    if (window.jx_shadowdiv)
+                        window.jx_shadowdiv.jx_increment();
+
                     if(window.pingQ)
                         return;
                     if (window.lastPing < Date.now() - 6000) {
@@ -275,18 +299,28 @@
         });
     };
 
-    utils.jxMonitorStartStop = function (start) {
+    utils.jxCall = function (method_name, value) {
 
-        window.toServer("monitorStartStop", { op: start }, function (param) {
+        window.toServer(method_name, { op: value }, function (param) {
             if (param.err) {
                 utils.jxAddMessage('danger', param.err);
             } else {
                 document.location.reload();
             }
-        }, true);
+        }, true, true);
 
         return false;
     };
+
+
+    utils.jxMonitorStartStop = function (start) {
+        return utils.jxCall("monitorStartStop", start);
+    };
+
+    utils.jxInstall = function () {
+        return utils.jxCall("jxInstall", true);
+    };
+
 
     $(document).ready(function() {
        pageSetUp();

@@ -8,7 +8,7 @@ var path = require('path');
 var fs = require('fs');
 var exec = require('child_process').exec;
 var downloads = require('./downloads');
-var database = require("../db/database");
+var database = require("../install/database");
 
 var newUser = function(session_id){
     return {

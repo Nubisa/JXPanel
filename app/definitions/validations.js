@@ -1,7 +1,7 @@
 var server = require('jxm');
 var form_lang = require('./form_lang');
 var system_tools = require("./../system_tools");
-var database = require("./../db/database");
+var database = require("./../install/database");
 
 
 /**
@@ -139,8 +139,16 @@ exports.MaxPort = function(min_port_field) {
 
     this.validate = function (env, active_user, val, vals) {
 
-        var ok = new exports.Int({ gt : vals[_min_port_field], lte : 20000 }).validate(env, active_user, val, vals);
-        return ok;
+        var min = vals[_min_port_field];
+        var max = val;
+        var ret = new exports.Int({ gt : min, lte : 20000 }).validate(env, active_user, val, vals);
+        if (!ret.result) return ret;
+
+        var domains = database.getDomainsByUserName(null, 1e5);
+        if ((max - min) < domains.length * 2)
+            return {result: false, msg: form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ domains.length * 2, max - min ])};
+
+        return {result : true} ;
     };
 };
 
@@ -159,6 +167,46 @@ exports.UserName = function() {
 
         if (database.getUser(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "UserAlreadyExists", true)};
+
+        return {result: true};
+    };
+};
+
+
+exports.Domain = function() {
+
+    this.validate = function (env, active_user, val, vals) {
+
+        // todo: better email validation
+        var reg = new RegExp("^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,4}$", "i");
+
+        if (!reg.test(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainInvalid", true)};
+
+        if (database.getDomain(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainAlreadyExists", true)};
+
+        var domains = database.getDomainsByUserName(null, 1e5);
+
+        var cfg = database.getConfig();
+        var min = cfg.jx_app_min_port;
+        var max = cfg.jx_app_max_port;
+
+        var needed = domains.length * 2 + 2;
+        if (max - min < needed)
+            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [needed, max - min] )};
+
+        return {result: true};
+    };
+};
+
+
+exports.Plan = function() {
+
+    this.validate = function (env, active_user, val, vals) {
+
+        if (database.getPlan(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "PlanAlreadyExists", true)};
 
         return {result: true};
     };

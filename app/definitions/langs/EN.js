@@ -18,6 +18,10 @@ exports.Labels = {
     "Default" : "Default",
     "Online" : "Online",
     "Offline" : "Offline",
+    "Install" : "Install",
+    "Installed" : "Installed",
+    "Reinstall" : "Reinstall",
+    "NotInstalled" : "Not installed",
 
     "serverManagement":"Server Management",
     "help":"Help",
@@ -153,6 +157,7 @@ exports.Labels = {
     "FileSavedContent":"File Saved Successfully",
     "FolderNotEmpty":"Folder is not empty",
     "FileExists":"File already exists",
+    "FileDoesNotExist":"File does not exist",
     "CHMOD":"chmod",
     "CHMODTooltip":"Update CHMOD",
 
@@ -212,6 +217,10 @@ exports.Labels = {
 
     "DomainName" : "Domain",
     "DomainName_Description" : "The domain name for you subscription.",
+    "DomainInvalid" : "Please enter a valid domain name.",
+    "DomainAlreadyExists" : "Domain already exists.",
+    "DomainNotFound" : "Domain not found.",
+    "DomainCannotAdd" : "Cannot add domain.",
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
     "JXEnabled" : "JXcore",
@@ -233,6 +242,8 @@ exports.Labels = {
     "PlanCannotDetermineHostingValues" : "Cannot determine hosting values.",
     "PlanParentCannotAddMore" : "Parent hosting plan reached maximum %s count.",
     "PlanCannotAddMore" : "This hosting plan reached maximum %s count.",
+    "PlanInvalid" : "Invalid hosting plan",
+    "PlanAlreadyExists" : "Plan already exists",
     "UserSuspended" : "User is suspended",
 
     "CannotEditRecord" : "You cannot edit this record.",
@@ -283,11 +294,16 @@ exports.Labels = {
     "JXcoreInfo" : " Information",
     "JXcoreVersion" : " JXcore version",
     "JXcorePath" : " JXcore path",
+    "JXcorePathInvalid" : "JXcore path does not exist.",
     "JXcoreMonitor" : "JXcore Monitor",
     "JXcoreMonitorStatus" : "Status ",
+    "JXcorePleaseInstall" : "Please install JXcore.",
+    "JXcoreCannotDownload" : "Cannot download JXcore.",
+    "JXcoreReinstall_Description" : 'If you reinstall JXcore, all the running node applications will be restarted after updating JXcore binary.',
     "JXAppMinPort" : "Minimum app port number",
     "JXAppMaxPort" : "Maximum app port number",
     "JXAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
+    "JXAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
 
 
     "JXcoreNPMModules" : "NPM Modules",
@@ -296,8 +312,6 @@ exports.Labels = {
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
     "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
     "JXcoreNPMInstalled" : "NPM module successfully installed."
-
-
 };
 
 

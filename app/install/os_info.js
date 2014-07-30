@@ -1,4 +1,11 @@
+var fs = require('fs');
+var pathModule = require('path');
+var sep = pathModule.sep;
+var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored from git
 var osInfo = null;
+
+exports.apps_folder = app_folder;
+
 exports.OSInfo = function(){
     if(osInfo)
         return osInfo;

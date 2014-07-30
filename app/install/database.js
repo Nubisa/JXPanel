@@ -413,6 +413,16 @@ exports.getPlanByDomainName = function(name){
 };
 
 exports.getDomainsByUserName = function(user_name, deep){
+
+    if (user_name === null) {
+        // gets all domains
+        var arr = [];
+        for(var domain in Domains) {
+            arr.push(domain);
+        }
+        return arr;
+    }
+
     if(!Users[user_name]){
         throw new Error(user_name + " user doesn't exist");
     }
@@ -506,13 +516,13 @@ exports.deletePlan = function(name){
     delete(owner.subPlans[name]);
     delete(Plans[name]);
     for(var o in arr_users){
-        delete(Users[o]);
+        delete(Users[arr_users[o]]);
     }
     for(var o in arr_domains){
-        delete(Domains[o]);
+        delete(Domains[arr_domains[o]]);
     }
     for(var o in arr_plans){
-        delete(Plans[o]);
+        delete(Plans[arr_plans[o]]);
     }
 
     UpdateDB(JSON.stringify(DB));
@@ -595,7 +605,7 @@ exports.updateDomain = function(name, data){
 
 exports.updatePlan = function(name, data){
     if(!Plans[name]){
-        throw new Error(name + " plan doesnt exist");
+        throw new Error(name + " plan doesn't exist");
     }
 
     var plan = Plans[name];
@@ -659,6 +669,20 @@ exports.getConfig = function() {
     return Config;
 };
 
+exports.setConfigValue = function(param, value, update) {
+    Config[param] = value;
+    if (update)
+        UpdateDB(JSON.stringify(DB));
+};
+
+exports.getConfigValue = function(param) {
+    return Config[param];
+};
+
+
+exports.UpdateDB = function() {
+    UpdateDB(JSON.stringify(DB));
+};
 
 exports.fixDatabase = function() {
 

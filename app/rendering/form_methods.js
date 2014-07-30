@@ -5,11 +5,13 @@ var forms = require('./form_templates');
 var util = require("util");
 var server = require('jxm');
 var pam = require('authenticate-pam');
-var database = require("./../db/database");
+var database = require("./../install/database");
 var methods = {};
 var fs = require('fs');
 var path = require('path');
 var system_tools = require('../system_tools');
+var hosting_tools = require('../hosting_tools');
+var site_defaults = require("./../definitions/site_defaults");
 
 
 var checkUser = function(env){
@@ -174,6 +176,7 @@ var update = function(base, ext){
     }
 };
 
+
 methods.sessionApply = function(env, params){
 
     var active_user = checkUser(env);
@@ -270,7 +273,15 @@ methods.sessionApply = function(env, params){
                 update(domain, json);
                 ret = database.updateDomain(update_name, domain);
             } else {
-                ret = database.AddDomain(active_user.username, json.name, json);
+                var arr = hosting_tools.getFreePorts(2);
+                if (!arr || arr.length < 2) {
+                    var range = hosting_tools.getPortRange();
+                    ret = form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ range.count, range.count + 2 ])
+                } else {
+                    json.port_http = arr[0];
+                    json.port_https = arr[1];
+                    ret = database.AddDomain(active_user.username, json.name, json);
+                }
             }
         } catch(ex) {
             ret = ex.toString();
@@ -299,11 +310,9 @@ methods.sessionApply = function(env, params){
         }
     } else
     if (params.form === "jxconfig") {
-        var cfg = {
-            "jx_app_min_port" : json["jx_app_min_port"],
-            "jx_app_max_port" : json["jx_app_max_port"]
-        };
-        database.setConfig(cfg);
+        var min = json["jx_app_min_port"];
+        var max = json["jx_app_max_port"];
+        hosting_tools.setPortRange(min,max);
     } else {
         ret = "UnknownForm";
     }
@@ -398,7 +407,7 @@ var uninstallNPM = function(env, params) {
     var active_user = checkUser(env);
 
     for(var i in params.ids) {
-        var modulesDir = path.normalize(datatables.jxconfig.globalModulePath + "/node_modules/" + params.ids[i]);
+        var modulesDir = path.normalize(site_defaults.dirNativeModules + "/node_modules/" + params.ids[i]);
 
         var ok = true;
         if (fs.existsSync(modulesDir)) {
@@ -423,8 +432,8 @@ methods.installNPM = function(env, params) {
         var version = nameAndVersion.slice(pos + 1).trim();
     }
 
-    if (!fs.existsSync(datatables.jxconfig.globalModulePath)) {
-        fs.mkdirSync(datatables.jxconfig.globalModulePath);
+    if (!fs.existsSync(site_defaults.dirNativeModules)) {
+        fs.mkdirSync(site_defaults.dirNativeModules);
     }
 
     var task = function(cmd) {
@@ -432,16 +441,23 @@ methods.installNPM = function(env, params) {
     };
 
     //console.log("Installing npm module. name:", name, "version:", version, "with cmd: ", cmd);
-    var cmd = "cd " + datatables.jxconfig.globalModulePath + "; '" + process.execPath + "' install " + nameAndVersion;
+    var cmd = "cd '" + site_defaults.dirNativeModules + "'; '" + process.execPath + "' install " + nameAndVersion;
     jxcore.tasks.addTask(task, cmd, function() {
-        var expectedModulePath = path.join(datatables.jxconfig.globalModulePath, "/node_modules/", name);
-
+        var id = process.threadId;
+        var expectedModulePath = path.join(site_defaults.dirNativeModules, "/node_modules/", name);
         server.sendCallBack(env, {err : !fs.existsSync(expectedModulePath)});
     });
 };
 
 
 methods.monitorStartStop = function (env, params) {
+
+//    var active_user = checkUser(env);
+//
+//    if (!system_tools.isJXValid()) {
+//        server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "JXcorePathInvalid", true)});
+//        return;
+//    }
 
     jxcore.monitor.checkMonitorExists(function (err, txt) {
         var online_before = !err;
@@ -477,20 +493,31 @@ methods.monitorStartStop = function (env, params) {
 //            server.sendCallBack(env, {err : ex.toString() } );
 //        }
 
+//        var cfg = database.getConfig();
         var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
-        jxcore.utils.cmdSync(cmd);
-        checkAfter();
 
-        // the "tasks" way, but it doesn't work!
-        // never returns from the task ???
-//        var task = function (cmd) {
-//            return jxcore.utils.cmdSync(cmd);
-//        };
-//        jxcore.tasks.addTask(task, cmd, checkAfter);
+        var task = function (cmd) {
+            jxcore.utils.cmdSync(cmd);
+        };
+        jxcore.tasks.addTask(task, cmd, checkAfter);
 
     });
 
 };
+
+
+methods.jxInstall = function (env, params) {
+
+    var active_user = checkUser(env);
+
+    system_tools.installJX(function(err) {
+        if (err)
+            err = form_lang.Get(active_user.lang, err, true);
+
+        server.sendCallBack(env, { err : err });
+    });
+};
+
 
 
 module.exports = methods;
