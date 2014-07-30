@@ -5,7 +5,7 @@ var nginx = require('./nginx');
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
 var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored from git
-var tools_folder = pathModule.join(__dirname, "../../tools"); // ignored from git
+var tools_folder = pathModule.join(__dirname, "../../tools");
 
 exports.apps_folder = app_folder;
 
