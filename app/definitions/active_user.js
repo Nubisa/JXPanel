@@ -262,14 +262,13 @@ exports.defineMethods = function(){
 
         var loc = home + path.sep + params.up;
 
-        debugger;
         if(!fs.existsSync(loc)){
             server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
             return;
         }
 
         try{
-            var target = oc + path.sep + params.name;
+            var target = loc + path.sep + params.name;
             if(fs.existsSync(target)){
                 server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileExists")});
                 return;
