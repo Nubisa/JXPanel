@@ -40,7 +40,9 @@ var installNGINX = function(){
 };
 
 var installDB = function() {
-    sqlite2.ReadDB();
+    sqlite2.ReadDB(function(err) {
+
+    });
 };
 
 
