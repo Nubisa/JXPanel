@@ -165,6 +165,7 @@ exports.Labels = {
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
     "UserSystemAlreadyExists" : "System user with this name already exists.",
+    "UserUnknown" : "Unknown user.",
     "EmailInvalid" : "Invalid e-mail address.",
 
 
@@ -226,6 +227,7 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
     "JXEnabled" : "JXcore",
     "JXAppPath" : "Application file path",
+    "JXAppStatus" : "Application status",
     "JXAppPath_Description" : "The path is relative to domain root folder.",
 
     // JXcore

@@ -99,6 +99,18 @@ exports.form = function () {
             },
 
             {
+                name: "jx_app_stats",
+                details: {
+                    label: "JXAppStatus",
+                    method: tool.createSimpleText,
+                    options: { dynamic : true }
+                },
+                dynamicValues : function(active_user) {
+                    return "dynval";
+                }
+            },
+
+            {
                 name: "jx_app_path",
                 details: {
                     label: "JXAppPath",
