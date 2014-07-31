@@ -157,7 +157,7 @@ var Plan = function(name, owner_user, opts, dummy){
     this.UnSuspendPlan = function(){
         this.suspended = false;
         if(exports.OnSuspend){
-            exports.OnSuspend(this.name, o, "Plan", false);
+            exports.OnSuspend(this.name, null, "Plan", false);
         }
     };
 
@@ -275,10 +275,10 @@ var User = function(name, parent_plan, opts){
         }
     };
 
-    this.UnSuspendPlan = function(){
+    this.UnSuspendUser = function(){
         this.suspended = false;
         if(exports.OnSuspend){
-            exports.OnSuspend(this.name, o, "User", false);
+            exports.OnSuspend(this.name, null, "User", false);
         }
         var plans = exports.getPlansByUserName(this.name);
         for(var o in plans){
