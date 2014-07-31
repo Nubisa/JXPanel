@@ -88,6 +88,8 @@ exports.defineMethods = function(){
 
 exports.dirNativeModules = path.join(os_info.apps_folder, "native_modules" ) + path.sep;
 exports.dirAppConfigs = path.join(os_info.apps_folder, "app_configs" ) + path.sep;
+exports.dirUserApps = path.join( os_info.apps_folder, "users") + path.sep;
+exports.dirMonitorCertificates = path.join(__dirname, "../spawner") + path.sep;
 exports.defaultAppMinPort = 10000;
 exports.defaultAppMaxPort = 20000;
 

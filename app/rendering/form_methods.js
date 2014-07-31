@@ -230,7 +230,7 @@ methods.sessionApply = function(env, params){
     }
 
     var sendError = function(errLabel) {
-        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
+        server.sendCallBack(env, {arr: [ { control: "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
     };
 
     if (!cnt)
@@ -278,7 +278,7 @@ methods.sessionApply = function(env, params){
                 var arr = hosting_tools.getFreePorts(2);
                 if (!arr || arr.length < 2) {
                     var range = hosting_tools.getPortRange();
-                    ret = form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ range.count, range.count + 2 ])
+                    ret = form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ range.count, range.count + 2 ])
                 } else {
                     json.port_http = arr[0];
                     json.port_https = arr[1];
@@ -289,8 +289,13 @@ methods.sessionApply = function(env, params){
             ret = ex.toString();
         }
 
-        if (json.jx_enabled)
-            hosting_tools.appRun(update_name);
+        if (!ret) {
+            hosting_tools.appStartStop(json.jx_enabled, update_name, function(err) {
+                var arr = err ? [ { control: "", msg : form_lang.Get(active_user.lang, err, true) } ] : false;
+                server.sendCallBack(env, {arr: arr });
+            });
+            return;
+        }
     } else
     if (params.form === "addPlan") {
         try {
@@ -323,7 +328,7 @@ methods.sessionApply = function(env, params){
     }
 
     if (ret) {
-        server.sendCallBack(env, {arr: [ { control: form_lang.Get(active_user.lang, "Form"), msg : form_lang.Get(active_user.lang, ret, true) } ]});
+        server.sendCallBack(env, {arr: [ { control: "", msg : form_lang.Get(active_user.lang, ret, true) } ]});
     } else {
         server.sendCallBack(env, {arr: false});
     }
@@ -343,7 +348,7 @@ methods.getForm = function(env, params) {
         return;
 
     if (params.form === "jxconfig") {
-        hosting_tools.getMonitorJSON(function(err, ret) {
+        hosting_tools.getMonitorJSON(false, function(err, ret) {
             // todo: just for now saving the value somewhere
             jxcore.monitor.isOnline = !err && ret;
             var ret = forms.renderForm(env.SessionID, params.form, true);

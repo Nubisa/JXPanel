@@ -261,9 +261,9 @@ exports.Labels = {
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
     "JXEnabled" : "JXcore",
-    "JXAppPath" : "Application file path",
-    "JXAppStatus" : "Application status",
-    "JXAppPath_Description" : "The path is relative to domain root folder.",
+    "JXcoreAppPath" : "Application file path",
+    "JXcoreAppStatus" : "Application status",
+    "JXcoreAppPath_Description" : "The path is relative to domain root folder.",
 
     // JXcore
     "JXcoreUpperCase" : "JXcore",
@@ -338,15 +338,19 @@ exports.Labels = {
     "JXcoreMonitorCannotStart" : "Cannot start JXcore monitor.",
     "JXcoreMonitorCannotStop" : "Cannot stop JXcore monitor.",
     "JXcoreMonitorStarted" : "JXcore monitor started.",
-    "JXcoreMonitorStoped" : "JXcore monitor stopped.",
+    "JXcoreMonitorStopped" : "JXcore monitor stopped.",
 
     "JXcorePleaseInstall" : "Please install JXcore.",
     "JXcoreCannotDownload" : "Cannot download JXcore.",
     "JXcoreReinstall_Description" : 'If you reinstall JXcore, all the running node applications will be restarted after updating JXcore binary.',
-    "JXAppMinPort" : "Minimum app port number",
-    "JXAppMaxPort" : "Maximum app port number",
-    "JXAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
-    "JXAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
+    "JXcoreAppMinPort" : "Minimum app port number",
+    "JXcoreAppMaxPort" : "Maximum app port number",
+    "JXcoreAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
+    "JXcoreAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
+    "JXcoreAppCannotStart" : "Cannot start application %s.",
+    "JXcoreAppCannotStop" : "Cannot stop application %s.",
+    "JXcoreAppStarted" : "Application %s started.",
+    "JXcoreAppStopped" : "Application %s stopped.",
 
 
     "JXcoreNPMModules" : "NPM Modules",

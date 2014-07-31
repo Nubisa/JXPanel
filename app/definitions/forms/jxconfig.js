@@ -132,7 +132,7 @@ exports.form = function () {
             {
                 name: "jx_app_min_port",
                 details: {
-                    label: "JXAppMinPort",
+                    label: "JXcoreAppMinPort",
                     method: tool.createTextBox,
                     options: { required: true, default : site_defaults.defaultAppMinPort }
                 },
@@ -142,7 +142,7 @@ exports.form = function () {
             {
                 name: "jx_app_max_port",
                 details: {
-                    label: "JXAppMaxPort",
+                    label: "JXcoreAppMaxPort",
                     method: tool.createTextBox,
                     options: { required: true, default : site_defaults.defaultAppMaxPort }
                 },
