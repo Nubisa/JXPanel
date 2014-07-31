@@ -5,6 +5,7 @@ var form_lang = require('./form_lang');
 var site_defaults = require('./site_defaults');
 var osinfo = require('../install/os_info').OSInfo();
 var db = require('../install/database');
+var system_tools = require('../system_tools');
 
 exports.markFile = function(target, uid, gid){
     var res = jxcore.utils.cmdSync("chown -R " + uid + ":" + gid + " " + target);
@@ -12,6 +13,18 @@ exports.markFile = function(target, uid, gid){
         return res.out;
     }
     return null;
+};
+
+exports.getUserPathSize = function(user_name){
+    var users = db.getUsersByUserName(user_name, 1e7);
+    var plan = db.getUser(user_name).plan;
+    var total = system_tools.getDiskUsageSync(exports.getUserPath(plan, user_name));
+    for(var o in users){
+        plan = db.getUser(o).plan;
+        total += system_tools.getDiskUsageSync(exports.getUserPath(plan, o));
+    }
+
+    return total;
 };
 
 exports.getUserPath = function(plan_name, user_name){

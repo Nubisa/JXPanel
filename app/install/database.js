@@ -267,7 +267,7 @@ var User = function(name, parent_plan, opts){
         }
         var plans = exports.getPlansByUserName(this.name);
         for(var o in plans){
-            exports.getPlan(plans[o]).SuspendPlan();
+            exports.getPlan(plans[o]).SuspendPlan(o);
         }
     };
 

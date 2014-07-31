@@ -4,7 +4,7 @@ var last_quota_check = 0;
 
 var check_quotas = function(){
     if(Date.now()<last_quota_check + 30000)
-        return;
+       return;
     last_quota_check = 0;
     db.ReadDB(function(err) {
         var plans = db.getPlansByPlanName("Unlimited", 1e7);
@@ -16,10 +16,10 @@ var check_quotas = function(){
                 if(max_disk){                                     // plan.plan_ssl -> ssl access
                     var users = plan.users;
                     for(var i in users){
-                       // var size = folders.getUserPathSize(i);
-                        //if(size>max_disk){
-
-                        //}
+                        var size = folders.getUserPathSize(i);
+                        if(size>max_disk){
+                            db.getUser(i).SuspendUser("plan_disk_space");
+                        }
                     }
                 }
             }

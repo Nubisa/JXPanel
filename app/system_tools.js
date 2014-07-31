@@ -136,13 +136,13 @@ var getdiskUsage = function(folder){
     var total = parseFloat(result.substr(0, result.length-1));
 
     if(size == "g"){
-        return total;
-    }
-    else if(size == "m"){
         return total / 1024;
     }
+    else if(size == "m"){
+        return total;
+    }
     else if(size == "k"){
-        return total / (1024 * 1024);
+        return total / (1024);
     }
     return total;
 };
