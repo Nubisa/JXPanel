@@ -2,42 +2,7 @@
     <li id="Menu-dashboard">
         <a href="dashboard.html" title="{{label.Home}}"><i class="fa fa-lg fa-fw fa-home"></i>{{label.Dashboard}}</a>
     </li>
-    <li id="Menu-users">
-        <a href="users.html"><i class="fa fa-lg fa-fw fa-user"></i>{{label.UsersUpperCase}}</a>
-    </li>
-    <li id="Menu-plans">
-        <a href="plans.html"><i class="fa fa-lg fa-fw fa-cogs"></i>{{label.DataPlans}}</a>
-    </li>
-    <li id="Menu-domains">
-        <a href="domains.html"><i class="fa fa-lg fa-fw fa-external-link"></i>{{label.DomainsUpperCase}}</a>
-    </li>
-
-    <li>
-        <a href="#"><img src="img/jx.png" style="padding-right: 13px; vertical-align: text-bottom"/>{{label.JXcoreUpperCase}}</a>
-        <ul>
-            <li>
-                <a href="jxconfig.html">{{label.JXcoreConfiguration}}</a>
-            </li>
-            <li>
-                <a href="jxmodules.html">{{label.JXcoreNPMModules}}</a>
-            </li>
-        </ul>
-    </li>
-    <li id="Menu-cdatatable">
-        <a href="cdatatable.html"><i class="fa fa-lg fa-fw fa-dashboard"></i>{{label.stats}}</a>
-    </li>
-    <li id="Menu-editor">
-        <a href="editor.html"><i class="fa fa-lg fa-fw fa-hdd-o"></i>{{label.fileManager}}</a>
-    </li>
-    <li id="Menu-xxx">
-        <a href="cform.html"><i class="fa fa-lg fa-fw fa-briefcase"></i>{{label.serviceManagement}}</a>
-    </li>
-    <li id="Menu-console">
-        <a href="console.html"><i class="fa fa-lg fa-fw fa-laptop"></i>{{label.RemoteManagement}}</a>
-    </li>
-    <li id="Menu-xxx3">
-        <a href="cform.html"><i class="fa fa-lg fa-fw fa-question"></i>{{label.help}}</a>
-    </li>
+    {{menu.createMenu}}
     <li id="MenuLogout">
         <a href="#" data-action="userLogout" data-action-ok="utils.logOut()" data-logout-msg="{{label.logoutQuestion}}"><i class="fa fa-lg fa-fw fa-power-off"></i>{{label.logout}}</a>
     </li>
