@@ -14,7 +14,7 @@ var hosting_tools = require('../hosting_tools');
 var site_defaults = require("./../definitions/site_defaults");
 
 
-var checkUser = function(env){
+var checkUser = function(env, checkIfSuspended, form_name) {
     var active_user = _active_user.getUser(env.SessionID, false);
 
     if(!active_user){
@@ -22,8 +22,16 @@ var checkUser = function(env){
         return null;
     }
 
+    if (checkIfSuspended && active_user.suspended_txt) {
+        if (!form_name || !_active_user.isRecordUpdating(active_user, form_name)) {
+            server.sendCallBack(env, {err: active_user.suspended_txt, hideForm : true });
+            return null;
+        }
+    }
+
     return active_user;
 };
+
 
 methods.tryLogin = function(env, params){
     if(!params || !params.username || !params.password){
@@ -389,7 +397,7 @@ methods.getTableData = function(env, params) {
 // getting the form in async way
 methods.getForm = function(env, params) {
 
-    var active_user = checkUser(env);
+    var active_user = checkUser(env, true, params.form);
     if (!active_user)
         return;
 
@@ -520,7 +528,7 @@ methods.monitorStartStop = function (env, params) {
 
 methods.appStartStop = function (env, params) {
 
-    var active_user = checkUser(env);
+    var active_user = checkUser(env, true);
     if (!active_user)
         return;
 

@@ -17,10 +17,13 @@ var check_quotas = function(){
                 if(max_disk){                                     // plan.plan_ssh -> ssh access
                     var users = plan.users;
                     for(var i in users){
-                        var size = folders.getUserPathSize(i);
-                        if(size>max_disk){
-                            db.getUser(i).SuspendUser("plan_disk_space");
-                            record_updated = true;
+                        var user = db.getUser(i);
+                        if (!user.suspended) {
+                            var size = folders.getUserPathSize(i);
+                            if(size>max_disk){
+                                user.SuspendUser("plan_disk_space");
+                                record_updated = true;
+                            }
                         }
                     }
                 }

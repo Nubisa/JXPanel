@@ -31,6 +31,39 @@ exports.form = function () {
             },
 
             {
+                name: "suspended",
+                details: {
+                    label: "Status",
+                    method: tool.createSimpleText,
+                    options: { },
+//                    displayValues : {
+//                        "true" : '<i class="fa-fw fa fa-times text-danger"></i>',
+//                        "false" : '<i class="fa-fw fa fa-times text-success"></i>'
+//                    },
+                    getValue : function(active_user, values) {
+
+                        // form is in "add" mode, not "edit"
+                        if (!values || !values["name"])
+                            return "";
+
+                        var iconOnline = '<i class="fa-lg fa fa-check text-success"></i> ' + form_lang.Get(active_user.lang, "Active", true);
+                        var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i> <code>' + form_lang.Get(active_user.lang, "Suspended", true) + "</code>";
+
+                        var user = database.getUser(values.name);
+
+                        if (user.suspended) {
+                            var labels = tool.getFormsLabels(active_user.lang);
+                            var reason = labels[user.suspended_reason] || plan.suspended_reason;
+                            return iconOffline + " (" + reason + ")";
+                        } else {
+                            return iconOnline;
+                        }
+                    }
+                }
+            },
+
+
+            {
                 name: "person_email",
                 details: {
                     label: "UserEmailAddress",

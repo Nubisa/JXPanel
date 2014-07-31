@@ -11,6 +11,8 @@ var downloads = require('./downloads');
 var database = require("../install/database");
 var system_tools = require('../system_tools');
 var folder_tools = require('./user_folders');
+var form_tools = require('../rendering/form_tools');
+var page_utils = require('../rendering/page_utils');
 var users = {};
 var sessionIDs = {};
 
@@ -75,8 +77,22 @@ exports.getUser = function(sessionId)
     jxcore.store.shared.set(sessionId, Date.now());
 
     var user = database.getUser(users[sessionId].username);
-    if(user && user.plan)
-       users[sessionId].plan = user.plan;
+    if(user) {
+        if (user.plan)
+            users[sessionId].plan = user.plan;
+
+        users[sessionId].suspended = "";
+        users[sessionId].suspended_txt = "";
+        if (user.suspended) {
+            var lang = users[sessionId].lang;
+            var labels = form_tools.getFormsLabels(lang);
+            var str = "<strong>" + form_lang.Get(lang, "YouAreSuspended", true, [labels[user.suspended_reason] || user.suspended_reason]) + "</strong>";
+            str += " " + form_lang.Get(lang, "YouAreSuspendedExtra", true);
+
+            users[sessionId].suspended_txt = str;
+            users[sessionId].suspended = page_utils.getErrorBar(str);
+        }
+    }
 
     return users[sessionId];
 };

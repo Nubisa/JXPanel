@@ -37,6 +37,7 @@ var ReadDB = function(cb){ // KRIS FILL IN
                 Plans[o] = new Plan(o, null, Plans[o], true);
             }
             for(var o in Users){
+                Users[o] = new User(o, Users[o].plan, Users[o]);
                 if(!Users[o].subPlans){
                     Users[o].subPlans = {};
                 }
@@ -270,8 +271,8 @@ var User = function(name, parent_plan, opts){
             exports.OnSuspend(this.name, o, "User", true);
         }
         var plans = exports.getPlansByUserName(this.name);
-        for(var o in plans){
-            exports.getPlan(plans[o]).SuspendPlan(o);
+        for(var i in plans){
+            exports.getPlan(plans[i]).SuspendPlan(o);
         }
     };
 
@@ -750,11 +751,6 @@ exports.setConfigValue = function(param, value, update) {
 
 exports.getConfigValue = function(param) {
     return Config[param];
-};
-
-
-exports.UpdateDB = function() {
-    UpdateDB(JSON.stringify(DB));
 };
 
 exports.fixDatabase = function() {

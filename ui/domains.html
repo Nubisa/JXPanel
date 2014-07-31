@@ -50,12 +50,14 @@
     <!-- END RIBBON -->
 
     <!-- MAIN CONTENT -->
-    <div id="content" style="padding-top:50px">
+    <div id="content" style="padding-top:10px">
 
         {{view.topMessage}}
             {{toSub.topMessageTitle:DomainsManagement}}
             {{toSub.topMessageHeader:DomainsHeaderList}}
             {{toSub.topMessageContent:DomainsContentList}}
+
+        {{user.suspended}}
 
             <p id="jxFormMessage"></p>
 

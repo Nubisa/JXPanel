@@ -147,7 +147,7 @@
         };
     </script>
     <!-- Widget ID (each widget will need unique ID)-->
-    <div class="jarviswidget jarviswidget-color-blue" id="wid-id-0" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
+    <div class="jarviswidget jarviswidget-color-blue" id="wid-id-0" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" style="display: none;">
 
         <header>
             {{form.icon}}
@@ -217,6 +217,7 @@
             if (param.err) {
                 utils.jxAddMessage("danger", param.err);
                 div.innerHTML = param.err;
+
             } else {
                 $("#jxform_buttons").show();
                 div.innerHTML = param.html;
@@ -226,6 +227,13 @@
                 document.head.appendChild(script);
                 window.jxForms["{{form.id}}"].loadDynamic();
             }
+
+            if (param.hideForm) {
+                $("#wid-id-0").hide();
+            } else {
+                $("#wid-id-0").show();
+            }
+
         });
     };
 

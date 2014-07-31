@@ -50,12 +50,14 @@
     <!-- END RIBBON -->
 
     <!-- MAIN CONTENT -->
-    <div id="content" style="padding-top:50px">
+    <div id="content" style="padding-top:30px">
 
         {{view.topMessage}}
             {{toSub.topMessageTitle:DataPlans}}
             {{toSub.topMessageHeader:DataPlansHeaderList}}
             {{toSub.topMessageContent:DataPlansContentList}}
+
+        {{user.suspended}}
 
             <p id="jxFormMessage"></p>
 

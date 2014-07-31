@@ -70,12 +70,12 @@ exports.form = function () {
                 name: "suspended",
                 details: {
                     label: "Status",
-                    method: null,
+                    method: tool.createSimpleText,
                     options: { },
-                    displayValues : {
-                        "true" : '<i class="fa-fw fa fa-times text-danger"></i>',
-                        "false" : '<i class="fa-fw fa fa-times text-success"></i>'
-                    },
+//                    displayValues : {
+//                        "true" : '<i class="fa-fw fa fa-times text-danger"></i>',
+//                        "false" : '<i class="fa-fw fa fa-times text-success"></i>'
+//                    },
                     getValue : function(active_user, values) {
 
                         // form is in "add" mode, not "edit"
@@ -87,7 +87,13 @@ exports.form = function () {
 
                         var plan = database.getPlan(values.name);
 
-                        return plan.suspended ? iconOffline : iconOnline;
+                        if (plan.suspended) {
+                            var labels = tool.getFormsLabels(active_user.lang);
+                            var reason = labels[plan.suspended_reason] || plan.suspended_reason;
+                            return iconOffline + " (" + reason + ")";
+                        } else {
+                            return iconOnline;
+                        }
                     }
                 }
             },
