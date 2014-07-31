@@ -1,5 +1,39 @@
 var database = require('../install/database');
 
+exports.hasView = function(active_user, file){
+    if(!active_user)
+    {
+        return file == "../ui//index.html";
+    }
+
+    var plan = database.getPlan(active_user.plan);
+    if(file == "../ui//addplan.html"){
+        return plan.canCreatePlan;
+    }
+
+    if(file == "../ui//adduser.html"){
+        return plan.canCreateUser;
+    }
+
+    if(file == "../ui//console.html"){
+        return plan.plan_ssh;
+    }
+
+    if(file == "../ui//uploads.html"){
+        return !plan.suspended;
+    }
+
+    if(file == "../ui//jxconfig.html"){
+        return plan.name == "Unlimited";
+    }
+
+    if(file == "../ui//jxmodules.html"){
+        return plan.name == "Unlimited";
+    }
+
+    return true;
+};
+
 exports.render = function(active_user){
 
     var plan = database.getPlan(active_user.plan);

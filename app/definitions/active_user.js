@@ -1,4 +1,5 @@
 var forms = require('../rendering/form_templates');
+var view_permissions = require('../rendering/menu_creator');
 var datatables = require('../rendering/datatable_templates');
 var charts = require('./charts/charts');
 var form_lang = require('./form_lang');
@@ -104,7 +105,7 @@ exports.hasPermission = function(sessionId, file){
         }
     }
 
-    return true;
+    return view_permissions.hasView(users[sessionId], file);
 };
 
 

@@ -137,7 +137,12 @@ var apply_smart = function(file, req, res, data){
     smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0, file:{name:bname} };
 
     if(pathModule.extname(file) != '.js' && !_active_user.hasPermission(sessionId, file)){
-        res.write("<html><script>location.href='/index.html?t="+file.replace("../ui/","")+"';</script></html>");
+        if(!_active_user){
+            res.write("<html><script>location.href='/index.html?t="+file.replace("../ui/","")+"';</script></html>");
+        }
+        else{
+            res.write("<html><script>location.href='/index.html?"+Date.now()+"';</script></html>");
+        }
         return;
     }
 
