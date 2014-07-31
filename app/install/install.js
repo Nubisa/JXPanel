@@ -55,7 +55,7 @@ var prepareUserGroup = function(){
             return true;
         }
 
-        ret_val = jxcore.utils.cmdSync("addgroup jxman");
+        ret_val = jxcore.utils.cmdSync("groupadd jxman");
         if(ret_val.exitCode !== 0){
             console.error(ret_val.out);
             clog("Consider starting this application with 'sudo' / admin rights.", "green");
