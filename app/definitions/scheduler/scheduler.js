@@ -21,7 +21,8 @@ exports.doJobs = {
            cb();
         });
         process.on('uncaughtException', function(err){
-            console.log(err);
+            if(err)
+                console.error(err);
         });
         var check_users = require('./definitions/scheduler/user_sessions').check_users;
         var check_quotas = require('./definitions/scheduler/user_disk_quota').check_quotas;

@@ -146,12 +146,15 @@ var Plan = function(name, owner_user, opts, dummy){
     this.SuspendPlan = function(o){
         this.suspended = true;
         if(exports.OnSuspend){
-            exports.OnSuspend(this.name, o);
+            exports.OnSuspend(this.name, o, "Plan", true);
         }
     };
 
     this.UnSuspendPlan = function(){
         this.suspended = false;
+        if(exports.OnSuspend){
+            exports.OnSuspend(this.name, o, "Plan", false);
+        }
     };
 
     //todo: this method probably should be also called on UpdateXXX()
@@ -254,6 +257,30 @@ var User = function(name, parent_plan, opts){
     this.domains = {};
     this.plan = parent_plan.name;
     this.subPlans = {};
+
+    this.suspended = false;
+
+    this.SuspendUser = function(o){
+        this.suspended = true;
+        if(exports.OnSuspend){
+            exports.OnSuspend(this.name, o, "User", true);
+        }
+        var plans = exports.getPlansByUserName(this.name);
+        for(var o in plans){
+            exports.getPlan(plans[o]).SuspendPlan();
+        }
+    };
+
+    this.UnSuspendPlan = function(){
+        this.suspended = false;
+        if(exports.OnSuspend){
+            exports.OnSuspend(this.name, o, "User", false);
+        }
+        var plans = exports.getPlansByUserName(this.name);
+        for(var o in plans){
+            exports.getPlan(plans[o]).UnSuspendPlan();
+        }
+    };
 
     extend(this, opts);
 };
