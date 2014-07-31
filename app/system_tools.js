@@ -6,6 +6,7 @@ var database = require("./install/database");
 var os_info = require("./install/os_info");
 var exec = require('child_process').exec;
 var hosting_tools = require("./hosting_tools");
+var folder_utils = require('./definitions/user_folders');
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -257,27 +258,71 @@ exports.systemUserExists = function(username) {
     return !isNaN(parseInt(ret.out));
 };
 
+exports.getUserIDS = function(username){
+    var ret = jxcore.utils.cmdSync("id -u " + username);
+    try{
+        ret.out = parseInt(ret.out);
+    }
+    catch(e){
+        return null;
+    }
+    if(isNaN(ret.out)){return null;}
 
-exports.addSystemUser = function(username, password) {
+    var uid = ret.out;
 
+    ret = jxcore.utils.cmdSync("id -g " + username);
+
+    try{
+        ret.out = parseInt(ret.out);
+    }
+    catch(e){
+        return null;
+    }
+
+    if(isNaN(ret.out)){return null;}
+
+    var gid = ret.out;
+
+    return {uid:uid, gid:gid};
+};
+
+exports.addSystemUser = function(json, password) {
+    var username = json.name;
     if (exports.systemUserExists(username))
         return { err : "UserAlreadyExists"  };
 
     // sudo is not working when calling exec, so the current process must be running as root
-    var cmd = "useradd -g jxman -d /nginx/www/" +username + " -M -s /sbin/nologin " + username;
-    cmd += ';echo "'+username + ':' + password + '" | chpasswd -c SHA256';
 
-    var ret = jxcore.utils.cmdSync(cmd);
+    var ret = folder_utils.createUserHome(json.plan, json.name);
 
-    if (ret.exitCode)
+    if(ret.err){
+        return ret;
+    }
+
+    var loc = ret.home;
+
+    var cmd = "useradd -g jxman -d " + loc + " -M -s /sbin/nologin " + username;
+    cmd += ';echo "' + username + ':' + password + '" | chpasswd -c SHA256';
+
+    ret = jxcore.utils.cmdSync(cmd);
+
+    if (ret.exitCode){
+        jxcore.utils.cmdSync("rm -rf "+loc);
         console.error("UsersCannotCreateSystemUser", ret.out.toString().trim());
+    }else{
+        var ids = exports.getUserIDS(username);
+        if(ids){
+            folder_utils.markFile(loc, ids.uid, ids.gid);
+        }else{
+            return {err: "CouldntFixFolderPermissions"};
+        }
+    }
 
-    return { err : ret.exitCode ? "UsersCannotCreateSystemUser" : false }
+    return { err : ret.exitCode ? "UsersCannotCreateSystemUser" : false };
 };
 
 
 exports.deleteSystemUser = function(username) {
-
     if (!exports.systemUserExists(username))
         return { err : false  };
 
@@ -294,7 +339,6 @@ exports.deleteSystemUser = function(username) {
 
 
 exports.downloadFile = function (url, localFile, cb) {
-
     if (!cb) {
         return;
     }
@@ -307,7 +351,7 @@ exports.downloadFile = function (url, localFile, cb) {
         return;
     }
 
-    var request = https.get(url, function (response) {
+    https.get(url, function (response) {
         response.pipe(file);
         file.on('finish', function () {
             file.close();

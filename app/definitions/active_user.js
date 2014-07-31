@@ -9,52 +9,46 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 var downloads = require('./downloads');
 var database = require("../install/database");
+var system_tools = require('../system_tools');
+var folder_tools = require('./user_folders');
 
 var newUser = function(session_id){
-    return {
-        nameTitle: "John Doe",
-        sessionId: session_id,
-        homeFolder: function(){
-            // TODO return user's home path (www path)
+    function __user(sid){
+        this.nameTitle = "John Doe";
+        this.sessionId = sid;
+        this.homeFolder = function(){
+            if(this.__path)
+                return this.__path;
 
-            var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE; // temporary
-            return home + "/Desktop";
-        },
-        lang: "EN",
-        uid:0,
-        gid:0,
-        groupIdPrefix: "gr" + jxcore.utils.uniqueId(),
-        session: { forms:{} },
-        lastOperation: Date.now() // TODO later clear the users
-     };
-};
+            this.__path = folder_tools.getUserPath(database.getUser(this.username).plan, this.username);
 
-var markFile = function(target, uid, gid){
-    var res = jxcore.utils.cmdSync("chown -R " + uid + ":" + gid + " " + target);
-    if(res.exitCode != 0){
-        return res.out;
+            return this.__path;
+        };
+        this.lang = "EN";
+        this.uid = 0;
+        this.gid = 0;
+        this.groupIdPrefix = "gr" + jxcore.utils.uniqueId();
+        this.session = { forms:{} };
+        this.lastOperation = Date.now();
     }
-    return null;;
+
+    return new __user(session_id);
 };
+
+var markFile = folder_tools.markFile;
 
 exports.loginUser = function(env, params){
     var sessionId = env.SessionID;
 
     users[sessionId] = newUser(sessionId);
-    var ret = jxcore.utils.cmdSync("id -u " + params.username);
-    users[sessionId].uid = parseInt(ret.out);
-    if (isNaN(users[sessionId].uid)) {
+    var ret = system_tools.getUserIDS(params.username);
+    if (!ret) {
         users[sessionId] = null;
         delete(users[sessionId]);
         return false;
     }
-    ret = jxcore.utils.cmdSync("id -g " + params.username);
-    users[sessionId].gid = parseInt(ret.out);
-    if (isNaN(users[sessionId].gid)) {
-        users[sessionId] = null;
-        delete(users[sessionId]);
-        return false;
-    }
+    users[sessionId].gid = ret.gid;
+    users[sessionId].uid = ret.uid;
 
     users[sessionId].username = params.username;
     users[sessionId].nameTitle = params.username; // TODO change it!!!
@@ -507,10 +501,14 @@ exports.defineMethods = function(){
     });
 
     server.addJSMethod("userIn", function(env, params){
+        var val = {done:true};
+
         if(!env.SessionID || !users[env.SessionID]){
-            server.sendCallBack(env, {relogin:true});
+            val.relogin = true;
+            server.sendCallBack(env, val);
             return;
         }
-        server.sendCallBack(env, {done:true});
+
+        server.sendCallBack(env, val);
     });
 };

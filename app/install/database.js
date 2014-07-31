@@ -654,6 +654,21 @@ exports.getPlan = function(name){
     return Plans[name];
 };
 
+exports.getParentPlanName = function(name){
+    var plan = Plans[name];
+    if(!plan)
+        return null;
+
+    var user = Users[plan.owner];
+    if(!user)
+        return null;
+
+    if(name == user.plan)
+        return null;
+
+    return user.plan;
+};
+
 exports.getUser = function(name){
     return Users[name];
 };

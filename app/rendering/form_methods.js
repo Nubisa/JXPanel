@@ -252,7 +252,7 @@ methods.sessionApply = function(env, params){
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
                 if (!ret) {
-                    var res = system_tools.addSystemUser(json.name,  params.controls["person_password"]);
+                    var res = system_tools.addSystemUser(json,  params.controls["person_password"]);
                     if (res.err) {
                         ret = res.err;
                         database.deleteUser(json.name);
@@ -261,6 +261,8 @@ methods.sessionApply = function(env, params){
             }
         } catch(ex) {
             ret = ex.toString();
+            if(json && !isUpdate && database.getUser(json.name))
+                database.deleteUser(json.name);
         }
     } else
     if (params.form === "addDomain") {

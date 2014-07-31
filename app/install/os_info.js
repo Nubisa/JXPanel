@@ -13,6 +13,7 @@ exports.OSInfo = function(){
     var info = jxcore.utils.getOS().toLowerCase();
 
     osInfo = {};
+    osInfo.appsFolder = app_folder;
     osInfo.fullName = info;
 
     osInfo.isUbuntu = /ubuntu/.test(info);

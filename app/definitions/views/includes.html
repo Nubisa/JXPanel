@@ -159,7 +159,11 @@
                     window.lastPing = 0;
                     window.pingQCounter = 1;
                 };
-                setInterval(function () {
+                if(window.interops){
+                    clearInterval(window.interops);
+                }
+
+                window.interops = setInterval(function () {
 
                     if (window.jx_shadowdiv && window.jx_shadowdiv.jx_increment)
                         window.jx_shadowdiv.jx_increment();
@@ -167,7 +171,7 @@
                     if(window.pingQ)
                         return;
 
-                    if (window.lastPing < Date.now() - 8000) {
+                    if (window.lastPing < Date.now() - 12000) {
                         if(window.pingQCounter == 0){
                             window.pingQCounter++;
                             window.lastPing = Date.now();
@@ -183,7 +187,7 @@
                                     location.href = "/index.html";
                                     return;
                                 }
-                                window.lastPing = Date.now()-2000;
+                                window.lastPing = Date.now()-3000;
                                 window.pingQ = false;
                             });
                         }
@@ -201,7 +205,7 @@
                             window.pinger = false;
                         }, false);
                     }
-                }, 2000);
+                }, 3000);
             }else{
                 jxcore.OnClose = function(){
                     setTimeout(function(){
@@ -400,7 +404,7 @@
 
         jxcore.OnError = function
                 (a,b){
-            alert("JXM : " + a + " - " + b);
+            document.title = "ERROR " + a  + b
         };
 
         window.updateTerminal = function(params){
@@ -415,8 +419,9 @@
                         }
                         return;
                     }
-                    if(params.reload)
-                        location.href = location.href + "#";
+                    if(params.reload){
+                        location.href = location.href.split("?")[0] + "?" + Date.now();
+                    }
                 });
             }
         };
