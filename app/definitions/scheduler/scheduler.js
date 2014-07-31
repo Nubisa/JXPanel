@@ -15,24 +15,28 @@ jxcore.tasks.on('message', function(tid, msg){
 // runs as a jxcore task, should return!!! otherwise there is no next run.
 exports.doJobs = {
     define:function(){
-        process.on('restart', function(cb){
-           console.error("Scheduler Thread is Restarted..");
-           process.sendToMain({origin_scheduler:1, restarting:true});
-           cb();
-        });
-        process.on('uncaughtException', function(err){
-            if(err)
-                console.error(err);
-        });
-        var check_users = require('./definitions/scheduler/user_sessions').check_users;
-        var check_quotas = require('./definitions/scheduler/user_disk_quota').check_quotas;
+        if(!process.scheduler){
+            console.log("AAAA");
+            process.scheduler = true;
+            process.on('restart', function(cb){
+               console.error("Scheduler Thread is Restarted..");
+               process.sendToMain({origin_scheduler:1, restarting:true});
+               cb();
+            });
+            process.on('uncaughtException', function(err){
+                if(err)
+                    console.error(err);
+            });
+            process.check_users = require('./definitions/scheduler/user_sessions').check_users;
+            process.check_quotas = require('./definitions/scheduler/user_disk_quota').check_quotas;
+        }
     },
     logic:function(sessionIDs){
         // check user sessions
-        check_users(sessionIDs);
+        process.check_users(sessionIDs);
 
         // check disk quotas
-        check_quotas();
+        process.check_quotas();
 
         return true;
     }
