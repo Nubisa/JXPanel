@@ -216,14 +216,14 @@ exports.form = function () {
                 validation: new validations.Int( { gte : 0})
             },
 
-            { name: "plan_ssl",
-                details: {
-                    label: "AllowSSL",
-                    method: tool.createCheckBox,
-                    options: { }
-                },
-                validation: new validations.Boolean()
-            },
+//            { name: "plan_ssl",
+//                details: {
+//                    label: "AllowSSL",
+//                    method: tool.createCheckBox,
+//                    options: { }
+//                },
+//                validation: new validations.Boolean()
+//            },
 
             { name: "plan_custom_socket",
                 details: {
