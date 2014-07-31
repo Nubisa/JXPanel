@@ -3,7 +3,6 @@ var datatables = require('../rendering/datatable_templates');
 var charts = require('./charts/charts');
 var form_lang = require('./form_lang');
 var server = require('jxm');
-var users = {};
 var path = require('path');
 var fs = require('fs');
 var exec = require('child_process').exec;
@@ -11,6 +10,8 @@ var downloads = require('./downloads');
 var database = require("../install/database");
 var system_tools = require('../system_tools');
 var folder_tools = require('./user_folders');
+var users = {};
+var sessionIDs = {};
 
 exports._users = users;
 
@@ -31,7 +32,6 @@ var newUser = function(session_id){
         this.gid = 0;
         this.groupIdPrefix = "gr" + jxcore.utils.uniqueId();
         this.session = { forms:{} };
-        this.lastOperation = Date.now();
     }
 
     return new __user(session_id);
@@ -49,6 +49,9 @@ exports.loginUser = function(env, params){
         delete(users[sessionId]);
         return false;
     }
+    jxcore.store.shared.set(sessionId, Date.now());
+    sessionIDs[sessionId] = 1;
+
     users[sessionId].gid = ret.gid;
     users[sessionId].uid = ret.uid;
 
@@ -68,7 +71,7 @@ exports.getUser = function(sessionId)
         return null;
     }
 
-    users[sessionId].lastOperation = Date.now();
+    jxcore.store.shared.set(sessionId, Date.now());
 
     return users[sessionId];
 };
@@ -115,6 +118,8 @@ exports.clearUser = function(sessionId) {
             users[sessionId].terminal.kill();
         }catch(e){}
     }
+    jxcore.store.shared.remove(sessionId);
+    delete(sessionIDs[sessionId]);
     delete users[sessionId];
 };
 
@@ -141,7 +146,7 @@ exports.defineMethods = function(){
        if(scheduler.isBusy)
          return;
        scheduler.isBusy = true;
-       jxcore.tasks.runOnThread(1, scheduler.doJobs, users, function(){
+       jxcore.tasks.runOnThread(1, scheduler.doJobs, sessionIDs, function(){
            scheduler.isBusy = false;
        });
     },5000);
