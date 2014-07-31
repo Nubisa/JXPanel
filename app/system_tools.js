@@ -303,7 +303,7 @@ exports.addSystemUser = function(json, password, skip) {
 
     if(!skip){
         var cmd = "/usr/sbin/useradd -g jxman -d " + loc + " -M -s /sbin/nologin " + username;
-        cmd += ';echo "' + username + ':' + password + '" | chpasswd -c SHA256';
+        cmd += ';echo "' + username + ':' + password + '" | /usr/sbin/chpasswd -c SHA256';
 
         ret = jxcore.utils.cmdSync(cmd);
     }
