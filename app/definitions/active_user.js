@@ -12,6 +12,8 @@ var database = require("../install/database");
 var system_tools = require('../system_tools');
 var folder_tools = require('./user_folders');
 
+exports._users = users;
+
 var newUser = function(session_id){
     function __user(sid){
         this.nameTitle = "John Doe";
@@ -132,17 +134,16 @@ exports.isRecordUpdating = function(active_user, formName) {
 
 
 exports.defineMethods = function(){
+    var scheduler = require('./scheduler');
+
     // CLEAR USERS BEGIN
     setInterval(function(){
-        var dt = Date.now();
-        for(var o in users){
-            if(users[o]){
-                if(dt> users[o].lastOperation + 600000){ // 10 mins timeout
-                    exports.clearUser(o);
-                    break;
-                }
-            }
-        }
+       if(scheduler.isBusy)
+         return;
+       scheduler.isBusy = true;
+       jxcore.tasks.runOnThread(1, scheduler.doJobs, users, function(){
+           scheduler.isBusy = false;
+       });
     },5000);
 // CLEAR USERS END
 
