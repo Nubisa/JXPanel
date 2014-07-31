@@ -14,25 +14,6 @@ var hosting_tools = require('../hosting_tools');
 var site_defaults = require("./../definitions/site_defaults");
 
 
-var checkUser = function(env, checkIfSuspended, form_name) {
-    var active_user = _active_user.getUser(env.SessionID, false);
-
-    if(!active_user){
-        server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied")});
-        return null;
-    }
-
-    if (checkIfSuspended && active_user.suspended_txt) {
-        if (!form_name || !_active_user.isRecordUpdating(active_user, form_name)) {
-            server.sendCallBack(env, {err: active_user.suspended_txt, hideForm : true });
-            return null;
-        }
-    }
-
-    return active_user;
-};
-
-
 methods.tryLogin = function(env, params){
     if(!params || !params.username || !params.password){
         server.sendCallBack(env, {err: form_lang.Get("EN", "CannotLoginNoUser")});
@@ -106,7 +87,7 @@ methods.tryLogin = function(env, params){
 };
 
 var sessionAdd = function(env, active_user, params){
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
 
     if(!active_user || !params.form || !params.controls || !active_user.session.forms[params.form]){
         // TODO send a notification or redirect user page to login!
@@ -198,7 +179,7 @@ var update = function(base, ext){
 
 methods.sessionApply = function(env, params){
 
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
     if (!active_user)
         return;
 
@@ -380,7 +361,7 @@ methods.sessionApply = function(env, params){
 
 methods.getTableData = function(env, params) {
 
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
     if (!active_user)
         return;
 
@@ -397,7 +378,7 @@ methods.getTableData = function(env, params) {
 // getting the form in async way
 methods.getForm = function(env, params) {
 
-    var active_user = checkUser(env, true, params.form);
+    var active_user = _active_user.checkUser(env, true, params.form);
     if (!active_user)
         return;
 
@@ -440,7 +421,7 @@ methods.logout = function(env, params) {
 // async way for getting forms' controls' values (e.g. for combo)
 methods.getControlsValues = function(env, params) {
 
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
     if (!active_user)
         return;
 
@@ -466,7 +447,7 @@ methods.getControlsValues = function(env, params) {
 var uninstallNPM = function(env, params) {
 
     var failures = [];
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
     if (!active_user)
         return;
 
@@ -516,7 +497,7 @@ methods.installNPM = function(env, params) {
 
 methods.monitorStartStop = function (env, params) {
 
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
     if (!active_user)
         return;
 
@@ -528,7 +509,7 @@ methods.monitorStartStop = function (env, params) {
 
 methods.appStartStop = function (env, params) {
 
-    var active_user = checkUser(env, true);
+    var active_user = _active_user.checkUser(env, true);
     if (!active_user)
         return;
 
@@ -550,7 +531,7 @@ methods.appStartStop = function (env, params) {
 
 methods.jxInstall = function (env, params) {
 
-    var active_user = checkUser(env);
+    var active_user = _active_user.checkUser(env);
     if (!active_user)
         return;
 

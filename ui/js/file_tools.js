@@ -28,6 +28,12 @@ var init_file_tools = function(){
         if(!document.treeId)
             return;
 
+        var suspended = "{{user.suspended_txt}}";
+        if (suspended){
+            utils.jxAddMessage("danger", suspended);
+            return;
+        }
+
         var zTree = $.fn.zTree.getZTreeObj(document.treeId);
         if(!zTree)
             return;
@@ -73,7 +79,7 @@ var init_file_tools = function(){
                 else{
                     toServer("addFileFolder", {up:loc, name:name, opt:selected}, function(ret_val){
                         if(ret_val.err){
-                            alert(ret_val.err.toString());
+                            alert($(ret_val.err.toString()).text());
 
                             if(ret_val.relogin){
                                 location.href = "/index.html";
@@ -288,6 +294,12 @@ var init_file_tools = function(){
     var uploadFile = function(){
         if(!document.treeId)
             return;
+
+        var suspended = "{{user.suspended_txt}}";
+        if (suspended){
+            utils.jxAddMessage("danger", suspended);
+            return;
+        }
 
         var zTree = $.fn.zTree.getZTreeObj(document.treeId);
         if(!zTree)
