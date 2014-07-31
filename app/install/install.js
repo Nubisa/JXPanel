@@ -55,10 +55,8 @@ var prepareUserGroup = function(){
             return true;
         }
 
-        var cmd = "groupadd jxman";
-        if(os_info.isRH){
-            cmd = "/usr/sbin/groupadd jxman";
-        }
+        var cmd = "/usr/sbin/groupadd jxman";
+
         ret_val = jxcore.utils.cmdSync(cmd);
         if(ret_val.exitCode !== 0){
             console.error(ret_val.out);
@@ -85,7 +83,7 @@ exports.install = function(){
         ret = jxcore.utils.cmdSync("sudo yum install -y pam-devel");
     }
     else if(os_info.isDebian || os_info.isUbuntu){
-        ret = jcore.utils.cmdSync("sudo apt-get install -y libpam0g-dev");
+        ret = jxcore.utils.cmdSync("sudo apt-get install -y libpam0g-dev");
     }
     else{
         console.error("find out lib pam installation for this server");

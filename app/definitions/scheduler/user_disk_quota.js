@@ -7,7 +7,11 @@ var check_quotas = function(){
        return;
     last_quota_check = 0;
     db.ReadDB(function(err) {
+        if(!db.getPlan("Unlimited"))
+            return;
+
         var plans = db.getPlansByPlanName("Unlimited", 1e7);
+
         var record_updated = false;
         for(var o in plans){
             var plan = db.getPlan(plans[o]);

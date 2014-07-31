@@ -302,7 +302,7 @@ exports.addSystemUser = function(json, password, skip) {
     var loc = ret.home;
 
     if(!skip){
-        var cmd = "useradd -g jxman -d " + loc + " -M -s /sbin/nologin " + username;
+        var cmd = "/usr/sbin/useradd -g jxman -d " + loc + " -M -s /sbin/nologin " + username;
         cmd += ';echo "' + username + ':' + password + '" | chpasswd -c SHA256';
 
         ret = jxcore.utils.cmdSync(cmd);
@@ -330,7 +330,7 @@ exports.deleteSystemUser = function(username, withHomeDir) {
     if (!exports.systemUserExists(username))
         return { err : false  };
 
-    var cmd = 'deluser ' + username;
+    var cmd = '/usr/sbin/deluser ' + username;
     var ret = jxcore.utils.cmdSync(cmd);
 
     if (ret.exitCode) {
