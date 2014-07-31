@@ -203,7 +203,7 @@ var Plan = function(name, owner_user, opts, dummy){
                     return "PlanCannotAddUsers";
                 }
                 if(_totalUsers(this)>=this.maxUserCount){
-                    return "PlanCannotAddMore|user";
+                    return "PlanCannotAddMore|user|" + this.maxUserCount;
                 }
                 var _owner = Users[this.owner];
                 while(_owner){
@@ -226,7 +226,7 @@ var Plan = function(name, owner_user, opts, dummy){
                     return "UserSuspended";
                 }
                 if(_totalDomains(this)>=this.maxDomainCount){
-                    return "PlanCannotAddMore|domain";
+                    return "PlanCannotAddMore|domain|" + this.maxDomainCount;
                 }
                 var _owner = Users[this.owner];
                 while(_owner){

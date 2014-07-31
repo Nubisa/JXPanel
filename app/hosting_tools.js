@@ -169,37 +169,37 @@ exports.appCreateHomeDir = function(domain_name) {
 };
 
 
-exports.appRemove = function(domain_name, withUserFiles, cb) {
-
-    exports.appStartStop(true, domain_name, function(err) {
-        if (err) {
-            cb(err);
-            return;
-        }
-
-        if (!withUserFiles) {
-            cb(false);
-            return;
-        }
-
-        // removing domain dir
-        var options = exports.appGetOptions(domain_name);
-        if (options.err) {
-            cb(options.err);
-            return;
-        }
-
-        if (fs.existsSync(options.app_dir)) {
-            system_tools.rmdirSync(options.app_dir);
-
-            var deleted = !fs.existsSync(options.app_dir);
-            cb(deleted ? false : "DomainCannotRemoveDir");
-            return;
-        }
-
-        cb(false);
-    });
-};
+//exports.appRemove = function(domain_name, withUserFiles, cb) {
+//
+//    exports.appStartStop(true, domain_name, function(err) {
+//        if (err) {
+//            cb(err);
+//            return;
+//        }
+//
+//        if (!withUserFiles) {
+//            cb(false);
+//            return;
+//        }
+//
+//        // removing domain dir
+//        var options = exports.appGetOptions(domain_name);
+//        if (options.err) {
+//            cb(options.err);
+//            return;
+//        }
+//
+//        if (fs.existsSync(options.app_dir)) {
+//            system_tools.rmdirSync(options.app_dir);
+//
+//            var deleted = !fs.existsSync(options.app_dir);
+//            cb(deleted ? false : "DomainCannotRemoveDir");
+//            return;
+//        }
+//
+//        cb(false);
+//    });
+//};
 
 
 exports.appGetSpawnerPath = function (domain_name) {
