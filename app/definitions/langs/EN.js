@@ -217,6 +217,9 @@ exports.Labels = {
 
     "DomainName" : "Domain",
     "DomainName_Description" : "The domain name for you subscription.",
+    "DomainInvalid" : "Please enter a valid domain name.",
+    "DomainAlreadyExists" : "Domain already exists.",
+    "DomainCannotAdd" : "Cannot add domain.",
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
     "JXEnabled" : "JXcore",
@@ -297,7 +300,7 @@ exports.Labels = {
     "JXAppMinPort" : "Minimum app port number",
     "JXAppMaxPort" : "Maximum app port number",
     "JXAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
-    "JXAppSmallPortRange" : "Too small range. You need at least %s ports.",
+    "JXAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
 
 
     "JXcoreNPMModules" : "NPM Modules",

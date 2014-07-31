@@ -146,7 +146,7 @@ exports.MaxPort = function(min_port_field) {
 
         var domains = database.getDomainsByUserName(null, 1e5);
         if ((max - min) < domains.length * 2)
-            return {result: false, msg: form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ domains.length * 2 ])};
+            return {result: false, msg: form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ domains.length * 2, max - min ])};
 
         return {result : true} ;
     };
@@ -167,6 +167,34 @@ exports.UserName = function() {
 
         if (database.getUser(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "UserAlreadyExists", true)};
+
+        return {result: true};
+    };
+};
+
+
+exports.Domain = function() {
+
+    this.validate = function (env, active_user, val, vals) {
+
+        // todo: better email validation
+        var reg = new RegExp("^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,4}$", "i");
+
+        if (!reg.test(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainInvalid", true)};
+
+        if (database.getDomain(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainAlreadyExists", true)};
+
+        var domains = database.getDomainsByUserName(null, 1e5);
+
+        var cfg = database.getConfig();
+        var min = cfg.jx_app_min_port;
+        var max = cfg.jx_app_max_port;
+
+        var needed = domains.length * 2 + 2;
+        if (max - min < needed)
+            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [needed, max - min] )};
 
         return {result: true};
     };

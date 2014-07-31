@@ -5,6 +5,7 @@
 var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var path = require("path");
+var validations = require('./../validations');
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -50,7 +51,8 @@ exports.form = function () {
                     options: { required: true, prefix: "www." },
                     dbName: "name", // alias to `name` in object database.getDomain();
                     cannotEdit: true
-                }
+                },
+                validation : new validations.Domain()
             },
 
             {
