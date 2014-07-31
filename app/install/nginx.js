@@ -20,7 +20,7 @@ exports.prepare = function(){
 
 // returns null if it's successfull otherwise returns ret{exitCode, out}
 exports.start = function(){
-    if(os_info.isDebian || os_info.isUbuntu){
+    if(os_info.isDebian || os_info.isUbuntu || os_info.isRH){
         clog("Starting NGINX", "green");
         var ret = jxcore.utils.cmdSync(nginx_process + " -p "+ app_folder + sep + "nginx");
         if(ret.exitCode !== 0)
@@ -36,7 +36,7 @@ exports.start = function(){
 
 // returns null if it's successfull otherwise returns ret{exitCode, out}
 exports.stop = function(){
-    if(os_info.isDebian || os_info.isUbuntu){
+    if(os_info.isDebian || os_info.isUbuntu || os_info.isRH){
         clog("Stopping NGINX", "green");
 
         var ret = jxcore.utils.cmdSync(nginx_process + " -s stop -p "+ app_folder + sep + "nginx");
@@ -53,7 +53,7 @@ exports.stop = function(){
 
 // returns null if it's successfull otherwise returns ret{exitCode, out}
 exports.reload = function(){
-    if(os_info.isDebian || os_info.isUbuntu){
+    if(os_info.isDebian || os_info.isUbuntu || os_info.isRH){
         clog("Reloading NGINX", "green");
 
         var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ app_folder + sep + "nginx");
