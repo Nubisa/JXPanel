@@ -75,21 +75,27 @@ exports.install = function(){
         return false;
     }
 
+    var ret;
     // install lib_pam
     if(os_info.isRH){
-        jxcore.utils.cmdSync("sudo yum install -y pam-devel");
+        ret = jxcore.utils.cmdSync("sudo yum install -y pam-devel");
     }
     else if(os_info.isDebian || os_info.isUbuntu){
-        jcore.utils.cmdSync("sudo apt-get install -y libpam0g-dev");
+        ret = jcore.utils.cmdSync("sudo apt-get install -y libpam0g-dev");
     }
     else{
         console.error("find out lib pam installation for this server");
         process.exit(-1);
     }
 
+    if(ret.exitCode !== 0){
+        console.error(ret.out);
+        process.exit(-1);
+    }
+
     // create server_apps folder
     fs.mkdirSync(app_folder);
-    var ret = jxcore.utils.cmdSync("chmod -R o-rwx " + app_folder);
+    ret = jxcore.utils.cmdSync("chmod -R o-rwx " + app_folder);
 
     installNGINX();
     installDB();
