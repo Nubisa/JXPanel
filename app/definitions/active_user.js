@@ -116,6 +116,15 @@ exports.checkUser = function(env, checkIfSuspended, form_name) {
     return active_user;
 };
 
+exports.checkAdmin = function(env) {
+    var active_user = exports.checkUser(env);
+
+    if (active_user.plan !== "Unlimited") {
+        server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "Access Denied", true) });
+        return;
+    }
+};
+
 exports.getForm = function(sessionId, form_name){
     // TODO check permissions to form
     console.log("active_user::getForm", sessionId, form_name);
