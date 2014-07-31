@@ -13,7 +13,7 @@ var check_quotas = function(){
             var isSuspended = plan.suspended;
             if(!isSuspended){
                 var max_disk = plan.planMaximums.plan_disk_space; // plan.planMaximums.plan_traffic -> web traffic
-                if(max_disk){                                     // plan.plan_ssl -> ssl access
+                if(max_disk){                                     // plan.plan_ssh -> ssh access
                     var users = plan.users;
                     for(var i in users){
                         var size = folders.getUserPathSize(i);

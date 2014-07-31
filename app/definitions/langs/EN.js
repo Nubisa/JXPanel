@@ -217,6 +217,7 @@ exports.Labels = {
 
     // Terminal
     "RemoteManagement":"Remote Management",
+    "SSHNotAllowed":"Remote management access is disabled for this user account",
     "Restart":"Restart",
     "RestartTerminalTooltip":"Restart Terminal Instance",
     "StopOperation":"Stop Operation",

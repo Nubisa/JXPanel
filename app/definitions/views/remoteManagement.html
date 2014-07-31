@@ -152,6 +152,11 @@ var Init = function(){
                 return;
             }
 
+            if(ret_val.errmsg){
+                terminal.echo(ret_val.errmsg);
+                return;
+            }
+
             terminal.echo("\x1b[1;32m{{label.TerminalConnectedToServer}}");
             terminal._g = ret_val.g;
             terminal.___disabled = false;
@@ -169,6 +174,12 @@ var Init = function(){
     window.flushCount = 0;
 
     window.termx = function(params){
+
+        if(params.errmsg){
+            terminal.___disabled = true;
+            terminal.echo(params.errmsg);
+            return;
+        }
 
         if(params.exit){
             terminal.___disabled = true;

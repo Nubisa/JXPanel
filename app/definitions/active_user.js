@@ -73,6 +73,10 @@ exports.getUser = function(sessionId)
 
     jxcore.store.shared.set(sessionId, Date.now());
 
+    var user = database.getUser(users[sessionId].username);
+    if(user && user.plan)
+       users[sessionId].plan = user.plan;
+
     return users[sessionId];
 };
 

@@ -3,6 +3,7 @@ var pathModule = require('path');
 var _active_user = require('./active_user');
 var server = require('jxm');
 var form_lang = require('./form_lang');
+var database = require('../install/database');
 
 exports.defineMethods = function(){
 
@@ -16,6 +17,16 @@ exports.defineMethods = function(){
         var active_user = _active_user.getUser(env.SessionID);
         if(!active_user){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var plan = database.getPlan(active_user.plan);
+
+        var ssh = plan.plan_ssh;
+
+        if(!ssh || plan.suspended){
+            console.log("DISABLED SSH");
+            server.sendCallBack(env, {errmsg:form_lang.Get("EN", "SSHNotAllowed")});
             return;
         }
 
@@ -107,6 +118,13 @@ exports.defineMethods = function(){
         var active_user = _active_user.getUser(env.SessionID);
         if(!active_user){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
+            return;
+        }
+
+        var ssh = database.getPlan(active_user.plan).plan_ssh;
+
+        if(!ssh || plan.suspended){
+            server.sendCallBack(env, {msg:form_lang.Get("EN", "SSHNotAllowed")});
             return;
         }
 
