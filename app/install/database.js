@@ -679,18 +679,10 @@ exports.getConfigValue = function(param) {
     return Config[param];
 };
 
-// iterating through domains and assigning http/https port
-exports.setPortRange = function(min, max) {
 
-    var current = min;
-    for(var domain in Domains) {
-        var ok = current <= max - 2;
-        Domains[domain].port_http = ok ? current++ : null;
-        Domains[domain].port_https = ok ? current++ : null;
-    }
+exports.UpdateDB = function() {
     UpdateDB(JSON.stringify(DB));
 };
-
 
 exports.fixDatabase = function() {
 
