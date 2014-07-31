@@ -155,6 +155,9 @@ exports.defineMethods = function(){
 
         var home = active_user.homeFolder();
         var loc;
+        if(params.up == "")
+            params.up = "#";
+
         if(params.up == "#"){
             loc = home;
         }
@@ -181,7 +184,7 @@ exports.defineMethods = function(){
             }
 
             if(params.up == "#"){
-                _nodes = {name:'/', children:_nodes, open:true};
+                _nodes = [{name:'/', children:_nodes, open:true}];
             }
 
             server.sendCallBack(env, {nodes:_nodes, id:params.id});
@@ -262,14 +265,13 @@ exports.defineMethods = function(){
 
         var loc = home + path.sep + params.up;
 
-        debugger;
         if(!fs.existsSync(loc)){
             server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileNotFound"), relogin:false, reloadTree:true});
             return;
         }
 
         try{
-            var target = oc + path.sep + params.name;
+            var target = loc + path.sep + params.name;
             if(fs.existsSync(target)){
                 server.sendCallBack(env, {err:form_lang.Get(active_user.lang, "FileExists")});
                 return;

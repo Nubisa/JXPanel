@@ -89,7 +89,8 @@
 
     var editorInter = setInterval(function(){
 
-        if(typeof jQuery != 'undefined' && typeof init_file_tools != 'undefined' && typeof CodeMirror != 'undefined' && typeof jxcore != 'undefined' && jxcore.IsConnected){
+        if(typeof jQuery != 'undefined' && typeof init_file_tools != 'undefined' && typeof CodeMirror != 'undefined'
+                && typeof jxcore != 'undefined' && jxcore.IsConnected){
             var elm_editor = document.getElementById("code_editor_content_holder");
             clearInterval(editorInter);
             var scr = document.createElement("script");
