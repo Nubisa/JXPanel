@@ -251,6 +251,10 @@ methods.sessionApply = function(env, params){
     var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
     var update_name = isUpdate ? active_user.session.edits[params.form].ID : json.name;
 
+    if (!update_name) {
+        return sendError("FormEmpty");
+    }
+
     var ret = null;
     if (params.form === "addUser") {
         try {
@@ -301,13 +305,13 @@ methods.sessionApply = function(env, params){
             ret = ex.toString();
         }
 
-        if (!ret) {
-            hosting_tools.appStartStop(json.jx_enabled, update_name, function(err) {
-                var arr = err ? [ { control: "", msg : form_lang.Get(active_user.lang, err, true) } ] : false;
-                server.sendCallBack(env, {arr: arr });
-            });
-            return;
-        }
+//        if (!ret) {
+//            hosting_tools.appStartStop(json.jx_enabled, update_name, function(err) {
+//                var arr = err ? [ { control: "", msg : form_lang.Get(active_user.lang, err, true) } ] : false;
+//                server.sendCallBack(env, {arr: arr });
+//            });
+//            return;
+//        }
     } else
     if (params.form === "addPlan") {
         try {
@@ -353,8 +357,18 @@ methods.sessionApply = function(env, params){
 
 methods.getTableData = function(env, params) {
 
-    var obj = datatables.render(env.SessionID, params.dt, true);
-    server.sendCallBack(env, obj)
+    var active_user = checkUser(env);
+    if (!active_user)
+        return;
+
+    hosting_tools.getMonitorJSON(false, function(err, ret) {
+        // todo: just for now saving the value somewhere
+        active_user.session.monitor = { isOnline : !err && ret, json : ret };
+        var obj = datatables.render(env.SessionID, params.dt, true);
+        active_user.session.monitor = null;
+        server.sendCallBack(env, obj)
+    });
+
 };
 
 // getting the form in async way
@@ -364,18 +378,13 @@ methods.getForm = function(env, params) {
     if (!active_user)
         return;
 
-    if (params.form === "jxconfig") {
-        hosting_tools.getMonitorJSON(false, function(err, ret) {
-            // todo: just for now saving the value somewhere
-            jxcore.monitor.isOnline = !err && ret;
-            var ret = forms.renderForm(env.SessionID, params.form, true);
-            server.sendCallBack(env, ret);
-        });
-    } else {
+    hosting_tools.getMonitorJSON(false, function(err, ret) {
+        // todo: just for now saving the value somewhere
+        active_user.session.monitor = { isOnline : !err && ret, json : ret };
         var ret = forms.renderForm(env.SessionID, params.form, true);
+        active_user.session.monitor = null;
         server.sendCallBack(env, ret);
-    }
-
+    });
 };
 
 
@@ -385,8 +394,9 @@ methods.removeFromTableData = function(env, params) {
         var ret = uninstallNPM(env, params);
         server.sendCallBack(env, {err : ret.err });
     } else {
-        var ret = datatables.remove(env.SessionID, params.dt, params.ids);
-        server.sendCallBack(env, {err : ret.err });
+        datatables.remove(env.SessionID, params.dt, params.ids, params.with, function(err) {
+            server.sendCallBack(env, {err : err });
+        });
     }
 };
 
@@ -484,6 +494,23 @@ methods.monitorStartStop = function (env, params) {
     hosting_tools.monitorStartStop(params.op, function(err) {
         server.sendCallBack(env, {err: err ? form_lang.Get(active_user.lang, err, true) : false });
     });
+};
+
+methods.appStartStop = function (env, params) {
+
+    var active_user = checkUser(env);
+
+    if (!params.id) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "'DomainNotFound", true) });
+    } else {
+        hosting_tools.appStartStop(params.op, params.id, function(err) {
+            // let's wait for monitor to respawn an app as user
+            setTimeout(function() {
+                server.sendCallBack(env, {err: err });
+            }, params.op ? 2000 : 10);
+
+        });
+    }
 };
 
 

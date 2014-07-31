@@ -8,6 +8,9 @@
         background-image:-webkit-linear-gradient(top,#336699,#6699bb);background-image:-o-linear-gradient(top,#336699,#6699bb);
         background-image:linear-gradient(to bottom,#336699,#6699bb);border-bottom:1px solid #336699
     }
+    .jxTable td {
+        vertical-align: middle !important;
+    }
 </style>
 <!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
@@ -262,14 +265,14 @@
         });
         return false;
     };
-    utils.jxConfirm = function (title, question, cb) {
+    utils.jxConfirm = function (title, question, cb, buttons) {
 
         if (!cb) return;
 
         $.SmartMessageBox({
             title : title,
             content : question,
-            buttons : '[{{label.No}}][{{label.Yes}}]'
+            buttons : buttons || '[{{label.No}}][{{label.Yes}}]'
         }, function(ButtonPressed) {
             cb(ButtonPressed);
         });
@@ -328,9 +331,9 @@
         });
     };
 
-    utils.jxCall = function (method_name, value) {
+    utils.jxCall = function (method_name, value, value2) {
 
-        window.toServer(method_name, { op: value }, function (param) {
+        window.toServer(method_name, { op: value, id : value2 }, function (param) {
             if (param.err) {
                 utils.jxAddMessage('danger', param.err);
             } else {
@@ -343,7 +346,11 @@
 
 
     utils.jxMonitorStartStop = function (start) {
-        return utils.jxCall("monitorStartStop", start);
+        return utils.jxCall("monitorStartStop", start );
+    };
+
+    utils.jxAppStartStop = function (start, domain_name) {
+        return utils.jxCall("appStartStop", start, domain_name );
     };
 
     utils.jxInstall = function () {

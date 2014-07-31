@@ -9,6 +9,7 @@ var path = require("path");
 var rep = require('./smart_search').replace;
 var database = require("./../install/database");
 var system_tools = require("./../system_tools");
+var hosting_tools = require("./../hosting_tools");
 var site_defaults = require("./../definitions/site_defaults");
 
 
@@ -70,8 +71,6 @@ var getHTML = function (active_user, table) {
 
         ret[0].push(displayName);
     }
-
-//    var myPlan = database.getUser(active_user.username).plan;
 
     var data = null;
     var method = null;
@@ -146,6 +145,10 @@ var getHTML = function (active_user, table) {
                 }
             }
 
+            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.getValue) {
+                val = formControls[columns[x]].details.getValue(active_user, record);
+            }
+
 
             // virtual column with plan name
             if (colName === "plan_table_id" && table.name === "domains") {
@@ -153,8 +156,10 @@ var getHTML = function (active_user, table) {
                 if (plan && plan.name) val = plan.name;
             }
 
-
             var str = '<a href="#" onclick="jxEditRow(\'' + record.name + '\'); return false;">' + val + '</a>';
+            // no href if there is already one
+            if (val && val.indexOf && val.indexOf("onclick") !== -1) str = val;
+
             if (colName === "_checkbox")
                 str = '<input type="checkbox" id="jxrow_' + record.name + '"></input>';
             else if (colName === "_id")
@@ -327,18 +332,23 @@ var logic = [
 ];
 
 
-exports.remove = function (sessionId, table_name, ids) {
+var getHomePaths = function() {
+
+};
+
+
+exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
 
     var active_user = _active_user.getUser(sessionId);
 
     var table = getTable(table_name);
-    if (!table)
-        return { err : form_lang.Get(active_user.lang, "UnknownDataTable") };
+    if (!table) {
+        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
+    }
 
-    if (!ids)
-        return { err : form_lang.Get(active_user.lang, "EmptySelection") };
-
-    var myPlan = database.getUser(active_user.username).plan;
+    if (!ids) {
+        cb(form_lang.Get(active_user.lang, "EmptySelection"));
+    }
 
     var method = null;
     var isOwner = null;
@@ -353,11 +363,15 @@ exports.remove = function (sessionId, table_name, ids) {
     if (table.name == "domains") {
         method = database.deleteDomain;
         isOwner = function(name) { return database.isOwnerOfDomain(active_user.username, name) };
-    } else
-        return { err: form_lang.Get(active_user.lang, "UnknownDataTable") };
+    } else {
+        cb(form_lang.Get(active_user.lang, "UnknownDataTable"));
+    }
 
     var accessDenied = [];
+    var domainsToRemove = [];
+    var usersToRemove = [];
     var errors = [];
+    // multiple selection on list
     for(var i in ids) {
 
         if (!isOwner(ids[i])) {
@@ -375,26 +389,47 @@ exports.remove = function (sessionId, table_name, ids) {
             errors.push(form_lang.Get(active_user.lang, "DBCannotRemoveRecord", true, [ ids[i] ]));
         }
 
-        if (ret.deleted && ret.users) {
-
-            for(var o in ret.users) {
-                _active_user.clearUserByName(ret.users[o]);
-                var ret1 = system_tools.deleteSystemUser(ret.users[o]);
-                if (ret1.err) {
-                    errors.push(form_lang.Get(active_user.lang, ret1.err, true));
-                    continue;
+        if (ret.deleted) {
+            if (ret.users) {
+                for(var id in ret.users) {
+                    if (usersToRemove.indexOf(ret.users[id]) === -1)
+                        usersToRemove.push(ret.users[id]);
                 }
+            }
+            if (ret.domains) {
+                for(var id in ret.domains)
+                    if (domainsToRemove.indexOf(ret.domains[id]) === -1)
+                        domainsToRemove.push(ret.domains[id])
             }
         }
     }
 
-    if (accessDenied.length) {
-        var noun = form_lang.Get(active_user.lang, table.name);
-        var str = form_lang.Get(active_user.lang, "AccessDeniedToRemoveRecord", null, [ noun, accessDenied.join(", ") ] );
-        errors.push(str);
-    }
+    var removeUsers = function() {
+        for(var o in usersToRemove) {
+            _active_user.clearUserByName(usersToRemove[o]);
+            var ret1 = system_tools.deleteSystemUser(usersToRemove[o]);
+            if (ret1.err) {
+                errors.push(form_lang.Get(active_user.lang, ret1.err, true));
+                continue;
+            }
+        }
 
-    return { err: errors.length ? errors.join(" ") : false };
+        cb(errors.length ? errors.join(" ") : false);
+    };
+
+    // first we should stop apps before removing folders
+    hosting_tools.appStopMultiple(domainsToRemove, function(err, infos) {
+        if (err) {
+            for(var domain_name in infos) {
+                if (infos[domain_name].err)
+                    errors.push(err);
+            }
+        }
+
+        removeUsers();
+    });
+
+
 };
 
 // called when user clicked Apply on the form
@@ -411,6 +446,7 @@ exports.edit = function (sessionId, table_name, id) {
 
     active_user.session.edits = active_user.session.edits || {};
     active_user.session.edits[table.settings.addForm] = { ID : id };
+    active_user.session.edits.lastForm = table.settings.addForm;
     active_user.session.lastPath = "/" + table.settings.addFormURL;
 
     return {err : false, url : table.settings.addFormURL};

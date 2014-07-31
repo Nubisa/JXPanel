@@ -6,6 +6,7 @@ exports.Labels = {
     "Apply":"Apply",
     "Cancel":"Cancel",
     "Submit":"Submit",
+    "Accept":"Accept",
     "Close":"Close",
     "Done":"Done",
     "Next":"Next",
@@ -144,6 +145,7 @@ exports.Labels = {
 
     "UsersCannotCreateSystemUser" : "Cannot create system user.",
     "UsersCannotDeleteSystemUser" : "Cannot delete system user.",
+    "UsersCannotDeleteSystemUsersFolder" : "Cannot delete user's folder.",
 
     "domains" : "domains",
     "DomainsUpperCase" : "Domains",
@@ -206,6 +208,7 @@ exports.Labels = {
     "UserAlreadyExists" : "User with this name already exists.",
     "UserSystemAlreadyExists" : "System user with this name already exists.",
     "UserUnknown" : "Unknown user.",
+    "UserHomeDirNotExists" : "User's home directory does not exists.",
     "EmailInvalid" : "Invalid e-mail address.",
 
 
@@ -264,6 +267,8 @@ exports.Labels = {
     "DomainAlreadyExists" : "Domain already exists.",
     "DomainNotFound" : "Domain not found.",
     "DomainCannotAdd" : "Cannot add domain.",
+    "DomainCannotRemoveDir" : "Cannot remove domain's directory.",
+
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
     "JXEnabled" : "JXcore",
@@ -321,6 +326,11 @@ exports.Labels = {
     "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
     "RemoveSelectedInfo" : "This operation cannot be undone.",
 
+    "RemoveSelectedDomainsQuestion" : "Are you sure to remove selected domains?",
+    "RemoveSelectedDomainInfo" : "Would you like to delete also files and folders including user's files?",
+    "RemoveWithUserFiles" : "Remove also user files",
+    "RemoveWithoutUserFiles" : "Remove only records, leave user files intact",
+
     //charts
     "DiskUsageInformation": "Disk Usage",
     "ChartsTopCPUInfo": "Process CPU",
@@ -346,6 +356,7 @@ exports.Labels = {
     "JXcoreMonitorCannotStop" : "Cannot stop JXcore monitor.",
     "JXcoreMonitorStarted" : "JXcore monitor started.",
     "JXcoreMonitorStopped" : "JXcore monitor stopped.",
+    "JXcoreMonitorNotRunning" : "JXcore monitor is not running.",
 
     "JXcorePleaseInstall" : "Please install JXcore.",
     "JXcoreCannotDownload" : "Cannot download JXcore.",

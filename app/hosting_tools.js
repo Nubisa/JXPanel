@@ -9,6 +9,8 @@ var path = require("path");
 var fs = require("fs");
 var exec = require('child_process').exec;
 var https = require("https");
+var user_folders = require("./definitions/user_folders");
+var system_tools = require("./system_tools");
 
 // iterating through domains and assigning http/https port
 exports.setPortRange = function (min, max) {
@@ -70,7 +72,7 @@ exports.getFreePorts = function (howMany) {
     return null;
 };
 
-exports.appGetJXConfig = function (domain_name) {
+exports.appGetOptions = function (domain_name) {
 
     var fields = {
         // plan settings
@@ -85,8 +87,6 @@ exports.appGetJXConfig = function (domain_name) {
         "port_http": "portTCP",
         "port_https": "portTCPS"
     };
-
-    exports.appGetSpawnerCommand()
 
     var domain = database.getDomain(domain_name);
     if (!domain)
@@ -126,12 +126,54 @@ exports.appGetJXConfig = function (domain_name) {
             add(fields[o], plan.planMaximums[o]);
     }
 
-    // replacement for config file name
-    //  app_location.replace(/[\/]/g, "_").replace(/[\\]/g, "_")
 
-    //return { cfg : json, path : }
-    console.log(json);
+    var appDir = path.join(user_folders.getUserPath(plan.name, domain.owner), domain_name) + path.sep;
+    if (!fs.existsSync(appDir)) {
+        var ret = user_folders.createUserFolder(appDir);
+        if (ret.err)
+            return ret;
+    }
+
+    var appPath = appDir + domain.jx_app_path;
+    var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
+
+//    console.log(json, appDir, cfgPath);
+    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath  };
 };
+
+
+exports.appRemove = function(domain_name, withUserFiles, cb) {
+
+    exports.appStartStop(true, domain_name, function(err) {
+        if (err) {
+            cb(err);
+            return;
+        }
+
+        if (!withUserFiles) {
+            cb(false);
+            return;
+        }
+
+        // removing domain dir
+        var options = exports.appGetOptions(domain_name);
+        if (options.err) {
+            cb(options.err);
+            return;
+        }
+
+        if (fs.existsSync(options.app_dir)) {
+            system_tools.rmdirSync(options.app_dir);
+
+            var deleted = !fs.existsSync(options.app_dir);
+            cb(deleted ? false : "DomainCannotRemoveDir");
+            return;
+        }
+
+        cb(false);
+    });
+};
+
 
 exports.appGetSpawnerPath = function (domain_name) {
     var dir = site_defaults.dirAppConfigs;
@@ -147,7 +189,6 @@ exports.appGetSpawnerPath = function (domain_name) {
         return { err: "CannotCopySpawner" };
 
     return spawner;
-
 };
 
 
@@ -157,9 +198,18 @@ exports.appGetSpawnerCommand = function (domain_name) {
      .../jx spawner_7.jx -opt '{ "user" : "krisuser", "log" : "/var/www/vhosts/krissubscription.com/httpdocs/jxcore_logs/index.txt", "file" : "/var/www/vhosts/krissubscription.com/httpdocs/index.js", "domain" : "krissubscription.com", "tcp" : "10008", "tcps" : "10009", "logWebAccess" : "0"}'
 
      */
+
+    var jxPath = exports.getJXPath();
+    if (jxPath.err)
+        return jxPath;
+
     var ret = exports.appGetSpawnerPath(domain_name);
     if (ret.err)
         return ret;
+
+    var options = exports.appGetOptions(domain_name);
+    if (options.err)
+        return options;
 
     var domain = database.getDomain(domain_name);
     if (!domain)
@@ -169,23 +219,18 @@ exports.appGetSpawnerCommand = function (domain_name) {
     if (!user)
         return { err: "UserUnknown" };
 
-    var appDir = path.join(site_defaults.dirUserApps, user.name);
-    if (!fs.existsSync(appDir))
-        return { err : "" }
+    if (!fs.existsSync(options.app_dir))
+        return { err : "UserHomeDirNotExists" };
 
     var opt = {
         "user": user.name,
-        "log": site_defaults.dirUserApps + "/jxcore_logs/index.txt",
-        "file": appDir + path.sep + "index.js",
+        "log": options.app_dir + "/jxcore_logs/index.txt",
+        "file": options.app_path,
         "domain": domain.name,
         "tcp": domain.port_http,
         "tcps": domain.port_https,
         "logWebAccess": domain.jx_app_log_web_access
     };
-
-    var jxPath = exports.getJXPath();
-    if (jxPath.err)
-        return jxPath;
 
     var cmd = jxPath + " " + ret + " -opt '" + JSON.stringify(opt) + "'";
     return cmd;
@@ -200,12 +245,12 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
     }
 
     if (startOrStop) {
-        var jxconfig = exports.appGetJXConfig(domain_name);
+        var jxconfig = exports.appGetOptions(domain_name);
         if (jxconfig.err) {
             cb(jxconfig.err);
             return;
         }
-        fs.writeFileSync()
+        fs.writeFileSync(jxconfig.cfg_path, JSON.stringify(jxconfig, null, 9));
     }
 
     var jxPath = exports.getJXPath();
@@ -223,6 +268,12 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
 
         // no point to stop app if it's not running
         if (!startOrStop && !online_before) {
+            cb();
+            return;
+        }
+
+        if (err || !ret) {
+            // monitor is offline, don't treat this a error
             cb();
             return;
         }
@@ -249,7 +300,100 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
     });
 };
 
-exports.appIsRunning = function (domain_name) {
+
+exports.appStopMultiple = function(domain_names, cb) {
+
+    if (!domain_names || !domain_names.length) {
+        // no domains, don't treat it as error
+        cb();
+        return;
+    }
+
+    var jxPath = exports.getJXPath();
+    if (jxPath.err) {
+        cb(jxPath.err);
+        return;
+    }
+
+    var infos = {};
+    var cnt = domain_names.length;
+    var done = 0;
+
+    var allStepsDone = function() {
+        exports.getMonitorJSON(false, function(err, ret) {
+
+            var isErr = false;
+            for(var o in domain_names) {
+                var domain_name = domain_names[o];
+                if (infos[domain_name].err) {
+                    isErr = true;
+                    continue;
+                }
+
+                var online_after = ret.indexOf(infos[domain_name]) !== -1;
+
+                if (online_after) {
+                    infos[domain_name].err = "JXcoreAppCannotStop";
+                    isErr = true;
+                }
+            }
+            cb(isErr, isErr ? infos :false);
+        });
+    };
+
+    var stepDone = function() {
+        done++;
+        if (done === cnt)
+            allStepsDone();
+    };
+
+    exports.getMonitorJSON(false, function(err, ret) {
+
+        if (err || !ret) {
+            // monitor is offline, don't treat this a error
+            cb();
+            return;
+        }
+
+        for(var o in domain_names) {
+            var domain_name = domain_names[o];
+            infos[domain_name] = {};
+
+            var spawner = exports.appGetSpawnerPath(domain_name);
+            if (spawner.err) {
+                infos[domain_name].err = spawner.err;
+                stepDone();
+                continue;
+            }
+
+            infos[domain_name].spawner = spawner;
+
+            var online_before = ret.indexOf(spawner) !== -1;
+
+            // no point to stop app if it's not running
+            if (!online_before) {
+                stepDone();
+                continue;
+            }
+
+            var cmd = jxPath + " monitor kill " + spawner + " 2>&1";
+            exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
+                // cannot rely on err in this case. command returns non-zero exitCode on success
+                stepDone();
+            });
+        };
+    });
+};
+
+// returns string with information about app status
+exports.appStatus = function (domain_name, monitor_json) {
+
+//    var str = "";
+//    var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user, "Online", true);
+//    var iconOffline = '<i class="fa-fw fa fa-check text-danger"></i>';
+//
+//
+//    if (!monitor_json)
 
 };
 
@@ -310,7 +454,7 @@ exports.getMonitorJSON = function (parse, cb) {
 
         res.on('end', function () {
             try {
-                var json = parse ? body :JSON.parse(body);
+                var json = parse ? JSON.parse(body) : body;
                 cb(false, json);
             } catch (ex) {
                 cb("Cannot parse json: " + ex);
