@@ -39,5 +39,7 @@ exports.createUserHome = function(plan_name, user_name){
         return {err:res.out};
     }
 
+    jxcore.utils.cmdSync("chmod -R o-rwx " + location);
+
     return {home:location};
 };
