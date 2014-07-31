@@ -9,6 +9,7 @@ var fs = require("fs");
 var validations = require('./../validations');
 var database = require("./../../install/database");
 var system_tools = require("./../../system_tools");
+var site_defaults = require("./../site_defaults");
 
 exports.form = function () {
 
@@ -133,9 +134,9 @@ exports.form = function () {
                 details: {
                     label: "JXAppMinPort",
                     method: tool.createTextBox,
-                    options: { required: true }
+                    options: { required: true, default : site_defaults.defaultAppMinPort }
                 },
-                validation : new validations.Int({ gte : 10000, lte : 20000 })
+                validation : new validations.Int({ gte : site_defaults.defaultAppMinPort, lte : site_defaults.defaultAppMaxPort })
             },
 
             {
@@ -143,7 +144,7 @@ exports.form = function () {
                 details: {
                     label: "JXAppMaxPort",
                     method: tool.createTextBox,
-                    options: { required: true }
+                    options: { required: true, default : site_defaults.defaultAppMaxPort }
                 },
                 validation : new validations.MaxPort("jx_app_min_port")
             },
