@@ -18,9 +18,14 @@ var sqlite2 = require("./../app/install/sqlite2");
 var util = require("util");
 var fs = require("fs");
 
+var hosting_tools = require("./../app/hosting_tools");
+
 
 //sqlite2.SetFileName(__dirname + "/dbfile.db");
 
 database.ReadDB(function(err) {
-    if (err) console.error(err); else console.log(util.inspect(database.DB, { depth : null }));
+    if (err) console.error(err); else {
+        console.log(util.inspect(database.DB, { depth : null }));
+//        hosting_tools.getJXConfig("domain1.com");
+    }
 });

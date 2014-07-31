@@ -87,6 +87,8 @@ exports.defineMethods = function(){
 
 
 exports.dirNativeModules = path.join(os_info.apps_folder, "native_modules" ) + path.sep;
+exports.defaultAppMinPort = 10000;
+exports.defaultAppMaxPort = 20000;
 
 
 

@@ -273,7 +273,15 @@ methods.sessionApply = function(env, params){
                 update(domain, json);
                 ret = database.updateDomain(update_name, domain);
             } else {
-                ret = database.AddDomain(active_user.username, json.name, json);
+                var arr = hosting_tools.getFreePorts(2);
+                if (!arr || arr.length < 2) {
+                    var range = hosting_tools.getPortRange();
+                    ret = form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ range.count, range.count + 2 ])
+                } else {
+                    json.port_http = arr[0];
+                    json.port_https = arr[1];
+                    ret = database.AddDomain(active_user.username, json.name, json);
+                }
             }
         } catch(ex) {
             ret = ex.toString();

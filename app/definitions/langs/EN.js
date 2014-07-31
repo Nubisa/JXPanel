@@ -219,6 +219,7 @@ exports.Labels = {
     "DomainName_Description" : "The domain name for you subscription.",
     "DomainInvalid" : "Please enter a valid domain name.",
     "DomainAlreadyExists" : "Domain already exists.",
+    "DomainNotFound" : "Domain not found.",
     "DomainCannotAdd" : "Cannot add domain.",
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
