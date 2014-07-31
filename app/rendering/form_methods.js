@@ -70,6 +70,17 @@ methods.tryLogin = function(env, params){
                 });
 
                 database.AddUser("Unlimited", params.username, { person_name : params.username });
+                try{
+                    var ret = system_tools.addSystemUser({plan:"Unlimited", name:params.username}, null, 1);
+                    if(ret.err){
+                        database.deleteUser(params.username);
+                        server.sendCallBack(env, {err: form_lang.Get("EN", ret.err, true)});
+                        return;
+                    }
+                }catch(e){
+                    server.sendCallBack(env, {err: e.toString()});
+                    return;
+                }
                 finish(env, params);
                 return;
             }

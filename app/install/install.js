@@ -71,12 +71,20 @@ var prepareUserGroup = function(){
 exports.install = function(){
     clog("Operating System Detected :  "+ os_info.fullName);
 
+    var ret = jxcore.utils.cmdSync("chmod -R o-rwx ~");
+
+    if(ret.exitCode){
+        console.error("This application requires root/sudo permissions to run");
+        return;
+    }
+
     if(!prepareUserGroup()){
         return false;
     }
 
     // create server_apps folder
     fs.mkdirSync(app_folder);
+    var ret = jxcore.utils.cmdSync("chmod -R o-rwx " + app_folder);
 
     installNGINX();
     installDB();

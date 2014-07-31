@@ -4,9 +4,10 @@
 
 var sqlite3 = require('sqlite3');
 var fs = require("fs");
+var osinfo = require('./os_info').OSInfo();
+var pathModule = require('path');
 
-
-var dbFileName = __dirname + "/dbfile.db";
+var dbFileName = osinfo.appsFolder + pathModule.sep + "dbfile.db";
 var db_object = null;
 
 

@@ -286,9 +286,9 @@ exports.getUserIDS = function(username){
     return {uid:uid, gid:gid};
 };
 
-exports.addSystemUser = function(json, password) {
+exports.addSystemUser = function(json, password, skip) {
     var username = json.name;
-    if (exports.systemUserExists(username))
+    if (!skip && exports.systemUserExists(username))
         return { err : "UserAlreadyExists"  };
 
     // sudo is not working when calling exec, so the current process must be running as root
@@ -301,10 +301,14 @@ exports.addSystemUser = function(json, password) {
 
     var loc = ret.home;
 
-    var cmd = "useradd -g jxman -d " + loc + " -M -s /sbin/nologin " + username;
-    cmd += ';echo "' + username + ':' + password + '" | chpasswd -c SHA256';
+    if(!skip){
+        var cmd = "useradd -g jxman -d " + loc + " -M -s /sbin/nologin " + username;
+        cmd += ';echo "' + username + ':' + password + '" | chpasswd -c SHA256';
 
-    ret = jxcore.utils.cmdSync(cmd);
+        ret = jxcore.utils.cmdSync(cmd);
+    }
+    else
+        ret.exitCode = 0;
 
     if (ret.exitCode){
         jxcore.utils.cmdSync("rm -rf "+loc);
