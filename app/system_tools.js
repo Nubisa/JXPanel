@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var http = require("http");
 var https = require("https");
-var database = require("./db/database");
+var database = require("./install/database");
 var os_info = require("./install/os_info");
 var exec = require('child_process').exec;
 
@@ -351,6 +351,8 @@ exports.installJX = function(cb) {
             } else{
 
                 var file = dir + "jx";
+
+                fs.unlinkSync(zipFile);
 
                 if (fs.existsSync(file)) {
                     cfg.jxPath = file;

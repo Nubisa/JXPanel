@@ -3,7 +3,7 @@
  */
 
 
-var sqlite2 = require("./sqlite2");
+var sqlite2 = require("./../install/sqlite2");
 
 sqlite2.SetFileName(__dirname + "/test2.db")
 

@@ -6,6 +6,7 @@ var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
 var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored from git
 var tools_folder = pathModule.join(__dirname, "../../tools");
+var sqlite2 = require("./sqlite2");
 
 exports.apps_folder = app_folder;
 
@@ -37,6 +38,11 @@ var installNGINX = function(){
         process.exit(res.exitCode);
     }
 };
+
+var installDB = function() {
+    sqlite2.ReadDB();
+};
+
 
 var prepareUserGroup = function(){
     clog("Adding jxman user group", "green");
@@ -71,6 +77,7 @@ exports.install = function(){
     fs.mkdirSync(app_folder);
 
     installNGINX();
+    installDB();
 };
 
 exports.uninstall = function(){

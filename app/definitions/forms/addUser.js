@@ -6,7 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var path = require("path");
 var validations = require('./../validations');
-var database = require("./../../db/database");
+var database = require("./../../install/database");
 
 exports.form = function () {
 

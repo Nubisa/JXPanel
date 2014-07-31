@@ -13,8 +13,8 @@
 //console.log(test,  str.length);
 
 
-var database = require("./database");
-var sqlite2 = require("./sqlite2");
+var database = require("./../install/database");
+var sqlite2 = require("./../install/sqlite2");
 var util = require("util");
 var fs = require("fs");
 

@@ -1,7 +1,7 @@
 var server = require('jxm');
 var form_lang = require('./form_lang');
 var system_tools = require("./../system_tools");
-var database = require("./../db/database");
+var database = require("./../install/database");
 
 
 /**

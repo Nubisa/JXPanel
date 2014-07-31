@@ -4,7 +4,7 @@ var form_lang = require('../definitions/form_lang');
 var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
-var database = require("./../db/database");
+var database = require("./../install/database");
 
 
 var logic = [

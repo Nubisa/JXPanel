@@ -37,7 +37,7 @@ else {
     var form_methods = require('./rendering/form_methods');
     var charts = require('./definitions/charts/charts');
     var _active_users = require('./definitions/active_user');
-    var database = require("./db/database");
+    var database = require("./install/database");
     var downloads = require("./definitions/downloads")
     var terminal = require("./definitions/terminal");
 
