@@ -16,7 +16,6 @@ jxcore.tasks.on('message', function(tid, msg){
 exports.doJobs = {
     define:function(){
         if(!process.scheduler){
-            console.log("AAAA");
             process.scheduler = true;
             process.on('restart', function(cb){
                console.error("Scheduler Thread is Restarted..");
