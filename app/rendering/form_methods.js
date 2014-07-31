@@ -10,6 +10,7 @@ var methods = {};
 var fs = require('fs');
 var path = require('path');
 var system_tools = require('../system_tools');
+var hosting_tools = require('../hosting_tools');
 var site_defaults = require("./../definitions/site_defaults");
 
 
@@ -176,25 +177,6 @@ var update = function(base, ext){
 };
 
 
-// iterating through domains and assigning http/https port
-var setPortRange = function (min, max) {
-
-    var domains = database.getDomainsByUserName(null, 1e5);
-
-    var current = min;
-    for (var i in domains) {
-        var domain = database.getDomain(domains[i]);
-        var ok = current <= max - 2;
-        domain.port_http = ok ? current++ : null;
-        domain.port_https = ok ? current++ : null;
-    }
-
-    database.setConfigValue("jx_app_min_port", min);
-    database.setConfigValue("jx_app_max_port", max);
-    database.UpdateDB();
-};
-
-
 methods.sessionApply = function(env, params){
 
     var active_user = checkUser(env);
@@ -322,7 +304,7 @@ methods.sessionApply = function(env, params){
     if (params.form === "jxconfig") {
         var min = json["jx_app_min_port"];
         var max = json["jx_app_max_port"];
-        setPortRange(min,max);
+        hosting_tools.setPortRange(min,max);
     } else {
         ret = "UnknownForm";
     }
