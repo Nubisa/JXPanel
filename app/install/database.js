@@ -605,7 +605,7 @@ exports.updateDomain = function(name, data){
 
 exports.updatePlan = function(name, data){
     if(!Plans[name]){
-        throw new Error(name + " plan doesnt exist");
+        throw new Error(name + " plan doesn't exist");
     }
 
     var plan = Plans[name];

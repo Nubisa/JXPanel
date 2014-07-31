@@ -90,20 +90,29 @@ exports.getJXConfig = function(domain_name) {
         return { err : "PlanInvalid" };
 
     var json = {};
+    var add = function(field_name, value) {
+        if (!value && value !== false && value !== 0)
+            return;
+
+        json[field_name] = value;
+    }
+
+
     for (var o in domain) {
         if (fields[o])
-            json[fields[o]] = domain[o];
+            add(fields[o], domain[o]);
     }
 
     for (var o in plan) {
         if (fields[o])
-            json[fields[o]] = plan[o];
+            add(fields[o], plan[o]);
     }
 
     for (var o in plan.planMaximums) {
         if (fields[o])
-            json[fields[o]] = plan.planMaximums[o];
+            add(fields[o], plan.planMaximums[o]);
     }
+
 
     console.log(json);
 
