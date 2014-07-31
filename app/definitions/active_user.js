@@ -139,7 +139,7 @@ exports.isRecordUpdating = function(active_user, formName) {
 
 
 exports.defineMethods = function(){
-    var scheduler = require('./scheduler');
+    var scheduler = require('./scheduler/scheduler');
 
     // CLEAR USERS BEGIN
     setInterval(function(){
