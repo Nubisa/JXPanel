@@ -40,15 +40,6 @@ exports.form = function () {
                 validation : new validations.Email()
             },
 
-//            {
-//                name: "person_subscriptions",
-//                details: {
-//                    label: "UserSubscriptionAccess",
-//                    method: tool.createComboBox,
-//                    options: { values: ["ALL"] }
-//                }
-//            },
-
             {
                 name: "person_lang",
                 details: {
@@ -99,6 +90,21 @@ exports.form = function () {
                     options: { required: true, dynamic: true },
                     dbName: "plan",
                     cannotEditOwnRecord : true
+                },
+                validation : new function () {
+
+                    this.validate = function (env, active_user, val, vals) {
+
+                        var me = database.getUser(active_user.username);
+                        // allows to select only existent plan
+                        var plans = database.getPlansByUserName(active_user.username, 1);
+                        plans.push(me.plan);
+
+                        if (plans.indexOf(val) === -1)
+                            return {result: false, msg: form_lang.Get(active_user.lang, "PlanInvalid", null)};
+
+                        return {result: true};
+                    };
                 },
                 dynamicValues : function(active_user) {
 
