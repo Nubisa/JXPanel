@@ -242,6 +242,7 @@ exports.Labels = {
     "PlanParentCannotAddMore" : "Parent hosting plan reached maximum %s count.",
     "PlanCannotAddMore" : "This hosting plan reached maximum %s count.",
     "PlanInvalid" : "Invalid hosting plan",
+    "PlanAlreadyExists" : "Plan already exists",
     "UserSuspended" : "User is suspended",
 
     "CannotEditRecord" : "You cannot edit this record.",

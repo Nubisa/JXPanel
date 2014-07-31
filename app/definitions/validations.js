@@ -199,3 +199,15 @@ exports.Domain = function() {
         return {result: true};
     };
 };
+
+
+exports.Plan = function() {
+
+    this.validate = function (env, active_user, val, vals) {
+
+        if (database.getPlan(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "PlanAlreadyExists", true)};
+
+        return {result: true};
+    };
+};

@@ -51,7 +51,8 @@ exports.form = function () {
                     options: { required: true },
                     dbName: "name",
                     cannotEdit: true
-                }
+                },
+                validation : new validations.Plan()
             },
 
             {
@@ -192,7 +193,8 @@ exports.form = function () {
                     label: "AllowSSL",
                     method: tool.createCheckBox,
                     options: { }
-                }
+                },
+                validation: new validations.Boolean()
             },
 
             { name: "plan_custom_socket",
@@ -200,7 +202,8 @@ exports.form = function () {
                     label: "AllowCustomSocketPort",
                     method: tool.createCheckBox,
                     options: { }
-                }
+                },
+                validation: new validations.Boolean()
             },
 
             { name: "plan_sys_exec",
@@ -208,7 +211,8 @@ exports.form = function () {
                     label: "AllowSysExec",
                     method: tool.createCheckBox,
                     options: { }
-                }
+                },
+                validation: new validations.Boolean()
             },
 
             { name: "plan_local_native_modules",
@@ -216,7 +220,8 @@ exports.form = function () {
                     label: "AllowLocalNativeModules",
                     method: tool.createCheckBox,
                     options: { }
-                }
+                },
+                validation: new validations.Boolean()
             },
 
 //            { name: "plan_app_log_web_access",
@@ -236,7 +241,8 @@ exports.form = function () {
                     label: "AllowSSH",
                     method: tool.createCheckBox,
                     options: { }
-                }
+                },
+                validation: new validations.Boolean()
             },
 
             { name: "plan_nginx_directives",

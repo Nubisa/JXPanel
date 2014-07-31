@@ -94,7 +94,8 @@ exports.form = function () {
                         "true" : '<i class="fa-fw fa fa-check text-success"></i>',
                         "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
                     }
-                }
+                },
+                validation : new validations.Boolean()
             },
 
             {
@@ -111,7 +112,8 @@ exports.form = function () {
                     label: "AppLogWebAccess",
                     method: tool.createCheckBox,
                     options: { }
-                }
+                },
+                validation : new validations.Boolean()
             },
 
             {"END" : 1}
