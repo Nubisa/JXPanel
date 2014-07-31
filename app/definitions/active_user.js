@@ -107,7 +107,7 @@ exports.checkUser = function(env, checkIfSuspended, form_name) {
     }
 
     if (checkIfSuspended && active_user.suspended_txt) {
-        if (!form_name || !_active_user.isRecordUpdating(active_user, form_name)) {
+        if (!form_name || !exports.isRecordUpdating(active_user, form_name)) {
             server.sendCallBack(env, {err: active_user.suspended_txt, hideForm : true });
             return null;
         }
