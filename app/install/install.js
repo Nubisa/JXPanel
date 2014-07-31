@@ -55,7 +55,11 @@ var prepareUserGroup = function(){
             return true;
         }
 
-        ret_val = jxcore.utils.cmdSync("groupadd jxman");
+        var cmd = "groupadd jxman";
+        if(os_info.isRH){
+            cmd = "/usr/sbin/groupadd jxman";
+        }
+        ret_val = jxcore.utils.cmdSync(cmd);
         if(ret_val.exitCode !== 0){
             console.error(ret_val.out);
             clog("Consider starting this application with 'sudo' / admin rights.", "green");
