@@ -5,7 +5,7 @@ jxcore.tasks.on('message', function(tid, msg){
    if(msg){
        if(msg.scheduler){
            if(msg.callFromUser){
-               _active_user[msg.userCall].apply(null, msg.params);
+               _active_user[msg.callFromUser].apply(null, msg.params);
            }
        }
    }
