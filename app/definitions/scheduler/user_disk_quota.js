@@ -8,6 +8,7 @@ var check_quotas = function(){
     last_quota_check = 0;
     db.ReadDB(function(err) {
         var plans = db.getPlansByPlanName("Unlimited", 1e7);
+        var record_updated = false;
         for(var o in plans){
             var plan = db.getPlan(plans[o]);
             var isSuspended = plan.suspended;
@@ -19,10 +20,14 @@ var check_quotas = function(){
                         var size = folders.getUserPathSize(i);
                         if(size>max_disk){
                             db.getUser(i).SuspendUser("plan_disk_space");
+                            record_updated = true;
                         }
                     }
                 }
             }
+        }
+        if(record_updated){
+            db.updateDBFile();
         }
     });
 };
