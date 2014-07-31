@@ -7,8 +7,8 @@
  */
 
 
-var database = require("./../install/database");
-var sqlite2 = require("./../install/sqlite2");
+var database = require("./../app/install/database");
+var sqlite2 = require("./../app/install/sqlite2");
 var util = require("util");
 var fs = require("fs");
 
