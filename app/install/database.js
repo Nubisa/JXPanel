@@ -516,13 +516,13 @@ exports.deletePlan = function(name){
     delete(owner.subPlans[name]);
     delete(Plans[name]);
     for(var o in arr_users){
-        delete(Users[o]);
+        delete(Users[arr_users[o]]);
     }
     for(var o in arr_domains){
-        delete(Domains[o]);
+        delete(Domains[arr_domains[o]]);
     }
     for(var o in arr_plans){
-        delete(Plans[o]);
+        delete(Plans[arr_plans[o]]);
     }
 
     UpdateDB(JSON.stringify(DB));
