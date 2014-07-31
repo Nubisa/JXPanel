@@ -1,8 +1,18 @@
+#!/bin/sh
+rm -rf build_$1
 mkdir build_$1
 make
 mv vsftpd build_$1/
 cp _vsftpd.conf build_$1/vsftpd.conf
 cp _vsftpd_users build_$1/vsftpd_users
+chdir build_$1
+mkdir ftp_root
+chown -R root:root ftp_root
+chmod 755 ftp_root
+chmod a-w ftp_root
+mkdir log
+chown -R root:root log
+cd ..
 make clean
 
 echo ""
