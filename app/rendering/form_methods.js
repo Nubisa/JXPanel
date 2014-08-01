@@ -69,9 +69,9 @@ methods.tryLogin = function(env, params){
                     planMaximums: {}
                 });
 
-                database.AddUser("Unlimited", params.username, { person_name : params.username });
+                database.AddUser("Unlimited", params.username, { person_name : params.username, firstUser:true });
                 try{
-                    var ret = system_tools.addSystemUser({plan:"Unlimited", name:params.username, firstUser:true}, null, 1);
+                    var ret = system_tools.addSystemUser({plan:"Unlimited", name:params.username }, null, 1);
                     if(ret.err){
                         database.deleteUser(params.username);
                         server.sendCallBack(env, {err: form_lang.Get("EN", ret.err, true)});
@@ -151,7 +151,7 @@ var sessionAdd = function(env, active_user, params){
                    continue;
                }
 
-               var res = valids[a].validate(env, active_user, params.controls[o], params.controls);
+               var res = valids[a].validate(env, active_user, params.controls[o], params.controls, o);
                if(!res.result){
                    messages.push({control:ctrlDisplayName, msg:res.msg});
                }
@@ -234,7 +234,8 @@ methods.sessionApply = function(env, params){
                 json[field_name] = val;
 
             if (det.definesMax) {
-                planMaximums[field_name] = json[field_name];
+                var val = parseInt(json[field_name]);
+                planMaximums[field_name] = isNaN(val) ? site_defaults.defaultMaximum : val;
                 delete json[field_name];
             }
         }
@@ -310,6 +311,11 @@ methods.sessionApply = function(env, params){
     } else
     if (params.form === "addPlan") {
         try {
+
+            // those are required by the form
+            json.maxUserCount = parseInt(json.maxUserCount);
+            json.maxDomainCount = parseInt(json.maxDomainCount);
+
             if (isUpdate) {
                 var plan = database.getPlan(update_name);
                 if (!plan)
@@ -320,8 +326,8 @@ methods.sessionApply = function(env, params){
                 ret = database.updatePlan(update_name, plan);
             } else {
 
-                json.canCreateUser = json.maxUserCount + "" !== "0";
-                json.canCreatePlan = planMaximums.plan_max_plans + "" !== "0";
+                json.canCreateUser = json.maxUserCount !== 0;
+                json.canCreatePlan = planMaximums.plan_max_plans !== 0;
                 json.planMaximums = planMaximums;
 
                 ret = database.AddPlan(active_user.username, json.name, json);

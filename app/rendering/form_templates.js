@@ -5,7 +5,7 @@ var fs = require("fs");
 var path = require("path");
 var rep = require('./smart_search').replace;
 var database = require("./../install/database");
-
+var site_defaults = require("./../definitions/site_defaults");
 
 var logic = [
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
@@ -64,6 +64,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     };
 
     var isUpdate = null;
+    var values = null;
 
     if (formName === "jxconfig") {
         isUpdate = { record : database.getConfig()};
@@ -71,32 +72,60 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     if (_active_user.isRecordUpdating(active_user, formName)) {
         isUpdate = {};
         isUpdate.name = active_user.session.edits[formName].ID;
-        isUpdate.record = null;
+        values = null;
 
         if (formName === "addUser") {
             if (!database.isOwnerOfUser(active_user.username, isUpdate.name) && active_user.username !== isUpdate.name)
                 return accessDeniedError("user", isUpdate.name);
 
-            isUpdate.record = database.getUser(isUpdate.name);
+            values = database.getUser(isUpdate.name);
         } else
         if (formName === "addPlan") {
             if (!database.isOwnerOfPlan(active_user.username, isUpdate.name))
                 return accessDeniedError("plan", isUpdate.name);
 
-            isUpdate.record = database.getPlan(isUpdate.name);
+            values = database.getPlan(isUpdate.name);
         } else
         if (formName === "addDomain") {
             if (!database.isOwnerOfDomain(active_user.username, isUpdate.name))
                 return accessDeniedError("domain", isUpdate.name);
 
-            isUpdate.record = database.getDomain(isUpdate.name);
+            values = database.getDomain(isUpdate.name);
         } else
             return {err : form_lang.Get(active_user.lang, "UnknownForm") };
+    }
 
-        if (formName === "addPlan" && isUpdate.record.planMaximums) {
+
+
+    if (formName === "addPlan") {
+
+        if (!isUpdate) {
+            // getting owner of the plan
+            var me = database.getUser(active_user.username);
+            if (!me)
+                return { err : "DBCannotGetUser" };
+
+            if (me.plan !== "Unlimited") {
+                var parentPlan = database.getPlan(me.plan);
+                if (!parentPlan)
+                    return { err : "DBCannotGetPlan" };
+
+                values = { planMaximums : {} };
+                for(var o in parentPlan.planMaximums) {
+                    if (!values.planMaximums[o] || values.planMaximums[o] > parentPlan.planMaximums[o])
+                        values.planMaximums[o] = parentPlan.planMaximums[o];
+                }
+                values.maxUserCount = parentPlan.maxUserCount;
+                values.maxDomainCount = parentPlan.maxDomainCount;
+            }
+        }
+
+        if (values && values.planMaximums) {
             // copying values for easier display to the form
-            for(var o in isUpdate.record.planMaximums) {
-                isUpdate.record[o] = isUpdate.record.planMaximums[o]
+            for(var o in values.planMaximums) {
+                // this is integer, not a string
+                var v = values.planMaximums[o];
+                values[o] = v === site_defaults.defaultMaximum ? "" : v;
             }
         }
     }
@@ -127,13 +156,14 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         ctrl.options = ctrl.options || {};
 
         var dbname = ctrl.dbName ? ctrl.dbName : name;
-        var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
+//        var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
+        var val = values && values[dbname] || null;
 
         ctrl.options.extra = { formName : formName, isUpdate : isUpdate, active_user : active_user};
         if (ctrl.options.password && isUpdate)
             val = null;
 
-        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && isUpdate.record["name"] === active_user.username)))
+        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && values["name"] === active_user.username)))
             ctrl.options.extra.noEditDisplayValue = val;
 
         if (ctrl.getValue && typeof ctrl.getValue === "function") {

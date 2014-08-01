@@ -127,6 +127,11 @@ exports.Labels = {
     "RequiresMaximumLength": "Maximum string length for this control must be %s.",
 
     "ValueShouldBe": "The value should be %s.",
+    "less than" : "less than",
+    "greater than" : "greater than",
+    "equal" : "equal",
+    "and" : "and",
+    "or" : "or",
 
     // Pages
     "Subscription" : "Subscription Management",
@@ -229,7 +234,7 @@ exports.Labels = {
     "PlanID" : "Hosting Plan",
     "Overuse" : "Allow overuse",
     "MaxDiskSpace" : "Disk space",
-    "MaxDiskSpace_Description" : "Maximum disk usage. Empty value disables the limit.",
+    "MaxDiskSpace_Description" : "Maximum disk usage (MB). Empty value disables the limit.",
     "MaxTraffic" : "Traffic",
     "MaxTraffic_Description" : "Maximum amount of transferred data during given period of time. Empty value disables the limit.",
     "MaxCPU" : "Max CPU",
@@ -283,6 +288,7 @@ exports.Labels = {
     "PlanCannotAddMore" : "This hosting plan reached maximum %s count.",
     "PlanInvalid" : "Invalid hosting plan",
     "PlanAlreadyExists" : "Plan already exists",
+    "PlanParentDefinesValue" : "Parent hosting plan defines this value as %s.",
     "UserSuspended" : "User is suspended",
 
     "CannotEditRecord" : "You cannot edit this record.",
@@ -297,7 +303,7 @@ exports.Labels = {
     "DBCannotGetUser" : "Cannot read user data from database.",
     "DBCannotGetParentUser" : "Cannot read parent user data from database.",
     "DBCannotGetPlan" : "Cannot read hosting plan from database.",
-    "DBCannotGetParsentPlan" : "Cannot read parent hosting plan from database.",
+    "DBCannotGetParentPlan" : "Cannot read parent hosting plan from database.",
     "DBCannotGetDomain" : "Cannot read domain from database.",
     "DBCannotReadData" : "Cannot read data from database.",
 

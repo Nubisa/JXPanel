@@ -133,6 +133,15 @@ var start5 = function() {
     console.log("getUsersByUserName Kris", inspect(database.getUsersByUserName("Kris")));
 };
 
+//
+//var fixMaximus = function() {
+//    for(var plan in database.DB.Plans) {
+//        for(var m in database.DB.Plans[plan].planMaximus) {
+//            var v = database.DB.Plans[plan].planMaximus[m];
+//        }
+//    }
+//};
+
 var testdb = __dirname + "/test.db";
 
 //sqlite2.SetFileName(testdb);

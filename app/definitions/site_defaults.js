@@ -91,7 +91,7 @@ exports.dirUserApps = path.join( os_info.apps_folder, "users") + path.sep;
 exports.dirMonitorCertificates = path.join(__dirname, "../spawner") + path.sep;
 exports.defaultAppMinPort = 10000;
 exports.defaultAppMaxPort = 20000;
-
+exports.defaultMaximum = 1e9;  // don't change it, otherwise db should be refreshed
 
 
 //{{defaults.LABELHERE}}

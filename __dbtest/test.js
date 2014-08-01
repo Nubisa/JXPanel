@@ -25,9 +25,9 @@ var hosting_tools = require("./../app/hosting_tools");
 
 database.ReadDB(function(err) {
     if (err) console.error(err); else {
-//        console.log(util.inspect(database.DB, { depth : null }));
+        console.log(util.inspect(database.DB, { depth : null }));
 
         //console.log(util.inspect( ));
-        hosting_tools.appGetJXConfig("test11.com");
+//        hosting_tools.appGetJXConfig("test11.com");
     }
 });

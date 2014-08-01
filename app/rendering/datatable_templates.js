@@ -98,17 +98,22 @@ var getHTML = function (active_user, table) {
     for (var i in data) {
 
         var name = data[i];
-        var record = method(name);
+        var record_org = method(name);
 
         // empty record?
-        if (!record)
+        if (!record_org)
             continue;
 
+        // copying
+        var record = {};
+        for(var o in record_org)
+            record[o] = record_org[o];
 
         if (table.name == "plans" && record.planMaximums) {
             // copying values for easier display to the list
             for(var o in record.planMaximums) {
-                record[o] = record.planMaximums[o]
+                var v = record.planMaximums[o];
+                record[o] = v ===  site_defaults.defaultMaximum ? "" : v;
             }
         }
 
@@ -120,12 +125,6 @@ var getHTML = function (active_user, table) {
         for (var x in columns) {
             var colName = dbNames[columns[x]] || columns[x];
             var val = record[colName];
-
-//            // null/undefined value replacement into display value
-//            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.nullDisplayAs) {
-//                if (!val && val + "" !== "0" && val + "" !== "false" )
-//                    val = form_lang.Get(active_user.lang, formControls[columns[x]].details.nullDisplayAs) || val;
-//            }
 
             if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.displayValues) {
 

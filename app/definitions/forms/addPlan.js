@@ -65,18 +65,18 @@ exports.form = function () {
                 }
             },
 
-            { name: "plan_overuse",
-                details: {
-                    label: "Overuse",
-                    method: tool.createCheckBox,
-                    options: { },
-                    displayValues : {
-                        "true" : "allow",
-                        "false" : "disallow"
-                    }
-                },
-                validation: new validations.Boolean()
-            },
+//            { name: "plan_overuse",
+//                details: {
+//                    label: "Overuse",
+//                    method: tool.createCheckBox,
+//                    options: { },
+//                    displayValues : {
+//                        "true" : "allow",
+//                        "false" : "disallow"
+//                    }
+//                },
+//                validation: new validations.Boolean()
+//            },
 
             { END : 1},
 
@@ -92,7 +92,7 @@ exports.form = function () {
                     },
                     definesMax: true
                 },
-                validation: new validations.Int( { gte : 0})
+                validation: new validations.Int({ gte : 0})
             },
 
             { name: "plan_traffic",

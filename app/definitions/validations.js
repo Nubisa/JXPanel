@@ -85,33 +85,39 @@ exports.Int = function (options) {
             return {result: false, msg: form_lang.Get(active_user.lang, "ValueInvalidInteger", null)};
         }
 
+        var translate = function(txt) {
+            return form_lang.Get(active_user.lang, txt, true);
+        };
+
         console.log("options", this.options, "parsed", parsed);
         if (this.options) {
             var params = [];
             var err = false;
 
             if (this.options.gt || this.options.gt === 0) {
-                params.push("greater than " + this.options.gt);
+                params.push(translate("greater than") + " " + this.options.gt);
                 if (parsed <= this.options.gt) err = true;
             }
 
             if (this.options.gte || this.options.gte === 0) {
-                params.push("greater than " + this.options.gte + " (or equal)");
+                params.push(translate("greater than") + " " + this.options.gte + " (" + translate("or") + " " + translate("equal" + ")"));
                 if (parsed < this.options.gte) err = true
             }
 
             if (this.options.lt || this.options.lt === 0) {
-                params.push("less than " + this.options.lt);
+                params.push(translate("less than") + " " + this.options.lt);
                 if (parsed >= this.options.lt) err = true;
             }
 
             if (this.options.lte || this.options.lte === 0) {
-                params.push("less than " + this.options.lte + " (or equal)");
+                params.push(translate("less than") + " " + this.options.lte +  " (" + translate("or") + " " + translate("equal" + ")"));
                 if (parsed > this.options.lte) err = true;
             }
 
-            if (err)
-                return {result: false, msg: form_lang.Get(active_user.lang, "ValueShouldBe", null, [ params.join(" and ") ])};
+            if (err) {
+                var delim = " " + translate("and") + " ";
+                return {result: false, msg: form_lang.Get(active_user.lang, "ValueShouldBe", null, [ params.join(delim) ])};
+            }
         }
 
         return {result: true};
@@ -158,9 +164,9 @@ exports.UserName = function() {
 
     this.validate = function (env, active_user, val, vals) {
 
-        var reg = new RegExp("^[a-z_][a-z0-9_-]*[$]?$", "i");
+        var reg = /[^0-9A-Za-z_]/;
 
-        if (!reg.test(val) || val.length >31)
+        if (val.match(reg) !== null || val.length >31)
             return {result: false, msg: form_lang.Get(active_user.lang, "UsernameEnterRequired", true)};
 
         if (system_tools.systemUserExists(val))
@@ -202,6 +208,7 @@ exports.Domain = function() {
 };
 
 
+// verifies plan name
 exports.Plan = function() {
 
     this.validate = function (env, active_user, val, vals) {
