@@ -507,6 +507,7 @@ exports.defineMethods = function(){
     });
 
     server.addJSMethod("userIn", function(env, params){
+        console.log("userIn");
         if(!env.SessionID || !users[env.SessionID]){
             server.sendCallBack(env, {relogin:true});
             return;
@@ -514,6 +515,3 @@ exports.defineMethods = function(){
         server.sendCallBack(env, {done:true});
     });
 };
-
-
-//{{user.LABELHERE}}
