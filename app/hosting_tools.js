@@ -86,6 +86,8 @@ exports.appGetJXConfig = function (domain_name) {
         "port_https": "portTCPS"
     };
 
+    exports.appGetSpawnerCommand()
+
     var domain = database.getDomain(domain_name);
     if (!domain)
         return { err: "DomainNotFound" };
@@ -94,7 +96,14 @@ exports.appGetJXConfig = function (domain_name) {
     if (!plan)
         return { err: "PlanInvalid" };
 
-    var json = {};
+    var json = {
+        "monitor": {
+            "https": {
+                "httpsKeyLocation": site_defaults.dirMonitorCertificates + "server.key",
+                "httpsCertLocation": site_defaults.dirMonitorCertificates + "server.crt"
+            }
+        }
+    };
     var add = function (field_name, value) {
         if (!value && value !== false && value !== 0)
             return;
@@ -117,6 +126,10 @@ exports.appGetJXConfig = function (domain_name) {
             add(fields[o], plan.planMaximums[o]);
     }
 
+    // replacement for config file name
+    //  app_location.replace(/[\/]/g, "_").replace(/[\\]/g, "_")
+
+    //return { cfg : json, path : }
     console.log(json);
 };
 
@@ -148,9 +161,6 @@ exports.appGetSpawnerCommand = function (domain_name) {
     if (ret.err)
         return ret;
 
-    var cfg = database.getConfig();
-
-
     var domain = database.getDomain(domain_name);
     if (!domain)
         return { err: "DomainNotFound" };
@@ -160,6 +170,9 @@ exports.appGetSpawnerCommand = function (domain_name) {
         return { err: "UserUnknown" };
 
     var appDir = path.join(site_defaults.dirUserApps, user.name);
+    if (!fs.existsSync(appDir))
+        return { err : "" }
+
     var opt = {
         "user": user.name,
         "log": site_defaults.dirUserApps + "/jxcore_logs/index.txt",
@@ -178,15 +191,62 @@ exports.appGetSpawnerCommand = function (domain_name) {
     return cmd;
 };
 
-exports.appRun = function (domain_name) {
+exports.appStartStop = function(startOrStop, domain_name, cb) {
 
-    var ret = exports.appGetSpawnerCommand(domain_name);
-    if (ret.err)
-        return ret;
+    var spawnerCmd = exports.appGetSpawnerCommand(domain_name);
+    if (spawnerCmd.err) {
+        cb(spawnerCmd.err);
+        return;
+    }
 
-    var cmd = ret;
+    if (startOrStop) {
+        var jxconfig = exports.appGetJXConfig(domain_name);
+        if (jxconfig.err) {
+            cb(jxconfig.err);
+            return;
+        }
+        fs.writeFileSync()
+    }
 
-    jxcore.utils.cmdSync(cmd);
+    var jxPath = exports.getJXPath();
+    var spawner = exports.appGetSpawnerPath(domain_name);
+
+
+    exports.getMonitorJSON(false, function(err, ret) {
+        var online_before = !err && ret && ret.indexOf(spawner) !== -1;
+
+        // no point to start a[[, if it's running
+        if (startOrStop && online_before) {
+            cb();
+            return;
+        }
+
+        // no point to stop app if it's not running
+        if (!startOrStop && !online_before) {
+            cb();
+            return;
+        }
+
+        var cmd = startOrStop ? spawnerCmd : jxPath + " monitor kill " + spawner + " 2>&1";
+        exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
+            // cannot rely on err in this case. command returns non-zero exitCode on success
+            exports.getMonitorJSON(false, function(err2, ret2) {
+                var online_after = !err2 && ret2 && ret2.indexOf(spawner) !== -1;
+
+                var err = online_after === online_before;
+                var msg = null;
+                if (err) {
+                    msg = startOrStop ? "JXcoreAppCannotStart" : "JXcoreAppCannotStop";
+                    msg += "|" + domain_name;
+                    if (err2) msg += " " + err2;
+                } else {
+                    console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
+                }
+
+                cb(msg);
+            });
+        });
+    });
 };
 
 exports.appIsRunning = function (domain_name) {
@@ -196,7 +256,6 @@ exports.appIsRunning = function (domain_name) {
 
 exports.saveMonitorConfig = function (jxPath) {
 
-    var certDir = path.join(__dirname, "spawner/");
     var dir = path.dirname(jxPath) + path.sep;
     var cfgPath = dir + "jx.config";
 
@@ -205,8 +264,8 @@ exports.saveMonitorConfig = function (jxPath) {
             "log_path": dir + "jx_monitor_[WEEKOFYEAR]_[YEAR].log",
             //"users": [ "psaadm" ],
             "https": {
-                "httpsKeyLocation": certDir + "server.key",
-                "httpsCertLocation": certDir + "server.crt"
+                "httpsKeyLocation": site_defaults.dirMonitorCertificates + "server.key",
+                "httpsCertLocation": site_defaults.dirMonitorCertificates + "server.crt"
             }
         },
         "globalModulePath": site_defaults.dirNativeModules,
@@ -229,7 +288,7 @@ exports.getJXPath = function () {
 };
 
 
-exports.getMonitorJSON = function (cb) {
+exports.getMonitorJSON = function (parse, cb) {
     if (!cb) {
         return;
     }
@@ -251,7 +310,7 @@ exports.getMonitorJSON = function (cb) {
 
         res.on('end', function () {
             try {
-                var json = JSON.parse(body);
+                var json = parse ? body :JSON.parse(body);
                 cb(false, json);
             } catch (ex) {
                 cb("Cannot parse json: " + ex);
@@ -271,7 +330,7 @@ exports.monitorStartStop = function (startOrStop, cb) {
         return
     }
 
-    exports.getMonitorJSON(function(err, ret) {
+    exports.getMonitorJSON(false, function(err, ret) {
         var online_before = !err && ret;
 
         // no point to start monitor, if it's running
@@ -287,7 +346,7 @@ exports.monitorStartStop = function (startOrStop, cb) {
         }
 
         var checkAfter = function () {
-            exports.getMonitorJSON(function(err2, ret2) {
+            exports.getMonitorJSON(false, function(err2, ret2) {
                 var online_after = !err2 && ret2;
 
                 var err = online_after === online_before;

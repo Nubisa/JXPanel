@@ -61,7 +61,7 @@
 
                         if (param.arr) {
                             for(var o in param.arr){
-                                utils.jxAddMessage('danger', param.arr[o].control + ":" + param.arr[o].msg);
+                                utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
                             }
                         } else {
                             document.location = "{{form.onSubmitSuccess}}";
