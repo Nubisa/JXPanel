@@ -70,7 +70,7 @@ exports.getFreePorts = function (howMany) {
     return null;
 };
 
-exports.getJXConfig = function (domain_name) {
+exports.appGetJXConfig = function (domain_name) {
 
     var fields = {
         // plan settings
@@ -100,8 +100,7 @@ exports.getJXConfig = function (domain_name) {
             return;
 
         json[field_name] = value;
-    }
-
+    };
 
     for (var o in domain) {
         if (fields[o])
@@ -121,7 +120,7 @@ exports.getJXConfig = function (domain_name) {
     console.log(json);
 };
 
-exports.getAppSpawnerPath = function (domain_name) {
+exports.appGetSpawnerPath = function (domain_name) {
     var dir = site_defaults.dirAppConfigs;
     if (!fs.existsSync(dir))
         fs.mkdirSync(dir);
@@ -139,13 +138,13 @@ exports.getAppSpawnerPath = function (domain_name) {
 };
 
 
-exports.getAppSpawnerCommand = function (domain_name) {
+exports.appGetSpawnerCommand = function (domain_name) {
 
     /*
      .../jx spawner_7.jx -opt '{ "user" : "krisuser", "log" : "/var/www/vhosts/krissubscription.com/httpdocs/jxcore_logs/index.txt", "file" : "/var/www/vhosts/krissubscription.com/httpdocs/index.js", "domain" : "krissubscription.com", "tcp" : "10008", "tcps" : "10009", "logWebAccess" : "0"}'
 
      */
-    var ret = exports.getAppSpawnerPath(domain_name);
+    var ret = exports.appGetSpawnerPath(domain_name);
     if (ret.err)
         return ret;
 
@@ -179,9 +178,9 @@ exports.getAppSpawnerCommand = function (domain_name) {
     return cmd;
 };
 
-exports.runApp = function (domain_name) {
+exports.appRun = function (domain_name) {
 
-    var ret = exports.getAppSpawnerCommand(domain_name);
+    var ret = exports.appGetSpawnerCommand(domain_name);
     if (ret.err)
         return ret;
 
@@ -190,7 +189,7 @@ exports.runApp = function (domain_name) {
     jxcore.utils.cmdSync(cmd);
 };
 
-exports.isAppRunning = function (domain_name) {
+exports.appIsRunning = function (domain_name) {
 
 };
 
