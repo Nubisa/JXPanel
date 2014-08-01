@@ -101,7 +101,7 @@ exports.form = function () {
             {
                 name: "jx_app_stats",
                 details: {
-                    label: "JXAppStatus",
+                    label: "JXcoreAppStatus",
                     method: tool.createSimpleText,
                     options: { dynamic : true }
                 },
@@ -113,7 +113,7 @@ exports.form = function () {
             {
                 name: "jx_app_path",
                 details: {
-                    label: "JXAppPath",
+                    label: "JXcoreAppPath",
                     method: tool.createTextBox,
                     options: { default : "index.js" }
                 }

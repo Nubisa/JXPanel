@@ -147,7 +147,7 @@ exports.MaxPort = function(min_port_field) {
 
         var domains = database.getDomainsByUserName(null, 1e5);
         if ((max - min) < domains.length * 2)
-            return {result: false, msg: form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [ domains.length * 2, max - min ])};
+            return {result: false, msg: form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ domains.length * 2, max - min ])};
 
         return {result : true} ;
     };
@@ -195,7 +195,7 @@ exports.Domain = function() {
 
         var needed = domains.length * 2 + 2;
         if (max - min < needed)
-            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXAppSmallPortRange", true, [needed, max - min] )};
+            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, max - min] )};
 
         return {result: true};
     };
