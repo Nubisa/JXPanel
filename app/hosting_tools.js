@@ -218,7 +218,7 @@ exports.saveMonitorConfig = function (jxPath) {
     fs.writeFileSync(cfgPath, JSON.stringify(json, null, 4));
 };
 
-
+// returns path to jx executable for running user apps
 exports.getJXPath = function () {
 
     var cfg = database.getConfig();
@@ -296,6 +296,8 @@ exports.monitorStartStop = function (startOrStop, cb) {
                 if (err) {
                     msg = startOrStop ? "JXcoreMonitorCannotStart" : "JXcoreMonitorCannotStop";
                     if (err2) msg += " " + err2;
+                } else {
+                    console.log(startOrStop ? "JXcoreMonitorStarted" : "JXcoreMonitorStopped");
                 }
 
                 cb(msg);

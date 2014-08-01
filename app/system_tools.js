@@ -320,62 +320,88 @@ exports.downloadFile = function (url, localFile, cb) {
 };
 
 // also reinstalls if already is installed
-exports.installJX = function(cb) {
+exports.installJX = function (cb) {
 
-    var cfg = database.getConfig();
-    if (cfg.jxPath && fs.existsSync(cfg.jxPath)) {
-        exports.rmdirSync(path.dirname(cfg.jxPath));
-    }
+    var jxPath = hosting_tools.getJXPath();
 
-    var os_str = os_info.OSInfo().OS_STR;
+    var _install = function () {
 
-    var dir = path.join(os_info.apps_folder, "jx_" + os_str) + path.sep;
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-
-    var basename = "jx_" + os_str;
-    var zipFile =  path.join(os_info.apps_folder, basename + ".zip");
-    var url = "https://s3.amazonaws.com/nodejx/" + basename + ".zip";
-
-
-    exports.downloadFile(url, zipFile, function(err) {
-        if (err) {
-            cb(err);
-            return;
+        // clearing the fodler first
+        if (!jxPath.err && fs.existsSync(jxPath)) {
+            exports.rmdirSync(path.dirname(jxPath));
         }
 
-        // unzipping
-        exec("unzip -u " + zipFile, {cwd:os_info.apps_folder, maxBuffer:1e7}, function(err, stdout, stderr){
-            if (err !== null) {
-                cb("Error" + JSON.stringify( err ) + (stderr || stdout));
-            } else{
+        var os_str = os_info.OSInfo().OS_STR;
 
-                var file = dir + "jx";
+        var dir = path.join(os_info.apps_folder, "jx_" + os_str) + path.sep;
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
 
-                fs.unlinkSync(zipFile);
+        var basename = "jx_" + os_str;
+        var zipFile = path.join(os_info.apps_folder, basename + ".zip");
+        var url = "https://s3.amazonaws.com/nodejx/" + basename + ".zip";
 
-                if (fs.existsSync(file)) {
-                    cfg.jxPath = file;
-                    var ret = jxcore.utils.cmdSync("'" + file + "' -jxv");
-                    cfg.jxv = ret.out.toString().trim();
-
-                    // if current jx is different than downloaded, use it
-                    if (cfg.jxv !== process.jxversion) {
-                        jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
-                        cfg.jxv = process.jxversion;
-                    }
-
-                    hosting_tools.saveMonitorConfig(file);
-
-                    database.setConfig(cfg);
-                    cb(false);
-                } else {
-                    cb("FileDoesNotExist");
-                }
+        exports.downloadFile(url, zipFile, function (err) {
+            if (err) {
+                cb(err);
+                return;
             }
+
+            // unzipping
+            exec("unzip -u " + zipFile, {cwd: os_info.apps_folder, maxBuffer: 1e7}, function (err, stdout, stderr) {
+                if (err !== null) {
+                    cb("Error" + JSON.stringify(err) + (stderr || stdout));
+                } else {
+
+                    var file = dir + "jx";
+
+                    fs.unlinkSync(zipFile);
+
+                    if (fs.existsSync(file)) {
+                        var ret = jxcore.utils.cmdSync("'" + file + "' -jxv");
+                        var jxv = ret.out.toString().trim();
+
+                        // if current jx is different than downloaded, use it
+                        if (jxv !== process.jxversion) {
+                            jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
+                            jxv = process.jxversion;
+                        }
+
+                        hosting_tools.saveMonitorConfig(file);
+
+                        database.setConfigValue("jxPath", file);
+                        database.setConfigValue("jxv", jxv, true);
+
+                        // let's start the monitor after install
+                        hosting_tools.monitorStartStop(true, function (err01) {
+                            cb(err01 || false)
+                        });
+                    } else {
+                        cb("FileDoesNotExist");
+                    }
+                }
+            });
         });
-    });
+    };
+
+
+    if (jxPath.err) {
+        // just install
+        _install();
+    } else {
+        // shut the monitor down
+
+        hosting_tools.monitorStartStop(false, function (err0) {
+
+            if (err0) {
+                cb(err0);
+                return;
+            }
+
+            _install();
+        });
+    }
 };
 
 
