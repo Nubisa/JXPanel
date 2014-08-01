@@ -341,9 +341,9 @@ methods.getForm = function(env, params) {
         return;
 
     if (params.form === "jxconfig") {
-        jxcore.monitor.checkMonitorExists(function(err, txt) {
+        hosting_tools.getMonitorJSON(function(err, ret) {
             // todo: just for now saving the value somewhere
-            jxcore.monitor.isOnline = !err;
+            jxcore.monitor.isOnline = !err && ret;
             var ret = forms.renderForm(env.SessionID, params.form, true);
             server.sendCallBack(env, ret);
         });
@@ -455,57 +455,11 @@ methods.installNPM = function(env, params) {
 
 methods.monitorStartStop = function (env, params) {
 
-//    var active_user = checkUser(env);
-//
-//    if (!system_tools.isJXValid()) {
-//        server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "JXcorePathInvalid", true)});
-//        return;
-//    }
+    var active_user = checkUser(env);
 
-    jxcore.monitor.checkMonitorExists(function (err, txt) {
-        var online_before = !err;
-
-        // no point to start monitor, if it's running
-        if (params.op && online_before) {
-            server.sendCallBack(env, {err: false });
-            return;
-        }
-
-        // no point to stop monitor if it's not running
-        if (!params.op && !online_before) {
-            server.sendCallBack(env, {err: false });
-            return;
-        }
-
-
-        var checkAfter = function () {
-            jxcore.monitor.checkMonitorExists(function (err2, txt2) {
-                var online_after = !err2;
-
-                var err = online_after === online_before;
-                server.sendCallBack(env, {err: err ? txt2.toString() : false });
-            });
-        };
-
-        // solution below crashes app, when EADDRINUSE
-        // since it cannot be caught, i don't use it
-//        var method = online_before ? jxcore.monitor.stopMonitor : jxcore.monitor.startMonitor;
-//        try {
-//            method(checkAfter);
-//        } catch (ex) {
-//            server.sendCallBack(env, {err : ex.toString() } );
-//        }
-
-//        var cfg = database.getConfig();
-        var cmd = "'" + process.execPath + "' monitor " + (params.op ? "start" : "stop");
-
-        var task = function (cmd) {
-            jxcore.utils.cmdSync(cmd);
-        };
-        jxcore.tasks.addTask(task, cmd, checkAfter);
-
+    hosting_tools.monitorStartStop(params.op, function(err) {
+        server.sendCallBack(env, {err: err ? form_lang.Get(active_user.lang, err, true) : false });
     });
-
 };
 
 

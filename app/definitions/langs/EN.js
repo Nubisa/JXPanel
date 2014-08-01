@@ -301,6 +301,9 @@ exports.Labels = {
     "JXcorePathInvalid" : "JXcore path does not exist.",
     "JXcoreMonitor" : "JXcore Monitor",
     "JXcoreMonitorStatus" : "Status ",
+    "JXcoreMonitorCannotStart" : "Cannot start JXcore monitor.",
+    "JXcoreMonitorCannotStop" : "Cannot stop JXcore monitor.",
+
     "JXcorePleaseInstall" : "Please install JXcore.",
     "JXcoreCannotDownload" : "Cannot download JXcore.",
     "JXcoreReinstall_Description" : 'If you reinstall JXcore, all the running node applications will be restarted after updating JXcore binary.',
