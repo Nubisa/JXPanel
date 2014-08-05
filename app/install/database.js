@@ -145,8 +145,8 @@ var Plan = function(name, owner_user, opts, dummy){
 
     this.SuspendPlan = function(o){
         this.suspended = true;
-        if(this.OnSuspend){
-            this.OnSuspend(this.name, o);
+        if(exports.OnSuspend){
+            exports.OnSuspend(this.name, o);
         }
     };
 
@@ -447,6 +447,23 @@ exports.getDomainsByUserName = function(user_name, deep){
     return arr;
 };
 
+exports.getDomainsByPlanName = function(name) {
+    if(!Plans[name]){
+        throw new Error(name + " plan doesn't exist");
+    }
+
+    var users = exports.getUsersByPlanName(name);
+    var arr = [];
+    for(var i in users) {
+        var domains = exports.getDomainsByUserName(users[i], 1e7);
+        for(var o in domains) {
+            arr.push(domains[o]);
+        }
+    }
+
+    return arr;
+};
+
 exports.deleteDomain = function(name){
     if(!Domains[name]){
         throw new Error(name + " domain doesn't exist");
@@ -613,23 +630,32 @@ exports.updatePlan = function(name, data){
         throw new Error("You can't change the owner of a plan");
     }
 
-    var max_org = plan.planMaximums;
+    var parent_plan = Users[plan.owner].plan;
+    var res = Plans[parent_plan].CheckOperation(operation_enum.AddPlan, data);
+    if(res){
+        return res;
+    }
+
+    // this is pointless
+    // plan and data are already the same.
+    // data is plan object with values and methods fetched by database.getPlan("modified_plan")
+//    var max_org = plan.planMaximums;
     var max_new = data.planMaximums;
     var sub_plans = exports.getPlansByPlanName(name, 1e5);
 
     for(var o in max_new){
-        if(max_org[o]){
-            if(max_new[o]<max_org[o]){
+//        if(max_org[o]){
+//            if(max_new[o]<max_org[o]){
                 for(var i in sub_plans){
-                    var sub_plan = Plans[i];
+                    var sub_plan = Plans[sub_plans[i]];
                     if(sub_plan.planMaximums[o]){
                         if(sub_plan.planMaximums[o]>max_new[o]){
                             sub_plan.SuspendPlan(o);
                         }
                     }
                 }
-            }
-        }
+//            }
+//        }
     }
 
     var totalUsers = plan.totalActiveUsers();
@@ -641,7 +667,8 @@ exports.updatePlan = function(name, data){
         max_new.SuspendPlan("maxDomainCount");
     }
 
-    Plans[name] = data
+    data.UnSuspendPlan();
+    Plans[name] = data;
     UpdateDB(JSON.stringify(DB));
     return null;
 };
