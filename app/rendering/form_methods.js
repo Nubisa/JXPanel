@@ -299,19 +299,20 @@ methods.sessionApply = function(env, params){
                     json.port_http = arr[0];
                     json.port_https = arr[1];
                     ret = database.AddDomain(active_user.username, json.name, json);
+
+                    if (!ret) {
+                        // creating dir for a domain
+                        var ret1 = hosting_tools.appCreateHomeDir(active_user, json.name);
+                        if (ret1 && ret1.err) {
+                            ret = ret1.err;
+                            database.deleteDomain(json.name);
+                        }
+                    }
                 }
             }
         } catch(ex) {
             ret = ex.toString();
         }
-
-//        if (!ret) {
-//            hosting_tools.appStartStop(json.jx_enabled, update_name, function(err) {
-//                var arr = err ? [ { control: "", msg : form_lang.Get(active_user.lang, err, true) } ] : false;
-//                server.sendCallBack(env, {arr: arr });
-//            });
-//            return;
-//        }
     } else
     if (params.form === "addPlan") {
         try {
@@ -507,7 +508,7 @@ methods.appStartStop = function (env, params) {
             // let's wait for monitor to respawn an app as user
             setTimeout(function() {
                 server.sendCallBack(env, {err: err });
-            }, params.op ? 2000 : 10);
+            }, params.op ? 4000 : 10);
 
         });
     }

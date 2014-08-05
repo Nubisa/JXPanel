@@ -92,7 +92,11 @@ exports.appGetOptions = function (domain_name) {
     if (!domain)
         return { err: "DomainNotFound" };
 
-    var plan = database.getPlanByDomainName(domain_name);
+    var user = database.getUser(domain.owner);
+    if (!user)
+        return { err: "UserUnknown" };
+
+    var plan = database.getPlan(user.plan);
     if (!plan)
         return { err: "PlanInvalid" };
 
@@ -138,7 +142,25 @@ exports.appGetOptions = function (domain_name) {
     var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
 
 //    console.log(json, appDir, cfgPath);
-    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath  };
+    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, user : user, plan: plan };
+};
+
+exports.appCreateHomeDir = function(active_user, domain_name) {
+
+    // creating dir for a domain
+    var options = exports.appGetOptions(domain_name);
+    if (options.err)
+        return options;
+
+    var ret = user_folders.createUserFolder(options.app_dir);
+    if (ret.err)
+        return ret;
+
+    ret = user_folders.markFile(options.app_dir, active_user.uid, active_user.gid);
+    if (ret)
+        return ret;
+
+    return false;
 };
 
 
