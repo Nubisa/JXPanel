@@ -157,7 +157,9 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
         var dbname = ctrl.dbName ? ctrl.dbName : name;
 //        var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
-        var val = values && values[dbname] || null;
+        var val = (values && (values[dbname] || values[dbname] === 0 || values[dbname] === false)) ? values[dbname] : null;
+        // if we'll check against !val
+        if (val === 0) val = "0";
 
         ctrl.options.extra = { formName : formName, isUpdate : isUpdate, active_user : active_user};
         if (ctrl.options.password && isUpdate)
