@@ -183,7 +183,7 @@ var Plan = function(name, owner_user, opts, dummy){
                 for(var o in with_opts.planMaximums){
                     if(this.planMaximums[o]){
                         if(with_opts.planMaximums[o]>this.planMaximums[o]){
-                            return "PlanCannotAddMore|" + o;
+                            return "PlanCannotAddMore|" + o + "|" + this.planMaximums[o];
                         }
                     }
                 }

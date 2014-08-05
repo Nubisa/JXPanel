@@ -294,7 +294,7 @@ exports.Labels = {
     "PlanCannotAddMorePlans" : "This hosting plan does not allow to add more than %s hosting plans.",
     "PlanCannotDetermineHostingValues" : "Cannot determine hosting values.",
     "PlanParentCannotAddMore" : "Parent hosting plan reached maximum %s count.",
-    "PlanCannotAddMore" : "This hosting plan reached maximum %s count.",
+    "PlanCannotAddMore" : "This hosting plan reached maximum %s count (%s).",
     "PlanInvalid" : "Invalid hosting plan",
     "PlanAlreadyExists" : "Plan already exists",
     "PlanParentDefinesValue" : "Parent hosting plan defines this value as %s.",

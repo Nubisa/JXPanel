@@ -352,7 +352,19 @@ methods.sessionApply = function(env, params){
     }
 
     if (ret) {
-        server.sendCallBack(env, {arr: [ { control: "", msg : form_lang.Get(active_user.lang, ret, true) } ]});
+
+        ret = form_lang.Get(active_user.lang, ret, true);
+        for(var field_name in _controls){
+            if (ret.indexOf(field_name) !== -1) {
+                var label = _controls[field_name].details.label;
+                if (label) {
+                    label = form_lang.Get(active_user.lang, label, true);
+                    ret = ret.replace(field_name, "`" + label + "`");
+                }
+            }
+        }
+
+        server.sendCallBack(env, {arr: [ { control: "", msg : ret } ]});
     } else {
         server.sendCallBack(env, {arr: false});
     }
