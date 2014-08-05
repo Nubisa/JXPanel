@@ -6,6 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var path = require("path");
 var validations = require('./../validations');
+var hosting_tools = require("./../../hosting_tools");
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -84,29 +85,60 @@ exports.form = function () {
 
             {"BEGIN": "JXcore options"},
 
-            {
-                name: "jx_enabled",
-                details: {
-                    label: "JXEnabled",
-                    method: tool.createCheckBox,
-                    options: { },
-                    displayValues : {
-                        "true" : '<i class="fa-fw fa fa-check text-success"></i>',
-                        "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
-                    }
-                },
-                validation : new validations.Boolean()
-            },
+//            {
+//                name: "jx_enabled",
+//                details: {
+//                    label: "JXEnabled",
+//                    method: tool.createCheckBox,
+//                    options: { },
+//                    displayValues : {
+//                        "true" : '<i class="fa-fw fa fa-check text-success"></i>',
+//                        "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
+//                    }
+//                },
+//                validation : new validations.Boolean()
+//            },
 
             {
-                name: "jx_app_stats",
+                name: "jx_app_status",
                 details: {
                     label: "JXcoreAppStatus",
                     method: tool.createSimpleText,
-                    options: { dynamic : true }
-                },
-                dynamicValues : function(active_user) {
-                    return "dynval";
+                    options: { },
+//                    displayValues : {
+//                        "true" : '<i class="fa-fw fa fa-check text-success"></i>',
+//                        "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
+//                    }
+                    getValue : function(active_user, values) {
+
+                        // form is in "add" mode, not "edit"
+                        if (!values || !values["name"])
+                            return iconOffline;
+
+                        var domain_name = values["name"];
+
+                        var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true);
+                        var iconOffline = '<i class="fa-fw fa fa-check text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true);
+
+                        var btnStart = '<button class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
+                            + form_lang.Get(active_user.lang, "Start", true) + '</button>';
+
+                        var btnStop = '<button class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
+                            + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
+
+
+                        if (!active_user.session.monitor && !active_user.session.monitor.json)
+                            return iconOffline + ". " + form_lang.Get(active_user.lang, "JXcoreMonitorNotRunning", true);
+
+                        var ret = hosting_tools.appGetSpawnerPath(domain_name);
+                        if (ret.err)
+                            return ret.err;
+
+                        if (active_user.session.monitor.json.indexOf(ret) === -1)
+                            return iconOffline + btnStart;
+                        else
+                            return iconOnline + btnStop;
+                    }
                 }
             },
 

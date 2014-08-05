@@ -47,7 +47,7 @@
                         </div>
 
                         <!--<div class="row">-->
-                            <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
+                            <table id="dt_basic" class="table table-striped table-bordered table-hover jxTable" width="100%">
                                 {{datatable.contents}}
                             </table>
                         <!--</div>-->
@@ -197,7 +197,7 @@
         utils.jxAddMessage(type, msg);
     };
 
-    window.jxRemoveRows = function() {
+    window.jxRemoveRows = function(buttons) {
         var ids = [];
         $('input:checkbox[id^=jxrow_]:checked').each(function() {
             var id = $(this).attr('id').replace("jxrow_", "");
@@ -220,6 +220,35 @@
                 }, true);
             }
         });
+    };
+
+    window.jxRemoveDomains = function() {
+        var ids = [];
+        $('input:checkbox[id^=jxrow_]:checked').each(function() {
+            var id = $(this).attr('id').replace("jxrow_", "");
+            ids.push(id);
+        });
+
+        if (!ids.length) {
+            addMessage("{{label.EmptySelection}}");
+            return;
+        }
+
+        utils.jxConfirm("{{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedInfo}}", function(ButtonPressed) {
+
+            var _with = ButtonPressed === "{{label.RemoveWithUserFiles}}";
+            var _without = ButtonPressed === "{{label.RemoveWithoutUserFiles}}";
+
+
+            if (_with || _without) {
+                window.toServer('removeFromTableData', { dt : '{{datatable.name}}', ids : ids, with : _with || _without }, function(param) {
+                    if (!param.err)
+                        location.reload();
+                    else
+                        addMessage(param.err);
+                }, true);
+            }
+        }, "[{{label.Cancel}}][{{label.DomainRemoveWithoutUserFiles}}][{{label.DomainRemoveWithUserFiles}}]");
     };
 
     window.jxEditRow = function(id) {
