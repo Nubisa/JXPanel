@@ -28,6 +28,6 @@ database.ReadDB(function(err) {
         console.log(util.inspect(database.DB, { depth : null }));
 
         //console.log(util.inspect( ));
-//        hosting_tools.appGetJXConfig("test11.com");
+//        hosting_tools.appGetOptions("test11.com");
     }
 });

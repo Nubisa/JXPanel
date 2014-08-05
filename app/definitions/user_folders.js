@@ -33,6 +33,15 @@ exports.createUserHome = function(plan_name, user_name){
     var location = exports.getUserPath(plan_name, user_name);
 
     console.log("creating user home at", location);
+    var res = exports.createUserFolder(location);
+    if (res.err)
+        return res;
+
+    return {home:location};
+};
+
+exports.createUserFolder = function(location) {
+
     var res = jxcore.utils.cmdSync("mkdir -p " + location);
 
     if(res.exitCode!=0){
@@ -41,5 +50,5 @@ exports.createUserHome = function(plan_name, user_name){
 
     jxcore.utils.cmdSync("chmod -R o-rwx " + location);
 
-    return {home:location};
+    return true;
 };

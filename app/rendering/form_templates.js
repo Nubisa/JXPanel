@@ -167,7 +167,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             ctrl.options.extra.noEditDisplayValue = val;
 
         if (ctrl.getValue && typeof ctrl.getValue === "function") {
-            ctrl.options.extra.noEditDisplayValue = ctrl.getValue(active_user);
+            ctrl.options.extra.noEditDisplayValue = ctrl.getValue(active_user, values);
         }
 
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));

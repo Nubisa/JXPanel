@@ -326,19 +326,36 @@ exports.addSystemUser = function(json, password, skip) {
 };
 
 
-exports.deleteSystemUser = function(username) {
+exports.deleteSystemUser = function(username, withHomeDir) {
     if (!exports.systemUserExists(username))
         return { err : false  };
 
     var cmd = 'deluser ' + username;
     var ret = jxcore.utils.cmdSync(cmd);
 
-    if (ret.exitCode)
+    if (ret.exitCode) {
         console.error("UsersCannotDeleteSystemUser", ret.out.toString().trim());
-    else
+        return { err : ret.exitCode ? "UsersCannotDeleteSystemUser" : false };
+    } else {
         console.log("System user %s was deleted successfully.", username);
+    }
 
-    return { err : ret.exitCode ? "UsersCannotDeleteSystemUser" : false }
+    if (withHomeDir) {
+        var plans = database.getPlansByUserName(username);
+        if (!plans) {
+            return { err : "DBCannotGetPlan" };
+        }
+
+        var dir = folder_utils.getUserPath(null, username);
+        if (fs.existSync(dir)) {
+            exports.rmdirSync(dir);
+            if (fs.existsSync(dir)) {
+                return { ret : "UsersCannotDeleteSystemUsersFolder" };
+            }
+        }
+    }
+
+    return { err : false };
 };
 
 

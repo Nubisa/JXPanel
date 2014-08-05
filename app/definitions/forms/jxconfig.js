@@ -106,13 +106,13 @@ exports.form = function () {
                                 + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
 
 
-                            return jxcore.monitor.isOnline
-                                ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user, "Online", true) +  btnStop
-                                : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user, "Offline", true) +  btnStart;
+                            return active_user.session.monitor.isOnline
+                                ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true) +  btnStop
+                                : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true) +  btnStart;
 //                        } else {
 //
 //                            var str = "<br><code>" + form_lang.Get(active_user.lang, "JXcorePleaseInstall") + "</code>";
-//                            return jxcore.monitor.isOnline
+//                            return active_user.session.monitor.isOnline
 //                                ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user, "Online", true) + " " + str
 //                                : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user, "Offline", true) + " " + str;
 //                        }
