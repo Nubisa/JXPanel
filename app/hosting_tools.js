@@ -339,6 +339,36 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
     });
 };
 
+// just runs the command. useful when calling for multiple domains.
+// also checking should be done outside
+exports.appStartWithoutCheck = function(domain_name, cb) {
+
+    var spawnerCmd = exports.appGetSpawnerCommand(domain_name);
+    if (spawnerCmd.err) {
+        cb(spawnerCmd.err, domain_name);
+        return;
+    }
+
+    var options = exports.appGetOptions(domain_name);
+    if (options.err) {
+        cb(options.err, domain_name);
+        return;
+    }
+    if (options.plan.suspended) {
+        cb("PlanSuspended", domain_name);
+        return;
+    }
+
+    fs.writeFileSync(options.cfg_path, JSON.stringify(options, null, 9));
+
+    var jxPath = exports.getJXPath();
+
+    exec(spawnerCmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (errExec, stdout, stderr) {
+        cb(false, domain_name);
+    });
+};
+
+
 
 exports.appStopMultiple = function(domain_names, cb) {
 
@@ -424,17 +454,8 @@ exports.appStopMultiple = function(domain_names, cb) {
     });
 };
 
-// returns string with information about app status
-exports.appStatus = function (domain_name, monitor_json) {
 
-//    var str = "";
-//    var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user, "Online", true);
-//    var iconOffline = '<i class="fa-fw fa fa-check text-danger"></i>';
-//
-//
-//    if (!monitor_json)
 
-};
 
 
 exports.saveMonitorConfig = function (jxPath) {
@@ -504,6 +525,37 @@ exports.getMonitorJSON = function (parse, cb) {
     });
 };
 
+// starts all not-suspended and not-disabled user apps
+var appStartEnabled = function(cb) {
+
+    var appsToRun = [];
+
+    var domains = database.getDomainsByPlanName("Unlimited", 1e7);
+    for(var o in domains) {
+        var domain_name = domains[o];
+        var domain = database.getDomain(domain_name);
+        var plan = database.getPlanByDomainName(domain_name);
+        if (domain.jx_enabled && !plan.suspended)
+            appsToRun.push(domain_name);
+    }
+
+    var cnt = appsToRun.length;
+
+    if (!cnt) {
+        cb();
+        return;
+    }
+
+    var stepDone = function() {
+        cnt--;
+        if (cnt === 0)
+            cb();
+    };
+
+    for(var o in appsToRun) {
+        exports.appStartWithoutCheck(appsToRun[o], stepDone);
+    }
+};
 
 exports.monitorStartStop = function (startOrStop, cb) {
 
@@ -541,7 +593,14 @@ exports.monitorStartStop = function (startOrStop, cb) {
                     console.log(startOrStop ? "JXcoreMonitorStarted" : "JXcoreMonitorStopped");
                 }
 
-                cb(msg);
+                if (startOrStop) {
+                    appStartEnabled(function() {
+                        cb(msg);
+                    });
+                } else {
+                    cb(msg);
+                }
+
             });
         };
 

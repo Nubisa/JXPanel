@@ -530,6 +530,11 @@ methods.appStartStop = function (env, params) {
         hosting_tools.appStartStop(params.op, params.id, function(err) {
             if (err) err = form_lang.Get(active_user.lang, err, true);
             server.sendCallBack(env, {err: err });
+
+            // JXPanel should know, whether user wanted to start or stop an app
+            var domain = database.getDomain(params.id);
+            domain.jx_enabled = params.op;
+            database.updateDomain(params.id, domain);
         });
     }
 };
