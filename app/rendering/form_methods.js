@@ -302,7 +302,7 @@ methods.sessionApply = function(env, params){
 
                     if (!ret) {
                         // creating dir for a domain
-                        var ret1 = hosting_tools.appCreateHomeDir(active_user, json.name);
+                        var ret1 = hosting_tools.appCreateHomeDir(json.name);
                         if (ret1 && ret1.err) {
                             ret = ret1.err;
                             database.deleteDomain(json.name);
@@ -505,11 +505,7 @@ methods.appStartStop = function (env, params) {
         server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "'DomainNotFound", true) });
     } else {
         hosting_tools.appStartStop(params.op, params.id, function(err) {
-            // let's wait for monitor to respawn an app as user
-            setTimeout(function() {
-                server.sendCallBack(env, {err: err });
-            }, params.op ? 4000 : 10);
-
+            server.sendCallBack(env, {err: err });
         });
     }
 };

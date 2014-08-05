@@ -72,6 +72,12 @@ exports.getFreePorts = function (howMany) {
     return null;
 };
 
+
+exports.appGetHomeDirByPlanAndUser = function(plan_name, user_name, domain_name) {
+
+    return appDir = path.join(user_folders.getUserPath(plan_name, user_name), domain_name) + path.sep;
+};
+
 exports.appGetOptions = function (domain_name) {
 
     var fields = {
@@ -130,13 +136,7 @@ exports.appGetOptions = function (domain_name) {
             add(fields[o], plan.planMaximums[o]);
     }
 
-
-    var appDir = path.join(user_folders.getUserPath(plan.name, domain.owner), domain_name) + path.sep;
-    if (!fs.existsSync(appDir)) {
-        var ret = user_folders.createUserFolder(appDir);
-        if (ret.err)
-            return ret;
-    }
+    var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
 
     var appPath = appDir + domain.jx_app_path;
     var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
@@ -145,18 +145,23 @@ exports.appGetOptions = function (domain_name) {
     return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, user : user, plan: plan };
 };
 
-exports.appCreateHomeDir = function(active_user, domain_name) {
+exports.appCreateHomeDir = function(domain_name) {
 
     // creating dir for a domain
     var options = exports.appGetOptions(domain_name);
     if (options.err)
         return options;
 
+    // no error
+    if (fs.existSync(options.app_dir))
+        return false;
+
     var ret = user_folders.createUserFolder(options.app_dir);
     if (ret.err)
         return ret;
 
-    ret = user_folders.markFile(options.app_dir, active_user.uid, active_user.gid);
+    var uids = system_tools.getUserIDS(options.user.name)
+    ret = user_folders.markFile(options.app_dir, uids.uid, uids.gid);
     if (ret)
         return ret;
 
@@ -303,21 +308,25 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
         var cmd = startOrStop ? spawnerCmd : jxPath + " monitor kill " + spawner + " 2>&1";
         exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
             // cannot rely on err in this case. command returns non-zero exitCode on success
-            exports.getMonitorJSON(false, function(err2, ret2) {
-                var online_after = !err2 && ret2 && ret2.indexOf(spawner) !== -1;
 
-                var err = online_after === online_before;
-                var msg = null;
-                if (err) {
-                    msg = startOrStop ? "JXcoreAppCannotStart" : "JXcoreAppCannotStop";
-                    msg += "|" + domain_name;
-                    if (err2) msg += " " + err2;
-                } else {
-                    console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
-                }
+            // let's wait for monitor to respawn an app as user
+            setTimeout(function() {
+                exports.getMonitorJSON(false, function(err2, ret2) {
+                    var online_after = !err2 && ret2 && ret2.indexOf(spawner) !== -1;
 
-                cb(msg);
-            });
+                    var err = online_after === online_before;
+                    var msg = null;
+                    if (err) {
+                        msg = startOrStop ? "JXcoreAppCannotStart" : "JXcoreAppCannotStop";
+                        msg += "|" + domain_name;
+                        if (err2) msg += " " + err2;
+                    } else {
+                        console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
+                    }
+
+                    cb(msg);
+                });
+            }, startOrStop ? 4000 : 10);
         });
     });
 };

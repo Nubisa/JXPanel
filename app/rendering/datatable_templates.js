@@ -11,6 +11,7 @@ var database = require("./../install/database");
 var system_tools = require("./../system_tools");
 var hosting_tools = require("./../hosting_tools");
 var site_defaults = require("./../definitions/site_defaults");
+var folder_utils = require("../definitions/user_folders");
 
 
 var getTable = function(table_name) {
@@ -332,14 +333,44 @@ var logic = [
 ];
 
 
-var getHomePaths = function() {
+// collects home dirs for each user and each domain
+var getHomePaths = function(active_user) {
 
+    var users = database.getUsersByUserName(active_user.username, 1e7);
+    var domains = database.getDomainsByUserName(active_user.username, 1e7);
+    var plans = database.getPlansByUserName(active_user.username, 1e7);
+
+    var ret = { users : {}, domains : {}, plans : {} };
+    for(var o in users) {
+        var user = database.getUser(users[o]);
+        ret.users[users[o]] = folder_utils.getUserPath(user.plan, user.name);
+    }
+
+    for(var o in domains) {
+        var domain = database.getDomain(domains[o]);
+        var user = database.getUser(domain.owner);
+        ret.domains[domains[o]] = hosting_tools.appGetHomeDirByPlanAndUser(user.plan, user.name, domains[o]);
+    }
+
+    for(var o in plans) {
+        ret.plans[plans[o]] = folder_utils.getPlanPath(plans[o]);
+    }
+
+    return ret;
 };
 
+
+var updateArrUnique = function(base, ext){
+    for(var id in ext)
+        if (base.indexOf(ext[id]) === -1)
+            base.push(ext[id])
+};
 
 exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
 
     var active_user = _active_user.getUser(sessionId);
+
+    var homeDirs = withUserFiles ? getHomePaths(active_user) : null;
 
     var table = getTable(table_name);
     if (!table) {
@@ -370,6 +401,7 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
     var accessDenied = [];
     var domainsToRemove = [];
     var usersToRemove = [];
+    var plansToRemove = [];
     var errors = [];
     // multiple selection on list
     for(var i in ids) {
@@ -390,17 +422,9 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
         }
 
         if (ret.deleted) {
-            if (ret.users) {
-                for(var id in ret.users) {
-                    if (usersToRemove.indexOf(ret.users[id]) === -1)
-                        usersToRemove.push(ret.users[id]);
-                }
-            }
-            if (ret.domains) {
-                for(var id in ret.domains)
-                    if (domainsToRemove.indexOf(ret.domains[id]) === -1)
-                        domainsToRemove.push(ret.domains[id])
-            }
+            if (ret.users) updateArrUnique(usersToRemove, ret.users);
+            if (ret.domains) updateArrUnique(domainsToRemove, ret.domains);
+            if (ret.plans) updateArrUnique(plansToRemove, ret.plans);
         }
     }
 
@@ -410,7 +434,15 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
             var ret1 = system_tools.deleteSystemUser(usersToRemove[o]);
             if (ret1.err) {
                 errors.push(form_lang.Get(active_user.lang, ret1.err, true));
-                continue;
+            }
+            if (withUserFiles && homeDirs && homeDirs.users[usersToRemove[o]])
+                system_tools.rmdirSync(homeDirs.users[usersToRemove[o]]);
+        }
+
+        // removing plans folders
+        if (withUserFiles && homeDirs) {
+            for(var o in plansToRemove) {
+                system_tools.rmdirSync(homeDirs.plans[plansToRemove[o]]);
             }
         }
 
@@ -423,6 +455,14 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
             for(var domain_name in infos) {
                 if (infos[domain_name].err)
                     errors.push(err);
+            }
+        }
+
+        if (withUserFiles && homeDirs) {
+            for(var o in domainsToRemove) {
+                var domain_name = domainsToRemove[o];
+                if (homeDirs.domains[domain_name])
+                    system_tools.rmdirSync(homeDirs.domains[domain_name]);
             }
         }
 

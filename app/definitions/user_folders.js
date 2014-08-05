@@ -23,9 +23,13 @@ exports.getUserPath = function(plan_name, user_name){
         subplan = db.getParentPlanName(subplan);
     }
 
-    var location = osinfo.appsFolder + pathModule.sep + arr.join(pathModule.sep) + pathModule.sep + user_name;
+    var location = osinfo.appsFolder + pathModule.sep + arr.join(pathModule.sep) + pathModule.sep + (user_name || "");
 
     return location;
+};
+
+exports.getPlanPath = function(plan_name) {
+   return exports.getUserPath(plan_name);
 };
 
 exports.createUserHome = function(plan_name, user_name){

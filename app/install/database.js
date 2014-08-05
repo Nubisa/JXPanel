@@ -437,7 +437,7 @@ exports.getDomainsByUserName = function(user_name, deep){
     if(deep>0){
         var users = exports.getUsersByUserName(user_name, deep);
         for(var o in users){
-            var sub_user = Users[o];
+            var sub_user = Users[users[o]];
             for(var i in sub_user.domains){
                 arr.push(i);
             }

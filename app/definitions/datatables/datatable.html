@@ -197,7 +197,7 @@
         utils.jxAddMessage(type, msg);
     };
 
-    window.jxRemoveRows = function(buttons) {
+    window.jxRemoveRows_old = function(buttons) {
         var ids = [];
         $('input:checkbox[id^=jxrow_]:checked').each(function() {
             var id = $(this).attr('id').replace("jxrow_", "");
@@ -222,7 +222,7 @@
         });
     };
 
-    window.jxRemoveDomains = function() {
+    window.jxRemoveRows = function() {
         var ids = [];
         $('input:checkbox[id^=jxrow_]:checked').each(function() {
             var id = $(this).attr('id').replace("jxrow_", "");
@@ -248,7 +248,7 @@
                         addMessage(param.err);
                 }, true);
             }
-        }, "[{{label.Cancel}}][{{label.DomainRemoveWithoutUserFiles}}][{{label.DomainRemoveWithUserFiles}}]");
+        }, "[{{label.Cancel}}][{{label.RemoveWithoutUserFiles}}][{{label.RemoveWithUserFiles}}]");
     };
 
     window.jxEditRow = function(id) {
