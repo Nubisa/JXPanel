@@ -173,7 +173,7 @@ if (!isRoot || !respawned) {
     var runApp = function(){
         if (fs.existsSync(file)) {
             var spawn = require('child_process').spawn;
-            child = spawn(process.execPath, [file], { uid: uid, stdio: [ 'ignore', out, out ], cwd: pathModule.dirname(file)});
+            child = spawn(process.execPath, [file], { uid: uid, gid: gid, maxBuffer: 1e7, stdio: [ 'ignore', out, out ], cwd: pathModule.dirname(file)});
 
             child.on('error', function (err) {
                 if (err.toString().trim().length) {
