@@ -27,6 +27,9 @@ exports.Labels = {
     "Installed" : "Installed",
     "Reinstall" : "Reinstall",
     "NotInstalled" : "Not installed",
+    "Suspended" : "Suspended",
+    "Active" : "Active",
+    "Status" : "Status",
 
     "serverManagement":"Server Management",
     "help":"Help",
@@ -296,6 +299,7 @@ exports.Labels = {
     "PlanAlreadyExists" : "Plan already exists",
     "PlanParentDefinesValue" : "Parent hosting plan defines this value as %s.",
     "UserSuspended" : "User is suspended",
+    "PlanSuspended" : "Hosting plan is suspended",
 
     "CannotEditRecord" : "You cannot edit this record.",
 

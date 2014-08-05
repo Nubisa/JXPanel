@@ -6,6 +6,7 @@ var tool = require('./../../rendering/form_tools');
 var form_lang = require('../form_lang');
 var path = require("path");
 var validations = require('./../validations');
+var database = require("./../../install/database");
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -64,6 +65,33 @@ exports.form = function () {
                     dbName: "owner"
                 }
             },
+
+            {
+                name: "suspended",
+                details: {
+                    label: "Status",
+                    method: null,
+                    options: { },
+                    displayValues : {
+                        "true" : '<i class="fa-fw fa fa-times text-danger"></i>',
+                        "false" : '<i class="fa-fw fa fa-times text-success"></i>'
+                    },
+                    getValue : function(active_user, values) {
+
+                        // form is in "add" mode, not "edit"
+                        if (!values || !values["name"])
+                            return "";
+
+                        var iconOnline = '<i class="fa-lg fa fa-check text-success"></i> ' + form_lang.Get(active_user.lang, "Active", true);
+                        var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i> <code>' + form_lang.Get(active_user.lang, "Suspended", true) + "</code>";
+
+                        var plan = database.getPlan(values.name);
+
+                        return plan.suspended ? iconOffline : iconOnline;
+                    }
+                }
+            },
+
 
 //            { name: "plan_overuse",
 //                details: {
