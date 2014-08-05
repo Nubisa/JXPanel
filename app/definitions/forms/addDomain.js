@@ -140,7 +140,8 @@ exports.form = function () {
                         if (ret.err)
                             return ret.err;
 
-                        if (active_user.session.monitor && active_user.session.monitor.json && active_user.session.monitor.json.indexOf(ret) === -1)
+                        if (!active_user.session.monitor.json) active_user.session.monitor.json = "";
+                        if (!active_user.session.monitor.json || active_user.session.monitor.json.indexOf(ret) === -1)
                             return iconOffline + btnStart;
                         else
                             return iconOnline + btnStop;
