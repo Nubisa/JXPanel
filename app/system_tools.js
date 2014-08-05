@@ -347,7 +347,7 @@ exports.deleteSystemUser = function(username, withHomeDir) {
         }
 
         var dir = folder_utils.getUserPath(null, username);
-        if (fs.existSync(dir)) {
+        if (fs.existsSync(dir)) {
             exports.rmdirSync(dir);
             if (fs.existsSync(dir)) {
                 return { ret : "UsersCannotDeleteSystemUsersFolder" };

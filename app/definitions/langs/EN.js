@@ -268,6 +268,7 @@ exports.Labels = {
     "DomainNotFound" : "Domain not found.",
     "DomainCannotAdd" : "Cannot add domain.",
     "DomainCannotRemoveDir" : "Cannot remove domain's directory.",
+    "DomainHomeDirDoesNotExist" : "Domain's home directory does not exist.",
 
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",

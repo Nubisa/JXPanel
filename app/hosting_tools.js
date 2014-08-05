@@ -153,7 +153,7 @@ exports.appCreateHomeDir = function(domain_name) {
         return options;
 
     // no error
-    if (fs.existSync(options.app_dir))
+    if (fs.existsSync(options.app_dir))
         return false;
 
     var ret = user_folders.createUserFolder(options.app_dir);
@@ -230,9 +230,9 @@ exports.appGetSpawnerCommand = function (domain_name) {
     if (jxPath.err)
         return jxPath;
 
-    var ret = exports.appGetSpawnerPath(domain_name);
-    if (ret.err)
-        return ret;
+    var spawnerPath = exports.appGetSpawnerPath(domain_name);
+    if (spawnerPath.err)
+        return spawnerPath;
 
     var options = exports.appGetOptions(domain_name);
     if (options.err)
@@ -246,8 +246,11 @@ exports.appGetSpawnerCommand = function (domain_name) {
     if (!user)
         return { err: "UserUnknown" };
 
-    if (!fs.existsSync(options.app_dir))
-        return { err : "UserHomeDirNotExists" };
+    if (!fs.existsSync(options.app_dir)) {
+        var ret = exports.appCreateHomeDir(domain_name);
+        if (ret.err)
+            return ret;
+    }
 
     var opt = {
         "user": user.name,
@@ -259,7 +262,7 @@ exports.appGetSpawnerCommand = function (domain_name) {
         "logWebAccess": domain.jx_app_log_web_access
     };
 
-    var cmd = jxPath + " " + ret + " -opt '" + JSON.stringify(opt) + "'";
+    var cmd = jxPath + " " + spawnerPath + " -opt '" + JSON.stringify(opt) + "'";
     return cmd;
 };
 
@@ -306,7 +309,7 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
         }
 
         var cmd = startOrStop ? spawnerCmd : jxPath + " monitor kill " + spawner + " 2>&1";
-        exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
+        exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (errExec, stdout, stderr) {
             // cannot rely on err in this case. command returns non-zero exitCode on success
 
             // let's wait for monitor to respawn an app as user

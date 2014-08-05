@@ -191,6 +191,8 @@ var update = function(base, ext){
 methods.sessionApply = function(env, params){
 
     var active_user = checkUser(env);
+    if (!active_user)
+        return;
 
     if(!sessionAdd(env, active_user, params))
         return;
@@ -419,6 +421,8 @@ methods.logout = function(env, params) {
 methods.getControlsValues = function(env, params) {
 
     var active_user = checkUser(env);
+    if (!active_user)
+        return;
 
     var activeForm = active_user.session.forms[params.form];
     var activeInstance = activeForm.activeInstance;
@@ -443,6 +447,8 @@ var uninstallNPM = function(env, params) {
 
     var failures = [];
     var active_user = checkUser(env);
+    if (!active_user)
+        return;
 
     for(var i in params.ids) {
         var modulesDir = path.normalize(site_defaults.dirNativeModules + "/node_modules/" + params.ids[i]);
@@ -491,20 +497,26 @@ methods.installNPM = function(env, params) {
 methods.monitorStartStop = function (env, params) {
 
     var active_user = checkUser(env);
+    if (!active_user)
+        return;
 
     hosting_tools.monitorStartStop(params.op, function(err) {
-        server.sendCallBack(env, {err: err ? form_lang.Get(active_user.lang, err, true) : false });
+        if (err) err = form_lang.Get(active_user.lang, err, true);
+        server.sendCallBack(env, {err: err });
     });
 };
 
 methods.appStartStop = function (env, params) {
 
     var active_user = checkUser(env);
+    if (!active_user)
+        return;
 
     if (!params.id) {
         server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "'DomainNotFound", true) });
     } else {
         hosting_tools.appStartStop(params.op, params.id, function(err) {
+            if (err) err = form_lang.Get(active_user.lang, err, true);
             server.sendCallBack(env, {err: err });
         });
     }
@@ -514,11 +526,11 @@ methods.appStartStop = function (env, params) {
 methods.jxInstall = function (env, params) {
 
     var active_user = checkUser(env);
+    if (!active_user)
+        return;
 
     system_tools.installJX(function(err) {
-        if (err)
-            err = form_lang.Get(active_user.lang, err, true);
-
+        if (err) err = form_lang.Get(active_user.lang, err, true);
         server.sendCallBack(env, { err : err });
     });
 };
