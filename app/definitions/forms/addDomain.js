@@ -7,6 +7,7 @@ var form_lang = require('../form_lang');
 var path = require("path");
 var validations = require('./../validations');
 var hosting_tools = require("./../../hosting_tools");
+var database = require("./../../install/database");
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -115,6 +116,8 @@ exports.form = function () {
                         if (!values || !values["name"])
                             return iconOffline;
 
+                        var plan = database.getPlanByDomainName(values.name);
+
                         var domain_name = values["name"];
 
                         var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true);
@@ -126,6 +129,9 @@ exports.form = function () {
                         var btnStop = '<button class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
                             + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
 
+
+                        if (plan.suspended)
+                            btnStart = btnStop = ". <code>" + form_lang.Get(active_user.lang, "PlanSuspended", true) + "</code>";
 
                         if (!active_user.session.monitor && !active_user.session.monitor.json)
                             return iconOffline + ". " + form_lang.Get(active_user.lang, "JXcoreMonitorNotRunning", true);

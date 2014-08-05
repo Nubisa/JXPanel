@@ -275,12 +275,17 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
     }
 
     if (startOrStop) {
-        var jxconfig = exports.appGetOptions(domain_name);
-        if (jxconfig.err) {
-            cb(jxconfig.err);
+        var options = exports.appGetOptions(domain_name);
+        if (options.err) {
+            cb(options.err);
             return;
         }
-        fs.writeFileSync(jxconfig.cfg_path, JSON.stringify(jxconfig, null, 9));
+        if (options.plan.suspended) {
+            cb("PlanSuspended");
+            return;
+        }
+
+        fs.writeFileSync(options.cfg_path, JSON.stringify(options, null, 9));
     }
 
     var jxPath = exports.getJXPath();
@@ -556,6 +561,19 @@ exports.monitorStartStop = function (startOrStop, cb) {
             checkAfter();
         });
     });
+};
 
+
+
+database.OnSuspend = function(plan_name, field_name) {
+
+    var domains = database.getDomainsByPlanName(plan_name);
+    if (!domains.length) {
+        return;
+    }
+
+    exports.appStopMultiple(domains, function(err) {
+        console.error("There were some errors while trying to stop applications.")
+    });
 
 };
