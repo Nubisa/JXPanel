@@ -447,7 +447,7 @@ methods.getControlsValues = function(env, params) {
 var uninstallNPM = function(env, params) {
 
     var failures = [];
-    var active_user = _active_user.checkUser(env);
+    var active_user = _active_user.checkAdmin(env);
     if (!active_user)
         return;
 
@@ -467,6 +467,10 @@ var uninstallNPM = function(env, params) {
 
 
 methods.installNPM = function(env, params) {
+
+    var active_user = _active_user.checkAdmin(env);
+    if (!active_user)
+        return;
 
     var nameAndVersion = params;
     var name = nameAndVersion;
@@ -497,7 +501,7 @@ methods.installNPM = function(env, params) {
 
 methods.monitorStartStop = function (env, params) {
 
-    var active_user = _active_user.checkUser(env);
+    var active_user = _active_user.checkAdmin(env, false, false, true);
     if (!active_user)
         return;
 
@@ -531,7 +535,7 @@ methods.appStartStop = function (env, params) {
 
 methods.jxInstall = function (env, params) {
 
-    var active_user = _active_user.checkUser(env);
+    var active_user = _active_user.checkAdmin(env);
     if (!active_user)
         return;
 
