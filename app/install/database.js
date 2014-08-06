@@ -37,6 +37,7 @@ var ReadDB = function(cb){ // KRIS FILL IN
                 Plans[o] = new Plan(o, null, Plans[o], true);
             }
             for(var o in Users){
+                Users[o] = new User(o, Users[o].plan, Users[o]);
                 if(!Users[o].subPlans){
                     Users[o].subPlans = {};
                 }
