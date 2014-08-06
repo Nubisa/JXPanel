@@ -17,10 +17,20 @@ exports.markFile = function(target, uid, gid){
 
 exports.getUserPathSize = function(user_name){
     var users = db.getUsersByUserName(user_name, 1e7);
-    var plan = db.getUser(user_name).plan;
+    var pl = db.getUser(user_name);
+    if(!pl){
+        console.error(user_name, "wasn't exist in database");
+        process.exit(-1);
+    }
+    var plan = pl.plan;
     var total = system_tools.getDiskUsageSync(exports.getUserPath(plan, user_name));
     for(var o in users){
-        plan = db.getUser(o).plan;
+        pl = db.getUser(o);
+        if(!pl){
+            console.error(user_name, "wasn't exist in database");
+            process.exit(-1);
+        }
+        plan = pl.plan;
         total += system_tools.getDiskUsageSync(exports.getUserPath(plan, o));
     }
 
