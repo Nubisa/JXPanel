@@ -478,7 +478,7 @@ exports.getDomainsByUserName = function(user_name, deep){
     return arr;
 };
 
-exports.getDomainsByPlanName = function(name) {
+exports.getDomainsByPlanName = function(name, deep) {
     if(!Plans[name]){
         throw new Error(name + " plan doesn't exist");
     }
@@ -486,7 +486,7 @@ exports.getDomainsByPlanName = function(name) {
     var users = exports.getUsersByPlanName(name);
     var arr = [];
     for(var i in users) {
-        var domains = exports.getDomainsByUserName(users[i], 1e7);
+        var domains = exports.getDomainsByUserName(users[i], deep);
         for(var o in domains) {
             arr.push(domains[o]);
         }

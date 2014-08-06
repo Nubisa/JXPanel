@@ -624,15 +624,28 @@ exports.monitorStartStop = function (startOrStop, cb) {
 
 
 
-database.OnSuspend = function(plan_name, field_name) {
+database.OnSuspend = function(name, field_name, table, suspended) {
 
-    var domains = database.getDomainsByPlanName(plan_name);
-    if (!domains.length) {
-        return;
+    if (suspended) {
+        var domains = [];
+        if (table === "Plan") {
+            domains = database.getDomainsByPlanName(name);
+            var plan = database.getPlan(name);
+            plan.suspended_reason = field_name;
+        }
+        if (table === "User") {
+            domains = database.getDomainsByUserName(name);
+            var user = database.getUser(name);
+            user.suspended_reason = field_name;
+        }
+
+        database.UpdateDB();
+
+        if (domains.length) {
+            exports.appStopMultiple(domains, function(err) {
+                console.error("There were some errors while trying to stop applications.", err);
+            });
+        }
     }
-
-    exports.appStopMultiple(domains, function(err) {
-        console.error("There were some errors while trying to stop applications.")
-    });
 
 };
