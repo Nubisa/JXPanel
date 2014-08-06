@@ -234,23 +234,22 @@ exports.createSimpleText = function(label, _title, input_id, _value, lang, optio
 exports.end = "</fieldset></form>";
 
 
-var formLabels = null;
+var formLabels = {};
 
 // returns english labels for form controls,
 // e.g. { person_name : "Contact name", .... }
 exports.getFormsLabels = function(lang) {
 
-    if (formLabels)
-        return formLabels;
-
-
     if (!lang) lang = "EN";
+
+    if (formLabels[lang])
+        return formLabels[lang];
 
     var dir = path.join(__dirname, "../definitions/forms");
     var files = fs.readdirSync(dir);
 
 
-    formLabels = {};
+    var labels = {};
     for(var o in files) {
         var file = dir + path.sep + files[o];
         if (path.extname(file) === ".js") {
@@ -258,16 +257,19 @@ exports.getFormsLabels = function(lang) {
                 var form = require(file).form();
 
                 for(var i in form.controls) {
-                    if (form.controls[i].name)
-                        formLabels[form.controls[i].name] = form_lang.Get("EN", form.controls[i].details.label, true);
+                    if (form.controls[i].name) {
+                        labels[form.controls[i].name] = form_lang.Get("EN", form.controls[i].details.label, true);
 
-                    if (form.controls[i].details.dbName)
-                        formLabels[form.controls[i].details.dbName] = form_lang.Get("EN", form.controls[i].details.label, true);
+                        if (form.controls[i].details.dbName)
+                            labels[form.controls[i].details.dbName] = form_lang.Get("EN", form.controls[i].details.label, true);
+                    }
                 }
 
             } catch(ex) {}
         }
     }
 
-    return formLabels;
+    formLabels[lang] = labels;
+
+    return formLabels[lang];
 };
