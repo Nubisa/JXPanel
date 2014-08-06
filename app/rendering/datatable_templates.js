@@ -349,7 +349,15 @@ var getHomePaths = function(active_user) {
     for(var o in domains) {
         var domain = database.getDomain(domains[o]);
         var user = database.getUser(domain.owner);
-        ret.domains[domains[o]] = hosting_tools.appGetHomeDirByPlanAndUser(user.plan, user.name, domains[o]);
+        var paths = [];
+        paths.push(hosting_tools.appGetHomeDirByPlanAndUser(user.plan, user.name, domains[o]));
+        var spawner = hosting_tools.appGetSpawnerPath(domains[o]);
+        if (!spawner.err)
+            paths.push(spawner);
+        var options = hosting_tools.appGetOptions(domains[o]);
+        if (!options.ret)
+            paths.push(options.cfg_path);
+        ret.domains[domains[o]] = paths;
     }
 
     for(var o in plans) {
@@ -461,8 +469,10 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
         if (withUserFiles && homeDirs) {
             for(var o in domainsToRemove) {
                 var domain_name = domainsToRemove[o];
-                if (homeDirs.domains[domain_name])
-                    system_tools.rmdirSync(homeDirs.domains[domain_name]);
+                if (homeDirs.domains[domain_name]) {
+                    for(var i in homeDirs.domains[domain_name])
+                        system_tools.rmdirSync(homeDirs.domains[domain_name][i]);
+                }
             }
         }
 
