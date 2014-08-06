@@ -25,7 +25,6 @@ exports.defineMethods = function(){
         var ssh = plan.plan_ssh;
 
         if(!ssh || plan.suspended){
-            console.log("DISABLED SSH");
             server.sendCallBack(env, {errmsg:form_lang.Get("EN", "SSHNotAllowed")});
             return;
         }

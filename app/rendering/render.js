@@ -5,6 +5,7 @@ var form_lang = require('../definitions/form_lang');
 var page_utils = require('./page_utils');
 var fs = require('fs');
 var pathModule = require('path');
+var menu_creator = require('./menu_creator');
 
 var takeValue = function(lang, obj, val, active_user){
     if(!obj[lang]){
@@ -46,6 +47,13 @@ var smart_rule = [
             }
 
             return !gl.active_user[val] ? "":gl.active_user[val];
+        }
+    },
+    {from:"{{menu.$$}}", to:"$$", "$":function(val, gl){
+            if(!gl.active_user){
+                return "";
+            }
+            return menu_creator.render(gl.active_user);
         }
     },
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
