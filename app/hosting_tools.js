@@ -27,7 +27,7 @@ exports.setPortRange = function (min, max) {
 
     database.setConfigValue("jx_app_min_port", min);
     database.setConfigValue("jx_app_max_port", max);
-    database.UpdateDB();
+    database.updateDBFile();
 };
 
 exports.getPortRange = function () {
@@ -639,7 +639,7 @@ database.OnSuspend = function(name, field_name, table, suspended) {
             user.suspended_reason = field_name;
         }
 
-        database.UpdateDB();
+        database.updateDBFile();
 
         if (domains.length) {
             exports.appStopMultiple(domains, function(err) {
