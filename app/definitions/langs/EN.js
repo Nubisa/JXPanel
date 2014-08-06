@@ -147,6 +147,7 @@ exports.Labels = {
     "UsersContentList": "Create new users and manage their options.",
 
     "UsersCannotCreateSystemUser" : "Cannot create system user.",
+    "UsersCannotUpdatePassword" : "Cannot update system user's password.",
     "UsersCannotDeleteSystemUser" : "Cannot delete system user.",
     "UsersCannotDeleteSystemUsersFolder" : "Cannot delete user's folder.",
 
