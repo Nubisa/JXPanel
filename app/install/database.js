@@ -15,6 +15,10 @@ var UpdateDB = function(stringToSave){ // KRIS FILL IN
     });
 };
 
+exports.updateDBFile = function(){
+   UpdateDB(JSON.stringify(DB));
+};
+
 var ReadDB = function(cb){ // KRIS FILL IN
 
     sqlite2.ReadDB(function(err, fromSQLite) {
