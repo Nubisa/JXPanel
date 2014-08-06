@@ -5,7 +5,7 @@ make
 mv vsftpd build_$1/
 cp _vsftpd.conf build_$1/vsftpd.conf
 cp _vsftpd_users build_$1/vsftpd_users
-cd build_$1
+chdir build_$1
 mkdir ftp_root
 chown -R root:root ftp_root
 chmod 755 ftp_root
