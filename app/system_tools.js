@@ -325,6 +325,13 @@ exports.addSystemUser = function(json, password, skip) {
     return { err : ret.exitCode ? "UsersCannotCreateSystemUser" : false };
 };
 
+exports.updatePassword = function(username, password) {
+    var cmd = 'echo "' + username + ':' + password + '" | /usr/sbin/chpasswd -c SHA256';
+
+    var ret = jxcore.utils.cmdSync(cmd);
+    return { err : ret.exitCode ? "UsersCannotUpdatePassword" : false };
+};
+
 
 exports.deleteSystemUser = function(username, withHomeDir) {
     if (!exports.systemUserExists(username))

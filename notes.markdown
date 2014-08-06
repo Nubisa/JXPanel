@@ -3,3 +3,5 @@
    for subplans it will be fired separately
 
 2. suspended user can only edit or delete. cannot add or start app or call remote management
+
+3. update password feature

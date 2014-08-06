@@ -256,10 +256,16 @@ methods.sessionApply = function(env, params){
 
                 update(user, json);
                 ret = database.updateUser(update_name, user);
+
+                if (params.controls["person_password"]) {
+                    var res = system_tools.updatePassword(update_name, params.controls["person_password"]);
+                    if (res.err)
+                        ret = res.err;
+                }
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
                 if (!ret) {
-                    var res = system_tools.addSystemUser(json,  params.controls["person_password"]);
+                    var res = system_tools.addSystemUser(json, params.controls["person_password"]);
                     if (res.err) {
                         ret = res.err;
                         database.deleteUser(json.name);
