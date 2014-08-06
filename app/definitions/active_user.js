@@ -97,6 +97,25 @@ exports.getUser = function(sessionId)
     return users[sessionId];
 };
 
+
+exports.checkUser = function(env, checkIfSuspended, form_name) {
+    var active_user = exports.getUser(env.SessionID, false);
+
+    if(!active_user){
+        server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied")});
+        return null;
+    }
+
+    if (checkIfSuspended && active_user.suspended_txt) {
+        if (!form_name || !_active_user.isRecordUpdating(active_user, form_name)) {
+            server.sendCallBack(env, {err: active_user.suspended_txt, hideForm : true });
+            return null;
+        }
+    }
+
+    return active_user;
+};
+
 exports.getForm = function(sessionId, form_name){
     // TODO check permissions to form
     console.log("active_user::getForm", sessionId, form_name);
@@ -327,8 +346,11 @@ exports.defineMethods = function(){
     server.addJSMethod("addFileFolder", function(env, params){
         console.log("addFileFolder", params);
 
-        var active_user = exports.getUser(env.SessionID);
-        if(!active_user || !params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
+        var active_user = exports.checkUser(env, true);
+        if (!active_user)
+            return;
+
+        if(!params.up || !params.up.indexOf || params.up.indexOf("..")>=0){
             server.sendCallBack(env, {err:form_lang.Get("EN", "Access Denied"), relogin:true});
             return;
         }
