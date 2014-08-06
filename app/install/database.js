@@ -35,9 +35,13 @@ var ReadDB = function(cb){ // KRIS FILL IN
 
             for(var o in Plans){
                 Plans[o] = new Plan(o, null, Plans[o], true);
+                // obsolete value
+                delete Plans[o].suspended_reason;
             }
             for(var o in Users){
                 Users[o] = new User(o, Users[o].plan, Users[o]);
+                // obsolete value
+                delete Users[o].suspended_reason;
                 if(!Users[o].subPlans){
                     Users[o].subPlans = {};
                 }
@@ -149,7 +153,7 @@ var Plan = function(name, owner_user, opts, dummy){
     this.suspended = false;
 
     this.SuspendPlan = function(o){
-        this.suspended = true;
+        this.suspended = o;
         if(exports.OnSuspend){
             exports.OnSuspend(this.name, o, "Plan", true);
         }
@@ -266,7 +270,7 @@ var User = function(name, parent_plan, opts){
     this.suspended = false;
 
     this.SuspendUser = function(o){
-        this.suspended = true;
+        this.suspended = o;
         if(exports.OnSuspend){
             exports.OnSuspend(this.name, o, "User", true);
         }

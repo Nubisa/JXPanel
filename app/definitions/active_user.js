@@ -86,7 +86,7 @@ exports.getUser = function(sessionId)
         if (user.suspended) {
             var lang = users[sessionId].lang;
             var labels = form_tools.getFormsLabels(lang);
-            var str = "<strong>" + form_lang.Get(lang, "YouAreSuspended", true, [labels[user.suspended_reason] || user.suspended_reason]) + "</strong>";
+            var str = "<strong>" + form_lang.Get(lang, "YouAreSuspended", true, [labels[user.suspended] || user.suspended]) + "</strong>";
             str += " " + form_lang.Get(lang, "YouAreSuspendedExtra", true);
 
             users[sessionId].suspended_txt = str;

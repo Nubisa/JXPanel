@@ -89,7 +89,7 @@ exports.form = function () {
 
                         if (plan.suspended) {
                             var labels = tool.getFormsLabels(active_user.lang);
-                            var reason = labels[plan.suspended_reason] || plan.suspended_reason;
+                            var reason = labels[plan.suspended] || plan.suspended;
                             return iconOffline + " (" + reason + ")";
                         } else {
                             return iconOnline;
