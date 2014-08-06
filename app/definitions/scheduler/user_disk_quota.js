@@ -18,7 +18,7 @@ var check_quotas = function(){
                     var users = plan.users;
                     for(var i in users){
                         var user = db.getUser(i);
-                        if (!user.suspended || true) {
+                        if (!user.suspended) {
                             var size = folders.getUserPathSize(i);
                             if(size>max_disk){
                                 user.SuspendUser("plan_disk_space");
