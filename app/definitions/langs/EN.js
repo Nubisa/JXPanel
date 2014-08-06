@@ -301,6 +301,8 @@ exports.Labels = {
     "PlanParentDefinesValue" : "Parent hosting plan defines this value as %s.",
     "UserSuspended" : "User is suspended",
     "PlanSuspended" : "Hosting plan is suspended",
+    "YouAreSuspended" : "You are suspended (%s).",
+    "YouAreSuspendedExtra" : "You can only edit and remove records. Adding records or launching applications is disabled.",
 
     "CannotEditRecord" : "You cannot edit this record.",
 
