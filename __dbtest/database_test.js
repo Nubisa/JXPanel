@@ -16,6 +16,10 @@ var inspect = function(obj) {
     return util.inspect(obj, { depth : 9 });
 };
 
+var log = function(obj) {
+    console.log(inspect(obj));
+}
+
 var start = function() {
 
     var unlimited = database.getPlan("Unlimited");
@@ -142,6 +146,24 @@ var start5 = function() {
 //    }
 //};
 
+
+var suspendTest = function() {
+
+    var plan = database.getPlan("plan1");
+    plan.SuspendPlan("par1");
+//    log(plan);
+
+    plan.SuspendPlan("par2");
+//    log(plan);
+
+    plan.UnSuspendPlan("par1");
+//    log(plan);
+
+    plan.UnSuspendPlan();
+//    log(plan);
+
+};
+
 var testdb = __dirname + "/test.db";
 
 //sqlite2.SetFileName(testdb);
@@ -151,5 +173,9 @@ if (fs.existsSync(testdb))
 
 
 database.ReadDB(function(err) {
-    if (err) console.error(err); else database.fixDatabase();
+    if (err) console.error(err); else suspendTest();
 });
+
+
+var ss = [ ];
+console.log(Object.prototype.toString.call(ss));

@@ -273,3 +273,26 @@ exports.getFormsLabels = function(lang) {
 
     return formLabels[lang];
 };
+
+
+exports.getFieldDisplayNames = function(lang, field_names) {
+
+    if (!field_names) {
+        return "";
+    }
+
+    var labels = exports.getFormsLabels(lang);
+    var arr = [];
+
+    if (field_names.trim) {
+        field_names = [ field_names ];
+    }
+    for(var o in field_names) {
+        if (labels[field_names[o]])
+            arr[o] = labels[field_names[o]];
+        else
+            arr[o] = field_names[o];
+    }
+
+    return arr.join(", ");
+};

@@ -52,8 +52,7 @@ exports.form = function () {
                         var user = database.getUser(values.name);
 
                         if (user.suspended) {
-                            var labels = tool.getFormsLabels(active_user.lang);
-                            var reason = labels[user.suspended] || plan.suspended;
+                            var reason = tool.getFieldDisplayNames(active_user.lang, user.suspended);
                             return iconOffline + " (" + reason + ")";
                         } else {
                             return iconOnline;

@@ -80,6 +80,7 @@ var checkSet = function(name, host, sub, allowedValues){
     host[name] = sub[name];
 };
 
+
 exports.OnSuspend = null;
 exports.ReadDB = ReadDB;
 
@@ -153,16 +154,37 @@ var Plan = function(name, owner_user, opts, dummy){
     this.suspended = false;
 
     this.SuspendPlan = function(o){
-        this.suspended = o;
+        if (!this.suspended)
+            this.suspended = [];
+
+        if (this.suspended.trim)
+            this.suspended = [ this.suspended ];
+
+        if (this.suspended.indexOf(o) === -1)
+            this.suspended.push(o);
+
         if(exports.OnSuspend){
             exports.OnSuspend(this.name, o, "Plan", true);
         }
     };
 
-    this.UnSuspendPlan = function(){
-        this.suspended = false;
+    this.UnSuspendPlan = function(o){
+        if (o) {
+            if (this.suspended) {
+                if (this.suspended.trim)
+                    this.suspended = [ this.suspended ];
+                var pos = this.suspended.indexOf(o);
+                if (pos !== -1)
+                    this.suspended.splice(pos, 1);
+                if (!this.suspended.length)
+                    this.suspended = false;
+            }
+        } else {
+            this.suspended = false;
+        }
+
         if(exports.OnSuspend){
-            exports.OnSuspend(this.name, null, "Plan", false);
+            exports.OnSuspend(this.name, o, "Plan", false);
         }
     };
 
@@ -270,7 +292,15 @@ var User = function(name, parent_plan, opts){
     this.suspended = false;
 
     this.SuspendUser = function(o){
-        this.suspended = o;
+        if (!this.suspended)
+            this.suspended = [];
+
+        if (this.suspended.trim)
+            this.suspended = [ this.suspended ];
+
+        if (this.suspended.indexOf(o) === -1)
+            this.suspended.push(o);
+
         if(exports.OnSuspend){
             exports.OnSuspend(this.name, o, "User", true);
         }
@@ -281,7 +311,20 @@ var User = function(name, parent_plan, opts){
     };
 
     this.UnSuspendUser = function(){
-        this.suspended = false;
+        if (o) {
+            if (this.suspended) {
+                if (this.suspended.trim)
+                    this.suspended = [ this.suspended ];
+                var pos = this.suspended.indexOf(o);
+                if (pos !== -1)
+                    this.suspended.splice(pos, 1);
+                if (!this.suspended.length)
+                    this.suspended = false;
+            }
+        } else {
+            this.suspended = false;
+        }
+
         if(exports.OnSuspend){
             exports.OnSuspend(this.name, null, "User", false);
         }
