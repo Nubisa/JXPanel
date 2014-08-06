@@ -643,7 +643,8 @@ database.OnSuspend = function(name, field_name, table, suspended) {
 
         if (domains.length) {
             exports.appStopMultiple(domains, function(err) {
-                console.error("There were some errors while trying to stop applications.", err);
+                if (err)
+                    console.error("There were some errors while trying to stop applications.", err);
             });
         }
     }
