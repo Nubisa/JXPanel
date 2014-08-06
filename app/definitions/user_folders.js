@@ -25,13 +25,13 @@ exports.getUserPathSize = function(user_name){
     var plan = pl.plan;
     var total = system_tools.getDiskUsageSync(exports.getUserPath(plan, user_name));
     for(var o in users){
-        pl = db.getUser(o);
+        pl = db.getUser(users[o]);
         if(!pl){
             console.error(user_name, "wasn't exist in database");
             process.exit(-1);
         }
         plan = pl.plan;
-        total += system_tools.getDiskUsageSync(exports.getUserPath(plan, o));
+        total += system_tools.getDiskUsageSync(exports.getUserPath(plan, users[o]));
     }
 
     return total;
