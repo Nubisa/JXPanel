@@ -753,11 +753,6 @@ exports.getConfigValue = function(param) {
     return Config[param];
 };
 
-
-exports.UpdateDB = function() {
-    UpdateDB(JSON.stringify(DB));
-};
-
 exports.fixDatabase = function() {
 
     var arr_plans = [], arr_domains = [], arr_users = [];
