@@ -1,4 +1,6 @@
 var form_lang = require('../definitions/form_lang');
+var path = require("path");
+var fs = require("fs");
 
 exports.begin = '<form class="form-horizontal">';
 
@@ -230,3 +232,42 @@ exports.createSimpleText = function(label, _title, input_id, _value, lang, optio
 };
 
 exports.end = "</fieldset></form>";
+
+
+var formLabels = null;
+
+// returns english labels for form controls,
+// e.g. { person_name : "Contact name", .... }
+exports.getFormsLabels = function(lang) {
+
+    if (formLabels)
+        return formLabels;
+
+
+    if (!lang) lang = "EN";
+
+    var dir = path.join(__dirname, "../definitions/forms");
+    var files = fs.readdirSync(dir);
+
+
+    formLabels = {};
+    for(var o in files) {
+        var file = dir + path.sep + files[o];
+        if (path.extname(file) === ".js") {
+            try {
+                var form = require(file).form();
+
+                for(var i in form.controls) {
+                    if (form.controls[i].name)
+                        formLabels[form.controls[i].name] = form_lang.Get("EN", form.controls[i].details.label, true);
+
+                    if (form.controls[i].details.dbName)
+                        formLabels[form.controls[i].details.dbName] = form_lang.Get("EN", form.controls[i].details.label, true);
+                }
+
+            } catch(ex) {}
+        }
+    }
+
+    return formLabels;
+};
