@@ -271,8 +271,8 @@ var User = function(name, parent_plan, opts){
             exports.OnSuspend(this.name, o, "User", true);
         }
         var plans = exports.getPlansByUserName(this.name);
-        for(var o in plans){
-            exports.getPlan(plans[o]).SuspendPlan(o);
+        for(var i in plans){
+            exports.getPlan(plans[i]).SuspendPlan(o);
         }
     };
 
