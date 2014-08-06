@@ -139,7 +139,7 @@ exports.appGetOptions = function (domain_name) {
     var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
 
     var appPath = appDir + domain.jx_app_path;
-    var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
+    var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_") + ".jx.config";
 
 //    console.log(json, appDir, cfgPath);
     return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, user : user, plan: plan };
@@ -285,7 +285,7 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
             return;
         }
 
-        fs.writeFileSync(options.cfg_path, JSON.stringify(options, null, 9));
+        fs.writeFileSync(options.cfg_path, JSON.stringify(options.cfg, null, 9));
     }
 
     var jxPath = exports.getJXPath();
@@ -359,7 +359,7 @@ exports.appStartWithoutCheck = function(domain_name, cb) {
         return;
     }
 
-    fs.writeFileSync(options.cfg_path, JSON.stringify(options, null, 9));
+    fs.writeFileSync(options.cfg_path, JSON.stringify(options.cfg, null, 9));
 
     var jxPath = exports.getJXPath();
 
