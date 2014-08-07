@@ -122,6 +122,8 @@ exports.checkAdmin = function(env) {
         server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "Access Denied", true) });
         return;
     }
+
+    return active_user;
 };
 
 exports.getForm = function(sessionId, form_name){
