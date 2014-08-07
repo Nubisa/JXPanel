@@ -88,6 +88,7 @@ exports.defineMethods = function(){
 exports.dirNativeModules = path.join(os_info.apps_folder, "native_modules" ) + path.sep;
 exports.dirAppConfigs = path.join(os_info.apps_folder, "app_configs" ) + path.sep;
 exports.dirMonitorCertificates = path.join(__dirname, "../spawner") + path.sep;
+exports.dirNginxConfigs = path.join(os_info.apps_folder, "nginx/conf_jx") + path.sep;
 exports.defaultAppMinPort = 10000;
 exports.defaultAppMaxPort = 20000;
 exports.defaultMaximum = 1e9;  // don't change it, otherwise db should be refreshed
