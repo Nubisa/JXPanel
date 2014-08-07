@@ -11,6 +11,8 @@ var exec = require('child_process').exec;
 var https = require("https");
 var user_folders = require("./definitions/user_folders");
 var system_tools = require("./system_tools");
+var nginxconf = require("./spawner/nginxconf");
+var nginx = require("./install/nginx");
 
 // iterating through domains and assigning http/https port
 exports.setPortRange = function (min, max) {
@@ -139,10 +141,13 @@ exports.appGetOptions = function (domain_name) {
     var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
 
     var appPath = appDir + domain.jx_app_path;
-    var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_") + ".jx.config";
+    var appPathReplaced = appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
+    var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jx.config";
+    var logPath = appDir + "/jxcore_logs/index.txt";
+
 
 //    console.log(json, appDir, cfgPath);
-    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, user : user, plan: plan };
+    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_replaced : appPathReplaced, log_path : logPath, user : user, plan: plan, domain : domain };
 };
 
 exports.appCreateHomeDir = function(domain_name) {
@@ -169,6 +174,50 @@ exports.appCreateHomeDir = function(domain_name) {
 };
 
 
+exports.appGetNginxConfigPath = function(domain_name) {
+
+//    var options = exports.appGetOptions(domain_name);
+//    if (options.err)
+//        return options;
+
+//    return site_defaults.dirNginxConfigs + options.app_path_replaced;
+    return site_defaults.dirNginxConfigs + domain_name + ".conf";
+};
+
+exports.appSaveNginxConfigPath = function(domain_name) {
+
+    var dir = site_defaults.dirNginxConfigs;
+    if (!fs.existsSync(dir)) {
+        try {
+            fs.mkdirSync(dir);
+        } catch (ex) {};
+        if (!fs.existsSync(dir))
+            return {err : "NginxConfDirCannotCreate" };
+    }
+
+    var path = exports.appGetNginxConfigPath(domain_name);
+    if (path.err)
+        return path;
+
+    var options = exports.appGetOptions(domain_name);
+    var domain = options.domain;
+
+    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_app_log_web_access ? options.log_path : null);
+
+    var current = "";
+    if (fs.existsSync(path)) {
+        current = fs.readFileSync(path).toString();
+    }
+
+    if (current !== cfg) {
+        fs.writeFileSync(path, cfg);
+        nginx.needsReload = true;
+    }
+
+    return false;
+};
+
+
 exports.appGetSpawnerPath = function (domain_name) {
     var dir = site_defaults.dirAppConfigs;
     if (!fs.existsSync(dir))
@@ -176,7 +225,7 @@ exports.appGetSpawnerPath = function (domain_name) {
 
     var spawner_org = path.join(__dirname, "spawner/spawner.jx");
     var spawner = dir + "spawner_" + domain_name + ".jx";
-    if (!fs.existsSync(spawner))
+   // if (!fs.existsSync(spawner))
         jxcore.utils.cmdSync("cp " + spawner_org + " " + spawner);
 
     if (!fs.existsSync(spawner))
@@ -221,18 +270,21 @@ exports.appGetSpawnerCommand = function (domain_name) {
 
     var opt = {
         "user": user.name,
-        "log": options.app_dir + "/jxcore_logs/index.txt",
+        "log": options.log_path,
         "file": options.app_path,
         "domain": domain.name,
         "tcp": domain.port_http,
         "tcps": domain.port_https,
-        "logWebAccess": domain.jx_app_log_web_access
+        "logWebAccess": domain.jx_app_log_web_access,
+        "dontSaveNginxConfigFile" : true
     };
 
     var cmd = jxPath + " " + spawnerPath + " -opt '" + JSON.stringify(opt) + "'";
+    console.log(cmd);
     return cmd;
 };
 
+// start or stop single app
 exports.appStartStop = function(startOrStop, domain_name, cb) {
 
     var cmd = startOrStop ? appGetStartCommand(domain_name) : exports.appGetStopCommand(domain_name);
@@ -280,6 +332,11 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                         console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
                     }
 
+                    if (!msg) {
+                        var res = nginx.reload(true);
+                        if (res)
+                            msg = res;
+                    }
                     cb(msg);
                 });
             }, startOrStop ? 4000 : 10);
@@ -310,6 +367,8 @@ var appGetStartCommand = function(domain_name) {
         return jxPath;
 
     fs.writeFileSync(options.cfg_path, JSON.stringify(options.cfg, null, 9));
+
+    exports.appSaveNginxConfigPath(domain_name);
 
     return { cmd : spawnerCmd, jxPath : jxPath, options : options , spawner : spawner};
 };
@@ -513,7 +572,10 @@ var appStartEnabledApplications = function(cb) {
                 commands.push(cmd.cmd);
         }
     }
-    exports.runMultipleComands(commands, cb);
+    exports.runMultipleComands(commands, function() {
+        var res = nginx.reload(true);
+        cb(res ? res : false)
+    });
 };
 
 exports.monitorStartStop = function (startOrStop, cb) {

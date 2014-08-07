@@ -385,7 +385,10 @@ exports.Labels = {
     "JXcoreNPMEnterName" : "Please enter a name for NPM module.",
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
     "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
-    "JXcoreNPMInstalled" : "NPM module successfully installed."
+    "JXcoreNPMInstalled" : "NPM module successfully installed.",
+
+    // Nginx
+    "NginxConfDirCannotCreate" : "Cannot create Nginx config directory"
 };
 
 

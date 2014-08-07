@@ -5,21 +5,39 @@ var site_defaults = require("../definitions/site_defaults");
 
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
-var nginx_dir = os_info.apps_folder + sep + "nginx";
+var nginx_dir = os_info.appsFolder + sep + "nginx";
 var nginx_process =  nginx_dir + sep + "sbin" + sep + "nginx";
 
-var cmd_inlude = '; echo "include ' + site_defaults.dirNginxConfigs + '*.conf;" > "' + nginx_dir + sep + "conf" + sep +  'jxcore.conf"';
+exports.needsReload = false;
+
+var updateConfFile = function() {
+
+    var conf_file = nginx_dir + sep + "conf" + sep + "nginx.conf";
+    if (fs.existsSync(conf_file)) {
+        var str = fs.readFileSync(conf_file).toString();
+        var include = "include jxcore/*.conf;";
+        if (str.indexOf(include) === -1) {
+            var pos = str.lastIndexOf("}");
+            if (pos !== -1)
+                str = str.slice(0, pos -1) + "\n\t" + include + "\n" + str.slice(pos);
+            fs.writeFileSync(conf_file, str);
+        }
+    }
+};
+
 
 exports.prepare = function(){
     clog("Preparing NGINX for the first time usage", "green");
     jxcore.utils.cmdSync("service nginx stop");
 
 
-    var ret = jxcore.utils.cmdSync("chmod 755 "+nginx_process + cmd_inlude);
+    var ret = jxcore.utils.cmdSync("chmod 755 "+nginx_process);
     if(ret.exitCode != 0){
         console.error(ret.out);
         process.exit(ret.exitCode)
     }
+
+    updateConfFile();
 };
 
 // returns null if it's successfull otherwise returns ret{exitCode, out}
@@ -56,13 +74,21 @@ exports.stop = function(){
 };
 
 // returns null if it's successfull otherwise returns ret{exitCode, out}
-exports.reload = function(){
+exports.reload = function(onlyIfNeeded){
+
+    if (onlyIfNeeded && !exports.needsReload)
+        return null;
+
     if(os_info.isDebian || os_info.isUbuntu || os_info.isRH){
         clog("Reloading NGINX", "green");
 
-        var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir + cmd_inlude);
+        updateConfFile();
+
+        var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir);
         if(ret.exitCode !== 0)
             return ret;
+
+        exports.needsReload = false;
 
         return null;
     }

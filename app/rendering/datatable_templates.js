@@ -355,8 +355,11 @@ var getHomePaths = function(active_user) {
         if (!spawner.err)
             paths.push(spawner);
         var options = hosting_tools.appGetOptions(domains[o]);
-        if (!options.ret)
+        if (!options.err)
             paths.push(options.cfg_path);
+        var nginxCfg = hosting_tools.appGetNginxConfigPath(domains[o]);
+        if (!nginxCfg.err)
+            path.push(nginxCfg);
         ret.domains[domains[o]] = paths;
     }
 
