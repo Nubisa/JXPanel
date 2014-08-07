@@ -8,3 +8,5 @@
 3. update password feature - DONE
 
 4. check folder permissions for server_apps subfolders, since now server_apps it has +x permission
+
+5. nginx jx package should be repacked (i added there include jxcore/*.conf;)
