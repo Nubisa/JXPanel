@@ -1,7 +1,6 @@
 var fs = require('fs');
 var pathModule = require('path');
 var os_info = require('./os_info').OSInfo();
-var site_defaults = require("../definitions/site_defaults");
 
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
@@ -82,6 +81,7 @@ exports.reload = function(onlyIfNeeded){
     if(os_info.isDebian || os_info.isUbuntu || os_info.isRH){
         clog("Reloading NGINX", "green");
 
+        // this is performed in prepare() so may be removed from here
         updateConfFile();
 
         var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir);
