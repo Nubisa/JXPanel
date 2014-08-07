@@ -526,6 +526,15 @@ methods.appStartStop = function (env, params) {
     if (!params.id) {
         server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "'DomainNotFound", true) });
     } else {
+
+        if (active_user.plan !== "unlimited") {
+            var domains = database.getDomainsByUserName(active_user.username, 1e7);
+            if (domains.indexOf(params.id) === -1) {
+                server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Access Denied", true) });
+                return;
+            }
+        }
+
         hosting_tools.appStartStop(params.op, params.id, function(err) {
             if (err) err = form_lang.Get(active_user.lang, err, true);
             server.sendCallBack(env, {err: err });
