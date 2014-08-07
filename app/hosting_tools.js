@@ -235,7 +235,7 @@ exports.appGetSpawnerCommand = function (domain_name) {
 
 exports.appStartStop = function(startOrStop, domain_name, cb) {
 
-    var cmd = startOrStop ? exports.appGetStartCommand(domain_name) : exports.appGetStopCommand(domain_name);
+    var cmd = startOrStop ? appGetStartCommand(domain_name) : exports.appGetStopCommand(domain_name);
     if (cmd.err) {
         cb(cmd.err);
         return;
@@ -288,7 +288,7 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
 };
 
 
-exports.appGetStartCommand = function(domain_name) {
+var appGetStartCommand = function(domain_name) {
 
     var spawnerCmd = exports.appGetSpawnerCommand(domain_name);
     if (spawnerCmd.err)
@@ -508,7 +508,7 @@ var appStartEnabledApplications = function(cb) {
         var domain = database.getDomain(domain_name);
         var plan = database.getPlanByDomainName(domain_name);
         if (domain.jx_enabled && !plan.suspended) {
-            var cmd = exports.appGetStartCommand(domain_name);
+            var cmd = appGetStartCommand(domain_name);
             if (!cmd.err)
                 commands.push(cmd.cmd);
         }
