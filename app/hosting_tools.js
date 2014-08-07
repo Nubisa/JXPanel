@@ -184,7 +184,7 @@ exports.appGetNginxConfigPath = function(domain_name) {
     return site_defaults.dirNginxConfigs + domain_name + ".conf";
 };
 
-exports.appSaveNginxConfigPath = function(domain_name) {
+exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
 
     var dir = site_defaults.dirNginxConfigs;
     if (!fs.existsSync(dir)) {
@@ -212,6 +212,10 @@ exports.appSaveNginxConfigPath = function(domain_name) {
     if (current !== cfg) {
         fs.writeFileSync(path, cfg);
         nginx.needsReload = true;
+
+        if (reloadIfNeeded) {
+            nginx.reload(true);
+        }
     }
 
     return false;

@@ -282,11 +282,18 @@ methods.sessionApply = function(env, params){
         try {
             if (isUpdate) {
                 var domain = database.getDomain(update_name);
+                var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
                 if (!domain)
                     return sendError("DBCannotGetDomain");
 
                 update(domain, json);
                 ret = database.updateDomain(update_name, domain);
+
+                if (!ret && jx_web_log_changed) {
+                    var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
+                    if (res.err)
+                        ret = res.err;
+                }
             } else {
                 var arr = hosting_tools.getFreePorts(2);
                 if (!arr || arr.length < 2) {
