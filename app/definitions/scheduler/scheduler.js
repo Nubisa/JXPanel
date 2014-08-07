@@ -1,4 +1,5 @@
 var _active_user = require('./../active_user');
+var database = require("../../install/database");
 exports.isBusy = false;
 
 jxcore.tasks.on('message', function(tid, msg){
@@ -9,6 +10,8 @@ jxcore.tasks.on('message', function(tid, msg){
         else if(msg.restarting){
             exports.isBusy = false;
         }
+    } else if (msg && msg.reloadDB) {
+        database.ReadDB(function() {});
     }
 });
 
