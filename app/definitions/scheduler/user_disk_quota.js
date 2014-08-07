@@ -24,7 +24,6 @@ var check_quotas = function(){
                         var user = db.getUser(i);
 
                         var size = folders.getUserPathSize(i);
-                        console.log(i, size);
                         if(size>max_disk && !user.suspended){
                             user.SuspendUser("plan_disk_space");
                             record_updated = true;
