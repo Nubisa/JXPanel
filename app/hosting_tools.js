@@ -142,7 +142,7 @@ exports.appGetOptions = function (domain_name) {
 
     var appPath = appDir + domain.jx_app_path;
     var appPathReplaced = appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
-    var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jx.config";
+    var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jxcore.config";
     var logPath = appDir + "/jxcore_logs/index.txt";
 
 
