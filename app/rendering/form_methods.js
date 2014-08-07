@@ -507,7 +507,7 @@ methods.installNPM = function(env, params) {
 
 methods.monitorStartStop = function (env, params) {
 
-    var active_user = _active_user.checkAdmin(env, false, false, true);
+    var active_user = _active_user.checkAdmin(env);
     if (!active_user)
         return;
 
