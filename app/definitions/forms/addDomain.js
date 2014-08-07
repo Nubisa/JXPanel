@@ -158,7 +158,7 @@ exports.form = function () {
                 }
             },
 
-            { name: "jx_app_log_web_access",
+            { name: "jx_web_log",
                 details: {
                     label: "AppLogWebAccess",
                     method: tool.createCheckBox,

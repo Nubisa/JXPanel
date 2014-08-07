@@ -202,7 +202,7 @@ exports.appSaveNginxConfigPath = function(domain_name) {
     var options = exports.appGetOptions(domain_name);
     var domain = options.domain;
 
-    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_app_log_web_access ? options.log_path : null);
+    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null);
 
     var current = "";
     if (fs.existsSync(path)) {
@@ -275,7 +275,7 @@ exports.appGetSpawnerCommand = function (domain_name) {
         "domain": domain.name,
         "tcp": domain.port_http,
         "tcps": domain.port_https,
-        "logWebAccess": domain.jx_app_log_web_access,
+        "logWebAccess": domain.jx_web_log,
         "dontSaveNginxConfigFile" : true
     };
 

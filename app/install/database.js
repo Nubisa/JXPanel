@@ -49,6 +49,11 @@ var ReadDB = function(cb){ // KRIS FILL IN
                     Users[o].domains = {};
                 }
             }
+
+            // just for now removing obsolete values
+            for(var o in Domains) {
+                delete Domains[o].jx_app_log_web_access;
+            }
             exports.DB = DB;
         }
         if (cb) cb(err);
