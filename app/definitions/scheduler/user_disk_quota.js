@@ -22,12 +22,16 @@ var check_quotas = function(){
                     var users = plan.users;
                     for(var i in users){
                         var user = db.getUser(i);
-                        if (!user.suspended) {
-                            var size = folders.getUserPathSize(i);
-                            if(size>max_disk){
-                                user.SuspendUser("plan_disk_space");
-                                record_updated = true;
-                            }
+
+                        var size = folders.getUserPathSize(i);
+                        console.log(i, size);
+                        if(size>max_disk && !user.suspended){
+                            user.SuspendUser("plan_disk_space");
+                            record_updated = true;
+                        } else
+                        if(size<max_disk && user.suspended) {
+                            user.UnSuspendUser("plan_disk_space");
+                            record_updated = true;
                         }
                     }
                 }
@@ -35,6 +39,7 @@ var check_quotas = function(){
         }
         if(record_updated){
             db.updateDBFile();
+            process.sendToMain( { reloadDB: true } );
         }
     });
 };
