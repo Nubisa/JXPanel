@@ -4,6 +4,7 @@
 
 var database = require("./install/database");
 var site_defaults = require("./definitions/site_defaults");
+var form_lang = require("./definitions/form_lang");
 var os_info = require("./install/os_info");
 var path = require("path");
 var fs = require("fs");
@@ -19,17 +20,26 @@ exports.setPortRange = function (min, max) {
 
     var domains = database.getDomainsByUserName(null, 1e5);
 
+    var changed = false;
+
     var current = min;
     for (var i in domains) {
         var domain = database.getDomain(domains[i]);
         var ok = current <= max - 2;
+        var prev_http = domain.port_http;
+        var prev_https = domain.port_https;
         domain.port_http = ok ? current++ : null;
         domain.port_https = ok ? current++ : null;
+
+        if (prev_http !== domain.port_http || prev_https !== domain.port_https)
+            changed = true;
     }
 
     database.setConfigValue("jx_app_min_port", min);
     database.setConfigValue("jx_app_max_port", max);
     database.updateDBFile();
+
+    return changed;
 };
 
 exports.getPortRange = function () {
@@ -596,7 +606,7 @@ var appStartEnabledApplications = function(cb) {
     });
 };
 
-exports.monitorStartStop = function (startOrStop, cb) {
+exports.monitorStartStop = function (active_user, startOrStop, cb) {
 
     var jxPath = exports.getJXPath();
     if (jxPath.err) {
@@ -633,8 +643,10 @@ exports.monitorStartStop = function (startOrStop, cb) {
                 }
 
                 if (startOrStop) {
+                    active_user.session.status = form_lang.Get(active_user.lang, "JXcoreAppsStarting", true);
                     appStartEnabledApplications(function() {
                         cb(msg);
+                        active_user.session.status = "";
                     });
                 } else {
                     cb(msg);
@@ -654,13 +666,27 @@ exports.monitorStartStop = function (startOrStop, cb) {
 
         var cmd = "./jx monitor " + (startOrStop ? "start" : "stop");
 
+        active_user.session.status = form_lang.Get(active_user.lang, startOrStop ? "JXcoreMonitorStarting" : "JXcoreMonitorStopping", true);
         exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
+            active_user.session.status = null;
             // cannot rely on err in this case. command returns non-zero exitCode on success
             checkAfter();
         });
     });
 };
 
+
+exports.monitorRestart = function(active_user, cb) {
+
+    exports.monitorStartStop(active_user, false, function(err) {
+        if (err) {
+            if (cb) cb(err);
+            return;
+        }
+
+        exports.monitorStartStop(active_user, true, cb);
+    });
+};
 
 
 database.OnSuspend = function(name, field_name, table, suspended) {
