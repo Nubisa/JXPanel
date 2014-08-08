@@ -46,6 +46,7 @@ exports.createConfig = function(domain, node_ports, log_location){ // node_ports
                     +"  location /jxcore_logs {\n"
                     +"    autoindex on;\n"
                     +"    alias "+log_location+";\n"
+                    +"    add_header Content-type text/plain;\n"
                     +"  }\n"
                     +"}\n";
 
