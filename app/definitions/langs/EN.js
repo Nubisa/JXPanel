@@ -384,6 +384,7 @@ exports.Labels = {
     "JXcoreAppStarted" : "Application %s started.",
     "JXcoreAppStopped" : "Application %s stopped.",
     "JXcoreAppStarting" : "Launching the application",
+    "JXcoreAppsStarting" : "Launching user applications",
     "JXcoreAppStopping" : "Stopping the application",
 
 

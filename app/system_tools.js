@@ -7,6 +7,7 @@ var os_info = require("./install/os_info");
 var exec = require('child_process').exec;
 var hosting_tools = require("./hosting_tools");
 var folder_utils = require('./definitions/user_folders');
+var form_lang = require('./definitions/form_lang');
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -392,7 +393,7 @@ exports.downloadFile = function (url, localFile, cb) {
 };
 
 // also reinstalls if already is installed
-exports.installJX = function (cb) {
+exports.installJX = function (active_user, cb) {
 
     var jxPath = hosting_tools.getJXPath();
 
@@ -414,6 +415,7 @@ exports.installJX = function (cb) {
         var zipFile = path.join(os_info.apps_folder, basename + ".zip");
         var url = "https://s3.amazonaws.com/nodejx/" + basename + ".zip";
 
+        active_user.session.status = form_lang.Get(active_user.lang, "JXcoreDownloading", true);
         exports.downloadFile(url, zipFile, function (err) {
             if (err) {
                 cb(err);
@@ -448,7 +450,7 @@ exports.installJX = function (cb) {
                         database.setConfigValue("jxv", jxv, true);
 
                         // let's start the monitor after install
-                        hosting_tools.monitorStartStop(true, function (err01) {
+                        hosting_tools.monitorStartStop(active_user, true, function (err01) {
                             cb(err01 || false)
                         });
                     } else {
@@ -466,7 +468,7 @@ exports.installJX = function (cb) {
     } else {
         // shut the monitor down
 
-        hosting_tools.monitorStartStop(false, function (err0) {
+        hosting_tools.monitorStartStop(active_user, false, function (err0) {
 
             if (err0) {
                 cb(err0);

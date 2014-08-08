@@ -259,12 +259,11 @@ methods.sessionApply = function(env, params){
     var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
     var update_name = isUpdate ? active_user.session.edits[params.form].ID : json.name;
 
-    if (!update_name) {
-        return sendError("FormEmpty");
-    }
-
     var ret = null;
     if (params.form === "addUser") {
+        if (!update_name)
+            return sendError("FormEmpty");
+
         try {
             if (isUpdate) {
                 var user = database.getUser(update_name);
@@ -296,6 +295,9 @@ methods.sessionApply = function(env, params){
         }
     } else
     if (params.form === "addDomain") {
+        if (!update_name)
+            return sendError("FormEmpty");
+
         try {
             if (isUpdate) {
                 var domain = database.getDomain(update_name);
@@ -352,6 +354,9 @@ methods.sessionApply = function(env, params){
         }
     } else
     if (params.form === "addPlan") {
+        if (!update_name)
+            return sendError("FormEmpty");
+
         try {
 
             // those are required by the form
@@ -381,7 +386,13 @@ methods.sessionApply = function(env, params){
     if (params.form === "jxconfig") {
         var min = json["jx_app_min_port"];
         var max = json["jx_app_max_port"];
-        hosting_tools.setPortRange(min,max);
+        var changed = hosting_tools.setPortRange(min,max);
+        if (changed) {
+            hosting_tools.monitorRestart(active_user, function(err) {
+                sendError(err);
+            });
+            return;
+        }
     } else {
         ret = "UnknownForm";
     }
@@ -535,7 +546,7 @@ methods.monitorStartStop = function (env, params) {
     if (!active_user)
         return;
 
-    hosting_tools.monitorStartStop(params.op, function(err) {
+    hosting_tools.monitorStartStop(active_user, params.op, function(err) {
         if (err) err = form_lang.Get(active_user.lang, err, true);
         server.sendCallBack(env, {err: err });
     });
@@ -578,7 +589,7 @@ methods.jxInstall = function (env, params) {
     if (!active_user)
         return;
 
-    system_tools.installJX(function(err) {
+    system_tools.installJX(active_user, function(err) {
         if (err) err = form_lang.Get(active_user.lang, err, true);
         server.sendCallBack(env, { err : err });
     });
