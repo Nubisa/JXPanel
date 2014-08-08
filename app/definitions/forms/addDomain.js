@@ -141,10 +141,11 @@ exports.form = function () {
                             return ret.err;
 
                         var json = "";
-                        if (!active_user.session.monitor || !active_user.session.monitor.json) {
-                            json = active_user.session.monitor.json + "";
-                            btnStart = btnStop = ". " + form_lang.Get(active_user.lang, "JXcoreMonitorNotRunning", true);
+                        if (active_user.session.monitor) {
+                            json = active_user.session.monitor.json || "";
                         }
+                        if (!json)
+                            btnStart = btnStop = ". " + form_lang.Get(active_user.lang, "JXcoreMonitorNotRunning", true);
 
                         if (json.indexOf(ret) === -1) {
                             return iconOffline + btnStart;
