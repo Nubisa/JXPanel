@@ -8,6 +8,7 @@
             }
 
             if (ok) {
+                window.jxstatus = "{{label.JXcoreNPMInstalling}}";
                 window.toServer("installNPM", value, function(param) {
                     if (param.err)
                         utils.jxAddMessage('danger', "{{label.JXcoreNPMCouldNotInstall}} " + param.err);
