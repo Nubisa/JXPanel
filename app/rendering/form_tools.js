@@ -2,7 +2,7 @@ var form_lang = require('../definitions/form_lang');
 var path = require("path");
 var fs = require("fs");
 
-exports.begin = '<form class="form-horizontal">';
+exports.begin = '<form class="form-horizontal" onsubmit="return false;">';
 
 var getData = function(label, _title, input_id, lang, options) {
     var ret = { prefix : "", description: ""};
