@@ -301,6 +301,7 @@ methods.sessionApply = function(env, params){
                 var domain = database.getDomain(update_name);
                 var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
                 var jx_app_path_changed = domain.jx_app_path !== json.jx_app_path;
+                var jx_app_options = hosting_tools.appGetOptions(update_name);
                 if (!domain)
                     return sendError("DBCannotGetDomain");
 
@@ -309,6 +310,12 @@ methods.sessionApply = function(env, params){
 
                 if (!ret) {
                     if (jx_app_path_changed) {
+                        if (jx_app_options && !jx_app_options.err) {
+                            var file = jx_app_options.cfg_path;
+                            if (fs.existsSync(file)) {
+                                fs.unlinkSync(file);
+                            }
+                        }
                         hosting_tools.appRestart(update_name, function(err) {
                             sendError(err);
                         });

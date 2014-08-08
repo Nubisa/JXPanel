@@ -282,7 +282,6 @@ exports.appGetSpawnerCommand = function (domain_name) {
     };
 
     var cmd = jxPath + " " + spawnerPath + " -opt '" + JSON.stringify(opt) + "'";
-    console.log(cmd);
     return cmd;
 };
 
