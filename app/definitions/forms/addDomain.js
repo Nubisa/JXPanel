@@ -121,7 +121,7 @@ exports.form = function () {
                         var domain_name = values["name"];
 
                         var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true);
-                        var iconOffline = '<i class="fa-fw fa fa-check text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true);
+                        var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true);
 
                         var btnStart = '<button class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
                             + form_lang.Get(active_user.lang, "Start", true) + '</button>';
@@ -140,11 +140,17 @@ exports.form = function () {
                         if (ret.err)
                             return ret.err;
 
-                        if (!active_user.session.monitor.json) active_user.session.monitor.json = "";
-                        if (!active_user.session.monitor.json || active_user.session.monitor.json.indexOf(ret) === -1)
+                        var json = "";
+                        if (!active_user.session.monitor || !active_user.session.monitor.json) {
+                            json = active_user.session.monitor.json + "";
+                            btnStart = btnStop = ". " + form_lang.Get(active_user.lang, "JXcoreMonitorNotRunning", true);
+                        }
+
+                        if (json.indexOf(ret) === -1) {
                             return iconOffline + btnStart;
-                        else
+                        } else {
                             return iconOnline + btnStop;
+                        }
                     }
                 }
             },
@@ -155,7 +161,8 @@ exports.form = function () {
                     label: "JXcoreAppPath",
                     method: tool.createTextBox,
                     options: { default : "index.js" }
-                }
+                },
+                validation : new validations.FileName()
             },
 
             { name: "jx_web_log",
