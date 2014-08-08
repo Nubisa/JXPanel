@@ -75,7 +75,10 @@ exports.createUserFolder = function(location) {
         return {err:res.out};
     }
 
-    jxcore.utils.cmdSync("chmod -R o-rwx " + location);
+    // kris changed: allowing x for user home dir.
+    // changed from o-rwx into o-rw+x
+    // otherwise nginx could not reach jxcore_logs/index.txt
+    jxcore.utils.cmdSync("chmod -R o-rw+x " + location);
 
     return true;
 };
