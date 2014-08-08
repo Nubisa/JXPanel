@@ -233,6 +233,23 @@ methods.sessionApply = function(env, params){
     }
 
     var sendError = function(errLabel) {
+
+        if (!errLabel) {
+            server.sendCallBack(env, {arr: false});
+            return;
+        }
+
+        errLabel = form_lang.Get(active_user.lang, errLabel, true);
+        for(var field_name in _controls){
+            if (errLabel.indexOf(field_name) !== -1) {
+                var label = _controls[field_name].details.label;
+                if (label) {
+                    label = form_lang.Get(active_user.lang, label, true);
+                    errLabel = errLabel.replace(field_name, "`" + label + "`");
+                }
+            }
+        }
+
         server.sendCallBack(env, {arr: [ { control: "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
     };
 
@@ -283,16 +300,25 @@ methods.sessionApply = function(env, params){
             if (isUpdate) {
                 var domain = database.getDomain(update_name);
                 var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
+                var jx_app_path_changed = domain.jx_app_path !== json.jx_app_path;
                 if (!domain)
                     return sendError("DBCannotGetDomain");
 
                 update(domain, json);
                 ret = database.updateDomain(update_name, domain);
 
-                if (!ret && jx_web_log_changed) {
-                    var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
-                    if (res.err)
-                        ret = res.err;
+                if (!ret) {
+                    if (jx_app_path_changed) {
+                        hosting_tools.appRestart(update_name, function(err) {
+                            sendError(err);
+                        });
+                        return;
+                    }
+                    if (jx_web_log_changed) {
+                        var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
+                        if (res.err)
+                            ret = res.err;
+                    }
                 }
             } else {
                 var arr = hosting_tools.getFreePorts(2);
@@ -353,23 +379,7 @@ methods.sessionApply = function(env, params){
         ret = "UnknownForm";
     }
 
-    if (ret) {
-
-        ret = form_lang.Get(active_user.lang, ret, true);
-        for(var field_name in _controls){
-            if (ret.indexOf(field_name) !== -1) {
-                var label = _controls[field_name].details.label;
-                if (label) {
-                    label = form_lang.Get(active_user.lang, label, true);
-                    ret = ret.replace(field_name, "`" + label + "`");
-                }
-            }
-        }
-
-        server.sendCallBack(env, {arr: [ { control: "", msg : ret } ]});
-    } else {
-        server.sendCallBack(env, {arr: false});
-    }
+    sendError(ret);
 };
 
 methods.getTableData = function(env, params) {

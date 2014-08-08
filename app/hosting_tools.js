@@ -286,33 +286,50 @@ exports.appGetSpawnerCommand = function (domain_name) {
     return cmd;
 };
 
+
+exports.appRestart = function(domain_name, cb) {
+
+    exports.appStartStop(false, domain_name, function(err, _domain_name, _was_online) {
+        if (err) {
+            if (cb) cb(err);
+            return;
+        }
+
+        if (_was_online) {
+            exports.appStartStop(true, domain_name, cb);
+        } else {
+            cb();
+        }
+    });
+};
+
 // start or stop single app
 exports.appStartStop = function(startOrStop, domain_name, cb) {
 
     var cmd = startOrStop ? appGetStartCommand(domain_name) : exports.appGetStopCommand(domain_name);
     if (cmd.err) {
-        cb(cmd.err);
+        cb(cmd.err, domain_name, false);
         return;
     }
 
     exports.getMonitorJSON(false, function(err, ret) {
         var online_before = !err && ret && ret.indexOf(cmd.spawner) !== -1;
 
-        // no point to start a[[, if it's running
+        // no point to start app, if it's running
         if (startOrStop && online_before) {
-            cb();
+            cb(false, domain_name, online_before);
             return;
         }
 
         // no point to stop app if it's not running
         if (!startOrStop && !online_before) {
-            cb();
+            cb(false, domain_name, online_before);
             return;
         }
 
         if (err || !ret) {
             // monitor is offline, don't treat this a error
-            cb();
+            cb(false, domain_name, online_before);
             return;
         }
 
@@ -339,7 +356,7 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                         if (res)
                             msg = res;
                     }
-                    cb(msg);
+                    cb(msg, domain_name, online_before);
                 });
             }, startOrStop ? 4000 : 10);
         });
