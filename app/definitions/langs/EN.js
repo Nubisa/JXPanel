@@ -174,6 +174,8 @@ exports.Labels = {
     "FolderNotEmpty":"Folder is not empty",
     "FileExists":"File already exists",
     "FileDoesNotExist":"File does not exist",
+    "PathCannotContain" : "The path cannot contain the following: `%s`.",
+    "PathCannotStart" : "The path cannot start with the following: `%s`.",
     "CHMOD":"chmod",
     "CHMODTooltip":"Update CHMOD",
     "SelectFolder":"Select a folder to add file",

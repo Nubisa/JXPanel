@@ -219,3 +219,30 @@ exports.Plan = function() {
         return {result: true};
     };
 };
+
+// validates app's file name
+exports.FileName = function() {
+
+    this.validate = function (env, active_user, val, vals) {
+
+        var cannotContain = [ './', '/.', '.\\', '\\.', '\n', '\r', '\t' ];
+        var cannotStart = [ '/', '\\', ' ', '..'];
+
+        var str = val + "";
+        for(var o in cannotContain) {
+            if (str.indexOf(cannotContain[o]) !== -1)
+                return {result: false, msg: form_lang.Get(active_user.lang, "PathCannotContain", true, [cannotContain[o]])};
+        }
+
+        for(var o in cannotStart) {
+            var tmp = cannotStart[o];
+            if (str.slice(0, tmp.length) === tmp)
+                return {result: false, msg: form_lang.Get(active_user.lang, "PathCannotStart", true, [cannotStart[o]])};
+        }
+
+        return {result: true};
+    };
+};
+
+
+
