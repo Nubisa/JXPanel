@@ -95,7 +95,7 @@
                     var progressBar = "";
                     if (progress) {
                         progressBar =
-                                '<div class="progress" rel="tooltip" data-original-title="0%" data-placement="top" style="margin-top: 10px;">'
+                                '<div class="progress" rel="tooltip" data-original-title="0%" data-placement="top" style="margin-top: 10px; margin-bottom: 5px;">'
                                 + '<div id="jx_pb" style="width: 0%;" class="progress-bar bg-color-teal"></div></div>';
                     }
 
@@ -104,9 +104,14 @@
                     div.className = "divMessageBox animated fadeIn fast";
                     div.style.cssText = "background: none repeat scroll 0 0 rgba(200, 200, 200, 0.6);"
                     var str = '<div id="Msg1" class="MessageBoxContainer animated fadeIn fast">'
-                            +'<div class="MessageBoxMiddle" style="font-size:120%">'
-                            +'<strong><i class="fa fa-lg fa-fw fa-clock-o"></i>{{label.PleaseWait}}...</strong>' + progressBar
-                            +'</div></div></div>';
+                                 +'<div class="MessageBoxMiddle">'
+                                     +'<span class="MsgTitle">'
+                                        +'<strong><i class="fa fa-clock-o txt-color-orangeDark"> </i> {{label.PleaseWait}}...</strong>'
+                                     +'</span>'
+                                     + progressBar
+                                     +'<p id="Msg11" class="pText"></p>'
+                                 +'</div>'
+                             +'</div>';
 
 
 
@@ -116,6 +121,7 @@
                         div.jx_progress = 0;
 
                         div.jx_increment = function() {
+                            $("#Msg11").html(window.jxstatus);
                             if (window.jx_shadowdiv) {
                                 var dx = (100 - window.jx_shadowdiv.jx_progress) / 5;
                                 window.jx_shadowdiv.jx_progress += parseInt(dx);
@@ -201,6 +207,11 @@
                             if (ret_val.relogin) {
                                 location.href = "/index.html";
                                 return;
+                            }
+
+                            if (ret_val.status) {
+                                window.jxstatus = ret_val.status;
+                                $("#Msg11").html(window.jxstatus);
                             }
 
                             window.pingQCounter = 0;
@@ -346,14 +357,17 @@
 
 
     utils.jxMonitorStartStop = function (start) {
+        window.jxstatus = start ? "{{label.JXcoreMonitorStarting}}" : "{{label.JXcoreMonitorStopping}}";
         return utils.jxCall("monitorStartStop", start );
     };
 
     utils.jxAppStartStop = function (start, domain_name) {
+        window.jxstatus = start ? "{{label.JXcoreAppStarting}}" : "{{label.JXcoreAppStopping}}";
         return utils.jxCall("appStartStop", start, domain_name );
     };
 
     utils.jxInstall = function () {
+        window.jxstatus = "{{label.JXcoreDownloading}}";
         return utils.jxCall("jxInstall", true);
     };
 

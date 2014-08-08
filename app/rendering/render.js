@@ -129,6 +129,7 @@ var apply_smart = function(file, req, res, data){
                 delete _user.session.edits;
             }
             _user.session.lastPath = req.path;
+            delete _user.session.status;
         }
     }
 

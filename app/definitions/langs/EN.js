@@ -368,9 +368,12 @@ exports.Labels = {
     "JXcoreMonitorStarted" : "JXcore monitor started.",
     "JXcoreMonitorStopped" : "JXcore monitor stopped.",
     "JXcoreMonitorNotRunning" : "JXcore monitor is not running.",
+    "JXcoreMonitorStarting" : "Starting JXcore monitor",
+    "JXcoreMonitorStopping" : "Stopping JXcore monitor",
 
     "JXcorePleaseInstall" : "Please install JXcore.",
     "JXcoreCannotDownload" : "Cannot download JXcore.",
+    "JXcoreDownloading" : "Downloading JXcore",
     "JXcoreReinstall_Description" : 'If you reinstall JXcore, all the running node applications will be restarted after updating JXcore binary.',
     "JXcoreAppMinPort" : "Minimum app port number",
     "JXcoreAppMaxPort" : "Maximum app port number",
@@ -380,6 +383,8 @@ exports.Labels = {
     "JXcoreAppCannotStop" : "Cannot stop application %s.",
     "JXcoreAppStarted" : "Application %s started.",
     "JXcoreAppStopped" : "Application %s stopped.",
+    "JXcoreAppStarting" : "Launching the application",
+    "JXcoreAppStopping" : "Stopping the application",
 
 
     "JXcoreNPMModules" : "NPM Modules",
@@ -388,6 +393,7 @@ exports.Labels = {
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
     "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
     "JXcoreNPMInstalled" : "NPM module successfully installed.",
+    "JXcoreNPMInstalling" : "Installing NPM module",
 
     // Nginx
     "NginxConfDirCannotCreate" : "Cannot create Nginx config directory"
