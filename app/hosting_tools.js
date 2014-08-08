@@ -296,8 +296,9 @@ exports.appGetSpawnerCommand = function (domain_name) {
 };
 
 
-exports.appRestart = function(domain_name, cb) {
+exports.appRestart = function(active_user, domain_name, cb) {
 
+    active_user.session.status = form_lang.Get(active_user.lang, "JXcoreAppStarting", true);
     exports.appStartStop(false, domain_name, function(err, _domain_name, _was_online) {
         if (err) {
             if (cb) cb(err);

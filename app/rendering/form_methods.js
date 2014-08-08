@@ -318,7 +318,7 @@ methods.sessionApply = function(env, params){
                                 fs.unlinkSync(file);
                             }
                         }
-                        hosting_tools.appRestart(update_name, function(err) {
+                        hosting_tools.appRestart(active_user, update_name, function(err) {
                             sendError(err);
                         });
                         return;
