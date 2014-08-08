@@ -74,7 +74,7 @@ exports.form = function () {
 
                         var icon = cfg.jxPath ? "fa-refresh" : "fa-download";
 
-                        var str =  '<button class="btn btn-labeled btn-success" onclick="return utils.jxInstall();"><span class="btn-label"><i class="fa fa-lg fa-fw ' + icon + '"></i></span>'
+                        var str =  '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxInstall();"><span class="btn-label"><i class="fa fa-lg fa-fw ' + icon + '"></i></span>'
                             + form_lang.Get(active_user.lang, cfg.jxPath ? "Reinstall" : "Install", true) + '</button>';
 
                         if (cfg.jxPath)
@@ -99,10 +99,10 @@ exports.form = function () {
 
 //                        if (system_tools.isJXValid()) {
 
-                            var btnStart = '<button class="btn btn-labeled btn-success" onclick="return utils.jxMonitorStartStop(true);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
+                            var btnStart = '<button type="submit" class="btn btn-labeled btn-success" onclick="return utils.jxMonitorStartStop(true);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
                                 + form_lang.Get(active_user.lang, "Start", true) + '</button>';
 
-                            var btnStop = '<button class="btn btn-labeled btn-danger" onclick="return utils.jxMonitorStartStop(false);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
+                            var btnStop = '<button type="button" class="btn btn-labeled btn-danger" onclick="return utils.jxMonitorStartStop(false);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
                                 + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
 
 
@@ -134,7 +134,10 @@ exports.form = function () {
                 details: {
                     label: "JXcoreAppMinPort",
                     method: tool.createTextBox,
-                    options: { required: true, default : site_defaults.defaultAppMinPort }
+                    options: { required: true },
+                    getValue : function(active_user) {
+                        return database.getConfigValue("jx_app_min_port") ||   site_defaults.defaultAppMinPort;
+                    }
                 },
                 validation : new validations.Int({ gte : site_defaults.defaultAppMinPort, lte : site_defaults.defaultAppMaxPort })
             },
@@ -144,7 +147,10 @@ exports.form = function () {
                 details: {
                     label: "JXcoreAppMaxPort",
                     method: tool.createTextBox,
-                    options: { required: true, default : site_defaults.defaultAppMaxPort }
+                    options: { required: true },
+                    getValue : function(active_user) {
+                        return database.getConfigValue("jx_app_max_port") ||   site_defaults.defaultAppMaxPort;
+                    }
                 },
                 validation : new validations.MaxPort("jx_app_min_port")
             },
