@@ -123,10 +123,10 @@ exports.form = function () {
                         var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true);
                         var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true);
 
-                        var btnStart = '<button class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
+                        var btnStart = '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
                             + form_lang.Get(active_user.lang, "Start", true) + '</button>';
 
-                        var btnStop = '<button class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
+                        var btnStop = '<button type="button" class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
                             + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
 
 
