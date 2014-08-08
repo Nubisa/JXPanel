@@ -85,8 +85,7 @@ exports.getUser = function(sessionId)
         users[sessionId].suspended_txt = "";
         if (user.suspended) {
             var lang = users[sessionId].lang;
-            var labels = form_tools.getFormsLabels(lang);
-            var str = "<strong>" + form_lang.Get(lang, "YouAreSuspended", true, [labels[user.suspended] || user.suspended]) + "</strong>";
+            var str = "<strong>" + form_lang.Get(lang, "YouAreSuspended", true, form_tools.getFieldDisplayNames(lang, user.suspended)) + "</strong>";
             str += " " + form_lang.Get(lang, "YouAreSuspendedExtra", true);
 
             users[sessionId].suspended_txt = str;
@@ -123,6 +122,8 @@ exports.checkAdmin = function(env) {
         server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "Access Denied", true) });
         return;
     }
+
+    return active_user;
 };
 
 exports.getForm = function(sessionId, form_name){

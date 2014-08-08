@@ -97,7 +97,8 @@ exports.install = function(){
 
     // create server_apps folder
     fs.mkdirSync(app_folder);
-    ret = jxcore.utils.cmdSync("chmod -R o-rwx " + app_folder);
+    // chris changed from o-rwx to o-rw+x
+    ret = jxcore.utils.cmdSync("chmod -R o-rw+x " + app_folder);
 
     installNGINX();
     installDB();

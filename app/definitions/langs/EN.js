@@ -174,6 +174,8 @@ exports.Labels = {
     "FolderNotEmpty":"Folder is not empty",
     "FileExists":"File already exists",
     "FileDoesNotExist":"File does not exist",
+    "PathCannotContain" : "The path cannot contain the following: `%s`.",
+    "PathCannotStart" : "The path cannot start with the following: `%s`.",
     "CHMOD":"chmod",
     "CHMODTooltip":"Update CHMOD",
     "SelectFolder":"Select a folder to add file",
@@ -385,7 +387,10 @@ exports.Labels = {
     "JXcoreNPMEnterName" : "Please enter a name for NPM module.",
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
     "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
-    "JXcoreNPMInstalled" : "NPM module successfully installed."
+    "JXcoreNPMInstalled" : "NPM module successfully installed.",
+
+    // Nginx
+    "NginxConfDirCannotCreate" : "Cannot create Nginx config directory"
 };
 
 

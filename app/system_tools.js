@@ -435,10 +435,12 @@ exports.installJX = function (cb) {
                         var jxv = ret.out.toString().trim();
 
                         // if current jx is different than downloaded, use it
-                        if (jxv !== process.jxversion) {
+                        if (jxv < process.jxversion) {
                             jxcore.utils.cmdSync("cp '" + process.execPath + "' '" + file + "'");
                             jxv = process.jxversion;
                         }
+
+                        jxcore.utils.cmdSync("chmod 0775 " + dir + "; chmod 0755 " + file);
 
                         hosting_tools.saveMonitorConfig(file);
 

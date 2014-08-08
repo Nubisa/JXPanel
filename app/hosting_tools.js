@@ -11,6 +11,8 @@ var exec = require('child_process').exec;
 var https = require("https");
 var user_folders = require("./definitions/user_folders");
 var system_tools = require("./system_tools");
+var nginxconf = require("./spawner/nginxconf");
+var nginx = require("./install/nginx");
 
 // iterating through domains and assigning http/https port
 exports.setPortRange = function (min, max) {
@@ -139,10 +141,11 @@ exports.appGetOptions = function (domain_name) {
     var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
 
     var appPath = appDir + domain.jx_app_path;
-    var cfgPath = site_defaults.dirAppConfigs + appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_") + ".jx.config";
+    var appPathReplaced = appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
+    var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jxcore.config";
+    var logPath = path.join(appDir, "jxcore_logs/index.txt");
 
-//    console.log(json, appDir, cfgPath);
-    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, user : user, plan: plan };
+    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_replaced : appPathReplaced, log_path : logPath, user : user, plan: plan, domain : domain };
 };
 
 exports.appCreateHomeDir = function(domain_name) {
@@ -169,37 +172,52 @@ exports.appCreateHomeDir = function(domain_name) {
 };
 
 
-//exports.appRemove = function(domain_name, withUserFiles, cb) {
-//
-//    exports.appStartStop(true, domain_name, function(err) {
-//        if (err) {
-//            cb(err);
-//            return;
-//        }
-//
-//        if (!withUserFiles) {
-//            cb(false);
-//            return;
-//        }
-//
-//        // removing domain dir
-//        var options = exports.appGetOptions(domain_name);
-//        if (options.err) {
-//            cb(options.err);
-//            return;
-//        }
-//
-//        if (fs.existsSync(options.app_dir)) {
-//            system_tools.rmdirSync(options.app_dir);
-//
-//            var deleted = !fs.existsSync(options.app_dir);
-//            cb(deleted ? false : "DomainCannotRemoveDir");
-//            return;
-//        }
-//
-//        cb(false);
-//    });
-//};
+exports.appGetNginxConfigPath = function(domain_name) {
+
+//    var options = exports.appGetOptions(domain_name);
+//    if (options.err)
+//        return options;
+
+//    return site_defaults.dirNginxConfigs + options.app_path_replaced;
+    return site_defaults.dirNginxConfigs + domain_name + ".conf";
+};
+
+exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
+
+    var dir = site_defaults.dirNginxConfigs;
+    if (!fs.existsSync(dir)) {
+        try {
+            fs.mkdirSync(dir);
+        } catch (ex) {};
+        if (!fs.existsSync(dir))
+            return {err : "NginxConfDirCannotCreate" };
+    }
+
+    var path = exports.appGetNginxConfigPath(domain_name);
+    if (path.err)
+        return path;
+
+    var options = exports.appGetOptions(domain_name);
+    var domain = options.domain;
+
+    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null);
+
+    var current = "";
+    if (fs.existsSync(path)) {
+        current = fs.readFileSync(path).toString();
+    }
+
+    if (current !== cfg) {
+        fs.writeFileSync(path, cfg);
+        nginx.needsReload = true;
+
+        if (reloadIfNeeded) {
+            nginx.reload(true);
+        }
+    }
+
+    return false;
+};
 
 
 exports.appGetSpawnerPath = function (domain_name) {
@@ -209,7 +227,7 @@ exports.appGetSpawnerPath = function (domain_name) {
 
     var spawner_org = path.join(__dirname, "spawner/spawner.jx");
     var spawner = dir + "spawner_" + domain_name + ".jx";
-    if (!fs.existsSync(spawner))
+   // if (!fs.existsSync(spawner))
         jxcore.utils.cmdSync("cp " + spawner_org + " " + spawner);
 
     if (!fs.existsSync(spawner))
@@ -254,73 +272,73 @@ exports.appGetSpawnerCommand = function (domain_name) {
 
     var opt = {
         "user": user.name,
-        "log": options.app_dir + "/jxcore_logs/index.txt",
+        "log": options.log_path,
         "file": options.app_path,
         "domain": domain.name,
         "tcp": domain.port_http,
         "tcps": domain.port_https,
-        "logWebAccess": domain.jx_app_log_web_access
+        "logWebAccess": domain.jx_web_log,
+        "dontSaveNginxConfigFile" : true
     };
 
     var cmd = jxPath + " " + spawnerPath + " -opt '" + JSON.stringify(opt) + "'";
     return cmd;
 };
 
+
+exports.appRestart = function(domain_name, cb) {
+
+    exports.appStartStop(false, domain_name, function(err, _domain_name, _was_online) {
+        if (err) {
+            if (cb) cb(err);
+            return;
+        }
+
+        if (_was_online) {
+            exports.appStartStop(true, domain_name, cb);
+        } else {
+            cb();
+        }
+    });
+};
+
+// start or stop single app
 exports.appStartStop = function(startOrStop, domain_name, cb) {
 
-    var spawnerCmd = exports.appGetSpawnerCommand(domain_name);
-    if (spawnerCmd.err) {
-        cb(spawnerCmd.err);
+    var cmd = startOrStop ? appGetStartCommand(domain_name) : exports.appGetStopCommand(domain_name);
+    if (cmd.err) {
+        cb(cmd.err, domain_name, false);
         return;
     }
 
-    if (startOrStop) {
-        var options = exports.appGetOptions(domain_name);
-        if (options.err) {
-            cb(options.err);
-            return;
-        }
-        if (options.plan.suspended) {
-            cb("PlanSuspended");
-            return;
-        }
-
-        fs.writeFileSync(options.cfg_path, JSON.stringify(options.cfg, null, 9));
-    }
-
-    var jxPath = exports.getJXPath();
-    var spawner = exports.appGetSpawnerPath(domain_name);
-
-
     exports.getMonitorJSON(false, function(err, ret) {
-        var online_before = !err && ret && ret.indexOf(spawner) !== -1;
+        var online_before = !err && ret && ret.indexOf(cmd.spawner) !== -1;
 
-        // no point to start a[[, if it's running
+        // no point to start app, if it's running
         if (startOrStop && online_before) {
-            cb();
+            cb(false, domain_name, online_before);
             return;
         }
 
         // no point to stop app if it's not running
         if (!startOrStop && !online_before) {
-            cb();
+            cb(false, domain_name, online_before);
             return;
         }
 
         if (err || !ret) {
             // monitor is offline, don't treat this a error
-            cb();
+            cb(false, domain_name, online_before);
             return;
         }
 
-        var cmd = startOrStop ? spawnerCmd : jxPath + " monitor kill " + spawner + " 2>&1";
-        exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (errExec, stdout, stderr) {
+        exec(cmd.cmd, {cwd: path.dirname(cmd.jxPath), maxBuffer: 1e7}, function (errExec, stdout, stderr) {
             // cannot rely on err in this case. command returns non-zero exitCode on success
 
             // let's wait for monitor to respawn an app as user
             setTimeout(function() {
                 exports.getMonitorJSON(false, function(err2, ret2) {
-                    var online_after = !err2 && ret2 && ret2.indexOf(spawner) !== -1;
+                    var online_after = !err2 && ret2 && ret2.indexOf(cmd.spawner) !== -1;
 
                     var err = online_after === online_before;
                     var msg = null;
@@ -332,47 +350,135 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                         console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
                     }
 
-                    cb(msg);
+                    if (!msg) {
+                        var res = nginx.reload(true);
+                        if (res)
+                            msg = res;
+                    }
+                    cb(msg, domain_name, online_before);
                 });
             }, startOrStop ? 4000 : 10);
         });
     });
 };
 
-// just runs the command. useful when calling for multiple domains.
-// also checking should be done outside
-exports.appStartWithoutCheck = function(domain_name, cb) {
+
+var appGetStartCommand = function(domain_name) {
 
     var spawnerCmd = exports.appGetSpawnerCommand(domain_name);
-    if (spawnerCmd.err) {
-        cb(spawnerCmd.err, domain_name);
-        return;
-    }
+    if (spawnerCmd.err)
+        return spawnerCmd;
 
     var options = exports.appGetOptions(domain_name);
-    if (options.err) {
-        cb(options.err, domain_name);
-        return;
-    }
-    if (options.plan.suspended) {
-        cb("PlanSuspended", domain_name);
-        return;
-    }
+    if (options.err)
+        return options;
+
+    var spawner = exports.appGetSpawnerPath(domain_name);
+    if (spawner.err)
+        return spawner;
+
+    if (options.plan.suspended)
+        return { err : "PlanSuspended" };
+
+    var jxPath = exports.getJXPath();
+    if (jxPath.err)
+        return jxPath;
 
     fs.writeFileSync(options.cfg_path, JSON.stringify(options.cfg, null, 9));
 
-    var jxPath = exports.getJXPath();
+    exports.appSaveNginxConfigPath(domain_name);
 
-    exec(spawnerCmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (errExec, stdout, stderr) {
-        cb(false, domain_name);
+    return { cmd : spawnerCmd, jxPath : jxPath, options : options , spawner : spawner};
+};
+
+
+exports.appGetStopCommand = function(domain_name) {
+
+    var spawner = exports.appGetSpawnerPath(domain_name);
+    if (spawner.err)
+        return spawner;
+
+    var jxPath = exports.getJXPath();
+    if (jxPath.err)
+        return jxPath;
+
+    return { cmd : jxPath + " monitor kill " + spawner + " 2>&1", spawner : spawner, jxPath : jxPath };
+};
+
+
+exports.appStopMultiple = function (domain_names, cb) {
+
+    if (!domain_names || !domain_names.length) {
+        // no domains, don't treat it as error
+        cb();
+        return;
+    }
+
+    var infos = {};
+
+    exports.getMonitorJSON(false, function (err, ret) {
+
+        if (err || !ret) {
+            // monitor is offline, don't treat this a error
+            cb();
+            return;
+        }
+
+        var commands = [];
+
+        for (var o in domain_names) {
+            var domain_name = domain_names[o];
+            infos[domain_name] = {};
+
+            var cmd = exports.appGetStopCommand(domain_name);
+            if (cmd.err) {
+                infos[domain_name].err = spawner.err;
+                continue;
+            }
+
+            var online_before = ret.indexOf(cmd.spawner) !== -1;
+
+            // no point to stop app if it's not running
+            if (!online_before) {
+                stepDone();
+                continue;
+            }
+
+            commands.push(cmd.cmd);
+        }
+
+        exports.runMultipleComands(commands, function () {
+            exports.getMonitorJSON(false, function (err2, ret2) {
+
+                var isErr = false;
+                for (var o in domain_names) {
+                    var domain_name = domain_names[o];
+                    if (infos[domain_name].err) {
+                        isErr = true;
+                        continue;
+                    }
+
+                    var online_after = ret2.indexOf(infos[domain_name]) !== -1;
+
+                    if (online_after) {
+                        infos[domain_name].err = "JXcoreAppCannotStop";
+                        isErr = true;
+                    }
+                }
+                cb(isErr, isErr ? infos : false);
+            });
+        });
     });
 };
 
 
+exports.runMultipleComands = function (command_arr, cb) {
 
-exports.appStopMultiple = function(domain_names, cb) {
+    if (!cb) {
+        throw "Callback is required";
+    }
 
-    if (!domain_names || !domain_names.length) {
+    if (!command_arr || !command_arr.length) {
         // no domains, don't treat it as error
         cb();
         return;
@@ -384,78 +490,21 @@ exports.appStopMultiple = function(domain_names, cb) {
         return;
     }
 
-    var infos = {};
-    var cnt = domain_names.length;
+    var cnt = command_arr.length;
     var done = 0;
 
-    var allStepsDone = function() {
-        exports.getMonitorJSON(false, function(err, ret) {
-
-            var isErr = false;
-            for(var o in domain_names) {
-                var domain_name = domain_names[o];
-                if (infos[domain_name].err) {
-                    isErr = true;
-                    continue;
-                }
-
-                var online_after = ret.indexOf(infos[domain_name]) !== -1;
-
-                if (online_after) {
-                    infos[domain_name].err = "JXcoreAppCannotStop";
-                    isErr = true;
-                }
-            }
-            cb(isErr, isErr ? infos :false);
-        });
-    };
-
-    var stepDone = function() {
+    var stepDone = function () {
         done++;
         if (done === cnt)
-            allStepsDone();
+            cb();
     };
 
-    exports.getMonitorJSON(false, function(err, ret) {
-
-        if (err || !ret) {
-            // monitor is offline, don't treat this a error
-            cb();
-            return;
-        }
-
-        for(var o in domain_names) {
-            var domain_name = domain_names[o];
-            infos[domain_name] = {};
-
-            var spawner = exports.appGetSpawnerPath(domain_name);
-            if (spawner.err) {
-                infos[domain_name].err = spawner.err;
-                stepDone();
-                continue;
-            }
-
-            infos[domain_name].spawner = spawner;
-
-            var online_before = ret.indexOf(spawner) !== -1;
-
-            // no point to stop app if it's not running
-            if (!online_before) {
-                stepDone();
-                continue;
-            }
-
-            var cmd = jxPath + " monitor kill " + spawner + " 2>&1";
-            exec(cmd, {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
-                // cannot rely on err in this case. command returns non-zero exitCode on success
-                stepDone();
-            });
-        };
-    });
+    for (var o in command_arr) {
+        exec(command_arr[o], {cwd: path.dirname(jxPath), maxBuffer: 1e7}, function (err, stdout, stderr) {
+            stepDone();
+        });
+    }
 };
-
-
-
 
 
 exports.saveMonitorConfig = function (jxPath) {
@@ -526,35 +575,25 @@ exports.getMonitorJSON = function (parse, cb) {
 };
 
 // starts all not-suspended and not-disabled user apps
-var appStartEnabled = function(cb) {
+var appStartEnabledApplications = function(cb) {
 
-    var appsToRun = [];
+    var commands = [];
 
     var domains = database.getDomainsByPlanName("Unlimited", 1e7);
     for(var o in domains) {
         var domain_name = domains[o];
         var domain = database.getDomain(domain_name);
         var plan = database.getPlanByDomainName(domain_name);
-        if (domain.jx_enabled && !plan.suspended)
-            appsToRun.push(domain_name);
+        if (domain.jx_enabled && !plan.suspended) {
+            var cmd = appGetStartCommand(domain_name);
+            if (!cmd.err)
+                commands.push(cmd.cmd);
+        }
     }
-
-    var cnt = appsToRun.length;
-
-    if (!cnt) {
-        cb();
-        return;
-    }
-
-    var stepDone = function() {
-        cnt--;
-        if (cnt === 0)
-            cb();
-    };
-
-    for(var o in appsToRun) {
-        exports.appStartWithoutCheck(appsToRun[o], stepDone);
-    }
+    exports.runMultipleComands(commands, function() {
+        var res = nginx.reload(true);
+        cb(res ? res : false)
+    });
 };
 
 exports.monitorStartStop = function (startOrStop, cb) {
@@ -594,7 +633,7 @@ exports.monitorStartStop = function (startOrStop, cb) {
                 }
 
                 if (startOrStop) {
-                    appStartEnabled(function() {
+                    appStartEnabledApplications(function() {
                         cb(msg);
                     });
                 } else {

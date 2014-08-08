@@ -233,6 +233,23 @@ methods.sessionApply = function(env, params){
     }
 
     var sendError = function(errLabel) {
+
+        if (!errLabel) {
+            server.sendCallBack(env, {arr: false});
+            return;
+        }
+
+        errLabel = form_lang.Get(active_user.lang, errLabel, true);
+        for(var field_name in _controls){
+            if (errLabel.indexOf(field_name) !== -1) {
+                var label = _controls[field_name].details.label;
+                if (label) {
+                    label = form_lang.Get(active_user.lang, label, true);
+                    errLabel = errLabel.replace(field_name, "`" + label + "`");
+                }
+            }
+        }
+
         server.sendCallBack(env, {arr: [ { control: "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
     };
 
@@ -282,11 +299,34 @@ methods.sessionApply = function(env, params){
         try {
             if (isUpdate) {
                 var domain = database.getDomain(update_name);
+                var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
+                var jx_app_path_changed = domain.jx_app_path !== json.jx_app_path;
+                var jx_app_options = hosting_tools.appGetOptions(update_name);
                 if (!domain)
                     return sendError("DBCannotGetDomain");
 
                 update(domain, json);
                 ret = database.updateDomain(update_name, domain);
+
+                if (!ret) {
+                    if (jx_app_path_changed) {
+                        if (jx_app_options && !jx_app_options.err) {
+                            var file = jx_app_options.cfg_path;
+                            if (fs.existsSync(file)) {
+                                fs.unlinkSync(file);
+                            }
+                        }
+                        hosting_tools.appRestart(update_name, function(err) {
+                            sendError(err);
+                        });
+                        return;
+                    }
+                    if (jx_web_log_changed) {
+                        var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
+                        if (res.err)
+                            ret = res.err;
+                    }
+                }
             } else {
                 var arr = hosting_tools.getFreePorts(2);
                 if (!arr || arr.length < 2) {
@@ -346,23 +386,7 @@ methods.sessionApply = function(env, params){
         ret = "UnknownForm";
     }
 
-    if (ret) {
-
-        ret = form_lang.Get(active_user.lang, ret, true);
-        for(var field_name in _controls){
-            if (ret.indexOf(field_name) !== -1) {
-                var label = _controls[field_name].details.label;
-                if (label) {
-                    label = form_lang.Get(active_user.lang, label, true);
-                    ret = ret.replace(field_name, "`" + label + "`");
-                }
-            }
-        }
-
-        server.sendCallBack(env, {arr: [ { control: "", msg : ret } ]});
-    } else {
-        server.sendCallBack(env, {arr: false});
-    }
+    sendError(ret);
 };
 
 methods.getTableData = function(env, params) {
@@ -507,7 +531,7 @@ methods.installNPM = function(env, params) {
 
 methods.monitorStartStop = function (env, params) {
 
-    var active_user = _active_user.checkAdmin(env, false, false, true);
+    var active_user = _active_user.checkAdmin(env);
     if (!active_user)
         return;
 
@@ -526,6 +550,15 @@ methods.appStartStop = function (env, params) {
     if (!params.id) {
         server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "'DomainNotFound", true) });
     } else {
+
+        if (active_user.plan !== "unlimited") {
+            var domains = database.getDomainsByUserName(active_user.username, 1e7);
+            if (domains.indexOf(params.id) === -1) {
+                server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Access Denied", true) });
+                return;
+            }
+        }
+
         hosting_tools.appStartStop(params.op, params.id, function(err) {
             if (err) err = form_lang.Get(active_user.lang, err, true);
             server.sendCallBack(env, {err: err });

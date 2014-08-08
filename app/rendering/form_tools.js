@@ -2,7 +2,7 @@ var form_lang = require('../definitions/form_lang');
 var path = require("path");
 var fs = require("fs");
 
-exports.begin = '<form class="form-horizontal">';
+exports.begin = '<form class="form-horizontal" onsubmit="return false;">';
 
 var getData = function(label, _title, input_id, lang, options) {
     var ret = { prefix : "", description: ""};
@@ -272,4 +272,27 @@ exports.getFormsLabels = function(lang) {
     formLabels[lang] = labels;
 
     return formLabels[lang];
+};
+
+
+exports.getFieldDisplayNames = function(lang, field_names) {
+
+    if (!field_names) {
+        return "";
+    }
+
+    var labels = exports.getFormsLabels(lang);
+    var arr = [];
+
+    if (field_names.trim) {
+        field_names = [ field_names ];
+    }
+    for(var o in field_names) {
+        if (labels[field_names[o]])
+            arr[o] = labels[field_names[o]];
+        else
+            arr[o] = field_names[o];
+    }
+
+    return arr.join(", ");
 };
