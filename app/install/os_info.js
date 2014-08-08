@@ -25,10 +25,11 @@ exports.OSInfo = function(){
 
     osInfo.isMac = /mac/.test(info);
     osInfo.is64 = /x64/.test(info);
-    osInfo.is32 = !osInfo.is6;
+    osInfo.is32 = !osInfo.is64;
     osInfo.isRH = /red hat/.test(info);
     osInfo.isSuse = /suse/.test(info);
     osInfo.isBSD = /bsd/.test(info);
+    osInfo.isArch = /arch/.test(info);
 
     if(osInfo.isUbuntu)
         osInfo.OS_STR = "ub";
@@ -47,5 +48,5 @@ exports.OSInfo = function(){
 
     osInfo.OS_STR += (osInfo.is64)? "64":"32";
 
-    return osInfo;;
+    return osInfo;
 };
