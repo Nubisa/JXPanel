@@ -109,27 +109,41 @@ if (!isRoot || !respawned) {
 
     if (logPath) {
         if (!fs.existsSync(logPathDir)) {
-            fs.mkdirSync(logPathDir);
+            try {
+                fs.mkdirSync(logPathDir);
+            } catch (ex) {
+                log("Cannot create log's directory: " + ex, true);
+            }
+        }
+        if (fs.existsSync(logPathDir)) {
             try {
                 fs.chownSync(logPathDir, uid, gid);
+                fs.chmodSync(logPathDir, "0711"); // others only execute
             } catch (ex) {
                 log("Cannot set ownership of this log's directory: " + ex, true);
             }
         }
 
         if (!fs.existsSync(logPath)) {
-            fs.writeFileSync(logPath, "");
             try {
-                fs.chownSync(logPath, uid, gid);
-            } catch (ex) {
-                log("Cannot set ownership of this log file: " + ex, true);
+                fs.writeFileSync(logPath, "");
+            } catch(ex) {
+                log("Cannot create log file: " + ex, true);
             }
         }
 
-        try {
-            out = fs.openSync(logPath, 'a');
-        } catch (ex) {
-            // logging will no be possible, but app can still run
+        if (fs.existsSync(logPath)) {
+            try {
+                fs.chownSync(logPath, uid, gid);
+                fs.chmodSync(logPath, "0644");  // others only read
+            } catch (ex) {
+                log("Cannot set ownership of this log file: " + ex, true);
+            }
+            try {
+                out = fs.openSync(logPath, 'a');
+            } catch (ex) {
+                // logging will no be possible, but app can still run
+            }
         }
     }
 

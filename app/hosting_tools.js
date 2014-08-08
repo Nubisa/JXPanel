@@ -143,10 +143,8 @@ exports.appGetOptions = function (domain_name) {
     var appPath = appDir + domain.jx_app_path;
     var appPathReplaced = appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
     var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jxcore.config";
-    var logPath = appDir + "/jxcore_logs/index.txt";
+    var logPath = path.join(appDir, "jxcore_logs/index.txt");
 
-
-//    console.log(json, appDir, cfgPath);
     return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_replaced : appPathReplaced, log_path : logPath, user : user, plan: plan, domain : domain };
 };
 
