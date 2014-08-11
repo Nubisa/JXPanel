@@ -30,6 +30,7 @@ exports.Labels = {
     "Suspended" : "Suspended",
     "Active" : "Active",
     "Status" : "Status",
+    "RunningOn" : "Running on",
 
     "serverManagement":"Server Management",
     "help":"Help",

@@ -60,6 +60,8 @@ var getHTML = function (active_user, table) {
         var displayName = columns[a];
         if (displayName == "_checkbox") displayName = "";
         if (displayName == "_id") displayName = "ID";
+        if (displayName == "port_http") displayName = "TCP";
+        if (displayName == "port_https") displayName = "TCPS";
 
         if (formControls[columns[a]] && formControls[columns[a]].details) {
             displayName = form_lang.Get(active_user.lang, formControls[columns[a]].details.label);
