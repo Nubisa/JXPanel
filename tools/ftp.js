@@ -43,7 +43,7 @@ conf = conf.replace("{{user.group}}", user_group);
 conf = conf.replace("{{panel.name}}", panel_name);
 fs.writeFileSync(conf_file, conf);
 log("[OK] Settings", "green");
-log("FTP server is installed", "green");
+log("FTP server is successfully installed", "green");
 RunIt(ftp_dir + path.sep + "sbin" + path.sep + "proftpd");
 
 

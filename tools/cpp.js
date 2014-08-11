@@ -36,3 +36,4 @@ else if(osinfo.isArch){
     RunIt("pacman -Sy git");
     RunIt("pacman -Sy pam");
 }
+log("[OK] Developer tools are successfully installed", "green");
