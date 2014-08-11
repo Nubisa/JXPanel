@@ -12,7 +12,7 @@ var getData = function(label, _title, input_id, lang, options) {
 
     var desc = form_lang.Get(lang, label + "_Description");
 
-    ret.description = !desc?options.description:desc;
+    ret.description = options.extra && options.extra.description ? options.extra.description : desc || options.description;
     ret.prefix = options.prefix || "";
 
     var isUpdate = options.extra && options.extra.isUpdate;
@@ -224,6 +224,7 @@ exports.createSimpleText = function(label, _title, input_id, _value, lang, optio
         +'<label class="col-md-2 control-label">'+label + '</label>'
         +'<div class="col-md-10">'
         +'<div style="margin-top: 7px;">' + _value + '</div>'
+        + (data.description ? '<p class="note">'+data.description+'</p>' : "")
         +'</div></div>';
 
     var js = "";

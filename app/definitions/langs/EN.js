@@ -364,6 +364,8 @@ exports.Labels = {
     "JXcorePathInvalid" : "JXcore path does not exist.",
     "JXcoreMonitor" : "JXcore Monitor",
     "JXcoreMonitorStatus" : "Status ",
+    "JXcoreMonitorStatusStop_Description" : "If you stop, all the monitored applications will be terminated!",
+    "JXcoreMonitorStatusStart_Description" : "If you start, all the JXcore enabled applications will be launched.",
     "JXcoreMonitorCannotStart" : "Cannot start JXcore monitor.",
     "JXcoreMonitorCannotStop" : "Cannot stop JXcore monitor.",
     "JXcoreMonitorStarted" : "JXcore monitor started.",

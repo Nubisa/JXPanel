@@ -95,9 +95,12 @@ exports.form = function () {
                 details: {
                     label: "JXcoreMonitorStatus",
                     method: tool.createSimpleText,
+                    getDescription : function(active_user, values) {
+                        return active_user.session.monitor.isOnline
+                        ? form_lang.Get(active_user.lang, "JXcoreMonitorStatusStop_Description", true)
+                        : form_lang.Get(active_user.lang, "JXcoreMonitorStatusStart_Description", true);
+                    },
                     getValue : function(active_user) {
-
-//                        if (system_tools.isJXValid()) {
 
                             var btnStart = '<button type="submit" class="btn btn-labeled btn-success" onclick="return utils.jxMonitorStartStop(true);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
                                 + form_lang.Get(active_user.lang, "Start", true) + '</button>';
@@ -109,17 +112,6 @@ exports.form = function () {
                             return active_user.session.monitor.isOnline
                                 ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true) +  btnStop
                                 : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true) +  btnStart;
-//                        } else {
-//
-//                            var str = "<br><code>" + form_lang.Get(active_user.lang, "JXcorePleaseInstall") + "</code>";
-//                            return active_user.session.monitor.isOnline
-//                                ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user, "Online", true) + " " + str
-//                                : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user, "Offline", true) + " " + str;
-//                        }
-
-
-
-
                     }
                 }
             },

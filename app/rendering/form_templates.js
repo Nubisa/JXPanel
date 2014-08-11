@@ -176,6 +176,10 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             val = ctrl.getValue(active_user, values);
         }
 
+        if (ctrl.getDescription && typeof ctrl.getDescription === "function") {
+            ctrl.options.extra.description = ctrl.getDescription(active_user, values);
+        }
+
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
     }
 
