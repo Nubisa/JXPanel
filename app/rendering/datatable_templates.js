@@ -147,7 +147,7 @@ var getHTML = function (active_user, table) {
             }
 
             if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.getValue) {
-                val = formControls[columns[x]].details.getValue(active_user, record);
+                val = formControls[columns[x]].details.getValue(active_user, record, true);
             }
 
 
