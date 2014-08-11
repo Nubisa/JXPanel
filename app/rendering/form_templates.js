@@ -23,6 +23,10 @@ var logic = [
         if (val == "onSubmitCancel")
             return gl.form.onSubmitCancel || "";
 
+        if (val == "submitOnClick")
+            return gl.form.submitOnClick || "window.jxForms['"+ gl.name +"'].apply()";
+
+
         return form_lang.Get(gl.lang, gl[val], true);
     }}
 ];
@@ -86,7 +90,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
             values = database.getPlan(isUpdate.name);
         } else
-        if (formName === "addDomain") {
+        if (formName === "addDomain" || formName === "appLog") {
             if (!database.isOwnerOfDomain(active_user.username, isUpdate.name))
                 return accessDeniedError("domain", isUpdate.name);
 
