@@ -39,8 +39,6 @@ exports.form = function () {
 
         this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
 
-        this.submitOnClick = "return utils.jxAppViewLog();",
-
         this.onSubmitSuccess = "domains.html";
         this.onSubmitCancel = "domains.html";
 
