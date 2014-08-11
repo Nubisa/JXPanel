@@ -1,5 +1,5 @@
 <!--<article class="col-sm-12 col-md-16 col-lg-12">-->
-<article>
+<article class="sortable-grid ui-sortable">
 
     <script>
         if(!window.jxForms){
@@ -173,10 +173,10 @@
                     {{form.contents}}
                 </div>
 
-                <div class="form-group" id="jxform_buttons" style="display: none">
+                <div class="form-group" id="jxform_buttons" style="display: none; margin-bottom: 30px;">
                     <label class="col-md-2 control-label"></label>
                     <div class="col-md-4" style="padding-left: 0px">
-                        <button type="submit" class="btn btn-labeled btn-primary"  onclick="window.jxForms['{{form.id}}'].apply()">
+                        <button id="jxFormBtnSubmit" type="submit" class="btn btn-labeled btn-primary"  onclick="{{form.submitOnClick}}">
                              <span class="btn-label">
                               <i class="glyphicon glyphicon-ok"></i>
                              </span>
@@ -227,6 +227,11 @@
                 script.innerHTML = param.js;
                 document.head.appendChild(script);
                 window.jxForms["{{form.id}}"].loadDynamic();
+
+                // first load of a form applog
+                var logDiv = document.getElementById("jxAppLog");
+                if (logDiv)
+                    utils.jxAppViewLog();
             }
 
             if (param.hideForm) {
@@ -236,6 +241,55 @@
             }
 
         });
+
+        utils.jxAppViewLog = function(remove) {
+
+            var _this = window.jxForms["{{form.id}}"];
+
+            var lines = null;
+            if (remove) {
+                lines = -1;
+            } else {
+                for(var o in _this.controls) {
+                    var _t = _this.controls[o]._t;
+
+                    if (_t === "app_log_last_lines")
+                       lines = document.getElementById(o).value;
+                }
+            }
+
+            jxcore.Call('appViewLog', { lines : lines }, function(param) {
+
+                if (param.err) {
+                    utils.jxAddMessage('danger', param.err)
+                } else {
+                    if (param.url) {
+                        document.location - param.url;
+                        return;
+                    }
+
+                    $("#jxAppLog").html(param.log);
+                    $("#jxAppLogSize").html((param.size  || 0)+ " bytes");
+
+                    if (param.log && param.log.length)
+                        $("#jxAppLogClearBtn").show();
+                    else
+                        $("#jxAppLogClearBtn").hide();
+
+                }
+
+                if (param.err) {
+                    $("#wid-id-0").hide();
+                    $("#wid-id-1").hide();
+                } else {
+                    $("#wid-id-0").show();
+                    $("#wid-id-1").show();
+                }
+
+            });
+            return false;
+        };
+
     };
 
 </script>

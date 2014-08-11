@@ -559,7 +559,7 @@ methods.appStartStop = function (env, params) {
         return;
 
     if (!params.id) {
-        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "'DomainNotFound", true) });
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "DomainNotFound", true) });
     } else {
 
         if (active_user.plan !== "unlimited") {
@@ -580,6 +580,76 @@ methods.appStartStop = function (env, params) {
             database.updateDomain(params.id, domain);
         });
     }
+};
+
+methods.appViewLog = function (env, params) {
+    var active_user = _active_user.checkUser(env, true);
+    if (!active_user)
+        return;
+
+    //  if the call was made from addDomain form, session.edits exists
+    if (!_active_user.isRecordUpdating(active_user, "addDomain")) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Access Denied", true) });
+        return;
+    }
+
+    var domain_name = active_user.session.edits["addDomain"].ID;
+
+    var options = hosting_tools.appGetOptions(domain_name);
+    if (options.err) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, options.err, true) });
+        return;
+    }
+
+    var domains = database.getDomainsByUserName(active_user.username, 1e7);
+    if (domains.indexOf(domain_name) === -1) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Access Denied", true) });
+        return;
+    }
+
+    // truncating the log
+    if (params.lines === -1) {
+
+        if (!fs.existsSync(options.app_path)) {
+            server.sendCallBack(env, {err: false, log : "" });
+            return;
+        }
+
+        fs.truncateSync(options.log_path, 0);
+        server.sendCallBack(env, {err: false, log : "" , size: 0 });
+        return;
+    }
+
+    var log = "";
+    var size = null;
+    if (fs.existsSync(options.log_path)) {
+
+        try {
+            log = fs.readFileSync(options.log_path).toString();
+        } catch(ex) {
+            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "JXcoreAppLogCannotRead", true)});
+            return;
+        }
+
+        if (params.lines && params.lines > 0) {
+            // arr
+            log = log.trim().split("\n");
+            // string again
+            log = log.slice(log.length - params.lines).join("<br>");
+        } else {
+            log = log.replace( new RegExp("\n", "g"), "<br>");
+        }
+
+        try {
+            var stats = fs.statSync(options.log_path);
+            size = stats.size;
+        } catch(ex) {
+            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "JXcoreAppLogCannotRead", true)});
+        }
+
+    }
+
+    server.sendCallBack(env, {err: false, log : log,  size : size});
 };
 
 

@@ -82,6 +82,7 @@ exports.Labels = {
     "addSubscription" : "Add new subscription",
     "addPlan": "Add new hosting plan",
     "addDomain": "Add new domain",
+    "appLog": "Application log",
 
     // login page
     "SignIn" : "Sign In",
@@ -386,6 +387,14 @@ exports.Labels = {
     "JXcoreAppStarting" : "Launching the application",
     "JXcoreAppsStarting" : "Launching user applications",
     "JXcoreAppStopping" : "Stopping the application",
+    "JXcoreAppLog" : "Log file",
+    "JXcoreAppViewLog" : "View the log file",
+    "JXcoreAppLogSize" : "Log file size",
+    "JXcoreAppLogCannotRead" : "Cannot read log file.",
+    "JXcoreAppLogClear" : "Clear log",
+    "JXcoreAppLogLines" : "Show last # lines",
+    "JXcoreAppLogLines_Description" : "Displays only last # lines of the log file. Enter empty value to display the whole log.",
+
 
 
     "JXcoreNPMModules" : "NPM Modules",

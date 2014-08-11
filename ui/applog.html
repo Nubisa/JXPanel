@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    {{view.header}} - {{toSub.pageTitle:DomainsUpperCase}}
+</head>
+<body class="smart-style-3 fixed-navigation fixed-header fixed-ribbon fixed-page-footer">
+<!-- possible classes: minified, fixed-ribbon, fixed-header, fixed-width-->
+
+<!-- HEADER -->
+<header id="header">
+    <div id="logo-group">
+
+        <!-- PLACE YOUR LOGO HERE -->
+        <span id="logo"> <img src="img/logo.png" alt="{{defaults.panelName}}"> </span>
+        <!-- END LOGO PLACEHOLDER -->
+    </div>
+
+    {{view.topNav}}
+    <!-- end pulled right: nav area -->
+
+</header>
+<!-- END HEADER -->
+
+<!-- Left panel : Navigation area -->
+<!-- Note: This width of the aside area can be adjusted through LESS variables -->
+<aside id="left-panel">
+    <!-- User info -->
+    {{view.userInfo}}
+    <nav>
+        {{view.leftMenu}}
+    </nav>
+			<span class="minifyme" data-action="minifyMenu"> 
+				<i class="fa fa-arrow-circle-left hit"></i> 
+			</span>
+
+</aside>
+<!-- END NAVIGATION -->
+
+<!-- MAIN PANEL -->
+<div id="main" role="main">
+
+    <!-- RIBBON -->
+    <div id="ribbon">
+        <!-- breadcrumb -->
+        <ol class="breadcrumb">
+            <li>{{label.Home}}</li><li>{{label.DomainsUpperCase}}</li>
+        </ol>
+
+    </div>
+    <!-- END RIBBON -->
+
+    <!-- MAIN CONTENT -->
+    <div id="content" style="padding-top:50px">
+
+        {{view.topMessage}}
+            {{toSub.topMessageTitle:DomainsManagement}}
+            {{toSub.topMessageHeader:DomainsHeader}}
+            {{toSub.topMessageContent:DomainsContent}}
+
+        {{user.suspended}}
+
+            <p id="jxFormMessage"></p>
+
+            <!-- widget grid -->
+            <section id="widget-grid" class="">
+
+
+                {{forms.appLog}}
+
+
+                <div class="jarviswidget jarviswidget-color-darken" id="wid-id-1" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" style="display: block;">
+
+                    <header>
+                        <span class="widget-icon"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i></span>
+                        <h2 style="width:1px;overflow:visible"><nobr><strong>{{label.JXcoreAppLog}}</strong></nobr></h2>
+
+                    </header>
+
+                    <!-- widget div-->
+                    <div>
+
+                        <!-- widget edit box -->
+                        <div class="jarviswidget-editbox">
+                            <!-- This area used as dropdown edit box -->
+
+                        </div>
+                        <!-- end widget edit box -->
+
+                        <!-- widget content -->
+                        <div class="widget-body">
+
+                            <div id="jxAppLog">
+                            </div>
+
+                        </div>
+                        <!-- end widget div -->
+
+                    </div>
+                    <!-- end widget -->
+
+                </div>
+
+
+            </section>
+
+    </div>
+    <!-- END MAIN CONTENT -->
+
+</div>
+<!-- END MAIN PANEL -->
+
+<!-- PAGE FOOTER -->
+{{view.footer}}
+<!-- END PAGE FOOTER -->
+
+<!-- SHORTCUT AREA : With large tiles (activated via clicking user name tag)
+Note: These tiles are completely responsive,
+you can add as many as you like
+-->
+{{view.shortcut}}
+<!-- END SHORTCUT AREA -->
+
+{{view.includes}}
+
+</body>
+
+</html>
