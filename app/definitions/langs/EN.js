@@ -382,6 +382,7 @@ exports.Labels = {
     "JXcoreAppMaxPort" : "Maximum app port number",
     "JXcoreAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
     "JXcoreAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
+    "JXcoreAppsRestartWarning" : "Submitting the form may result in restarting the monitor together with all running applications.",
     "JXcoreAppCannotStart" : "Cannot start application %s.",
     "JXcoreAppCannotStop" : "Cannot stop application %s.",
     "JXcoreAppStarted" : "Application %s started.",

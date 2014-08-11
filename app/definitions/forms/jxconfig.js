@@ -148,6 +148,18 @@ exports.form = function () {
             },
 
 
+            {
+                name: "submit_warning",
+                details: {
+                    label: "",
+                    method: tool.createSimpleText,
+                    options: {  },
+                    getValue : function(active_user) {
+                        return '<code>' + form_lang.Get(active_user.lang, "JXcoreAppsRestartWarning", true ) +  '</code>'
+                    }
+                }
+            },
+
             {"END": 1}
         ];
     };
