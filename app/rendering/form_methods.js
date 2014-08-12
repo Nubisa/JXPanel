@@ -174,9 +174,13 @@ var getFormControls = function(activeInstance) {
 
 
 var update = function(base, ext){
+    var changed = false;
     for(var o in ext){
+        if (base[o] !== ext[o])
+            changed = true;
         base[o] = ext[o];
     }
+    return changed;
 };
 
 
@@ -229,7 +233,7 @@ methods.sessionApply = function(env, params){
 
             if (det.definesMax) {
                 var val = parseInt(json[field_name]);
-                planMaximums[field_name] = isNaN(val) ? site_defaults.defaultMaximum : val;
+                planMaximums[field_name] = isNaN(val) ? database.defaultMaximum : val;
                 delete json[field_name];
             }
         }
@@ -375,9 +379,17 @@ methods.sessionApply = function(env, params){
                 if (!plan)
                     return sendError("DBCannotGetPlan");
 
-                update(plan, json);
-                update(plan.planMaximums, planMaximums);
+                var changed1 = update(plan, json);
+                var changed2 = update(plan.planMaximums, planMaximums);
                 ret = database.updatePlan(update_name, plan);
+
+                if (changed1 || changed2) {
+                    var all_domains = database.getDomainsByPlanName(update_name, 1e5);
+                    hosting_tools.appRestartMultiple(all_domains, function(err) {
+                        sendError(err);
+                    });
+                    return;
+                }
             } else {
 
                 json.canCreateUser = json.maxUserCount !== 0;

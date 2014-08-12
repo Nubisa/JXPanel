@@ -145,7 +145,7 @@ exports.appGetOptions = function (domain_name) {
 
     for (var o in plan.planMaximums) {
         if (fields[o])
-            add(fields[o], plan.planMaximums[o]);
+            add(fields[o], plan.GetMaximum(o));
     }
 
     var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
@@ -184,11 +184,6 @@ exports.appCreateHomeDir = function(domain_name) {
 
 exports.appGetNginxConfigPath = function(domain_name) {
 
-//    var options = exports.appGetOptions(domain_name);
-//    if (options.err)
-//        return options;
-
-//    return site_defaults.dirNginxConfigs + options.app_path_replaced;
     return site_defaults.dirNginxConfigs + domain_name + ".conf";
 };
 
@@ -421,7 +416,7 @@ exports.appStopMultiple = function (domain_names, cb) {
 
     if (!domain_names || !domain_names.length) {
         // no domains, don't treat it as error
-        cb();
+        if (cb) cb();
         return;
     }
 
@@ -431,7 +426,7 @@ exports.appStopMultiple = function (domain_names, cb) {
 
         if (err || !ret) {
             // monitor is offline, don't treat this a error
-            cb();
+            if (cb) cb();
             return;
         }
 
@@ -476,12 +471,76 @@ exports.appStopMultiple = function (domain_names, cb) {
                         isErr = true;
                     }
                 }
-                cb(isErr, isErr ? infos : false);
+                if (cb) cb(isErr, isErr ? infos : false);
             });
         });
     });
 };
 
+
+// kills processes and allows the monitor to restart them
+exports.appRestartMultiple = function (domain_names, cb) {
+
+    if (!domain_names || !domain_names.length) {
+        // no domains, don't treat it as error
+        if (cb)  cb();
+        return;
+    }
+
+    console.log("domain_names", domain_names);
+
+    exports.getMonitorJSON(true, function (err, ret) {
+        if (err) {
+            if (cb)  cb(err);
+            return;
+        }
+
+        if (!ret || !ret.length) {
+            // no monitored apps, don't treat this as error
+            if (cb) cb();
+            return;
+        }
+
+        var spawners = [];
+        for (var o in domain_names) {
+            var domain_name = domain_names[o];
+            var spawner = exports.appGetSpawnerPath(domain_name);
+            if (spawner.err)
+                continue;
+
+            // refreshes config files
+            var cmd = appGetStartCommand(domain_name);
+            if (cmd.err)
+                continue;
+
+            spawners.push(spawner);
+        }
+
+        if (!spawners.length) {
+            if (cb) cb();
+            return;
+        }
+
+        var killed = [];
+        var notKilled = [];
+        for (var o in ret) {
+            var pid = ret[o].pid;
+            var path = ret[o].path;
+            if (spawners.indexOf(path) !== -1) {
+                try {
+                    process.kill(pid);
+                    killed.push(pid);
+                } catch (ex) {
+                    notKilled.push(pid);
+                }
+            }
+        }
+
+        console.log("killed", killed, "notkilled", notKilled);
+        cb(notKilled.length ? "Cannot kill: " + notKilled.join(", ") : false);
+    });
+
+};
 
 exports.runMultipleComands = function (command_arr, cb) {
 
