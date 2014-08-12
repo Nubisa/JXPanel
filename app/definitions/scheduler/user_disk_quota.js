@@ -3,7 +3,7 @@ var folders = require('../../definitions/user_folders');
 var last_quota_check = 0;
 
 var check_quotas = function(){
-    if(Date.now()<last_quota_check + 30000)
+    if(Date.now()<last_quota_check + 3000)
        return;
     last_quota_check = 0;
     db.ReadDB(function(err) {
@@ -15,7 +15,7 @@ var check_quotas = function(){
         var record_updated = false;
         for(var o in plans){
             var plan = db.getPlan(plans[o]);
-            var isSuspended = plan.suspended;
+            var isSuspended = plan.suspended && plan.suspended.indexOf("plan_disk_space") !== -1;
             if(!isSuspended){
                 var max_disk = plan.planMaximums.plan_disk_space; // plan.planMaximums.plan_traffic -> web traffic
                 if(max_disk){                                     // plan.plan_ssh -> ssh access
@@ -23,14 +23,18 @@ var check_quotas = function(){
                     for(var i in users){
                         var user = db.getUser(i);
 
+                        var isUserSuspended = user.suspended && user.suspended.indexOf("plan_disk_space") !== -1;
                         var size = folders.getUserPathSize(i);
-                        if(size>max_disk && !user.suspended){
+//                        console.log("quota size for user", user.name, "size", size, 'maxdisk', max_disk, "suspended", user.suspended,"isUserSuspended", isUserSuspended );
+                        if(size>max_disk && max_disk !== db.defaultMaximum && !isUserSuspended){
                             user.SuspendUser("plan_disk_space");
                             record_updated = true;
-                        } else
-                        if(size<max_disk && user.suspended) {
+                            continue;
+                        }
+                        if((size<max_disk || max_disk === db.defaultMaximum) && isUserSuspended) {
                             user.UnSuspendUser("plan_disk_space");
                             record_updated = true;
+                            continue;
                         }
                     }
                 }
