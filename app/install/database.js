@@ -281,6 +281,10 @@ var Plan = function(name, owner_user, opts, dummy){
     // goes up until top parent and gets effective maximum for this plan
     this.GetMaximum = function(field_name) {
 
+        if (this.name === "Unlimited") {
+            return exports.defaultMaximum;
+        }
+
         var val = this.planMaximums[field_name];
         if (this.owner) {
             var parentPlanName = exports.getParentPlanName(this.name);
@@ -299,6 +303,26 @@ var Plan = function(name, owner_user, opts, dummy){
 
                 if (parentVal < val)
                     return parentVal;
+            }
+        }
+        return val;
+    };
+
+    // goes up until top parent and gets effective bool value for this plan
+    // e.g. allowSysExec
+    this.GetBool = function(field_name) {
+
+        if (this.name === "Unlimited") {
+            return true;
+        }
+
+        var val = this[field_name];
+        if (this.owner) {
+            var parentPlanName = exports.getParentPlanName(this.name);
+            if (parentPlanName && Plans[parentPlanName]) {
+                var parentVal = Plans[parentPlanName].GetBool(field_name);
+
+                return parentVal === true ? val : parentVal;
             }
         }
         return val;

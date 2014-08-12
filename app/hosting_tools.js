@@ -126,8 +126,14 @@ exports.appGetOptions = function (domain_name) {
             }
         }
     };
-    var add = function (field_name, value) {
+    var add = function (field_name, value, isBool) {
+        if (!value && isBool)
+            value = false;
+
         if (!value && value !== false && value !== 0)
+            return;
+
+        if (!isBool && value === database.defaultMaximum)
             return;
 
         json[field_name] = value;
@@ -139,8 +145,8 @@ exports.appGetOptions = function (domain_name) {
     }
 
     for (var o in plan) {
-        if (fields[o])
-            add(fields[o], plan[o]);
+        if (fields[o] && fields[o].slice(0,5) === "allow")
+            add(fields[o], plan.GetBool(o), true);
     }
 
     for (var o in plan.planMaximums) {
@@ -491,7 +497,8 @@ exports.appRestartMultiple = function (domain_names, cb) {
 
     exports.getMonitorJSON(true, function (err, ret) {
         if (err) {
-            if (cb)  cb(err);
+            // monitor offline. don't treat is as error
+            if (cb) cb;
             return;
         }
 
@@ -536,7 +543,7 @@ exports.appRestartMultiple = function (domain_names, cb) {
             }
         }
 
-        console.log("killed", killed, "notkilled", notKilled);
+//        console.log("killed", killed, "notkilled", notKilled);
         cb(notKilled.length ? "Cannot kill: " + notKilled.join(", ") : false);
     });
 
