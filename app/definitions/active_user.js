@@ -561,7 +561,6 @@ exports.defineMethods = function(){
 
     server.addJSMethod("userIn", function(env, params){
         var val = {done:true};
-        val.status = users[env.SessionID].session.status;
 
         if(!env.SessionID || !users[env.SessionID]){
             val.relogin = true;
@@ -569,6 +568,7 @@ exports.defineMethods = function(){
             return;
         }
 
+        val.status = users[env.SessionID].session.status;
         server.sendCallBack(env, val);
     });
 };

@@ -58,7 +58,7 @@ methods.tryLogin = function(env, params){
                     planMaximums: {}
                 });
 
-                database.AddUser("Unlimited", params.username, { person_name : params.username, firstUser:true });
+                database.AddUser("Unlimited", params.username, { person_name : params.username, firstUser:true, ftp_access : true, panel_access : true });
                 try{
                     var ret = system_tools.addSystemUser({plan:"Unlimited", name:params.username }, null, 1);
                     if(ret.err){
@@ -79,6 +79,9 @@ methods.tryLogin = function(env, params){
 
             if (!user) {
                 server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
+            } else
+            if (!user["panel_access"]) {
+                server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoAccess")});
             } else {
                 finish(env, params);
             }
@@ -277,6 +280,10 @@ methods.sessionApply = function(env, params){
                     var res = system_tools.updatePassword(update_name, params.controls["person_password"]);
                     if (res.err)
                         ret = res.err;
+                }
+
+                if (!json.panel_access) {
+                    _active_user.clearUserByName(update_name);
                 }
             } else {
                 ret = database.AddUser(json.plan, json.name, json);

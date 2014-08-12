@@ -70,6 +70,7 @@ exports.Labels = {
     "MSBrowserOutOfDate": "Your browser is out of date, please update your browser by going to www.microsoft.com/download",
     "SessionExpired": "The user session is expired. Please login again!",
     "CannotLoginNoUser" : "Cannot login. User does not exists in database.",
+    "CannotLoginNoAccess" : "Cannot login to JXPanel (access denied).",
     "CouldntFixFolderPermissions":"There was a problem with folder permissions during user creation",
 
     "Access Denied": "You do not have a permission to view this resource.",
