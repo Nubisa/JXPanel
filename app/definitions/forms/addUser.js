@@ -36,18 +36,14 @@ exports.form = function () {
                     label: "Status",
                     method: tool.createSimpleText,
                     options: { },
-//                    displayValues : {
-//                        "true" : '<i class="fa-fw fa fa-times text-danger"></i>',
-//                        "false" : '<i class="fa-fw fa fa-times text-success"></i>'
-//                    },
                     getValue : function(active_user, values) {
 
                         // form is in "add" mode, not "edit"
                         if (!values || !values["name"])
                             return "";
 
-                        var iconOnline = '<i class="fa-lg fa fa-check text-success"></i> ' + form_lang.Get(active_user.lang, "Active", true);
-                        var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i> <code>' + form_lang.Get(active_user.lang, "Suspended", true) + "</code>";
+                        var iconOnline = form_lang.GetBool(active_user.lang, true, "Active");
+                        var iconOffline = form_lang.GetBool(active_user.lang, false, null, "Suspended");
 
                         var user = database.getUser(values.name);
 
@@ -151,6 +147,35 @@ exports.form = function () {
                     }
                     return ret;
                 }
+            },
+
+
+            {
+                name: "ftp_access",
+                details: {
+                    label: "UserFTPAccess",
+                    method: tool.createCheckBox,
+                    options: { },
+                    cannotEditOwnRecord : true,
+                    getValue : function(active_user, values) {
+                        return form_lang.GetBool(active_user.lang, values["ftp_access"], "Granted", "Denied");
+                    }
+                },
+                validation : new validations.Boolean()
+            },
+
+            {
+                name: "panel_access",
+                details: {
+                    label: "UserPanelAccess",
+                    method: tool.createCheckBox,
+                    options: { },
+                    cannotEditOwnRecord : true,
+                    getValue : function(active_user, values) {
+                        return form_lang.GetBool(active_user.lang, values["panel_access"], "Granted", "Denied");
+                    }
+                },
+                validation : new validations.Boolean()
             },
 
             {"END": 1}

@@ -168,17 +168,17 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
 
 
     var _html = '<div class="form-group">'
-        + '<label class="col-md-2 control-label">'+label + req_label + '</label><div class="col-md-10">'
-        + '<div class="checkbox"><label>';
+        + '<label class="col-md-2 control-label">'+label + req_label + '</label><div class="col-md-10">';
 
     var id = jxcore.utils.uniqueId();
 
-    if (options && options.extra && options.extra.noEditDisplayValue) {
+    if (options && options.extra && typeof options.extra.noEditDisplayValue !== "undefined") {
         var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
         return {html: _html + v + "</div></div>", js: ""};
     }
 
 
+    _html += '<div class="checkbox"><label>';
     _html += '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
 
     _html += '<span>&nbsp;</span></label></div>';

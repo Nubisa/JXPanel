@@ -31,6 +31,8 @@ exports.Labels = {
     "Active" : "Active",
     "Status" : "Status",
     "RunningOn" : "Running on",
+    "Granted" : "Granted",
+    "Denied" : "Denied",
 
     "serverManagement":"Server Management",
     "help":"Help",
@@ -120,6 +122,8 @@ exports.Labels = {
     "UserEmailAddress" : "Email Address",
     "UserSubscriptionAccess" : "Access to subscriptions",
     "UserPanelLanguage" : "JXPanel language",
+    "UserFTPAccess" : "FTP access",
+    "UserPanelAccess" : "JXPanel access",
 
     "ValueRequired" : "This field is required.",
     "ValueInvalid" : "The value for the field is invalid.",

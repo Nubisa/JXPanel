@@ -169,11 +169,11 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (ctrl.options.password && isUpdate)
             val = null;
 
-        if (isUpdate && (ctrl.cannotEdit || (ctrl.cannotEditOwnRecord && values["name"] === active_user.username)))
+        if (isUpdate && (ctrl.cannotEdit || ctrl.method === tool.createSimpleText || (ctrl.cannotEditOwnRecord && values["name"] === active_user.username))) {
+            if (ctrl.getValue && typeof ctrl.getValue === "function") {
+                val = ctrl.getValue(active_user, values);
+            }
             ctrl.options.extra.noEditDisplayValue = val;
-
-        if (ctrl.getValue && typeof ctrl.getValue === "function") {
-            val = ctrl.getValue(active_user, values);
         }
 
         if (ctrl.getDescription && typeof ctrl.getDescription === "function") {

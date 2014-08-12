@@ -133,7 +133,7 @@ var getHTML = function (active_user, table) {
                 for (var _val in formControls[columns[x]].details.displayValues) {
 
                     // null/undefined value replacement into display value
-                    var isEmpty = _val === "__EMPTY__" && val === null || val === undefined || val === "";
+                    var isEmpty = _val === "__EMPTY__" && (val === null || val === undefined || val === "");
                     // specific value replacement
                     var isEqual = _val + "" === val + "";
 
