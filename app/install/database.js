@@ -15,7 +15,7 @@ var UpdateDB = function(stringToSave){ // KRIS FILL IN
     });
 };
 
-exports.defaultMaximum = 1e9;  // don't change it, otherwise db should be refreshed
+exports.defaultMaximum = -1;  // don't change it, otherwise db should be refreshed
 
 exports.updateDBFile = function(){
    UpdateDB(JSON.stringify(DB));
@@ -214,7 +214,7 @@ var Plan = function(name, owner_user, opts, dummy){
 
                 for(var o in with_opts.planMaximums){
                     if(this.planMaximums[o]){
-                        if(with_opts.planMaximums[o]>this.planMaximums[o] && with_opts.planMaximums[o] !== exports.defaultMaximum){
+                        if(with_opts.planMaximums[o]>this.planMaximums[o] && with_opts.planMaximums[o] !== exports.defaultMaximum && this.planMaximums[o] !== exports.defaultMaximum){
                             return "PlanCannotAddMore|" + o + "|" + this.planMaximums[o];
                         }
                     }
@@ -358,7 +358,7 @@ var User = function(name, parent_plan, opts){
         }
     };
 
-    this.UnSuspendUser = function(){
+    this.UnSuspendUser = function(o){
         if (o) {
             if (this.suspended) {
                 if (this.suspended.trim)
@@ -374,11 +374,11 @@ var User = function(name, parent_plan, opts){
         }
 
         if(exports.OnSuspend){
-            exports.OnSuspend(this.name, null, "User", false);
+            exports.OnSuspend(this.name, o, "User", false);
         }
         var plans = exports.getPlansByUserName(this.name);
-        for(var o in plans){
-            exports.getPlan(plans[o]).UnSuspendPlan();
+        for(var i in plans){
+            exports.getPlan(plans[i]).UnSuspendPlan(o);
         }
     };
 
@@ -794,7 +794,9 @@ exports.updatePlan = function(name, data){
         max_new.SuspendPlan("maxDomainCount");
     }
 
-    data.UnSuspendPlan();
+    if (data.suspended)
+        data.UnSuspendPlan();
+
     Plans[name] = data;
     UpdateDB(JSON.stringify(DB));
     return null;

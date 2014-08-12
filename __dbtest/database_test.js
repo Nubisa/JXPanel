@@ -143,8 +143,11 @@ var clean = function() {
     for(var plan in plans) {
         delete plans[plan].suspended_reason;
 
-        for(var max in plans[plan].planMaximums)
+        for(var max in plans[plan].planMaximums) {
             delete plans[plan][max];
+            if (plans[plan].planMaximums[max] === 1e9) // old maximum
+                plans[plan].planMaximums[max] = -1
+        }
     }
 
     var domains = database.DB.Domains;
