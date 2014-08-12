@@ -67,7 +67,7 @@ exports.loginUser = function(env, params){
 
 exports.getUser = function(sessionId)
 {
-    console.log("active_user::getUser", sessionId);
+//    console.log("active_user::getUser", sessionId);
 
     if(!users[sessionId]){
         console.log("active_user::getUser not_exist");

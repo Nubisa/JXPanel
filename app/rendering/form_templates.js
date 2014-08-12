@@ -77,26 +77,30 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         isUpdate = {};
         isUpdate.name = active_user.session.edits[formName].ID;
         values = null;
+        var dbValues = null;
 
         if (formName === "addUser") {
             if (!database.isOwnerOfUser(active_user.username, isUpdate.name) && active_user.username !== isUpdate.name)
                 return accessDeniedError("user", isUpdate.name);
 
-            values = database.getUser(isUpdate.name);
+            dbValues = database.getUser(isUpdate.name);
         } else
         if (formName === "addPlan") {
             if (!database.isOwnerOfPlan(active_user.username, isUpdate.name))
                 return accessDeniedError("plan", isUpdate.name);
 
-            values = database.getPlan(isUpdate.name);
+            dbValues = database.getPlan(isUpdate.name);
         } else
         if (formName === "addDomain" || formName === "appLog") {
             if (!database.isOwnerOfDomain(active_user.username, isUpdate.name))
                 return accessDeniedError("domain", isUpdate.name);
 
-            values = database.getDomain(isUpdate.name);
+            dbValues = database.getDomain(isUpdate.name);
         } else
             return {err : form_lang.Get(active_user.lang, "UnknownForm") };
+
+
+        values = JSON.parse(JSON.stringify(dbValues));
     }
 
 

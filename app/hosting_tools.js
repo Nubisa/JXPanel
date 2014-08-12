@@ -493,12 +493,10 @@ exports.appRestartMultiple = function (domain_names, cb) {
         return;
     }
 
-    console.log("domain_names", domain_names);
-
     exports.getMonitorJSON(true, function (err, ret) {
         if (err) {
             // monitor offline. don't treat is as error
-            if (cb) cb;
+            if (cb) cb();
             return;
         }
 
@@ -758,7 +756,10 @@ exports.monitorRestart = function(active_user, cb) {
 
 database.OnSuspend = function(name, field_name, table, suspended) {
 
+//    console.error("suspended?", suspended, table, name, field_name);
     if (suspended) {
+
+
         var domains = [];
         if (table === "Plan") {
             domains = database.getDomainsByPlanName(name);
@@ -767,7 +768,7 @@ database.OnSuspend = function(name, field_name, table, suspended) {
             domains = database.getDomainsByUserName(name);
         }
 
-        database.updateDBFile();
+//        database.updateDBFile();
 
         if (domains.length) {
             exports.appStopMultiple(domains, function(err) {

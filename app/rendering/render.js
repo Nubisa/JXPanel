@@ -115,7 +115,7 @@ var smart_rule = [
 ];
 
 var apply_smart = function(file, req, res, data){
-    console.log("apply_smart::SessionId", req.session);
+//    console.log("apply_smart::SessionId", req.session);
     var sessionId = (!req.session)?null:req.session.id;
 
     var _user = _active_user.getUser(sessionId);

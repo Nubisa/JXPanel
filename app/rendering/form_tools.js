@@ -1,6 +1,7 @@
 var form_lang = require('../definitions/form_lang');
 var path = require("path");
 var fs = require("fs");
+var database = require("../install/database");
 
 exports.begin = '<form class="form-horizontal" onsubmit="return false;">';
 
@@ -295,11 +296,17 @@ exports.getFieldDisplayNames = function(lang, field_names, field_values) {
         else
             arr[o] = field_name;
 
-        if (field_values && field_values.planMaximums && field_values.planMaximums[field_name])
-            arr[o] += " `" + field_values.planMaximums[field_name] + "`";
-        else
-        if (field_values && field_values[field_name])
-            arr[o] += " `" + field_values[field_name] + "`";
+
+        if (field_values) {
+            var val = "###";
+            if (field_values.planMaximums && field_values.planMaximums[field_name])
+                val = field_values.planMaximums[field_name];
+            else if (field_values[field_name])
+                val = field_values[field_name];
+
+            if (val !== "###" && val !== database.defaultMaximum)
+                arr[o] += " `" + val  + "`";
+        }
     }
 
     return arr.join(", ");
