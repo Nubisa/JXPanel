@@ -106,10 +106,6 @@ exports.form = function () {
                     label: "JXcoreAppStatus",
                     method: tool.createSimpleText,
                     options: { },
-//                    displayValues : {
-//                        "true" : '<i class="fa-fw fa fa-check text-success"></i>',
-//                        "false" : '<i class="fa-fw fa fa-times text-danger"></i>'
-//                    }
                     getValue : function(active_user, values, listOrForm) {
 
                         // form is in "add" mode, not "edit"
@@ -122,8 +118,8 @@ exports.form = function () {
 
                         var domain = database.getDomain(domain_name);
 
-                        var iconOnline = '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "RunningOn", true) + " TCP: " + domain.port_http + ", TCPS: " + domain.port_https;
-                        var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true);
+                        var iconOnline = form_lang.GetBool(active_user.lang, true, "RunningOn") + " TCP: " + domain.port_http + ", TCPS: " + domain.port_https;
+                        var iconOffline = form_lang.GetBool(active_user.lang, false, null, "Offline");
 
                         var btnStart = '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
                             + form_lang.Get(active_user.lang, "Start", true) + '</button>';

@@ -72,23 +72,21 @@ exports.form = function () {
                     label: "Status",
                     method: tool.createSimpleText,
                     options: { },
-//                    displayValues : {
-//                        "true" : '<i class="fa-fw fa fa-times text-danger"></i>',
-//                        "false" : '<i class="fa-fw fa fa-times text-success"></i>'
-//                    },
                     getValue : function(active_user, values) {
 
                         // form is in "add" mode, not "edit"
                         if (!values || !values["name"])
                             return "";
 
-                        var iconOnline = '<i class="fa-lg fa fa-check text-success"></i> ' + form_lang.Get(active_user.lang, "Active", true);
-                        var iconOffline = '<i class="fa-fw fa fa-times text-danger"></i> <code>' + form_lang.Get(active_user.lang, "Suspended", true) + "</code>";
+                        var iconOnline = form_lang.GetBool(active_user.lang, true, "Active");
+                        var iconOffline = form_lang.GetBool(active_user.lang, false, null, "Suspended");
 
                         var plan = database.getPlan(values.name);
+                        var parentPlanName = database.getParentPlanName(values.name);
+                        var parentPlan = database.getPlan(parentPlanName);
 
                         if (plan.suspended) {
-                            var reason = tool.getFieldDisplayNames(active_user.lang, plan.suspended);
+                            var reason = tool.getFieldDisplayNames(active_user.lang, plan.suspended, parentPlan);
                             return iconOffline + " (" + reason + ")";
                         } else {
                             return iconOnline;
@@ -257,14 +255,6 @@ exports.form = function () {
                 validation: new validations.Boolean()
             },
 
-//            { name: "plan_app_log_web_access",
-//                details: {
-//                    label: "AppLogWebAccess",
-//                    method: tool.createCheckBox,
-//                    options: { }
-//                }
-//            },
-
             {"END" : 1},
 
             {"BEGIN": "System options"},
@@ -285,42 +275,6 @@ exports.form = function () {
                     options: { multiline : true }
                 }
             },
-
-
-
-
-            // do not remove this yet, may be useful
-//            "sub_domain_name": {
-//                label: "DomainName",
-//                method: tool.createTextBox,
-//                options: { required: true, prefix : "www."}
-//            },
-//            "sub_ipv4": {
-//                label: "IPv4",
-//                method: tool.createComboBox,
-//                options: { required: true, values : ifcv4_list }
-//            },
-//            "sub_ipv6": {
-//                label: "IPv6",
-//                method: tool.createComboBox,
-//                options: { required: true, values : ifcv6_list }
-//            },
-//            "sub_username": {
-//                label: "Username",
-//                method: tool.createTextBox,
-//                options: { required: true, values: ["EN"]}
-//            },
-//            "sub_password": {
-//                label: "Password",
-//                method: tool.createTextBox,
-//                options: { required: true, password: true }
-//            },
-//            "sub_repeatpassword": {
-//                label: "PasswordRepeat",
-//                method: tool.createTextBox,
-//                options: { required: true, password: true },
-//                db : false
-//            }
 
             {"END" : 1}
         ];
