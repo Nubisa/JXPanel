@@ -129,7 +129,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             for(var o in values.planMaximums) {
                 // this is integer, not a string
                 var v = values.planMaximums[o];
-                values[o] = v === site_defaults.defaultMaximum ? "" : v;
+                values[o] = v === database.defaultMaximum ? "" : v;
             }
         }
     }

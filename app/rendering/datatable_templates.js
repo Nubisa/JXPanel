@@ -115,7 +115,7 @@ var getHTML = function (active_user, table) {
             // copying values for easier display to the list
             for(var o in record.planMaximums) {
                 var v = record.planMaximums[o];
-                record[o] = v ===  site_defaults.defaultMaximum ? "" : v;
+                record[o] = v ===  database.defaultMaximum ? "" : v;
             }
         }
 

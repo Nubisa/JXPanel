@@ -15,6 +15,8 @@ var UpdateDB = function(stringToSave){ // KRIS FILL IN
     });
 };
 
+exports.defaultMaximum = 1e9;  // don't change it, otherwise db should be refreshed
+
 exports.updateDBFile = function(){
    UpdateDB(JSON.stringify(DB));
 };
@@ -212,7 +214,7 @@ var Plan = function(name, owner_user, opts, dummy){
 
                 for(var o in with_opts.planMaximums){
                     if(this.planMaximums[o]){
-                        if(with_opts.planMaximums[o]>this.planMaximums[o]){
+                        if(with_opts.planMaximums[o]>this.planMaximums[o] && with_opts.planMaximums[o] !== exports.defaultMaximum){
                             return "PlanCannotAddMore|" + o + "|" + this.planMaximums[o];
                         }
                     }
@@ -274,6 +276,32 @@ var Plan = function(name, owner_user, opts, dummy){
             default:
         }
         throw new Exception("Unknown Operation!");
+    };
+
+    // goes up until top parent and gets effective maximum for this plan
+    this.GetMaximum = function(field_name) {
+
+        var val = this.planMaximums[field_name];
+        if (this.owner) {
+            var parentPlanName = exports.getParentPlanName(this.name);
+            if (parentPlanName && Plans[parentPlanName]) {
+                var parentVal = Plans[parentPlanName].GetMaximum(field_name);
+
+                if (parentVal === exports.defaultMaximum || val === exports.defaultMaximum) {
+                    if (parentVal === exports.defaultMaximum)
+                        return val;
+
+                    if (val === exports.defaultMaximum)
+                        return parentVal;
+
+                    return val;
+                }
+
+                if (parentVal < val)
+                    return parentVal;
+            }
+        }
+        return val;
     };
 
     extend(this, opts);
@@ -724,7 +752,7 @@ exports.updatePlan = function(name, data){
                 for(var i in sub_plans){
                     var sub_plan = Plans[sub_plans[i]];
                     if(sub_plan.planMaximums[o]){
-                        if(sub_plan.planMaximums[o]>max_new[o]){
+                        if(sub_plan.planMaximums[o]>max_new[o] && sub_plan.planMaximums[o] !== exports.defaultMaximum && max_new[o] !== exports.defaultMaximum){
                             sub_plan.SuspendPlan(o);
                         }
                     }
