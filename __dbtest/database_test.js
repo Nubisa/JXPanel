@@ -142,6 +142,9 @@ var clean = function() {
     var plans = database.DB.Plans;
     for(var plan in plans) {
         delete plans[plan].suspended_reason;
+
+        for(var max in plans[plan].planMaximums)
+            delete plans[plan][max];
     }
 
     var domains = database.DB.Domains;
