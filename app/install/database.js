@@ -35,24 +35,15 @@ var ReadDB = function(cb){ // KRIS FILL IN
 
             for(var o in Plans){
                 Plans[o] = new Plan(o, null, Plans[o], true);
-                // obsolete value
-                delete Plans[o].suspended_reason;
             }
             for(var o in Users){
                 Users[o] = new User(o, Users[o].plan, Users[o]);
-                // obsolete value
-                delete Users[o].suspended_reason;
                 if(!Users[o].subPlans){
                     Users[o].subPlans = {};
                 }
                 if(!Users[o].domains){
                     Users[o].domains = {};
                 }
-            }
-
-            // just for now removing obsolete values
-            for(var o in Domains) {
-                delete Domains[o].jx_app_log_web_access;
             }
             exports.DB = DB;
         }

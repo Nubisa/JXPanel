@@ -137,14 +137,28 @@ var start5 = function() {
     console.log("getUsersByUserName Kris", inspect(database.getUsersByUserName("Kris")));
 };
 
-//
-//var fixMaximus = function() {
-//    for(var plan in database.DB.Plans) {
-//        for(var m in database.DB.Plans[plan].planMaximus) {
-//            var v = database.DB.Plans[plan].planMaximus[m];
-//        }
-//    }
-//};
+
+var clean = function() {
+    var plans = database.DB.Plans;
+    for(var plan in plans) {
+        delete plans[plan].suspended_reason;
+    }
+
+    var domains = database.DB.Domains;
+    for(var domain in domains) {
+        delete domains[domain].jx_app_log_web_access;
+    }
+
+    var users = database.DB.Users;
+    for(var user in users) {
+        // obsolete value
+        delete users[user].suspended_reason;
+        users[user].ftp_access = true;
+        users[user].panel_access = true;
+    }
+
+    database.updateDBFile();
+};
 
 
 var suspendTest = function() {
@@ -173,7 +187,7 @@ if (fs.existsSync(testdb))
 
 
 database.ReadDB(function(err) {
-    if (err) console.error(err); else suspendTest();
+    if (err) console.error(err); else clean();
 });
 
 
