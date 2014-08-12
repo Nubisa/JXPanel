@@ -28,3 +28,9 @@ d) parent plan has e.g. CPU = 50, sup plan has CPU = empty (unlimited) - does it
 
 - addPlan()
 we put on the form values from parent plan. should we also do the same on updatePlan()
+
+
+- suspending
+
+suspendUser() suspends also plans (but only first level)
+suspendPlan() does not suspend users - should it?
