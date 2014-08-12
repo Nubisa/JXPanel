@@ -202,7 +202,8 @@ methods.sessionApply = function(env, params){
     var json = {};
     var planMaximums = {};
     var cnt = 0;
-    for (var field_name in params.controls) {
+    for (var fld in params.controls) {
+        var field_name = fld;
         var val = params.controls[field_name];
         if (_controls[field_name]) {
             cnt++;
@@ -235,6 +236,7 @@ methods.sessionApply = function(env, params){
                 var val = parseInt(json[field_name]);
                 planMaximums[field_name] = isNaN(val) ? database.defaultMaximum : val;
                 delete json[field_name];
+                delete json[fld];
             }
         }
     }
