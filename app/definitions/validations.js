@@ -40,8 +40,6 @@ exports.Email = function () {
         var regexp = /.+\@.+\..+/;
         var ret = regexp.exec(val);
 
-//        console.log("email validation", req);
-
         if (ret === null) {
             return {result: false, msg: form_lang.Get(active_user.lang, "EmailInvalid", null)};
         } else {
@@ -89,7 +87,6 @@ exports.Int = function (options) {
             return form_lang.Get(active_user.lang, txt, true);
         };
 
-        console.log("options", this.options, "parsed", parsed);
         if (this.options) {
             var params = [];
             var err = false;

@@ -23,3 +23,8 @@ schema to update a plan is:
 c) when updating the plan, i added UnSuspend() call for this plan
 
  should we do also for subPlans?
+
+d) parent plan has e.g. CPU = 50, sup plan has CPU = empty (unlimited) - does it mean, that he uses value from parentPlan?
+
+- addPlan()
+we put on the form values from parent plan. should we also do the same on updatePlan()
