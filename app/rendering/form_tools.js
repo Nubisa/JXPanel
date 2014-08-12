@@ -276,7 +276,7 @@ exports.getFormsLabels = function(lang) {
 };
 
 
-exports.getFieldDisplayNames = function(lang, field_names) {
+exports.getFieldDisplayNames = function(lang, field_names, field_values) {
 
     if (!field_names) {
         return "";
@@ -289,10 +289,17 @@ exports.getFieldDisplayNames = function(lang, field_names) {
         field_names = [ field_names ];
     }
     for(var o in field_names) {
-        if (labels[field_names[o]])
-            arr[o] = labels[field_names[o]];
+        var field_name = field_names[o];
+        if (labels[field_name])
+            arr[o] = labels[field_name];
         else
-            arr[o] = field_names[o];
+            arr[o] = field_name;
+
+        if (field_values && field_values.planMaximums && field_values.planMaximums[field_name])
+            arr[o] += " `" + field_values.planMaximums[field_name] + "`";
+        else
+        if (field_values && field_values[field_name])
+            arr[o] += " `" + field_values[field_name] + "`";
     }
 
     return arr.join(", ");
