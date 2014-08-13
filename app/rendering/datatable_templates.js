@@ -321,6 +321,9 @@ var logic = [
         if (val == "id")
             return gl.name;
 
+        if (val == "displayName")
+            return form_lang.Get(gl.lang, gl.table.displayNameLabel || gl.name, true);
+
         if (val == "buttons") {
             var containerFile = path.join(__dirname, "../definitions/datatables/" + gl.name + "_buttons.html");
             if (fs.existsSync(containerFile)) {

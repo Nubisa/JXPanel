@@ -6,6 +6,7 @@ var form_lang = require('../form_lang');
 var path = require("path");
 
 exports.name = path.basename(__filename, ".js").toLowerCase();
+exports.displayNameLabel = "JXcoreNPMModules";
 
 exports.settings = {
     columns :[ "_checkbox",  "_id", "name", "version", "description" ]
