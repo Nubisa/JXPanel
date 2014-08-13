@@ -248,17 +248,19 @@ methods.sessionApply = function(env, params){
         }
 
         errLabel = form_lang.Get(active_user.lang, errLabel, true);
+        var label = null;
         for(var field_name in _controls){
             if (errLabel.indexOf(field_name) !== -1) {
-                var label = _controls[field_name].details.label;
+                label = _controls[field_name].details.label;
                 if (label) {
                     label = form_lang.Get(active_user.lang, label, true);
                     errLabel = errLabel.replace(field_name, "`" + label + "`");
                 }
+                break;
             }
         }
 
-        server.sendCallBack(env, {arr: [ { control: "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
+        server.sendCallBack(env, {arr: [ { control: label || "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
     };
 
     if (!cnt)
@@ -384,7 +386,7 @@ methods.sessionApply = function(env, params){
                 var changed2 = update(plan.planMaximums, planMaximums);
                 ret = database.updatePlan(update_name, plan);
 
-                if (changed1 || changed2) {
+                if (!ret && (changed1 || changed2)) {
                     var all_domains = database.getDomainsByPlanName(update_name, 1e5);
                     hosting_tools.appRestartMultiple(all_domains, function(err) {
                         sendError(err);

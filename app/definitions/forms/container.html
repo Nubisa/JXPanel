@@ -71,6 +71,7 @@
                             }
 
                             var focus = null;
+                            var bubbled = false;
                             for(var o in param.arr){
                                 var id = aliases[param.arr[o].control];
 
@@ -81,6 +82,7 @@
                                     $("#" + id + "_group").addClass("has-error");
                                     if (!focus) focus = id;
                                 } else {
+                                    bubbled = true;
                                     utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
                                 }
 
@@ -90,7 +92,8 @@
                                 }
                             }
 
-                            utils.jxAddMessage('danger', "{{label.FormError}}");
+                            if (!bubbled)
+                                utils.jxAddMessage('danger', "{{label.FormError}}");
                         } else {
                             document.location = "{{form.onSubmitSuccess}}";
                         }
