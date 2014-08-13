@@ -4,7 +4,7 @@
 - updatePlan()
 
 a)
-check maximums, and suspends subplans eventually, even if new maximum is not overused
+updatePlan() check maximums, and suspends subplans eventually, even if new maximum is not overused
 e.g. some user has 3 domains, and we chaged parents plan from maxDomains = 10 into 5.
 still 5 > 3 so why to suspend subplan?
 
@@ -20,11 +20,12 @@ schema to update a plan is:
  plan.maxDomainsCount = 5
  database.updatePlan(plan_name, plan);  // we pass the same object instance
 
-c) when updating the plan, i added UnSuspend() call for this plan
+c) when updating the plan, i added UnSuspend() call for this particular plan
 
  should we do also for subPlans?
 
 d) parent plan has e.g. CPU = 50, sup plan has CPU = empty (unlimited) - does it mean, that he uses value from parentPlan?
+    for now it acts this way
 
 - addPlan()
 we put on the form values from parent plan. should we also do the same on updatePlan()

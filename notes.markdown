@@ -9,8 +9,7 @@ TODO
 - for now users/plans/ domains visibility is set to database.getXXXByUserName, and this prevents seeing  e.g. users on the same level (having the same parent plan)
     since we dont have plan aliases implemented
 
-- would be nice to implement on oor forms control validation similar like on login age
-    (error shows under the invalid control, not as a bubble)
+- IP adresses - how to use them? Right now they are defined on domains' form. Should they be maybe on plan's form?
 
 
 
@@ -24,3 +23,6 @@ DONE
     or call remote management - NOT DONE
 
 - update password feature - DONE
+
+- would be nice to implement on our forms control validation similar like on login page
+    (error shows under the invalid control, not as a bubble) - DONE
