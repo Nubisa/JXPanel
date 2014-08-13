@@ -61,8 +61,30 @@
                     window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
 
                         if (param.arr) {
+
+                            var aliases = {};
+                            for(var o in _this.controls){
+                                aliases[_this.controls[o].name] = o;
+                                $("#" + o + "_note").remove();
+                            }
+
+                            var focus = null;
                             for(var o in param.arr){
-                                utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
+                                var id = aliases[param.arr[o].control];
+
+                                if (id && document.getElementById(id)) {
+                                    var str = '<div class="note" id="'+id+'_note"><span style="color:red">' + param.arr[o].msg + '</span></div>';
+//                                    var str = '<em class="invalid" for="'+ id +'">' + param.arr[o].msg + '</em>';
+                                    $(str).insertAfter("#" + id);
+                                    if (!focus) focus = id;
+                                } else {
+                                    utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
+                                }
+
+                                if (focus) {
+                                    $("#" + focus).focus();
+                                    window.scrollBy(0,-100);
+                                }
                             }
                         } else {
                             document.location = "{{form.onSubmitSuccess}}";
