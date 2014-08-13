@@ -19,6 +19,9 @@ var getData = function(label, _title, input_id, lang, options) {
     var isUpdate = options.extra && options.extra.isUpdate;
 
     ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
+    ret.required_label = ret.required ? "&nbsp;<span style='color:red;'>*</span>" : "&nbsp;&nbsp;";
+
+
     ret.dynamic = options.dynamic || "";
 
     if (options.extra && options.extra.noEditDisplayValue)
@@ -58,15 +61,8 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
         _type = "textarea";
     }
 
-    var req_label = "";
-    if(data.required){
-        req_label = "&nbsp;<span style='color:red;'>*</span>";
-    }
-    else
-        req_label = "&nbsp;<span style='color:red;'>&nbsp;</span>";
-
     var _html = '<div class="form-group">'
-        +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
+        +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
     var id = jxcore.utils.uniqueId();
@@ -102,15 +98,8 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    var req_label = "";
-    if(data.required){
-        req_label = "&nbsp;<span style='color:red;'>*</span>";
-    }
-    else
-        req_label = "&nbsp;<span style='color:red;'>&nbsp;</span>";
-
     var _html = '<div class="form-group">'
-        +'<label class="col-md-2 control-label">'+label + req_label + '</label>'
+        +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
     var id = jxcore.utils.uniqueId();
@@ -160,16 +149,8 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
 
     var _type = "checkbox";
 
-    var req_label = "";
-    if(data.required){
-        req_label = "&nbsp;<span style='color:red;'>*</span>";
-    }
-    else
-        req_label = "&nbsp;<span style='color:red;'>&nbsp;</span>";
-
-
     var _html = '<div class="form-group">'
-        + '<label class="col-md-2 control-label">'+label + req_label + '</label><div class="col-md-10">';
+        + '<label class="col-md-2 control-label">'+label + data.required_label + '</label><div class="col-md-10">';
 
     var id = jxcore.utils.uniqueId();
 
