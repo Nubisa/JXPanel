@@ -118,7 +118,12 @@ exports.form = function () {
 
                         var domain = database.getDomain(domain_name);
 
-                        var iconOnline = form_lang.GetBool(active_user.lang, true, "RunningOn") + " TCP: " + domain.port_http + ", TCPS: " + domain.port_https;
+                        var ports = '<div style="display: inline">'
+                                + ' <span class="label label-info">TCP: '+ domain.port_http + '</span>'
+                                + ' <span class="label label-info">TCPS: '+ domain.port_https + '</span>'
+                                + '</div>'
+
+                        var iconOnline = form_lang.GetBool(active_user.lang, true, "RunningOn") + ports;
                         var iconOffline = form_lang.GetBool(active_user.lang, false, null, "Offline");
 
                         var btnStart = '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
