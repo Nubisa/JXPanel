@@ -22,10 +22,8 @@ schema to update a plan is:
 
 c) when updating the plan, i added UnSuspend() call for this particular plan
 
- should we do also for subPlans?
+ should we do also for subPlans? YES
 
-d) parent plan has e.g. CPU = 50, sup plan has CPU = empty (unlimited) - does it mean, that he uses value from parentPlan?
-    for now it acts this way
 
 - addPlan()
 we put on the form values from parent plan. should we also do the same on updatePlan()
@@ -33,5 +31,13 @@ we put on the form values from parent plan. should we also do the same on update
 
 - suspending
 
-suspendUser() suspends also plans (but only first level)
-suspendPlan() does not suspend users - should it?
+suspendUser() suspends also plans (but only first level) now it suspends all
+suspendPlan() does not suspend users - should it? YES
+
+
+todo:
+
+1. header - remove
+2. window - remove
+3. tabbing for log file
+4. dynamic control list servers side for form's inctance
