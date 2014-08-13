@@ -18,6 +18,9 @@ exports.form = function () {
         this.onSubmitSuccess = "users.html";
         this.onSubmitCancel = "users.html";
 
+        this.displayNameLabel_Add = "AddUser";
+        this.displayNameLabel_Edit = "EditUser";
+
         this.controls = [
             {"BEGIN": "User Details"},
 

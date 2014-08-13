@@ -42,6 +42,9 @@ exports.form = function () {
         this.onSubmitSuccess = "domains.html";
         this.onSubmitCancel = "domains.html";
 
+        this.displayNameLabel_Add = "AddDomain";
+        this.displayNameLabel_Edit = "EditDomain";
+
         this.controls = [
             {"BEGIN": "Domain Details"},
 

@@ -83,10 +83,12 @@ exports.Labels = {
     "FormError" : "Some field values are invalid. Please enter correct values.",
 
     // Form names
-    "addUser" : "Add new user",
-    "addSubscription" : "Add new subscription",
-    "addPlan": "Add new hosting plan",
-    "addDomain": "Add new domain",
+    "AddUser" : "Add new user",
+    "EditUser" : "Edit user data",
+    "AddPlan": "Add new hosting plan",
+    "EditPlan": "Edit hosting plan",
+    "AddDomain": "Add new domain",
+    "EditDomain": "Edit domain data",
     "appLog": "Application log",
 
     // login page
@@ -122,7 +124,6 @@ exports.Labels = {
     "ComboNotSelected" : "not selected",
     "UserContactName" : "Contact Name",
     "UserEmailAddress" : "Email Address",
-    "UserSubscriptionAccess" : "Access to subscriptions",
     "UserPanelLanguage" : "JXPanel language",
     "UserFTPAccess" : "FTP access",
     "UserPanelAccess" : "JXPanel access",
@@ -146,7 +147,6 @@ exports.Labels = {
     "or" : "or",
 
     // Pages
-    "Subscription" : "Subscription Management",
 
     "UsersManagement" : "User Management",
     "UsersHeader": "Customize the options",
@@ -277,7 +277,7 @@ exports.Labels = {
     "MaxPlans_Description" : "Maximum amount of hosting plans. Empty value disables the limit. Value 0 disables adding new plans.",
 
     "DomainName" : "Domain",
-    "DomainName_Description" : "The domain name for you subscription.",
+    "DomainName_Description" : "The domain name.",
     "DomainInvalid" : "Please enter a valid domain name.",
     "DomainAlreadyExists" : "Domain already exists.",
     "DomainNotFound" : "Domain not found.",

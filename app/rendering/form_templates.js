@@ -17,6 +17,14 @@ var logic = [
         if(val == "id")
             return gl.name;
 
+        if(val == "displayName") {
+            var isUpdate = _active_user.isRecordUpdating(gl.active_user, gl.name);
+            var labelAdd = gl.form.displayNameLabel_Add ? gl.form.displayNameLabel_Add : gl.name;
+            var labelEdit = gl.form.displayNameLabel_Edit ? gl.form.displayNameLabel_Edit : gl.name;
+
+            return form_lang.Get(gl.lang, isUpdate ? labelEdit : labelAdd);
+        }
+
         if (val == "onSubmitSuccess")
             return gl.form.onSubmitSuccess || "";
 

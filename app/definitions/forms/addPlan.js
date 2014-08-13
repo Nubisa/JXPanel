@@ -41,6 +41,9 @@ exports.form = function () {
         this.onSubmitSuccess = "plans.html";
         this.onSubmitCancel = "plans.html";
 
+        this.displayNameLabel_Add = "AddPlan";
+        this.displayNameLabel_Edit = "EditPlan";
+
         this.controls = [
             {"BEGIN": "General"},
 
