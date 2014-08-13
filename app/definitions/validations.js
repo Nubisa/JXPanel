@@ -131,6 +131,10 @@ exports.Password = function (password_field) {
 
     this.validate = function (env, active_user, val, params) {
 
+        var strValid = new exports.String(5);
+        var ret = strValid.validate(env, active_user, val, params);
+        if (!ret.result) return ret;
+
         if (params.controls && params.controls[_password_field] === val) {
             return {result: true};
         } else {
