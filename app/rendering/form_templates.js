@@ -71,12 +71,12 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     var values = null;
 
     if (formName === "jxconfig") {
-        isUpdate = { record : database.getConfig()};
+        isUpdate = { };
+        values = database.getConfig();
     } else
     if (_active_user.isRecordUpdating(active_user, formName)) {
         isUpdate = {};
         isUpdate.name = active_user.session.edits[formName].ID;
-        values = null;
         var dbValues = null;
 
         if (formName === "addUser") {
