@@ -97,7 +97,7 @@ exports.form = function () {
                     options: { required_insert: true, password: true, dont_update_null : true },
                     dbName: false
                 },
-                validation : new validations.String(5)
+                validation : new validations.Password("person_repeat_password")
             },
 
             {
