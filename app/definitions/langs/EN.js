@@ -80,6 +80,7 @@ exports.Labels = {
     "Nothing to Apply": "There was nothing to apply. Operation wasn't successful.",
     "UnknownForm" : "Unknown form",
     "FormEmpty" : "The form does not contain any controls.",
+    "FormError" : "Some field values are invalid. Please enter correct values.",
 
     // Form names
     "addUser" : "Add new user",

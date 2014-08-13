@@ -61,11 +61,11 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
         _type = "textarea";
     }
 
-    var _html = '<div class="form-group">'
+    var id = jxcore.utils.uniqueId();
+
+    var _html = '<div class="form-group" id="a' + id + '_group">'
         +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
-
-    var id = jxcore.utils.uniqueId();
 
     if (options && options.extra && options.extra.noEditDisplayValue) {
         var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
@@ -98,11 +98,11 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
     _title = form_lang.Get(lang, _title) || _title;
     label = form_lang.Get(lang, label) || label;
 
-    var _html = '<div class="form-group">'
+    var id = jxcore.utils.uniqueId();
+
+    var _html = '<div class="form-group" id="a' + id + '_group">'
         +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
-
-    var id = jxcore.utils.uniqueId();
 
     if (options && options.extra && options.extra.noEditDisplayValue) {
         var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
@@ -149,10 +149,10 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
 
     var _type = "checkbox";
 
-    var _html = '<div class="form-group">'
-        + '<label class="col-md-2 control-label">'+label + data.required_label + '</label><div class="col-md-10">';
-
     var id = jxcore.utils.uniqueId();
+
+    var _html = '<div class="form-group" id="a' + id + '_group">'
+        + '<label class="col-md-2 control-label">'+label + data.required_label + '</label><div class="col-md-10">';
 
     if (options && options.extra && typeof options.extra.noEditDisplayValue !== "undefined") {
         var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
@@ -202,7 +202,7 @@ exports.createSimpleText = function(label, _title, input_id, _value, lang, optio
 
     var id = jxcore.utils.uniqueId();
 
-    var _html = '<div class="form-group">'
+    var _html = '<div class="form-group" id="a' + id + '_group">'
         +'<label class="col-md-2 control-label">'+label + '</label>'
         +'<div class="col-md-10">'
         +'<div style="margin-top: 7px;">' + _value + '</div>'

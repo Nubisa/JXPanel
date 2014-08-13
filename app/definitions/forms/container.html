@@ -66,6 +66,8 @@
                             for(var o in _this.controls){
                                 aliases[_this.controls[o].name] = o;
                                 $("#" + o + "_note").remove();
+                                $("#" + o + "_group").removeClass("has-error");
+                                $("#" + o + "_group").addClass("has-success");
                             }
 
                             var focus = null;
@@ -73,9 +75,12 @@
                                 var id = aliases[param.arr[o].control];
 
                                 if (id && document.getElementById(id)) {
-                                    var str = '<div class="note" id="'+id+'_note"><span style="color:red">' + param.arr[o].msg + '</span></div>';
+                                    var str = '<span class="help-block" id="'+id+'_note"><i class="fa fa-warning"></i> s' + param.arr[o].msg + '</span>';
+//                                    var str = '<div class="note" id="'+id+'_note"><span style="color:red">' + param.arr[o].msg + '</span></div>';
 //                                    var str = '<em class="invalid" for="'+ id +'">' + param.arr[o].msg + '</em>';
                                     $(str).insertAfter("#" + id);
+                                    $("#" + id + "_group").removeClass("has-success");
+                                    $("#" + id + "_group").addClass("has-error");
                                     if (!focus) focus = id;
                                 } else {
                                     utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
@@ -86,6 +91,8 @@
                                     window.scrollBy(0,-100);
                                 }
                             }
+
+                            utils.jxAddMessage('danger', "{{label.FormError}}");
                         } else {
                             document.location = "{{form.onSubmitSuccess}}";
                         }
