@@ -121,7 +121,7 @@ exports.form = function () {
                 },
                 validation : new function () {
 
-                    this.validate = function (env, active_user, val, vals) {
+                    this.validate = function (env, active_user, val) {
 
                         var me = database.getUser(active_user.username);
                         // allows to select only existent plan

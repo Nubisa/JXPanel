@@ -3,6 +3,9 @@ var form_lang = require('./form_lang');
 var system_tools = require("./../system_tools");
 var database = require("./../install/database");
 var site_defaults = require("./site_defaults");
+var nginxconf = require("../spawner/nginxconf");
+var nginx = require("../install/nginx");
+var _active_user = require("../definitions/active_user");
 
 
 /**
@@ -126,9 +129,9 @@ exports.Password = function (password_field) {
 
     var _password_field = password_field;
 
-    this.validate = function (env, active_user, val, vals) {
+    this.validate = function (env, active_user, val, params) {
 
-        if (vals && vals[_password_field] === val) {
+        if (params.controls && params.controls[_password_field] === val) {
             return {result: true};
         } else {
             return {result: false, msg: form_lang.Get(active_user.lang, "PasswordDoesNotMatch", null)};
@@ -141,11 +144,11 @@ exports.MaxPort = function(min_port_field) {
 
     var _min_port_field = min_port_field;
 
-    this.validate = function (env, active_user, val, vals) {
+    this.validate = function (env, active_user, val, params) {
 
-        var min = vals[_min_port_field];
+        var min = params.controls[_min_port_field];
         var max = val;
-        var ret = new exports.Int({ gt : min, lte : site_defaults.defaultAppMaxPort }).validate(env, active_user, val, vals);
+        var ret = new exports.Int({ gt : min, lte : site_defaults.defaultAppMaxPort }).validate(env, active_user, val, params.controls);
         if (!ret.result) return ret;
 
         var domains = database.getDomainsByUserName(null, 1e5);
@@ -159,7 +162,7 @@ exports.MaxPort = function(min_port_field) {
 
 exports.UserName = function() {
 
-    this.validate = function (env, active_user, val, vals) {
+    this.validate = function (env, active_user, val) {
 
         var reg = /[^0-9A-Za-z_]/;
 
@@ -179,7 +182,7 @@ exports.UserName = function() {
 
 exports.Domain = function() {
 
-    this.validate = function (env, active_user, val, vals) {
+    this.validate = function (env, active_user, val) {
 
         // todo: better email validation
         var reg = new RegExp("^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,4}$", "i");
@@ -208,7 +211,7 @@ exports.Domain = function() {
 // verifies plan name
 exports.Plan = function() {
 
-    this.validate = function (env, active_user, val, vals) {
+    this.validate = function (env, active_user, val) {
 
         if (database.getPlan(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "PlanAlreadyExists", true)};
@@ -220,7 +223,7 @@ exports.Plan = function() {
 // validates app's file name
 exports.FileName = function() {
 
-    this.validate = function (env, active_user, val, vals) {
+    this.validate = function (env, active_user, val) {
 
         var cannotContain = [ './', '/.', '.\\', '\\.', '\n', '\r', '\t' ];
         var cannotStart = [ '/', '\\', ' ', '..'];
@@ -236,6 +239,31 @@ exports.FileName = function() {
             if (str.slice(0, tmp.length) === tmp)
                 return {result: false, msg: form_lang.Get(active_user.lang, "PathCannotStart", true, [cannotStart[o]])};
         }
+
+        return {result: true};
+    };
+};
+
+exports.NginxDirectives = function() {
+
+    this.validate = function (env, active_user, val, params) {
+
+        if (!val || val === "" || (val && val.trim() === ""))
+            return {result: true};
+
+        var plan_name = _active_user.isRecordUpdating(active_user, params.form);
+        if (!plan_name)
+            return {result: false, msg: form_lang.Get(active_user.lang, "PlanInvalid", true )};
+
+        var plan = database.getPlan(plan_name);
+        if (!plan)
+            return {result: false, msg: form_lang.Get(active_user.lang, "PlanInvalid", true )};
+
+        var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 10000, 10001], null, params.controls["plan_nginx_directives"]);
+        var test = nginx.testConfig(configString);
+
+        if (test.err)
+            return {result: false, msg: form_lang.Get(active_user.lang, "NginxDirectivesInvalid", true ) + " " + test.err};
 
         return {result: true};
     };

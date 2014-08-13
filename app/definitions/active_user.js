@@ -183,8 +183,10 @@ exports.clearUserByName = function(username) {
 };
 
 exports.isRecordUpdating = function(active_user, formName) {
-    var isUpdate = active_user.session.edits && active_user.session.edits[formName] && active_user.session.edits[formName].ID;
-    return isUpdate;
+    if (active_user.session.edits && active_user.session.edits[formName] && active_user.session.edits[formName].ID)
+        return active_user.session.edits[formName].ID;
+    else
+        return false;
 };
 
 

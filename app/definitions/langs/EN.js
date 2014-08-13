@@ -415,7 +415,8 @@ exports.Labels = {
     "JXcoreNPMInstalling" : "Installing NPM module",
 
     // Nginx
-    "NginxConfDirCannotCreate" : "Cannot create Nginx config directory"
+    "NginxConfDirCannotCreate" : "Cannot create Nginx config directory",
+    "NginxDirectivesInvalid" : "Provided directives failed on test."
 };
 
 

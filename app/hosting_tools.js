@@ -211,7 +211,9 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
     var options = exports.appGetOptions(domain_name);
     var domain = options.domain;
 
-    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null);
+    var plan = options.plan;
+
+    var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null, plan.plan_nginx_directives);
 
     var current = "";
     if (fs.existsSync(path)) {
@@ -542,6 +544,7 @@ exports.appRestartMultiple = function (domain_names, cb) {
         }
 
 //        console.log("killed", killed, "notkilled", notKilled);
+        nginx.reload(true);
         cb(notKilled.length ? "Cannot kill: " + notKilled.join(", ") : false);
     });
 

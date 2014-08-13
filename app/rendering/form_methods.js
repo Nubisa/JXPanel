@@ -98,12 +98,11 @@ var sessionAdd = function(env, active_user, params){
         return false;
     }
 
-//    console.log("handling submitted values", params);
-
     var sform = active_user.session.forms[params.form].activeInstance;
 
     var messages = [];
 
+    // o is field name
     for(var o in params.controls){
 
         var ctrl = null;
@@ -143,7 +142,7 @@ var sessionAdd = function(env, active_user, params){
                    continue;
                }
 
-               var res = valids[a].validate(env, active_user, params.controls[o], params.controls, o);
+               var res = valids[a].validate(env, active_user, params.controls[o], params);
                if(!res.result){
                    messages.push({control:ctrlDisplayName, msg:res.msg});
                }
@@ -266,7 +265,7 @@ methods.sessionApply = function(env, params){
         return sendError("FormEmpty");
 
     var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
-    var update_name = isUpdate ? active_user.session.edits[params.form].ID : json.name;
+    var update_name = isUpdate ? isUpdate : json.name;
 
     var ret = null;
     if (params.form === "addUser") {

@@ -97,3 +97,54 @@ exports.reload = function(onlyIfNeeded){
         process.exit(-1);
     }
 };
+
+
+exports.testConfig = function(configString) {
+
+    var testRootDir = pathModule.join(os_info.appsFolder, "nxginx_test_" + Date.now());
+
+    var dirs = [];
+    dirs.push(testRootDir)
+    dirs.push(pathModule.join(testRootDir, "conf"));
+    dirs.push(pathModule.join(testRootDir, "conf", "jxcore"));
+    dirs.push(pathModule.join(testRootDir, "logs"));
+
+    for(var o in dirs) {
+        if (!fs.existsSync(dirs[o]))
+            fs.mkdirSync(dirs[o]);
+    }
+
+    // copying original nginx.conf file
+    var cmd = "cp " + pathModule.join(os_info.appsFolder, "nginx/conf") + sep + "* " + pathModule.join(testRootDir, "conf") + sep;
+    jxcore.utils.cmdSync(cmd);
+
+    var logFile = pathModule.join(testRootDir, "logs/error.log")
+    if (fs.existsSync(logFile))
+        fs.unlinkSync(logFile);
+
+    var testFile = pathModule.join(testRootDir, "conf/jxcore", Date.now() +".conf");
+    fs.writeFileSync(testFile, configString);
+
+    var ret = jxcore.utils.cmdSync(nginx_process + " -t -p "+ testRootDir);
+
+    var err = false;
+    if(ret.exitCode !== 0) {
+        var log = fs.existsSync(logFile) ? fs.readFileSync(logFile).toString() : ret.out;
+        log = log.replace(new RegExp(testFile, "g"), "test file");
+
+        var arr = log.split("\n");
+        for(var o in arr) {
+            var pos = arr[o].indexOf(": ");
+            if (pos !== -1)
+                arr[o] = arr[o].slice(pos + 2);
+        }
+
+        err = arr.join(". ");
+    }
+
+    // cleaning up
+    var cmd = "rm -rf " + testRootDir;
+    jxcore.utils.cmdSync(cmd)
+
+    return {err : err};
+};

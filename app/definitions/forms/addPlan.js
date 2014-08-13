@@ -273,7 +273,8 @@ exports.form = function () {
                     label: "NginxDirectives",
                     method: tool.createTextBox,
                     options: { multiline : true }
-                }
+                },
+                validation : new validations.NginxDirectives()
             },
 
             {"END" : 1}
