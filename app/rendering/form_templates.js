@@ -74,6 +74,9 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         isUpdate = { };
         values = database.getConfig();
     } else
+    if (formName === "appLog") {
+        isUpdate = { };
+    } else
     if (_active_user.isRecordUpdating(active_user, formName)) {
         isUpdate = {};
         isUpdate.name = active_user.session.edits[formName].ID;
@@ -91,7 +94,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
             dbValues = database.getPlan(isUpdate.name);
         } else
-        if (formName === "addDomain" || formName === "appLog") {
+        if (formName === "addDomain") {
             if (!database.isOwnerOfDomain(active_user.username, isUpdate.name))
                 return accessDeniedError("domain", isUpdate.name);
 
@@ -164,7 +167,6 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         ctrl.options = ctrl.options || {};
 
         var dbname = ctrl.dbName ? ctrl.dbName : name;
-//        var val = isUpdate && isUpdate.record[dbname] ? isUpdate.record[dbname] : null;
         var val = (values && (values[dbname] || values[dbname] === 0 || values[dbname] === false)) ? values[dbname] : null;
         // if we'll check against !val
         if (val === 0) val = "0";
