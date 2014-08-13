@@ -116,6 +116,16 @@ exports.form = function () {
                 }
             },
 
+            {
+                name: "jx_monitor_api",
+                details: {
+                    label: "JXcoreMonitorAllowMonitorAPI",
+                    method: tool.createCheckBox,
+                    options: { }
+                },
+                validation : new validations.Boolean()
+            },
+
             {"END" : 1},
 
 

@@ -154,6 +154,8 @@ exports.appGetOptions = function (domain_name) {
             add(fields[o], plan.GetMaximum(o));
     }
 
+    json["allowMonitoringAPI"] = !!database.getConfigValue("jx_monitor_api");
+
     var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
 
     var appPath = appDir + domain.jx_app_path;

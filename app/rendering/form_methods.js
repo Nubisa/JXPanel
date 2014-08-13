@@ -404,10 +404,14 @@ methods.sessionApply = function(env, params){
         }
     } else
     if (params.form === "jxconfig") {
+        var allow_api = !!json["jx_monitor_api"];
+        var jx_monitor_api_changed = !!database.getConfigValue("jx_monitor_api") !== allow_api ;
+        database.setConfigValue("jx_monitor_api", allow_api);
+
         var min = json["jx_app_min_port"];
         var max = json["jx_app_max_port"];
         var changed = hosting_tools.setPortRange(min,max);
-        if (changed) {
+        if (changed | jx_monitor_api_changed) {
             hosting_tools.monitorRestart(active_user, function(err) {
                 sendError(err);
             });
