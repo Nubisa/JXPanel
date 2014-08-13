@@ -245,7 +245,6 @@
             if (param.err) {
                 utils.jxAddMessage("danger", param.err);
                 div.innerHTML = param.err;
-
             } else {
                 $("#jxform_buttons").show();
                 div.innerHTML = param.html;
@@ -267,6 +266,12 @@
                 $("#wid-id-0").show();
             }
 
+            // focus on first control
+            var _this = window.jxForms["{{form.id}}"];
+            for(var o in _this.controls) {
+                $("#" + o).focus();
+                break;
+            }
         });
 
         utils.jxAppViewLog = function(remove) {
