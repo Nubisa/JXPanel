@@ -26,3 +26,9 @@ DONE
 
 - would be nice to implement on our forms control validation similar like on login page
     (error shows under the invalid control, not as a bubble) - DONE
+
+
+- header - remove - DONE
+- window - remove - DONE
+- tabbing for log file - DONE
+- dynamic control list server's side for form's instance - DONE

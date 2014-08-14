@@ -3,6 +3,7 @@ var util = require('util');
 var langs = {};
 
 langs.EN = require("./langs/EN.js").Labels;
+langs.PL = require("./langs/PL.js").Labels;
 
 /**
  *

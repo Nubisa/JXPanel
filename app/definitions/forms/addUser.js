@@ -76,7 +76,7 @@ exports.form = function () {
                 details: {
                     label: "UserPanelLanguage",
                     method: tool.createComboBox,
-                    options: { values: ["EN"]}
+                    options: { values: ["EN", "PL"]}
                 }
             },
 

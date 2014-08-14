@@ -81,6 +81,8 @@ exports.getUser = function(sessionId)
         if (user.plan)
             users[sessionId].plan = user.plan;
 
+        users[sessionId].lang = user.person_lang || "EN";
+
         users[sessionId].suspended = "";
         users[sessionId].suspended_txt = "";
         if (user.suspended) {
