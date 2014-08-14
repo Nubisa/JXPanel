@@ -182,6 +182,20 @@ var update = function(base, ext){
     return changed;
 };
 
+// translating fake ids into real ids
+var translateFakeIds = function(activeForm, controls) {
+
+    for (var fld in controls) {
+        if (activeForm.fakeIds[fld]) {
+            controls[activeForm.fakeIds[fld]] = controls[fld];
+            delete controls[fld];
+        } else {
+            return { err : "FieldNotFound|" + fld };
+        }
+    }
+    return false;
+};
+
 
 methods.sessionApply = function(env, params){
 
@@ -220,15 +234,10 @@ methods.sessionApply = function(env, params){
 
     var _controls = getFormControls(activeInstance);
 
-    // translating fake ids into real ids
-    for (var fld in params.controls) {
-        if (activeForm.fakeIds[fld]) {
-            params.controls[activeForm.fakeIds[fld]] = params.controls[fld];
-            delete params.controls[fld];
-        } else {
-            sendError("FieldNotFound|" + fld);
-            return;
-        }
+    var res = translateFakeIds(activeForm, params.controls);
+    if (res.err) {
+        sendError(res.err);
+        return;
     }
 
     var json = {};
@@ -618,8 +627,19 @@ methods.appViewLog = function (env, params) {
         return;
     }
 
+    var activeForm = active_user.session.forms["appLog"];
+    if (!activeForm) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "UnknownForm", true) });
+    }
+
+    var res = translateFakeIds(activeForm, params.controls);
+    if (res.err) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, res.err, true) });
+        return;
+    }
+
     // truncating the log
-    if (params.lines === -1) {
+    if (params.controls == -1) {
 
         if (!fs.existsSync(options.log_path)) {
             server.sendCallBack(env, {err: false, log : "" });
@@ -640,11 +660,11 @@ methods.appViewLog = function (env, params) {
             return;
         }
 
-        if (params.lines && params.lines > 0) {
+        if (params.controls && params.controls.app_log_last_lines) {
             // arr
             log = log.trim().split("\n");
             // string again
-            log = log.slice(log.length - params.lines).join("<br>");
+            log = log.slice(log.length - params.controls.app_log_last_lines).join("<br>");
         } else {
             log = log.replace( new RegExp("\n", "g"), "<br>");
         }
