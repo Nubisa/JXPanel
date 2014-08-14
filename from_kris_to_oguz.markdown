@@ -6,8 +6,7 @@
 a)
 updatePlan() check maximums, and suspends subplans eventually, even if new maximum is not overused
 e.g. some user has 3 domains, and we chaged parents plan from maxDomains = 10 into 5.
-still 5 > 3 so why to suspend subplan?
-
+still 5 > 3 so why to suspend subplan? LEAVE IT FOR NOW
 b)
 also, i removed comparing max_org with max_new, since :
 // this is pointless
@@ -27,17 +26,18 @@ c) when updating the plan, i added UnSuspend() call for this particular plan
 
 - addPlan()
 we put on the form values from parent plan. should we also do the same on updatePlan()
+LEAVE IT FOR NOW
 
 
 - suspending
 
-suspendUser() suspends also plans (but only first level) now it suspends all
+suspendUser() suspends also plans (but only first level)
 suspendPlan() does not suspend users - should it? YES
 
 
 todo:
 
-1. header - remove
-2. window - remove
+1. header - remove - DONE
+2. window - remove - DONE
 3. tabbing for log file
 4. dynamic control list servers side for form's inctance
