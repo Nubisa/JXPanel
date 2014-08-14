@@ -1,203 +1,204 @@
-<!--<article class="col-sm-12 col-md-16 col-lg-12">-->
-<article class="sortable-grid ui-sortable">
+<script>
+    if(!window.jxForms){
+        window.jxForms = {};
+    }
 
-    <script>
-        if(!window.jxForms){
-            window.jxForms = {};
-        }
+    window.jxForms["{{form.id}}"] = {
+        created: false,
+        controls:{},
+        apply:function(){
+            var _this = window.jxForms["{{form.id}}"];
 
-        window.jxForms["{{form.id}}"] = {
-            created: false,
-            controls:{},
-            apply:function(){
-                var _this = window.jxForms["{{form.id}}"];
+            var values = {};
+            var failed = false;
+            utils.jxAddMessage();
 
-                var values = {};
-                var failed = false;
-                utils.jxAddMessage();
+            for(var o in _this.controls){
+                var type = _this.controls[o].type;
+                var required = _this.controls[o].required;
+                var name = _this.controls[o].name;
+                var _t = _this.controls[o]._t;
 
-                for(var o in _this.controls){
-                    var type = _this.controls[o].type;
-                    var required = _this.controls[o].required;
-                    var name = _this.controls[o].name;
-                    var _t = _this.controls[o]._t;
-
-                    if(type == 'text' || type == 'password' || type == 'textarea'){
-                        values[_t] = document.getElementById(o).value;
-                        if(required && !values[_t].trim().length){
-                            utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
-                            failed = true;
-                        }
+                if(type == 'text' || type == 'password' || type == 'textarea'){
+                    values[_t] = document.getElementById(o).value;
+                    if(required && !values[_t].trim().length){
+                        utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
+                        failed = true;
                     }
-                    else if (type == 'select'){
-                        var index = document.getElementById(o).selectedIndex;
-                        var value = document.getElementById(o).value;
+                }
+                else if (type == 'select'){
+                    var index = document.getElementById(o).selectedIndex;
+                    var value = document.getElementById(o).value;
 
-                        if(required && index <= 0){
-                            utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
-                            failed = true;
-                        }
-                        else{
-                            if(index<=0)
-                                values[_t] = "";
-                            else
-                                values[_t] = value;
-                        }
+                    if(required && index <= 0){
+                        utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
+                        failed = true;
                     }
-                    else if (type == 'checkbox'){
-                        var value = document.getElementById(o).checked;
-
-                        if(required && !value){
-                            utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
-                            failed = true;
-                        }
-                        else{
+                    else{
+                        if(index<=0)
+                            values[_t] = "";
+                        else
                             values[_t] = value;
-                        }
                     }
                 }
+                else if (type == 'checkbox'){
+                    var value = document.getElementById(o).checked;
 
-                if(!failed){
-                    window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
+                    if(required && !value){
+                        utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
+                        failed = true;
+                    }
+                    else{
+                        values[_t] = value;
+                    }
+                }
+            }
 
-                        if (param.arr) {
+            if(!failed){
+                window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
 
-                            var aliases = {};
-                            for(var o in _this.controls){
-                                aliases[_this.controls[o].name] = o;
-                                $("#" + o + "_note").remove();
-                                $("#" + o + "_group").removeClass("has-error");
+                    if (param.arr) {
+
+                        var aliases = {};
+                        for(var o in _this.controls){
+                            aliases[_this.controls[o].name] = o;
+                            $("#" + o + "_note").remove();
+                            $("#" + o + "_group").removeClass("has-error");
 //                                $("#" + o + "_group").addClass("has-success");
-                            }
-
-                            var focus = null;
-                            var bubbled = false;
-                            for(var o in param.arr){
-                                var id = aliases[param.arr[o].control];
-
-                                if (id && document.getElementById(id)) {
-                                    var str = '<span class="help-block" id="'+id+'_note"><i class="fa fa-warning"></i> ' + param.arr[o].msg + '</span>';
-                                    $(str).insertAfter("#" + id);
-//                                    $("#" + id + "_group").removeClass("has-success");
-                                    $("#" + id + "_group").addClass("has-error");
-                                    if (!focus) focus = id;
-                                } else {
-                                    bubbled = true;
-                                    utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
-                                }
-
-                                if (focus) {
-                                    $("#" + focus).focus();
-                                    window.scrollBy(0,-100);
-                                }
-                            }
-
-                            if (!bubbled)
-                                utils.jxAddMessage('danger', "{{label.FormError}}");
-                        } else {
-                            document.location = "{{form.onSubmitSuccess}}";
                         }
-                    }, true);
-                }
-            },
 
-            loadDynamic: function () {
-                var _this = window.jxForms["{{form.id}}"];
+                        var focus = null;
+                        var bubbled = false;
+                        for(var o in param.arr){
+                            var id = aliases[param.arr[o].control];
 
-                if (!_this.created) {
-                    setTimeout(_this.loadDynamic, 100);
-                    return;
-                }
+                            if (id && document.getElementById(id)) {
+                                var str = '<span class="help-block" id="'+id+'_note"><i class="fa fa-warning"></i> ' + param.arr[o].msg + '</span>';
+                                $(str).insertAfter("#" + id);
+//                                    $("#" + id + "_group").removeClass("has-success");
+                                $("#" + id + "_group").addClass("has-error");
+                                if (!focus) focus = id;
+                            } else {
+                                bubbled = true;
+                                utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
+                            }
 
-                // loading jxm dynamic values
-                var frm = window.jxForms["{{form.id}}"];
-                if (!frm || !frm.controls) return;
+                            if (focus) {
+                                $("#" + focus).focus();
+                                window.scrollBy(0,-100);
+                            }
+                        }
 
-                var dynarr = [];
-                for (var a in frm.controls) {
-                    var ctrl = frm.controls[a];
-                    if (typeof ctrl.dynamic !== 'undefined' && ctrl.dynamic !== null) {
-                        dynarr.push(ctrl._t);
+                        if (!bubbled)
+                            utils.jxAddMessage('danger', "{{label.FormError}}");
+                    } else {
+                        document.location = "{{form.onSubmitSuccess}}";
                     }
+                }, true);
+            }
+        },
+
+        loadDynamic: function () {
+            var _this = window.jxForms["{{form.id}}"];
+
+            if (!_this.created) {
+                setTimeout(_this.loadDynamic, 100);
+                return;
+            }
+
+            // loading jxm dynamic values
+            var frm = window.jxForms["{{form.id}}"];
+            if (!frm || !frm.controls) return;
+
+            var dynarr = [];
+            for (var a in frm.controls) {
+                var ctrl = frm.controls[a];
+                if (typeof ctrl.dynamic !== 'undefined' && ctrl.dynamic !== null) {
+                    dynarr.push(ctrl._t);
                 }
+            }
 
 //                utils.jxAddMessage("info", JSON.stringify(dynarr));
 
-                for (var a in dynarr) {
-                    jxcore.Call('getControlsValues', { form: '{{form.id}}', control: dynarr[a] }, function (param) {
+            for (var a in dynarr) {
+                jxcore.Call('getControlsValues', { form: '{{form.id}}', control: dynarr[a] }, function (param) {
 
 //                        utils.jxAddMessage("info", "received values " + JSON.stringify(param));
 //                        utils.jxAddMessage("info", "param.control " + JSON.stringify(param.control));
 //                        utils.jxAddMessage("info", "param.values " + JSON.stringify(param.values));
 
-                        if (param.err) {
-                            utils.jxAddMessage('danger', param.err);
-                        } else {
-                            _this.addToCombo(param.control, param.values);
-                        }
-                    });
-                }
-            },
-            addToCombo : function (ctrl_name, values) {
-                var _this = window.jxForms["{{form.id}}"];
+                    if (param.err) {
+                        utils.jxAddMessage('danger', param.err);
+                    } else {
+                        _this.addToCombo(param.control, param.values);
+                    }
+                });
+            }
+        },
+        addToCombo : function (ctrl_name, values) {
+            var _this = window.jxForms["{{form.id}}"];
 
 //                utils.jxAddMessage("warning", ctrl_name + "." + JSON.stringify(values));
 
-                // finding control id
-                var ctrl_id = null;
-                for (var o in _this.controls)
-                    if (_this.controls[o]._t == ctrl_name)
-                        ctrl_id = o;
+            // finding control id
+            var ctrl_id = null;
+            for (var o in _this.controls)
+                if (_this.controls[o]._t == ctrl_name)
+                    ctrl_id = o;
 
-                if (!ctrl_id) return;
-                var combo = document.getElementById(ctrl_id);
-                if (!combo) return;
+            if (!ctrl_id) return;
+            var combo = document.getElementById(ctrl_id);
+            if (!combo) return;
 
 //                utils.jxAddMessage("info", "values "  + JSON.stringify(values));
 
-                var selected = false;
-                // adding combo options
-                for (var id in values) {
-                    var item = values[id];
-                    var option = document.createElement('option');
-                    option.text = item.txt;
-                    option.value = item.id;
+            var selected = false;
+            // adding combo options
+            for (var id in values) {
+                var item = values[id];
+                var option = document.createElement('option');
+                option.text = item.txt;
+                option.value = item.id;
 
 //                    utils.jxAddMessage("danger", item.txt + ", " + JSON.stringify(_this.controls[ctrl_id]));
-                    if (item.id + '' === _this.controls[ctrl_id].dynamic + '') {
-                        option.selected = true;
-                        selected = true;
-                    }
-                    combo.add(option);
+                if (item.id + '' === _this.controls[ctrl_id].dynamic + '') {
+                    option.selected = true;
+                    selected = true;
                 }
-
-                _this.controls[ctrl_id].dynamic = null;
-                if (!selected)
-                    combo.selectedIndex = 0;
+                combo.add(option);
             }
-        };
-    </script>
+
+            _this.controls[ctrl_id].dynamic = null;
+            if (!selected)
+                combo.selectedIndex = 0;
+        }
+    };
+</script>
+
+<!--<article class="col-sm-12 col-md-16 col-lg-12">-->
+<!--<article class="sortable-grid ui-sortable">-->
+
     <!-- Widget ID (each widget will need unique ID)-->
-    <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" style="display: none;">
+    <!--<div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" style="display: none;">-->
 
-        <header>
-            {{form.icon}}
-            <h2 style="width:1px;overflow:visible"><nobr><strong>{{form.displayName}}</strong></nobr></h2>
+        <!--<header>-->
+            <!--{{form.icon}}-->
+            <!--<h2 style="width:1px;overflow:visible"><nobr><strong>{{form.displayName}}</strong></nobr></h2>-->
 
-        </header>
+        <!--</header>-->
 
         <!-- widget div-->
         <div>
 
             <!-- widget edit box -->
-            <div class="jarviswidget-editbox">
-                <!-- This area used as dropdown edit box -->
+            <!--<div class="jarviswidget-editbox">-->
+                <!--&lt;!&ndash; This area used as dropdown edit box &ndash;&gt;-->
 
-            </div>
+            <!--</div>-->
             <!-- end widget edit box -->
 
             <!-- widget content -->
-            <div class="widget-body">
+            <!--<div class="widget-body">-->
 
                 <div id="jxform">
                     {{form.contents}}
@@ -222,16 +223,16 @@
                     </div>
                 </div>
 
-                <br>
-            </div>
+                <!--<br>-->
+            <!--</div>-->
             <!-- end widget div -->
 
-        </div>
+        <!--</div>-->
         <!-- end widget -->
 
-    </div>
+    <!--</div>-->
 
-</article>
+<!--</article>-->
 <!-- WIDGET END -->
 
 
