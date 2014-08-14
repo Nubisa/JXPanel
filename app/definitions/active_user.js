@@ -128,7 +128,7 @@ exports.checkAdmin = function(env) {
 
 exports.getForm = function(sessionId, form_name){
     // TODO check permissions to form
-    console.log("active_user::getForm", sessionId, form_name);
+//    console.log("active_user::getForm", sessionId, form_name);
 
     return forms.renderForm(sessionId, form_name);
 };
