@@ -4,8 +4,6 @@
     }
 
     window.jxForms["{{form.id}}"] = {
-        created: false,
-        controls:{},
         apply:function(){
             var _this = window.jxForms["{{form.id}}"];
 
@@ -13,87 +11,78 @@
             var failed = false;
             utils.jxAddMessage();
 
-            for(var o in _this.controls){
-                var type = _this.controls[o].type;
-                var required = _this.controls[o].required;
-                var name = _this.controls[o].name;
+            // hiding previous errors
+            _this.hideErrors();
 
-                if(type == 'text' || type == 'password' || type == 'textarea'){
-                    values[o] = document.getElementById(o).value;
-                    if(required && !values[o].trim().length){
-                        utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
-                        failed = true;
-                    }
-                }
-                else if (type == 'select'){
-                    var index = document.getElementById(o).selectedIndex;
-                    var value = document.getElementById(o).value;
+            $("input").each(function(index, el) {
 
-                    if(required && index <= 0){
-                        utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
-                        failed = true;
-                    }
-                    else{
-                        if(index<=0)
-                            values[o] = "";
-                        else
-                            values[o] = value;
-                    }
-                }
-                else if (type == 'checkbox'){
-                    var value = document.getElementById(o).checked;
+                var isRequired = $(el).hasClass("required");
+                var type = $(el).attr('type');
+                var val = type === 'checkbox' ? el.checked : el.value;
+                var empty = (type === 'checkbox' && !val) || (type !== 'checkbox' && !val.trim().length);
 
-                    if(required && !value){
-                        utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
-                        failed = true;
-                    }
-                    else{
-                        values[o] = value;
-                    }
+                if (isRequired && empty) {
+                    _this.showError(this.id, "{{label.ValueRequired}}");
+                    failed = true;
+                    return;
                 }
-            }
+
+                values[this.id] = val;
+            });
+
+            $("select").each(function(index, el) {
+
+                var isRequired = $(el).hasClass("required");
+                var selected = $(el).find('option:selected');
+
+                if (isRequired && !selected.index()) {
+                    _this.showError(this.id, "{{label.ValueRequired}}");
+                    failed = true;
+                    return;
+                }
+
+                values[this.id] = selected.index() ? selected.val() : "";
+            });
 
             if(!failed){
                 window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
 
                     if (param.arr) {
-
-                        var aliases = {};
-                        for(var o in _this.controls){
-                            aliases[_this.controls[o].name] = o;
-                            $("#" + o + "_note").remove();
-                            $("#" + o + "_group").removeClass("has-error");
-//                                $("#" + o + "_group").addClass("has-success");
-                        }
-
-                        var focus = null;
-                        var bubbled = false;
-                        for(var o in param.arr){
-                            var id = aliases[param.arr[o].control];
-
-                            if (id && document.getElementById(id)) {
-                                var str = '<span class="help-block" id="'+id+'_note"><i class="fa fa-warning"></i> ' + param.arr[o].msg + '</span>';
-                                $(str).insertAfter("#" + id);
-//                                    $("#" + id + "_group").removeClass("has-success");
-                                $("#" + id + "_group").addClass("has-error");
-                                if (!focus) focus = id;
-                            } else {
-                                bubbled = true;
-                                utils.jxAddMessage('danger', param.arr[o].control ? (param.arr[o].control + ":" + param.arr[o].msg) : param.arr[o].msg);
-                            }
-
-                            if (focus) {
-                                $("#" + focus).focus();
-                                window.scrollBy(0,-100);
-                            }
-                        }
-
-                        if (!bubbled)
-                            utils.jxAddMessage('danger', "{{label.FormError}}");
+                        _this.hideErrors();
+                        for(var o in param.arr)
+                            _this.showError(param.arr[o].id, param.arr[o].msg);
                     } else {
                         document.location = "{{form.onSubmitSuccess}}";
                     }
                 }, true);
+            }
+        },
+        hideErrors : function() {
+            var _this = window.jxForms["{{form.id}}"];
+            $("input, select").each(function() {
+                $("#" + this.id + "_note").remove();
+                $("#" + this.id + "_group").removeClass("has-error");
+                //                $("#" + o + "_group").addClass("has-success");
+            });
+            _this.focused = false;
+        },
+        showError : function(id, msg) {
+
+            var _this = window.jxForms["{{form.id}}"];
+
+            if (id && document.getElementById(id)) {
+                var str = '<span class="help-block" id="'+id+'_note"><i class="fa fa-warning"></i> ' + msg + '</span>';
+                $(str).insertAfter("#" + id);
+//                $("#" + id + "_group").removeClass("has-success");
+                $("#" + id + "_group").addClass("has-error");
+            } else {
+                utils.jxAddMessage('danger', msg);
+            }
+
+            if (!_this.focused) {
+                _this.focused = true;
+                $("#" + id).focus();
+                window.scrollBy(0,-100);
             }
         }
     };
@@ -199,11 +188,7 @@
             }
 
             // focus on first control
-            var _this = window.jxForms["{{form.id}}"];
-            for(var o in _this.controls) {
-                $("#" + o).focus();
-                break;
-            }
+            $("input, select").first().focus();
         });
 
         utils.jxAppViewLog = function(remove) {
@@ -214,9 +199,9 @@
             if (remove) {
                 values = -1;
             } else {
-                for(var o in _this.controls) {
-                    values[o] = document.getElementById(o).value;
-                }
+                $("input").each(function(index, el) {
+                    values[this.id] = el.value;
+                });
             }
 
             jxcore.Call('appViewLog', { controls : values }, function(param) {
@@ -225,7 +210,7 @@
                     utils.jxAddMessage('danger', param.err)
                 } else {
                     if (param.url) {
-                        document.location - param.url;
+                        document.location = param.url;
                         return;
                     }
 

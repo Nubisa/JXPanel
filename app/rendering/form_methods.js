@@ -115,11 +115,13 @@ var sessionAdd = function(env, active_user, params){
         if(!ctrl)
             continue;
 
+        var fakeId = active_user.session.forms[params.form].fakeIdsReversed[o];
+
         var ctrlDisplayName = form_lang.Get(active_user.lang, ctrl.details.label, true);
 
         // checking if field is required and has a value
         if (ctrl.options && ctrl.options.required && !params.controls[o]) {
-            messages.push({control:ctrlDisplayName, msg:form_lang.Get(active_user.lang, "ValueRequired")});
+            messages.push({ msg:form_lang.Get(active_user.lang, "ValueRequired"), id : fakeId});
         }
 
         var valids = [];
@@ -143,8 +145,10 @@ var sessionAdd = function(env, active_user, params){
                }
 
                var res = valids[a].validate(env, active_user, params.controls[o], params);
+
+
                if(!res.result){
-                   messages.push({control:ctrlDisplayName, msg:res.msg});
+                   messages.push({ msg:res.msg, id : fakeId});
                }
            }
         }
@@ -203,9 +207,6 @@ methods.sessionApply = function(env, params){
     if (!active_user)
         return;
 
-    if(!sessionAdd(env, active_user, params))
-        return;
-
     var sendError = function(errLabel) {
 
         if (!errLabel) {
@@ -215,9 +216,11 @@ methods.sessionApply = function(env, params){
 
         errLabel = form_lang.Get(active_user.lang, errLabel, true);
         var label = null;
+        var fakeId = null;
         for(var field_name in _controls){
             if (errLabel.indexOf(field_name) !== -1) {
                 label = _controls[field_name].details.label;
+                fakeId = active_user.session.forms[params.form].fakeIdsReversed[field_name];
                 if (label) {
                     label = form_lang.Get(active_user.lang, label, true);
                     errLabel = errLabel.replace(field_name, "`" + label + "`");
@@ -226,19 +229,22 @@ methods.sessionApply = function(env, params){
             }
         }
 
-        server.sendCallBack(env, {arr: [ { control: label || "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
+        server.sendCallBack(env, {arr: [ { msg: form_lang.Get(active_user.lang, errLabel, true), id : fakeId} ] });
     };
 
     var activeForm = active_user.session.forms[params.form];
     var activeInstance = activeForm.activeInstance;
-
-    var _controls = getFormControls(activeInstance);
 
     var res = translateFakeIds(activeForm, params.controls);
     if (res.err) {
         sendError(res.err);
         return;
     }
+
+    if(!sessionAdd(env, active_user, params))
+        return;
+
+    var _controls = getFormControls(activeInstance);
 
     var json = {};
     var planMaximums = {};

@@ -20,12 +20,15 @@ var getData = function(label, _title, input_id, active_user, options) {
 
     ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
     ret.required_label = ret.required ? "&nbsp;<span style='color:red;'>*</span>" : "&nbsp;&nbsp;";
+    ret.required_class = ret.required ? " required" : "";
 
     ret.fakeId = "a" + jxcore.utils.uniqueId();
     if (!active_user.session.forms[options.extra.formName].fakeIds) {
         active_user.session.forms[options.extra.formName].fakeIds = {};
+        active_user.session.forms[options.extra.formName].fakeIdsReversed = {};
     }
     active_user.session.forms[options.extra.formName].fakeIds[ret.fakeId] = input_id;
+    active_user.session.forms[options.extra.formName].fakeIdsReversed[input_id] = ret.fakeId;
 
     if (options.extra && options.extra.noEditDisplayValue)
         ret.value = options.extra.noEditDisplayValue;
@@ -74,10 +77,10 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
     }
 
     if(!options.multiline)
-        _html += '<input id="'+data.fakeId+'" class="form-control" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
+        _html += '<input id="'+data.fakeId+'" class="form-control'+data.required_class+'" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
     else{
         var _rows = options.rows ? options.rows:5;
-        _html += '<textarea id="'+data.fakeId+'" class="form-control" autocomplete="off" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
+        _html += '<textarea id="'+data.fakeId+'" class="form-control'+data.required_class+'" autocomplete="off" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
     }
 
     if(data.description)
@@ -87,9 +90,9 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
          '</div>'
         +'</div>';
 
-    var _js = "window.jxForms[_form_name].controls['" + data.fakeId + "'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId + "'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
-    return {html:_html, js:_js};
+    return {html:_html, js:""};
 };
 
 exports.createComboBox = function(label, _title, input_id, _value, active_user, options){
@@ -108,7 +111,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
         return {html: _html + v + "</div></div>", js: ""};
     }
 
-    _html += '<select class="form-control" id="'+data.fakeId+'"><option>'+form_lang.Get(active_user.lang, "ComboNotSelected")+'</option>';
+    _html += '<select class="form-control'+data.required_class+'" id="'+data.fakeId+'"><option>'+form_lang.Get(active_user.lang, "ComboNotSelected")+'</option>';
 
     if(options && options.values){
         for(var o in options.values){
@@ -130,9 +133,9 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
         '</div>'
         +'</div>';
 
-    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'select', required:"+data.required+", name:'"+_title+"' };";
+//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'select', required:"+data.required+", name:'"+_title+"' };";
 
-    return {html:_html, js:_js};
+    return {html:_html, js:""};
 };
 
 // <input type="checkbox" class="checkbox style-0" checked="checked">
@@ -156,7 +159,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
 
     _html += '<div class="checkbox"><label>';
-    _html += '<input id="'+data.fakeId+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
+    _html += '<input id="'+data.fakeId+'" class="checkbox style-0'+data.required_class+'" type="'+_type+'" '+_value+' />';
 
     _html += '<span>&nbsp;</span></label></div>';
 
@@ -166,9 +169,9 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
     _html +=
         '</div></div>';
 
-    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
-    return {html:_html, js:_js};
+    return {html:_html, js:""};
 };
 
 
@@ -181,9 +184,9 @@ exports.createHidden = function(label, _title, input_id, _value, active_user, op
     var _type = "hidden";
 
     var _html = '<input id="'+data.fakeId+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
-    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
-    return {html:_html, js:_js};
+    return {html:_html, js:""};
 };
 
 
