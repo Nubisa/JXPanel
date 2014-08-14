@@ -39,5 +39,5 @@ todo:
 
 1. header - remove - DONE
 2. window - remove - DONE
-3. tabbing for log file
+3. tabbing for log file - DONE
 4. dynamic control list servers side for form's inctance

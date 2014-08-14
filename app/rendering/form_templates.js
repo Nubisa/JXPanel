@@ -194,7 +194,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             ctrl.options.extra.description = ctrl.getDescription(active_user, values);
         }
 
-        arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, lang, ctrl.options));
+        arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, active_user, ctrl.options));
     }
 
     for(var o in arr)

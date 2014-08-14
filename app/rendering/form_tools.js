@@ -5,13 +5,13 @@ var database = require("../install/database");
 
 exports.begin = '<form class="form-horizontal" onsubmit="return false;">';
 
-var getData = function(label, _title, input_id, lang, options) {
+var getData = function(label, _title, input_id, active_user, options) {
     var ret = { prefix : "", description: ""};
     if (!options) {
         return ret;
     }
 
-    var desc = form_lang.Get(lang, label + "_Description");
+    var desc = form_lang.Get(active_user.lang, label + "_Description");
 
     ret.description = options.extra && options.extra.description ? options.extra.description : desc || options.description;
     ret.prefix = options.prefix || "";
@@ -46,13 +46,13 @@ exports.endFieldSet = function(){
 };
 
 
-exports.createTextBox = function(label, _title, input_id, _value, lang, options){
+exports.createTextBox = function(label, _title, input_id, _value, active_user, options){
 
-    var data = getData(label, _title, input_id, lang, options);
+    var data = getData(label, _title, input_id, active_user, options);
 
     _value = _value || options.default || "";
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
+    _title = form_lang.Get(active_user.lang, _title) || _title;
+    label = form_lang.Get(active_user.lang, label) || label;
 
     var _type = "text";
     if(options.password)
@@ -91,12 +91,12 @@ exports.createTextBox = function(label, _title, input_id, _value, lang, options)
     return {html:_html, js:_js};
 };
 
-exports.createComboBox = function(label, _title, input_id, _value, lang, options){
+exports.createComboBox = function(label, _title, input_id, _value, active_user, options){
 
-    var data = getData(label, _title, input_id, lang, options);
+    var data = getData(label, _title, input_id, active_user, options);
 
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
+    _title = form_lang.Get(active_user.lang, _title) || _title;
+    label = form_lang.Get(active_user.lang, label) || label;
 
     var id = jxcore.utils.uniqueId();
 
@@ -109,7 +109,7 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
         return {html: _html + v + "</div></div>", js: ""};
     }
 
-    _html += '<select class="form-control" id="a'+id+'"><option>'+form_lang.Get(lang, "ComboNotSelected")+'</option>';
+    _html += '<select class="form-control" id="a'+id+'"><option>'+form_lang.Get(active_user.lang, "ComboNotSelected")+'</option>';
 
     if(options && options.values){
         for(var o in options.values){
@@ -139,13 +139,13 @@ exports.createComboBox = function(label, _title, input_id, _value, lang, options
 };
 
 // <input type="checkbox" class="checkbox style-0" checked="checked">
-exports.createCheckBox = function(label, _title, input_id, _value, lang, options){
+exports.createCheckBox = function(label, _title, input_id, _value, active_user, options){
 
-    var data = getData(label, _title, input_id, lang, options);
+    var data = getData(label, _title, input_id, active_user, options);
 
     _value = !_value?  "" : "checked='checked'";
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
+    _title = form_lang.Get(active_user.lang, _title) || _title;
+    label = form_lang.Get(active_user.lang, label) || label;
 
     var _type = "checkbox";
 
@@ -177,11 +177,11 @@ exports.createCheckBox = function(label, _title, input_id, _value, lang, options
 };
 
 
-exports.createHidden = function(label, _title, input_id, _value, lang, options){
-    var data = getData(label, _title, input_id, lang, options);
+exports.createHidden = function(label, _title, input_id, _value, active_user, options){
+    var data = getData(label, _title, input_id, active_user, options);
 
     _value = _value || "";
-    _title = form_lang.Get(lang, _title) || _title;
+    _title = form_lang.Get(active_user.lang, _title) || _title;
 
     var _type = "hidden";
     var id = jxcore.utils.uniqueId();
@@ -193,12 +193,12 @@ exports.createHidden = function(label, _title, input_id, _value, lang, options){
 };
 
 
-exports.createSimpleText = function(label, _title, input_id, _value, lang, options){
-    var data = getData(label, _title, input_id, lang, options);
+exports.createSimpleText = function(label, _title, input_id, _value, active_user, options){
+    var data = getData(label, _title, input_id, active_user, options);
 
     _value = _value || data.value || "";
-    _title = form_lang.Get(lang, _title) || _title;
-    label = form_lang.Get(lang, label) || label;
+    _title = form_lang.Get(active_user.lang, _title) || _title;
+    label = form_lang.Get(active_user.lang, label) || label;
 
     var id = jxcore.utils.uniqueId();
 
