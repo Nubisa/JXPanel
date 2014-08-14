@@ -89,7 +89,7 @@ exports.Labels = {
     "EditPlan": "Edit hosting plan",
     "AddDomain": "Add new domain",
     "EditDomain": "Edit domain data",
-    "appLog": "Application log",
+    "AppLog": "JXcore Application Log",
 
     // login page
     "SignIn" : "Sign In",
@@ -278,6 +278,7 @@ exports.Labels = {
 
     "DomainName" : "Domain",
     "DomainName_Description" : "The domain name.",
+    "DomainConfiguration" : "Domain Configuration",
     "DomainInvalid" : "Please enter a valid domain name.",
     "DomainAlreadyExists" : "Domain already exists.",
     "DomainNotFound" : "Domain not found.",

@@ -454,6 +454,7 @@ methods.getForm = function(env, params) {
         active_user.session.monitor = { isOnline : !err && ret, json : ret };
         var ret = forms.renderForm(env.SessionID, params.form, true);
         active_user.session.monitor = null;
+        ret.new = !!!_active_user.isRecordUpdating(active_user, params.form);
         server.sendCallBack(env, ret);
     });
 };
@@ -636,14 +637,12 @@ methods.appViewLog = function (env, params) {
     // truncating the log
     if (params.lines === -1) {
 
-        if (!fs.existsSync(options.app_path)) {
+        if (!fs.existsSync(options.log_path)) {
             server.sendCallBack(env, {err: false, log : "" });
             return;
         }
 
         fs.truncateSync(options.log_path, 0);
-        server.sendCallBack(env, {err: false, log : "" , size: 0 });
-        return;
     }
 
     var log = "";

@@ -80,7 +80,7 @@ var smart_rule = [
             return form_lang.Get(gl.lang, isUpdate ? labelEdit : labelAdd);
         }
 
-        return "";
+        return activeForm[second] || "";
     }
     },
     {from:"{{charts.$$}}", to:"$$", "$":function(val, gl){

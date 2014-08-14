@@ -262,6 +262,11 @@
                 var logDiv = document.getElementById("jxAppLog");
                 if (logDiv)
                     utils.jxAppViewLog();
+
+                if (!param.new) {
+                    $("#jxAppLog_Tab").removeClass("disabled");
+                    $("#jxAppLog_Tab a").attr("href", "applog.html");
+                }
             }
 
             if (param.hideForm) {

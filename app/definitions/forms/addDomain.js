@@ -37,7 +37,7 @@ exports.form = function () {
     var func = function () {
         this.name = path.basename(__filename, ".js");
 
-        this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
+        this.icon = '<i class="fa fa-fw fa-lg fa-external-link"></i>';
 
         this.onSubmitSuccess = "domains.html";
         this.onSubmitCancel = "domains.html";
@@ -135,8 +135,10 @@ exports.form = function () {
                         var btnStop = '<button type="button" class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
                             + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
 
-                        var btnViewLog = listOrForm ? "" : '<button type="button" class="btn btn-labeled btn-info" onclick="document.location = \'applog.html\'; return false;" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i></span>'
-                            + form_lang.Get(active_user.lang, "JXcoreAppViewLog", true) + '</button>';
+//                        var btnViewLog = listOrForm ? "" : '<button type="button" class="btn btn-labeled btn-info" onclick="document.location = \'applog.html\'; return false;" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i></span>'
+//                            + form_lang.Get(active_user.lang, "JXcoreAppViewLog", true) + '</button>';
+
+                        var btnViewLog = "";
 
                         if (plan.suspended)
                             btnStart = btnStop = ". <code>" + form_lang.Get(active_user.lang, "PlanSuspended", true) + "</code>";

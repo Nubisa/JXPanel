@@ -16,7 +16,7 @@ exports.form = function () {
     var func = function () {
         this.name = path.basename(__filename, ".js");
 
-        this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
+        this.icon = '<i class="fa fa-fw fa-lg fa-pencil-square-o"></i>';
 
         this.onSubmitSuccess = "appLog.html";
         this.onSubmitCancel = "domains.html";

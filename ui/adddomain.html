@@ -54,15 +54,26 @@
 
         {{user.suspended}}
 
-            <p id="jxFormMessage"></p>
+        <p id="jxFormMessage"></p>
 
-            <!-- widget grid -->
-            <section id="widget-grid" class="">
+        <section id="widget-grid" class="">
 
+            <ul id="myTab1" class="nav nav-tabs bordered">
+                <li class="active">
+                    <a href="#s1" data-toggle="tab">{{form.addDomain:icon}} {{label.DomainConfiguration}}</a>
+                </li>
+                <li class="disabled" id="jxAppLog_Tab">
+                    <a href="#">{{form.appLog:icon}} {{label.AppLog}}</a>
+                </li>
+            </ul>
 
-                {{forms.addDomain}}
+            <div id="myTabContent1" class="tab-content padding-10">
+                <div class="tab-pane fade in active" id="s1">
+                    {{forms.addDomain}}
+                </div>
+            </div>
 
-            </section>
+        </section>
 
     </div>
     <!-- END MAIN CONTENT -->
