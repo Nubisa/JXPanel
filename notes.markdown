@@ -11,7 +11,10 @@ TODO
 
 - IP adresses - how to use them? Right now they are defined on domains' form. Should they be maybe on plan's form?
 
-
+- switching plan for the user!
+    -- moving home directory
+    -- suspending subplans
+    -- restart of applications
 
 
 DONE
