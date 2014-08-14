@@ -65,6 +65,24 @@ var smart_rule = [
             return _active_user.getForm(gl.sessionId, val);
         }
     },
+    {from:"{{form.##:$$}}", to:"@@", "@!":function(first, second, gl){
+        try {
+            var activeForm = require('../definitions/forms/' + first).form();
+        } catch (ex) {
+            return "";
+        }
+
+        if(second == "displayName") {
+            var isUpdate = _active_user.isRecordUpdating(gl.active_user, activeForm.name);
+            var labelAdd = activeForm.displayNameLabel_Add ? activeForm.displayNameLabel_Add : activeForm.name;
+            var labelEdit = activeForm.displayNameLabel_Edit ? activeForm.displayNameLabel_Edit : activeForm.name;
+
+            return form_lang.Get(gl.lang, isUpdate ? labelEdit : labelAdd);
+        }
+
+        return "";
+    }
+    },
     {from:"{{charts.$$}}", to:"$$", "$":function(val, gl){
             var cdata = _active_user.getChart(gl.sessionId, val, gl.chart_index);
             gl.chart_index ++;
