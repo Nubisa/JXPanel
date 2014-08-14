@@ -39,8 +39,8 @@ exports.Labels = {
     "logoutQuestion":"Czy na pewno chcesz się wylogować?",
     "fileManager":"Menedżer plików",
     "codeEditor":"Edytor Kodu",
-    "serviceManagement":"Service Management",
-    "stats":"Statystyki Servera",
+    "serviceManagement":"Zarządzanie Usługami",
+    "stats":"Statystyki Serwera",
     "UsersUpperCase":"Użytkownicy",
     "users":"użytkownicy",
 
@@ -72,12 +72,12 @@ exports.Labels = {
     "CannotLoginNoAccess" : "Cannot login to JXPanel (access denied).",
     "CouldntFixFolderPermissions":"There was a problem with folder permissions during user creation",
 
-    "Access Denied": "You do not have a permission to view this resource.",
+    "Access Denied": "Nie posiadasz uprawnień dostępu do tego zasobu.",
     "CallbackRequired" : "The callback is required.",
 
     //Form
     "Nothing to Apply": "There was nothing to apply. Operation wasn't successful.",
-    "UnknownForm" : "Unknown form",
+    "UnknownForm" : "Nieznany formularz",
     "FormEmpty" : "The form does not contain any controls.",
     "FormError" : "Some field values are invalid. Please enter correct values.",
 
