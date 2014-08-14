@@ -135,6 +135,7 @@ exports.Labels = {
     "ValueInvalidIntegerOf" : "The value of %s is supposed to be integer.",
     "ValueNotDefined" : "not defined",
     "ValueUnlimited" : "unlimited",
+    "FieldNotFound" : "The field %s was not found.",
 
     "RequiresMinimumLength": "Minimum string length for this control must be %s.",
     "RequiresMaximumLength": "Maximum string length for this control must be %s.",

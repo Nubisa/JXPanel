@@ -118,9 +118,21 @@ exports.form = function () {
                 details: {
                     label: "PlanID",
                     method: tool.createComboBox,
-                    options: { required: true, dynamic: true },
+                    options: { required: true },
                     dbName: "plan",
-                    cannotEditOwnRecord : true
+                    cannotEditOwnRecord : true,
+                    getValuesList : function(active_user) {
+                        var plans = database.getPlansByUserName(active_user.username, 1);
+                        var me = database.getUser(active_user.username);
+
+                        var ret = [ ];
+                        ret.push(me.plan);
+
+                        for(var i in plans) {
+                            ret.push(plans[i]);
+                        }
+                        return ret;
+                    }
                 },
                 validation : new function () {
 
@@ -136,19 +148,6 @@ exports.form = function () {
 
                         return {result: true};
                     };
-                },
-                dynamicValues : function(active_user) {
-
-                    var plans = database.getPlansByUserName(active_user.username, 1);
-                    var me = database.getUser(active_user.username);
-
-                    var ret = [ ];
-                    ret.push({ id : me.plan, txt : me.plan });
-
-                    for(var i in plans) {
-                        ret.push({ id : plans[i], txt : plans[i] });
-                    }
-                    return ret;
                 }
             },
 

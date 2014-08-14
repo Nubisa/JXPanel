@@ -17,11 +17,10 @@
                 var type = _this.controls[o].type;
                 var required = _this.controls[o].required;
                 var name = _this.controls[o].name;
-                var _t = _this.controls[o]._t;
 
                 if(type == 'text' || type == 'password' || type == 'textarea'){
-                    values[_t] = document.getElementById(o).value;
-                    if(required && !values[_t].trim().length){
+                    values[o] = document.getElementById(o).value;
+                    if(required && !values[o].trim().length){
                         utils.jxAddMessage('danger',  name + ":: {{label.ValueRequired}}");
                         failed = true;
                     }
@@ -36,9 +35,9 @@
                     }
                     else{
                         if(index<=0)
-                            values[_t] = "";
+                            values[o] = "";
                         else
-                            values[_t] = value;
+                            values[o] = value;
                     }
                 }
                 else if (type == 'checkbox'){
@@ -49,7 +48,7 @@
                         failed = true;
                     }
                     else{
-                        values[_t] = value;
+                        values[o] = value;
                     }
                 }
             }
@@ -96,81 +95,6 @@
                     }
                 }, true);
             }
-        },
-
-        loadDynamic: function () {
-            var _this = window.jxForms["{{form.id}}"];
-
-            if (!_this.created) {
-                setTimeout(_this.loadDynamic, 100);
-                return;
-            }
-
-            // loading jxm dynamic values
-            var frm = window.jxForms["{{form.id}}"];
-            if (!frm || !frm.controls) return;
-
-            var dynarr = [];
-            for (var a in frm.controls) {
-                var ctrl = frm.controls[a];
-                if (typeof ctrl.dynamic !== 'undefined' && ctrl.dynamic !== null) {
-                    dynarr.push(ctrl._t);
-                }
-            }
-
-//                utils.jxAddMessage("info", JSON.stringify(dynarr));
-
-            for (var a in dynarr) {
-                jxcore.Call('getControlsValues', { form: '{{form.id}}', control: dynarr[a] }, function (param) {
-
-//                        utils.jxAddMessage("info", "received values " + JSON.stringify(param));
-//                        utils.jxAddMessage("info", "param.control " + JSON.stringify(param.control));
-//                        utils.jxAddMessage("info", "param.values " + JSON.stringify(param.values));
-
-                    if (param.err) {
-                        utils.jxAddMessage('danger', param.err);
-                    } else {
-                        _this.addToCombo(param.control, param.values);
-                    }
-                });
-            }
-        },
-        addToCombo : function (ctrl_name, values) {
-            var _this = window.jxForms["{{form.id}}"];
-
-//                utils.jxAddMessage("warning", ctrl_name + "." + JSON.stringify(values));
-
-            // finding control id
-            var ctrl_id = null;
-            for (var o in _this.controls)
-                if (_this.controls[o]._t == ctrl_name)
-                    ctrl_id = o;
-
-            if (!ctrl_id) return;
-            var combo = document.getElementById(ctrl_id);
-            if (!combo) return;
-
-//                utils.jxAddMessage("info", "values "  + JSON.stringify(values));
-
-            var selected = false;
-            // adding combo options
-            for (var id in values) {
-                var item = values[id];
-                var option = document.createElement('option');
-                option.text = item.txt;
-                option.value = item.id;
-
-//                    utils.jxAddMessage("danger", item.txt + ", " + JSON.stringify(_this.controls[ctrl_id]));
-                if (item.id + '' === _this.controls[ctrl_id].dynamic + '') {
-                    option.selected = true;
-                    selected = true;
-                }
-                combo.add(option);
-            }
-
-            _this.controls[ctrl_id].dynamic = null;
-            if (!selected)
-                combo.selectedIndex = 0;
         }
     };
 </script>
@@ -188,11 +112,11 @@
         <!--</header>-->
 
         <!-- widget div-->
-        <div>
+        <!--<div>-->
 
             <!-- widget edit box -->
             <!--<div class="jarviswidget-editbox">-->
-                <!--&lt;!&ndash; This area used as dropdown edit box &ndash;&gt;-->
+
 
             <!--</div>-->
             <!-- end widget edit box -->
@@ -256,7 +180,6 @@
                 var script = document.createElement("script");
                 script.innerHTML = param.js;
                 document.head.appendChild(script);
-                window.jxForms["{{form.id}}"].loadDynamic();
 
                 // first load of a form applog
                 var logDiv = document.getElementById("jxAppLog");

@@ -192,11 +192,44 @@ methods.sessionApply = function(env, params){
     if(!sessionAdd(env, active_user, params))
         return;
 
+    var sendError = function(errLabel) {
+
+        if (!errLabel) {
+            server.sendCallBack(env, {arr: false});
+            return;
+        }
+
+        errLabel = form_lang.Get(active_user.lang, errLabel, true);
+        var label = null;
+        for(var field_name in _controls){
+            if (errLabel.indexOf(field_name) !== -1) {
+                label = _controls[field_name].details.label;
+                if (label) {
+                    label = form_lang.Get(active_user.lang, label, true);
+                    errLabel = errLabel.replace(field_name, "`" + label + "`");
+                }
+                break;
+            }
+        }
+
+        server.sendCallBack(env, {arr: [ { control: label || "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
+    };
+
     var activeForm = active_user.session.forms[params.form];
     var activeInstance = activeForm.activeInstance;
 
-
     var _controls = getFormControls(activeInstance);
+
+    // translating fake ids into real ids
+    for (var fld in params.controls) {
+        if (activeForm.fakeIds[fld]) {
+            params.controls[activeForm.fakeIds[fld]] = params.controls[fld];
+            delete params.controls[fld];
+        } else {
+            sendError("FieldNotFound|" + fld);
+            return;
+        }
+    }
 
     var json = {};
     var planMaximums = {};
@@ -239,29 +272,6 @@ methods.sessionApply = function(env, params){
             }
         }
     }
-
-    var sendError = function(errLabel) {
-
-        if (!errLabel) {
-            server.sendCallBack(env, {arr: false});
-            return;
-        }
-
-        errLabel = form_lang.Get(active_user.lang, errLabel, true);
-        var label = null;
-        for(var field_name in _controls){
-            if (errLabel.indexOf(field_name) !== -1) {
-                label = _controls[field_name].details.label;
-                if (label) {
-                    label = form_lang.Get(active_user.lang, label, true);
-                    errLabel = errLabel.replace(field_name, "`" + label + "`");
-                }
-                break;
-            }
-        }
-
-        server.sendCallBack(env, {arr: [ { control: label || "", msg: form_lang.Get(active_user.lang, errLabel, true)} ] });
-    };
 
     if (!cnt)
         return sendError("FormEmpty");
@@ -483,32 +493,6 @@ methods.logout = function(env, params) {
 
     _active_user.clearUser(env.SessionID);
     server.sendCallBack(env, {err : false} );
-};
-
-
-// async way for getting forms' controls' values (e.g. for combo)
-methods.getControlsValues = function(env, params) {
-
-    var active_user = _active_user.checkUser(env);
-    if (!active_user)
-        return;
-
-    var activeForm = active_user.session.forms[params.form];
-    var activeInstance = activeForm.activeInstance;
-
-    var found = false;
-    for(var a in activeInstance.controls) {
-        if (activeInstance.controls[a].name && activeInstance.controls[a].name === params.control && activeInstance.controls[a].dynamicValues) {
-            found = true;
-            var ret = activeInstance.controls[a].dynamicValues(active_user);
-            server.sendCallBack(env, {err : false, values : ret, control : params.control } );
-            return;
-        }
-    }
-
-    if (!found) {
-        server.sendCallBack(env, {err : "Dynamic values loading method not found for field " + params.control  } );
-    }
 };
 
 

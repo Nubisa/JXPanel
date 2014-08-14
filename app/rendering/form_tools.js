@@ -21,8 +21,11 @@ var getData = function(label, _title, input_id, active_user, options) {
     ret.required = options.required || (options.required_insert && !options.extra.isUpdate);
     ret.required_label = ret.required ? "&nbsp;<span style='color:red;'>*</span>" : "&nbsp;&nbsp;";
 
-
-    ret.dynamic = options.dynamic || "";
+    ret.fakeId = "a" + jxcore.utils.uniqueId();
+    if (!active_user.session.forms[options.extra.formName].fakeIds) {
+        active_user.session.forms[options.extra.formName].fakeIds = {};
+    }
+    active_user.session.forms[options.extra.formName].fakeIds[ret.fakeId] = input_id;
 
     if (options.extra && options.extra.noEditDisplayValue)
         ret.value = options.extra.noEditDisplayValue;
@@ -61,9 +64,7 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
         _type = "textarea";
     }
 
-    var id = jxcore.utils.uniqueId();
-
-    var _html = '<div class="form-group" id="a' + id + '_group">'
+    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
         +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
@@ -73,10 +74,10 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
     }
 
     if(!options.multiline)
-        _html += '<input id="a'+id+'" class="form-control" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
+        _html += '<input id="'+data.fakeId+'" class="form-control" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
     else{
         var _rows = options.rows ? options.rows:5;
-        _html += '<textarea id="a'+id+'" class="form-control" autocomplete="off" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
+        _html += '<textarea id="'+data.fakeId+'" class="form-control" autocomplete="off" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
     }
 
     if(data.description)
@@ -86,7 +87,7 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
          '</div>'
         +'</div>';
 
-    var _js = "window.jxForms[_form_name].controls['a" + id + "'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
+    var _js = "window.jxForms[_form_name].controls['" + data.fakeId + "'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
     return {html:_html, js:_js};
 };
@@ -98,9 +99,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
     _title = form_lang.Get(active_user.lang, _title) || _title;
     label = form_lang.Get(active_user.lang, label) || label;
 
-    var id = jxcore.utils.uniqueId();
-
-    var _html = '<div class="form-group" id="a' + id + '_group">'
+    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
         +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
@@ -109,7 +108,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
         return {html: _html + v + "</div></div>", js: ""};
     }
 
-    _html += '<select class="form-control" id="a'+id+'"><option>'+form_lang.Get(active_user.lang, "ComboNotSelected")+'</option>';
+    _html += '<select class="form-control" id="'+data.fakeId+'"><option>'+form_lang.Get(active_user.lang, "ComboNotSelected")+'</option>';
 
     if(options && options.values){
         for(var o in options.values){
@@ -131,9 +130,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
         '</div>'
         +'</div>';
 
-    // comparing to true is important
-    var dynamic = data.dynamic === true ? "'" + (_value || "") + "'" : null;
-    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'select', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"', dynamic: "+ dynamic  +" };";
+    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'select', required:"+data.required+", name:'"+_title+"' };";
 
     return {html:_html, js:_js};
 };
@@ -149,9 +146,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
     var _type = "checkbox";
 
-    var id = jxcore.utils.uniqueId();
-
-    var _html = '<div class="form-group" id="a' + id + '_group">'
+    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
         + '<label class="col-md-2 control-label">'+label + data.required_label + '</label><div class="col-md-10">';
 
     if (options && options.extra && typeof options.extra.noEditDisplayValue !== "undefined") {
@@ -161,7 +156,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
 
     _html += '<div class="checkbox"><label>';
-    _html += '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
+    _html += '<input id="'+data.fakeId+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
 
     _html += '<span>&nbsp;</span></label></div>';
 
@@ -171,7 +166,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
     _html +=
         '</div></div>';
 
-    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
+    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
     return {html:_html, js:_js};
 };
@@ -184,10 +179,9 @@ exports.createHidden = function(label, _title, input_id, _value, active_user, op
     _title = form_lang.Get(active_user.lang, _title) || _title;
 
     var _type = "hidden";
-    var id = jxcore.utils.uniqueId();
 
-    var _html = '<input id="a'+id+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
-    var _js = "window.jxForms[_form_name].controls['a" + id+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"', _t:'"+input_id+"' };";
+    var _html = '<input id="'+data.fakeId+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
+    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
     return {html:_html, js:_js};
 };
@@ -200,9 +194,7 @@ exports.createSimpleText = function(label, _title, input_id, _value, active_user
     _title = form_lang.Get(active_user.lang, _title) || _title;
     label = form_lang.Get(active_user.lang, label) || label;
 
-    var id = jxcore.utils.uniqueId();
-
-    var _html = '<div class="form-group" id="a' + id + '_group">'
+    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
         +'<label class="col-md-2 control-label">'+label + '</label>'
         +'<div class="col-md-10">'
         +'<div style="margin-top: 7px;">' + _value + '</div>'

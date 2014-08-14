@@ -179,7 +179,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         // if we'll check against !val
         if (val === 0) val = "0";
 
-        ctrl.options.extra = { formName : formName, isUpdate : isUpdate, active_user : active_user};
+        ctrl.options.extra = { formName : formName, isUpdate : isUpdate };
         if (ctrl.options.password && isUpdate)
             val = null;
 
@@ -193,6 +193,9 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (ctrl.getDescription && typeof ctrl.getDescription === "function") {
             ctrl.options.extra.description = ctrl.getDescription(active_user, values);
         }
+
+        if (ctrl.getValuesList)
+            ctrl.options.values = ctrl.getValuesList(active_user);
 
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, active_user, ctrl.options));
     }
