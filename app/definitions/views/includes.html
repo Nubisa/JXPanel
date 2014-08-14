@@ -364,9 +364,19 @@
         return utils.jxCall("monitorStartStop", start );
     };
 
-    utils.jxAppStartStop = function (start, domain_name) {
+    utils.jxAppStartStop = function (start, domain_name, div) {
         window.jxstatus = start ? "{{label.JXcoreAppStarting}}" : "{{label.JXcoreAppStopping}}";
-        return utils.jxCall("appStartStop", start, domain_name );
+
+        window.toServer("appStartStop", { op: start, id : domain_name, div : div }, function (param) {
+            if (param.err) {
+                utils.jxAddMessage('danger', param.err);
+            } else {
+                $("#jxAppStatus_" + div).html(param.status);
+            }
+        }, true, true);
+
+        return false;
+//        return utils.jxCall("appStartStop", start, domain_name );
     };
 
     utils.jxInstall = function () {

@@ -592,12 +592,24 @@ methods.appStartStop = function (env, params) {
 
         hosting_tools.appStartStop(params.op, params.id, function(err) {
             if (err) err = form_lang.Get(active_user.lang, err, true);
-            server.sendCallBack(env, {err: err });
 
             // JXPanel should know, whether user wanted to start or stop an app
             var domain = database.getDomain(params.id);
             domain.jx_enabled = params.op;
             database.updateDomain(params.id, domain);
+
+
+            // reading new status of the app
+            var addDomain = require("../definitions/forms/addDomain").form();
+            var controls = getFormControls(addDomain);
+
+            hosting_tools.getMonitorJSON(false, function(err, ret) {
+                // todo: just for now saving the value somewhere
+                active_user.session.monitor = { isOnline : !err && ret, json : ret };
+                var status = controls["jx_app_status"].details.getValue(active_user, { name : params.id });
+                active_user.session.monitor = null;
+                server.sendCallBack(env, {err: err, status : status.err || status, div : params.div });
+            });
         });
     }
 };

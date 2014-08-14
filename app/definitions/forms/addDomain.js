@@ -129,10 +129,12 @@ exports.form = function () {
                         var iconOnline = form_lang.GetBool(active_user.lang, true, "RunningOn") + ports;
                         var iconOffline = form_lang.GetBool(active_user.lang, false, null, "Offline");
 
-                        var btnStart = '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
+                        var divId = jxcore.utils.uniqueId();
+
+                        var btnStart = '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\',' + divId + ');" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
                             + form_lang.Get(active_user.lang, "Start", true) + '</button>';
 
-                        var btnStop = '<button type="button" class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\' );" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
+                        var btnStop = '<button type="button" class="btn btn-labeled btn-danger" onclick="return utils.jxAppStartStop(false, \'' + domain_name + '\',' + divId + ');" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
                             + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
 
 //                        var btnViewLog = listOrForm ? "" : '<button type="button" class="btn btn-labeled btn-info" onclick="document.location = \'applog.html\'; return false;" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i></span>'
@@ -157,10 +159,13 @@ exports.form = function () {
                         if (!json)
                             btnStart = btnStop = ". " + form_lang.Get(active_user.lang, "JXcoreMonitorNotRunning", true);
 
+                        var divStart = '<div id="jxAppStatus_' + divId +'" style="display: inline-block; white-space: nowrap;">';
+                        var divEnd = "</div>";
+
                         if (json.indexOf(ret) === -1) {
-                            return iconOffline + btnStart + btnViewLog;
+                            return divStart + iconOffline + btnStart + btnViewLog + divEnd;
                         } else {
-                            return iconOnline + btnStop + btnViewLog;
+                            return divStart + iconOnline + btnStop + btnViewLog + divEnd;
                         }
                     }
                 }
