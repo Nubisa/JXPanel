@@ -47,10 +47,10 @@ methods.tryLogin = function(env, params){
                 server.sendCallBack(env, {url: _url});
             };
 
-            var unlimited = database.getPlan("Unlimited");
+            var unlimited = database.getPlan(database.unlimitedPlanName);
             if (!unlimited) {
                 // first sudo signing in
-                database.AddPlan(null, "Unlimited", {
+                database.AddPlan(null, database.unlimitedPlanName, {
                     maxDomainCount: 1e5,
                     maxUserCount: 1e5,
                     canCreatePlan: true,
@@ -58,9 +58,9 @@ methods.tryLogin = function(env, params){
                     planMaximums: {}
                 });
 
-                database.AddUser("Unlimited", params.username, { person_name : params.username, firstUser:true, ftp_access : true, panel_access : true });
+                database.AddUser(database.unlimitedPlanName, params.username, { person_name : params.username, firstUser:true, ftp_access : true, panel_access : true });
                 try{
-                    var ret = system_tools.addSystemUser({plan:"Unlimited", name:params.username }, null, 1);
+                    var ret = system_tools.addSystemUser({plan:database.unlimitedPlanName, name:params.username }, null, 1);
                     if(ret.err){
                         database.deleteUser(params.username);
                         server.sendCallBack(env, {err: form_lang.Get("EN", ret.err, true)});
@@ -80,7 +80,7 @@ methods.tryLogin = function(env, params){
             if (!user) {
                 server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
             } else
-            if (!user["panel_access"] && user.plan !== "Unlimited" ) {
+            if (!user["panel_access"] && user.plan !== database.unlimitedPlanName ) {
                 server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoAccess")});
             } else {
                 finish(env, params);
@@ -308,7 +308,7 @@ methods.sessionApply = function(env, params){
                         ret = res.err;
                 }
 
-                if (!json.panel_access && active_user.plan !== "Unlimited" ) {
+                if (!json.panel_access && active_user.plan !== database.unlimitedPlanName ) {
                     _active_user.clearUserByName(update_name);
                 }
             } else {
@@ -582,7 +582,7 @@ methods.appStartStop = function (env, params) {
         server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "DomainNotFound", true) });
     } else {
 
-        if (active_user.plan !== "unlimited") {
+        if (active_user.plan !== database.unlimitedPlanName) {
             var domains = database.getDomainsByUserName(active_user.username, 1e7);
             if (domains.indexOf(params.id) === -1) {
                 server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Access Denied", true) });

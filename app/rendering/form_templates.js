@@ -124,7 +124,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             if (!me)
                 return { err : "DBCannotGetUser" };
 
-            if (me.plan !== "Unlimited") {
+            if (me.plan !== database.unlimitedPlanName) {
                 var parentPlan = database.getPlan(me.plan);
                 if (!parentPlan)
                     return { err : "DBCannotGetPlan" };

@@ -118,7 +118,7 @@ exports.checkUser = function(env, checkIfSuspended, form_name) {
 exports.checkAdmin = function(env) {
     var active_user = exports.checkUser(env);
 
-    if (active_user.plan !== "Unlimited") {
+    if (active_user.plan !== database.unlimitedPlanName) {
         server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "Access Denied", true) });
         return;
     }

@@ -15,7 +15,9 @@ var UpdateDB = function(stringToSave){ // KRIS FILL IN
     });
 };
 
-exports.defaultMaximum = -1;  // don't change it, otherwise db should be refreshed
+// don't change it, otherwise db should be refreshed
+exports.defaultMaximum = -1;
+exports.unlimitedPlanName = "Unlimited";
 
 exports.updateDBFile = function(){
    UpdateDB(JSON.stringify(DB));
@@ -281,7 +283,7 @@ var Plan = function(name, owner_user, opts, dummy){
     // goes up until top parent and gets effective maximum for this plan
     this.GetMaximum = function(field_name) {
 
-        if (this.name === "Unlimited") {
+        if (this.name === exports.unlimitedPlanName) {
             return exports.defaultMaximum;
         }
 
@@ -312,7 +314,7 @@ var Plan = function(name, owner_user, opts, dummy){
     // e.g. allowSysExec
     this.GetBool = function(field_name) {
 
-        if (this.name === "Unlimited") {
+        if (this.name === exports.unlimitedPlanName) {
             return true;
         }
 

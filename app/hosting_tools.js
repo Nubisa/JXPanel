@@ -659,7 +659,7 @@ var appStartEnabledApplications = function(cb) {
 
     var commands = [];
 
-    var domains = database.getDomainsByPlanName("Unlimited", 1e7);
+    var domains = database.getDomainsByPlanName(database.unlimitedPlanName, 1e7);
     for(var o in domains) {
         var domain_name = domains[o];
         var domain = database.getDomain(domain_name);

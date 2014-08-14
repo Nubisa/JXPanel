@@ -24,11 +24,11 @@ exports.hasView = function(active_user, file){
     }
 
     if(file == "../ui//jxconfig.html"){
-        return plan.name == "Unlimited";
+        return plan.name == database.unlimitedPlanName;
     }
 
     if(file == "../ui//jxmodules.html"){
-        return plan.name == "Unlimited";
+        return plan.name == database.unlimitedPlanName;
     }
 
     return true;
