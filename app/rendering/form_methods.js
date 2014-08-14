@@ -80,7 +80,7 @@ methods.tryLogin = function(env, params){
             if (!user) {
                 server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoUser")});
             } else
-            if (!user["panel_access"]) {
+            if (!user["panel_access"] && user.plan !== "Unlimited" ) {
                 server.sendCallBack(env, {err: form_lang.Get(params.lang, "CannotLoginNoAccess")});
             } else {
                 finish(env, params);
@@ -308,7 +308,7 @@ methods.sessionApply = function(env, params){
                         ret = res.err;
                 }
 
-                if (!json.panel_access) {
+                if (!json.panel_access && active_user.plan !== "Unlimited" ) {
                     _active_user.clearUserByName(update_name);
                 }
             } else {
