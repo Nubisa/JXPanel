@@ -34,6 +34,9 @@ exports.Labels = {
     "RunningOn" : "Running on",
     "Granted" : "Granted",
     "Denied" : "Denied",
+    "Name" : "Name",
+    "Value" : "Value",
+    "Usage" : "Usage",
 
     "serverManagement":"Server Management",
     "help":"Help",
@@ -315,6 +318,7 @@ exports.Labels = {
     "PlanInvalid" : "Invalid hosting plan",
     "PlanAlreadyExists" : "Plan already exists",
     "PlanParentDefinesValue" : "Parent hosting plan defines this value as %s.",
+    "PlanCurrent" : "Your current plan",
     "UserSuspended" : "User is suspended",
     "PlanSuspended" : "Hosting plan is suspended",
     "YouAreSuspended" : "You are suspended (%s).",

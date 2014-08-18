@@ -14,3 +14,21 @@ exports.getErrorBar = function(errString) {
 
     return str;
 };
+
+
+
+exports.getProgressBar = function(maxValue, value, unit) {
+
+    var percent = parseInt(value * 100 / maxValue);
+    if (!unit) unit = "";
+
+//    var str = '<div class="progress" style="margin: 0px;">'
+//             +'    <div class="progress-bar bg-color-primary" role="progressbar" style="width: ' + percent + '%"></div>'
+//             +'</div>';
+
+    var str = '<div class="progress" style="margin: 0px;">'
+        +'    <div aria-valuenow="_val_" style="width: _val_%;" class="progress-bar bg-color-blue" aria-valuetransitiongoal="_val_">' + value + " " + unit + '</div>'
+        +'</div>';
+
+    return str.replace(/_val_/g, percent);
+};

@@ -214,7 +214,7 @@ exports.end = "</fieldset></form>";
 
 var formLabels = {};
 
-// returns english labels for form controls,
+// returns translated labels for form controls,
 // e.g. { person_name : "Contact name", .... }
 exports.getFormsLabels = function(lang) {
 
@@ -252,7 +252,7 @@ exports.getFormsLabels = function(lang) {
     return formLabels[lang];
 };
 
-
+// returns comma separated fields's display names and their values
 exports.getFieldDisplayNames = function(lang, field_names, field_values) {
 
     if (!field_names) {
@@ -286,4 +286,58 @@ exports.getFieldDisplayNames = function(lang, field_names, field_values) {
     }
 
     return arr.join(", ");
+};
+
+
+exports.getFormControls = function(activeInstance) {
+
+    if (!activeInstance)
+        throw "Instance of the form is empty.";
+
+    var ret = {};
+    for(var i in activeInstance.controls) {
+        if (activeInstance.controls[i].name)
+            ret[activeInstance.controls[i].name] = activeInstance.controls[i];
+    }
+    return ret;
+};
+
+
+exports.getFieldDisplayValue = function (active_user, activeInstance, field_name, record) {
+
+    if (!activeInstance)
+        throw "Instance of the form is empty.";
+
+    var val = record[field_name];
+
+    var controls = exports.getFormControls(activeInstance);
+
+    if (controls[field_name] && controls[field_name].details) {
+
+        if (controls[field_name].details.displayValues) {
+
+            for (var _val in controls[field_name].details.displayValues) {
+
+                // null/undefined value replacement into display value
+                var isEmpty = _val === "__EMPTY__" && (val === null || val === undefined || val === "");
+                // specific value replacement
+                var isEqual = _val + "" === val + "";
+
+                if (isEmpty || isEqual) {
+                    var _new_val = controls[field_name].details.displayValues[_val];
+                    // if val is something like "@JXcore" , treat it as label from lang definition.
+                    if (_new_val.length && _new_val.slice(0, 1) === "@") {
+                        _new_val = form_lang.Get(active_user.lang, _new_val.slice(1)) || val;
+                    }
+                    val = _new_val;
+                }
+            }
+        } else if (controls[field_name].details.getValue) {
+            val = controls[field_name].details.getValue(active_user, record, true);
+        } else if (controls[field_name].details.method === exports.createCheckBox) {
+            val = form_lang.GetBool(active_user.lang, val, "Yes", "No");
+        }
+    }
+
+    return val;
 };

@@ -148,8 +148,8 @@ var Plan = function(name, owner_user, opts, dummy){
         return count;
     };
 
-    this.totalActiveUsers = function(){_totalUsers(this);};
-    this.totalActiveDomains = function(){_totalDomains(this);};
+    this.totalActiveUsers = function(){ return _totalUsers(this);};
+    this.totalActiveDomains = function(){return _totalDomains(this);};
 
     this.suspended = false;
 
@@ -787,16 +787,19 @@ exports.updatePlan = function(name, data){
 //        }
     }
 
+    var _suspended = false;
     var totalUsers = plan.totalActiveUsers();
-    if(max_new.maxUserCount<totalUsers){
-        max_new.SuspendPlan("maxUserCount");
+    if(data.maxUserCount<totalUsers){
+        data.SuspendPlan("maxUserCount");
+        _suspended = true;
     }
     var totalDomains = plan.totalActiveDomains();
-    if(max_new.maxDomainCount<totalDomains){
-        max_new.SuspendPlan("maxDomainCount");
+    if(data.maxDomainCount<totalDomains){
+        data.SuspendPlan("maxDomainCount");
+        _suspended = true;
     }
 
-    if (data.suspended)
+    if (data.suspended && !_suspended)
         data.UnSuspendPlan();
 
     Plans[name] = data;

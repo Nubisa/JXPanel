@@ -11,7 +11,9 @@ var database = require("./../install/database");
 var system_tools = require("./../system_tools");
 var hosting_tools = require("./../hosting_tools");
 var site_defaults = require("./../definitions/site_defaults");
+var tools = require("./form_tools");
 var folder_utils = require("../definitions/user_folders");
+var page_utils = require("./page_utils");
 
 
 var getTable = function(table_name) {
@@ -44,18 +46,12 @@ var getHTML = function (active_user, table) {
         return { err: form_lang.Get(active_user.lang, "UnknownForm") };
 
     // getting form control display names
-    var formControls = {};
-    for (var i in form.controls) {
-        var ctrl = form.controls[i];
-        if (ctrl.name)
-            formControls[ctrl.name] = ctrl;
-    }
+    var formControls = tools.getFormControls(form);
 
     var ret = [];
     ret.push([]);
 
-    var dbNames = {};
-    // searching for display names and dbNames of controls
+    // searching for display names of controls
     for (var a in columns) {
         var displayName = columns[a];
         if (displayName == "_checkbox") displayName = "";
@@ -65,7 +61,6 @@ var getHTML = function (active_user, table) {
 
         if (formControls[columns[a]] && formControls[columns[a]].details) {
             displayName = form_lang.Get(active_user.lang, formControls[columns[a]].details.label);
-            dbNames[columns[a]] = formControls[columns[a]].details.dbName || columns[a];
         }
 
         // for virtual fields not defined in form (e.g. on domains list)
@@ -125,33 +120,13 @@ var getHTML = function (active_user, table) {
             single_row["_class"] = "success";
 
         for (var x in columns) {
-            var colName = dbNames[columns[x]] || columns[x];
+            var colName = columns[x];
+            if (formControls[columns[x]] && formControls[columns[x]].details.dbName)
+                colName = formControls[columns[x]].details.dbName;
+
             var val = record[colName];
 
-            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.displayValues) {
-
-                for (var _val in formControls[columns[x]].details.displayValues) {
-
-                    // null/undefined value replacement into display value
-                    var isEmpty = _val === "__EMPTY__" && (val === null || val === undefined || val === "");
-                    // specific value replacement
-                    var isEqual = _val + "" === val + "";
-
-                    if (isEmpty || isEqual) {
-                        var _new_val = formControls[columns[x]].details.displayValues[_val];
-                        // if val is something like "@JXcore" , treat it as label from lang definition.
-                        if (_new_val.length && _new_val.slice(0, 1) === "@") {
-                            _new_val = form_lang.Get(active_user.lang, _new_val.slice(1)) || val;
-                        }
-                        val = _new_val;
-                    }
-                }
-            }
-
-            if (formControls[columns[x]] && formControls[columns[x]].details && formControls[columns[x]].details.getValue) {
-                val = formControls[columns[x]].details.getValue(active_user, record, true);
-            }
-
+            val = tools.getFieldDisplayValue(active_user, form, colName, record);
 
             // virtual column with plan name
             if (colName === "plan_table_id" && table.name === "domains") {
@@ -317,6 +292,19 @@ var logic = [
         return !res ? "" : res;
     }
     },
+    {from: "{{plan.$$}}", to: "$$", "$": function (val, gl) {
+
+        if (!gl.plan)
+            return "";
+
+        if (val === "name")
+            return gl.plan.name;
+
+//        var active_user = gl.active_user;
+//        var res = form_lang.Get(active_user.lang, val);
+        return "";
+    }
+    },
     {from: "{{datatable.##}}", to: "##", "#": function (val, gl) {
         if (val == "id")
             return gl.name;
@@ -331,6 +319,14 @@ var logic = [
                 return rep(txt, logic);
             } else
                 return "";
+        }
+
+        if (val === "myPlan") {
+            return exports.getMyPlanAsTable(gl.active_user);
+        }
+
+        if (val === "myPlanContents") {
+            return gl.contents;
         }
 
         return form_lang.Get(gl.lang, gl[val], true);
@@ -508,4 +504,90 @@ exports.edit = function (sessionId, table_name, id) {
     active_user.session.lastPath = "/" + table.settings.addFormURL;
 
     return {err : false, url : table.settings.addFormURL};
+};
+
+
+var getMyPlan = function(active_user) {
+
+    var plan = database.getPlan(active_user.plan);
+    if (plan === database.unlimitedPlanName)
+        return "";
+
+    var table = getTable("plans");
+    if (!table)
+        return form_lang.Get(active_user.lang, "UnknownDataTable");
+
+    var form = getForm(table);
+    if (!form)
+        return form_lang.Get(active_user.lang, "UnknownForm");
+
+    var html = "";
+    for(var o in form.controls) {
+        var ctrl = form.controls[o];
+        if (!ctrl.name)
+            continue;
+
+        var dbName = ctrl.details.dbName || ctrl.name;
+        var val = ctrl.details.getValue ? ctrl.details.getValue(active_user, plan, true) : plan[dbName];
+
+        html += form_lang.Get(active_user.lang, ctrl.details.label) + ': <span class="label label-warning" style="margin-right: 20px;">' + val + '</span>';
+    }
+
+    return '<div style="margin-bottom: 20px;">' + html + "</div>" + "<br><br><br>" + exports.getMyPlanAsTable(active_user);
+};
+
+
+exports.getMyPlanAsTable = function (active_user) {
+
+    var plan = database.getPlan(active_user.plan);
+//    if (plan.name === database.unlimitedPlanName)
+//        return "";
+
+    var table = getTable("plans");
+    if (!table)
+        return form_lang.Get(active_user.lang, "UnknownDataTable");
+
+    var form = getForm(table);
+    if (!form)
+        return form_lang.Get(active_user.lang, "UnknownForm");
+
+    var html = [];
+    for (var o in form.controls) {
+        var ctrl = form.controls[o];
+        if (!ctrl.name)
+            continue;
+
+        var dbName = ctrl.details.dbName || ctrl.name;
+        var val = tools.getFieldDisplayValue(active_user, form, dbName, plan);
+        var usage = "";
+
+        if (ctrl.name === "plan_max_users") {
+            var arr = database.getUsersByPlanName(plan.name, 1e7);
+            usage = page_utils.getProgressBar(val, arr.length);
+        } else
+        if (ctrl.name === "plan_max_domains") {
+            var arr = database.getDomainsByPlanName(plan.name, 1e7);
+            usage = page_utils.getProgressBar(val, arr.length);
+        } else
+        if (ctrl.name === "plan_max_plans") {
+            var arr = database.getPlansByPlanName(plan.name, 1e7);
+            usage = page_utils.getProgressBar(val, arr.length);
+        } else
+        if (ctrl.name === "plan_disk_space") {
+            var size = parseInt(folder_utils.getUserPathSize(active_user.username));
+            usage = page_utils.getProgressBar(plan.planMaximums[dbName] === -1 ? size * 2 : val, size, "MB");
+        }
+
+        html.push('<tr>');
+        html.push('<td>' + form_lang.Get(active_user.lang, ctrl.details.label) + '</td>');
+        html.push('<td>' + val + '</td>');
+        html.push('<td>' + usage + '</td>');
+        html.push('</tr>');
+    }
+
+    logic.globals = { name: "plans", contents: html.join("\n"), active_user: active_user, table: table, plan: plan };
+    var tmp = fs.readFileSync(path.join(__dirname, "../definitions/datatables/myPlan.html")).toString();
+    var result = rep(tmp, logic);
+
+    return result;
 };

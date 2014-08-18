@@ -12,6 +12,7 @@ var path = require('path');
 var system_tools = require('../system_tools');
 var hosting_tools = require('../hosting_tools');
 var site_defaults = require("./../definitions/site_defaults");
+var tools = require("./form_tools");
 
 
 methods.tryLogin = function(env, params){
@@ -162,20 +163,6 @@ var sessionAdd = function(env, active_user, params){
         return true;
 };
 
-var getFormControls = function(activeInstance) {
-
-    if (!activeInstance)
-        throw "Instance of the form is empty.";
-
-    var ret = {};
-    for(var i in activeInstance.controls) {
-        if (activeInstance.controls[i].name)
-            ret[activeInstance.controls[i].name] = activeInstance.controls[i];
-    }
-    return ret;
-};
-
-
 var update = function(base, ext){
     var changed = false;
     for(var o in ext){
@@ -244,7 +231,7 @@ methods.sessionApply = function(env, params){
     if(!sessionAdd(env, active_user, params))
         return;
 
-    var _controls = getFormControls(activeInstance);
+    var _controls = tools.getFormControls(activeInstance);
 
     var json = {};
     var planMaximums = {};
@@ -609,7 +596,7 @@ methods.appStartStop = function (env, params) {
 
             // reading new status of the app
             var addDomain = require("../definitions/forms/addDomain").form();
-            var controls = getFormControls(addDomain);
+            var controls = tools.getFormControls(addDomain);
 
             hosting_tools.getMonitorJSON(false, function(err, ret) {
                 // todo: just for now saving the value somewhere

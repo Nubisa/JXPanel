@@ -1,11 +1,13 @@
 var smart_replace = require('./smart_search').replace;
 var site_defaults = require('../definitions/site_defaults');
 var _active_user = require('../definitions/active_user');
+var datatables = require('./datatable_templates');
 var form_lang = require('../definitions/form_lang');
 var page_utils = require('./page_utils');
 var fs = require('fs');
 var pathModule = require('path');
 var menu_creator = require('./menu_creator');
+var database = require("../install/database");
 
 var takeValue = function(lang, obj, val, active_user){
     if(!obj[lang]){
@@ -111,6 +113,10 @@ var smart_rule = [
         }
     },
     {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
+
+//            if (val === "myPlan" && gl.active_user.plan === database.unlimitedPlanName)
+//                return "";
+
             val = val.replace(/_/g, "/");
             var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
             view = smart_replace(view, smart_rule);
@@ -128,7 +134,10 @@ var smart_rule = [
         }
     },
     {from:"{{datatable.$$}}", to:"$$", "$":function(val, gl){
-        return _active_user.getDataTable(gl.sessionId, val);}
+       if (val === "myPlan")
+            return datatables.getMyPlanAsTable(gl.active_user);
+
+        return datatables.render(gl.sessionId, val);}
     },
     {from:"{{utils.$$}}", to:"$$", "$":function(val, gl){
             return page_utils[val](gl);
