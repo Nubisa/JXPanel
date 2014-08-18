@@ -47,18 +47,19 @@
     <!-- multiple lang dropdown : find all flags in the flags page -->
     <ul class="header-dropdown-list hidden-xs">
         <li>
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <img src="img/blank.gif" class="flag flag-us" alt="United States"> <span> US </span> <i class="fa fa-angle-down"></i> </a>
-            <ul class="dropdown-menu pull-right">
-                <li class="active">
-                    <a href="javascript:void(0);"><img src="img/blank.gif" class="flag flag-us" alt="United States"> US</a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);"><img src="img/blank.gif" class="flag flag-es" alt="Spanish"> Spanish</a>
-                </li>
-                <li>
-                    <a href="javascript:void(0);"><img src="img/blank.gif" class="flag flag-de" alt="German"> German</a>
-                </li>
-            </ul>
+            {{user.langs}}
+            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown"> <img src="img/blank.gif" class="flag flag-us" alt="United States"> <span> {{user.lang}} </span> <i class="fa fa-angle-down"></i> </a>-->
+            <!--<ul class="dropdown-menu pull-right">-->
+                <!--<li class="active">-->
+                    <!--<a href="#" onclick="return utils.jxSwitchLang('EN')"><img src="img/blank.gif" class="flag flag-gb" alt="United Kingdom"> UK</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#" onclick="return utils.jxSwitchLang('PL')"><img src="img/blank.gif" class="flag flag-pl" alt="Polish"> Poland</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="javascript:void(0);"><img src="img/blank.gif" class="flag flag-de" alt="German"> German</a>-->
+                <!--</li>-->
+            <!--</ul>-->
         </li>
     </ul>
     <!-- end multiple lang -->

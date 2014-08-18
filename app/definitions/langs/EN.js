@@ -1,4 +1,5 @@
 exports.Labels = {
+
     "Empty":"Empty",
     "Yes":"Yes",
     "No":"No",
@@ -44,6 +45,8 @@ exports.Labels = {
     "stats":"Server Stats",
     "UsersUpperCase":"Users",
     "users":"users",
+
+    "LanguageUnsupported" : "Unsupported language",
 
     "RefreshTooltip":"Refresh selected folder",
     "AddTooltip":"Add a new file or folder",

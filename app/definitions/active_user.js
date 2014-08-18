@@ -575,4 +575,26 @@ exports.defineMethods = function(){
         val.status = users[env.SessionID].session.status;
         server.sendCallBack(env, val);
     });
+
+    server.addJSMethod("switchLang", function (env, params) {
+        var val = {done: true};
+
+        var active_user = exports.checkUser(env);
+        if (!active_user)
+            return;
+
+        var langs = form_lang.getSupportedLangs(active_user).langs;
+        if (!langs[params.op]) {
+            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "LanguageUnsupported", true) });
+            return;
+        }
+
+        if (active_user.lang !== params.op) {
+            var user = database.getUser(active_user.username);
+            user.person_lang = params.op;
+            database.updateDBFile();
+        }
+
+        server.sendCallBack(env, { err: false });
+    });
 };

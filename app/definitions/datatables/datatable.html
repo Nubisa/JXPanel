@@ -132,31 +132,6 @@
         utils.jxAddMessage(type, msg);
     };
 
-    window.jxRemoveRows_old = function(buttons) {
-        var ids = [];
-        $('input:checkbox[id^=jxrow_]:checked').each(function() {
-            var id = $(this).attr('id').replace("jxrow_", "");
-            ids.push(id);
-        });
-
-        if (!ids.length) {
-            addMessage("{{label.EmptySelection}}");
-            return;
-        }
-
-        utils.jxConfirm("{{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedInfo}}", function(ButtonPressed) {
-
-            if (ButtonPressed === "Yes") {
-                window.toServer('removeFromTableData', { dt : '{{datatable.name}}', ids : ids }, function(param) {
-                    if (!param.err)
-                        location.reload();
-                    else
-                        addMessage(param.err);
-                }, true);
-            }
-        });
-    };
-
     window.jxRemoveRows = function() {
         var ids = [];
         $('input:checkbox[id^=jxrow_]:checked').each(function() {
@@ -169,7 +144,7 @@
             return;
         }
 
-        utils.jxConfirm("{{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedInfo}}", function(ButtonPressed) {
+        utils.jxConfirm("<i class='glyphicon glyphicon-trash txt-color-orangeDark'></i> {{label.RemoveSelectedQuestion}}", "{{label.RemoveSelectedInfo}}", function(ButtonPressed) {
 
             var _with = ButtonPressed === "{{label.RemoveWithUserFiles}}";
             var _without = ButtonPressed === "{{label.RemoveWithoutUserFiles}}";

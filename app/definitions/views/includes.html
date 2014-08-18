@@ -191,7 +191,7 @@
                         }else{
                             window.pingQ = true;
                             $.SmartMessageBox({
-                                title: "{{label.ServerNotResponding}}",
+                                title: "<i class='fa fa-chain-broken txt-color-orangeDark'></i> {{label.ServerNotResponding}}",
                                 content: "{{label.ReloginQuestion}}",
                                 buttons: '[{{label.No}}][{{label.Yes}}]'
                             }, function (ButtonPressed) {
@@ -376,7 +376,6 @@
         }, true, true);
 
         return false;
-//        return utils.jxCall("appStartStop", start, domain_name );
     };
 
     utils.jxInstall = function () {
@@ -384,6 +383,9 @@
         return utils.jxCall("jxInstall", true);
     };
 
+    utils.jxSwitchLang = function(lang) {
+        return utils.jxCall("switchLang", lang);
+    };
 
     $(document).ready(function() {
        pageSetUp();

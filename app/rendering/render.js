@@ -46,6 +46,10 @@ var smart_rule = [
                 return "";
             }
 
+            if (val === "langs") {
+                return form_lang.getSupportedLangs(gl.active_user).html;
+            }
+
             return !gl.active_user[val] ? "":gl.active_user[val];
         }
     },
