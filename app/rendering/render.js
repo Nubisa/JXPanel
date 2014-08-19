@@ -8,6 +8,7 @@ var fs = require('fs');
 var pathModule = require('path');
 var menu_creator = require('./menu_creator');
 var database = require("../install/database");
+var hosting_tools = require("../hosting_tools");
 
 var takeValue = function(lang, obj, val, active_user){
     if(!obj[lang]){
@@ -114,9 +115,6 @@ var smart_rule = [
     },
     {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
 
-//            if (val === "myPlan" && gl.active_user.plan === database.unlimitedPlanName)
-//                return "";
-
             val = val.replace(/_/g, "/");
             var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
             view = smart_replace(view, smart_rule);
@@ -142,6 +140,14 @@ var smart_rule = [
     {from:"{{utils.$$}}", to:"$$", "$":function(val, gl){
             return page_utils[val](gl);
         }
+    },
+    {from:"{{hosting.$$}}", to:"$$", "$":function(val, gl){
+
+        if (val === "appConfig")
+            return hosting_tools.appGetConfigAsString(gl.active_user);
+
+        return "";
+    }
     }
 ];
 

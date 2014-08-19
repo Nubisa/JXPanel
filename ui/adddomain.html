@@ -65,11 +65,17 @@
                 <li class="disabled" id="jxAppLog_Tab">
                     <a href="#">{{form.appLog:icon}} {{label.AppLog}}</a>
                 </li>
+                <li class="" id="jxAppConfig_Tab">
+                    <a href="#s3" data-toggle="tab"><i class="fa fa-lg fa-gear"></i> {{label.JXcoreAppConfig}}</a>
+                </li>
             </ul>
 
             <div id="myTabContent1" class="tab-content padding-10">
                 <div class="tab-pane fade in active" id="s1">
                     {{forms.addDomain}}
+                </div>
+                <div class="tab-pane fade" id="s3">
+                    {{hosting.appConfig}}
                 </div>
             </div>
 

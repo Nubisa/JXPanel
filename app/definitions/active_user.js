@@ -81,6 +81,8 @@ exports.getUser = function(sessionId)
         if (user.plan)
             users[sessionId].plan = user.plan;
 
+        users[sessionId].ssh = database.getPlan(user.plan).plan_ssh;
+
         users[sessionId].lang = user.person_lang || "EN";
 
         users[sessionId].suspended = "";

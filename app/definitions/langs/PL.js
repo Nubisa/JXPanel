@@ -400,7 +400,6 @@ exports.Labels = {
     "JXcoreAppStarting" : "Launching the application",
     "JXcoreAppsStarting" : "Launching user applications",
     "JXcoreAppStopping" : "Stopping the application",
-    "JXcoreAppLog" : "Log file",
     "JXcoreAppViewLog" : "View the log file",
     "JXcoreAppLogSize" : "Log file size",
     "JXcoreAppLogCannotRead" : "Cannot read log file.",

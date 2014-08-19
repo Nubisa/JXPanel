@@ -5,7 +5,7 @@
 var database = require("./install/database");
 var site_defaults = require("./definitions/site_defaults");
 var form_lang = require("./definitions/form_lang");
-var os_info = require("./install/os_info");
+var _active_user = require("./definitions/active_user");
 var path = require("path");
 var fs = require("fs");
 var exec = require('child_process').exec;
@@ -783,4 +783,21 @@ database.OnSuspend = function(name, field_name, table, suspended) {
         }
     }
 
+};
+
+
+exports.appGetConfigAsString = function(active_user) {
+
+    var domain_name = _active_user.isRecordUpdating(active_user, "addDomain");
+    if (!domain_name)
+        return "";
+
+    var options = exports.appGetOptions(domain_name);
+    if (options.err)
+        return form_lang.Get(active_user.lang, options.err);
+
+    // no need to display this to user
+    delete options.cfg.monitor;
+
+    return JSON.stringify(options.cfg, null, "#nbsp#").replace(/\n/g, "<br>").replace(/#nbsp#/g, '<span style="margin-left: 20px;"></span>');
 };
