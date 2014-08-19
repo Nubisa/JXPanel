@@ -44,6 +44,22 @@
                 values[this.id] = selected.index() ? selected.val() : "";
             });
 
+            $("textarea").each(function(index, el) {
+
+                var isRequired = $(el).hasClass("required");
+                var val = el.value;
+                var empty = !val.trim().length;
+
+                if (isRequired && empty) {
+                    _this.showError(this.id, "{{label.ValueRequired}}");
+                    failed = true;
+                    return;
+                }
+
+                values[this.id] = val;
+            });
+
+
             if(!failed){
                 window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
 
