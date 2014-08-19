@@ -576,6 +576,14 @@ exports.getMyPlanAsTable = function (active_user) {
         if (ctrl.name === "plan_disk_space") {
             var size = parseInt(folder_utils.getUserPathSize(active_user.username));
             usage = page_utils.getProgressBar(plan.planMaximums[dbName] === -1 ? size * 2 : val, size, "MB");
+        } else
+        if (ctrl.name === "plan_nginx_directives" && val && val.length) {
+            var str = val.replace(/"/g, "`").replace(/'/g, "`").replace(/\n/g, "<br>");
+            val = '<a href="javascript:void(0);" class="btn btn-default" style="margin: 0px;" rel="popover-hover" data-placement="top" data-original-title="'
+                  + form_lang.Get(active_user.lang, "NginxDirectives", true)
+                  + '" data-content="' + str + '">'
+                  + str.trim().slice(0, 30) + " [...]"
+                  + "</a>";
         }
 
         html.push('<tr>');
