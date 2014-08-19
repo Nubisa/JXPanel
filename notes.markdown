@@ -16,6 +16,9 @@ TODO
     -- suspending subplans
     -- restart of applications
 
+- SSH
+
+- big icons on top
 
 DONE
 

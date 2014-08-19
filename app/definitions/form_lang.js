@@ -326,8 +326,8 @@ exports.Get = function(lang, val, notNull, arrParams){
 
 exports.GetBool = function(lang, val, labelTrue, labelFalse) {
     return val
-        ? '<i class="fa-lg fa fa-check text-success"></i> ' + exports.Get(lang, labelTrue, true)
-        : '<i class="fa-lg fa fa-times text-danger"></i> ' + exports.Get(lang, labelFalse, true);
+        ? '<i class="fa-lg fa fa-check text-success" style="display: inline;"></i> ' + exports.Get(lang, labelTrue, true)
+        : '<i class="fa-lg fa fa-times text-danger" style="display: inline;"></i> ' + exports.Get(lang, labelFalse, true);
 };
 
 

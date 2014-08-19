@@ -300,6 +300,10 @@ var logic = [
         if (val === "name")
             return gl.plan.name;
 
+        if (val === "status" && gl.form) {
+            return tools.getFieldDisplayValue(gl.active_user, gl.form, "suspended", gl.plan);
+        }
+
 //        var active_user = gl.active_user;
 //        var res = form_lang.Get(active_user.lang, val);
         return "";
@@ -593,7 +597,7 @@ exports.getMyPlanAsTable = function (active_user) {
         html.push('</tr>');
     }
 
-    logic.globals = { name: "plans", contents: html.join("\n"), active_user: active_user, table: table, plan: plan };
+    logic.globals = { name: "plans", contents: html.join("\n"), active_user: active_user, table: table, plan: plan, form : form };
     var tmp = fs.readFileSync(path.join(__dirname, "../definitions/datatables/myPlan.html")).toString();
     var result = rep(tmp, logic);
 
