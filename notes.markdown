@@ -20,6 +20,13 @@ TODO
 
 - big icons on top
 
+- check install / uninstall
+
+- on jxPanel uninstall
+    -- should we remove system users created before in panel?
+
+
+
 DONE
 
 - suspending user or plan should perform stopping an app only for this user/plan.
