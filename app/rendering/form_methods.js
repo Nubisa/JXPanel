@@ -585,7 +585,7 @@ methods.appStartStop = function (env, params) {
             }
         }
 
-        hosting_tools.appStartStop(params.op, params.id, function(err) {
+        hosting_tools.appStartStop(params.op, params.id, function(err, domain_name, online_before) {
             if (err) err = form_lang.Get(active_user.lang, err, true);
 
             // JXPanel should know, whether user wanted to start or stop an app
@@ -598,12 +598,12 @@ methods.appStartStop = function (env, params) {
             var addDomain = require("../definitions/forms/addDomain").form();
             var controls = tools.getFormControls(addDomain);
 
-            hosting_tools.getMonitorJSON(false, function(err, ret) {
+            hosting_tools.getMonitorJSON(false, function(err2, ret) {
                 // todo: just for now saving the value somewhere
-                active_user.session.monitor = { isOnline : !err && ret, json : ret };
+                active_user.session.monitor = { isOnline : !err2 && ret, json : ret };
                 var status = controls["jx_app_status"].details.getValue(active_user, { name : params.id });
                 active_user.session.monitor = null;
-                server.sendCallBack(env, {err: err, status : status.err || status, div : params.div });
+                server.sendCallBack(env, {err: err || err2, status : status.err || status, div : params.div });
             });
         });
     }
@@ -668,6 +668,12 @@ methods.appViewLog = function (env, params) {
         }
 
         if (params.controls && params.controls.app_log_last_lines) {
+
+            var lines = parseInt(params.controls.app_log_last_lines);
+            if (isNaN(lines)) {
+                server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "ValueInvalidInteger", true)});
+                return;
+            }
             // arr
             log = log.trim().split("\n");
             // string again
@@ -681,10 +687,9 @@ methods.appViewLog = function (env, params) {
             size = stats.size;
         } catch(ex) {
             server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "JXcoreAppLogCannotRead", true)});
+            return;
         }
-
     }
-
     server.sendCallBack(env, {err: false, log : log,  size : size});
 };
 

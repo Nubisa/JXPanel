@@ -129,6 +129,10 @@ exports.form = function () {
                         var iconOnline = form_lang.GetBool(active_user.lang, true, "RunningOn") + ports;
                         var iconOffline = form_lang.GetBool(active_user.lang, false, null, "Offline");
 
+                        var jxPath = hosting_tools.getJXPath();
+                        if (jxPath.err)
+                            return iconOffline + ". " + form_lang.Get(active_user.lang, jxPath.err, true);
+
                         var divId = jxcore.utils.uniqueId();
 
                         var btnStart = '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxAppStartStop(true, \'' + domain_name + '\',' + divId + ');" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'

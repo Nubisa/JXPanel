@@ -231,7 +231,7 @@
                     }
 
                     $("#jxAppLog").html(param.log);
-                    $("#jxAppLogSize").html((param.size  || 0)+ " bytes");
+                    $("#jxAppLogSize").html(param.size ? param.size + " bytes" : "{{label.JXcoreAppLogEmpty}}");
 
                     if (param.log && param.log.length)
                         $("#jxAppLogClearBtn").show();

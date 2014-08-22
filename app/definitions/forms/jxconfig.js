@@ -54,7 +54,7 @@ exports.form = function () {
 
                         if (cfg.jxPath) {
                             var str = cfg.jxPath;
-                            if (!fs.existsSync(cfg.jxPath)) str += '<br><code>' + form_lang.Get(active_user.lang, "JXcorePathInvalid", true) +'</code>';
+                            if (!fs.existsSync(cfg.jxPath)) str += '<br><code>' + form_lang.Get(active_user.lang, "JXcoreNotInstalled", true) +'</code>';
                             return str;
                         } else {
                             return "";

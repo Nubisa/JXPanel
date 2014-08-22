@@ -369,7 +369,6 @@ exports.Labels = {
     "JXcoreInfo" : " Information",
     "JXcoreVersion" : " JXcore version",
     "JXcorePath" : " JXcore path",
-    "JXcorePathInvalid" : "JXcore path does not exist.",
     "JXcoreMonitor" : "JXcore Monitor",
     "JXcoreMonitorStatus" : "Status ",
     "JXcoreMonitorAllowMonitorAPI" : "Allow monitoring API",

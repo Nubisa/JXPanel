@@ -617,7 +617,7 @@ exports.getJXPath = function () {
     if (cfg.jxPath && fs.existsSync(cfg.jxPath))
         return cfg.jxPath;
 
-    return { err: "JXcorePathInvalid" }
+    return { err: "JXcoreNotInstalled" }
 };
 
 
