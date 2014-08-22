@@ -7,6 +7,7 @@ var clog = jxcore.utils.console.log;
 var app_folder = pathModule.join(__dirname, "../../server_apps"); // ignored from git
 var tools_folder = pathModule.join(__dirname, "../../tools");
 var sqlite2 = require("./sqlite2");
+var hosting_tools = require("../hosting_tools");
 
 exports.apps_folder = app_folder;
 
@@ -111,6 +112,12 @@ exports.uninstall = function(){
         var res = nginx.stop();
         if(res){
             console.error(res.out);
+        }
+
+        var jxPath = hosting_tools.getJXPath();
+        if (!jxPath.err) {
+            res = jxcore.utils.cmdSync(jxPath + " monitor stop");
+            console.log(res.out);
         }
 
         res = jxcore.utils.cmdSync("rm -rf "+app_folder);
