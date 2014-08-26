@@ -9,7 +9,8 @@ body {
   font-weight:300;
   font-size:9pt;
   cursor:default;
-  overflow:hidden;
+  overflow-y:scroll;
+  overflow-x:hidden;
 }
 
 #main{

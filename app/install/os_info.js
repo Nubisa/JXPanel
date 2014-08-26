@@ -26,6 +26,7 @@ exports.OSInfo = function(){
     osInfo.isMac = /mac/.test(info);
     osInfo.is64 = /x64/.test(info);
     osInfo.is32 = !osInfo.is64;
+    osInfo.isARM = /ARM/.test(info);
     osInfo.isRH = /red hat/.test(info);
     osInfo.isSuse = /suse/.test(info);
     osInfo.isBSD = /bsd/.test(info);
@@ -46,7 +47,10 @@ exports.OSInfo = function(){
     else
         throw new Error("This operating system is not supported ("+info+")");
 
-    osInfo.OS_STR += (osInfo.is64)? "64":"32";
+    if(osInfo.isARM)
+        osInfo.OS_STR += "ARM";
+    else
+        osInfo.OS_STR += (osInfo.is64)? "64":"32";
 
     return osInfo;
 };

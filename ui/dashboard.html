@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    {{view.header}} - {{toSub.pageTitle:Dashboard}}
+    {{view.header}} {{toSub.pageTitle:Dashboard}}
 </head>
 <body>
 <!-- Your HTML -->
@@ -15,13 +15,13 @@
                 {{view.leftMenu}}
 
                 <td id='right-page'><!-- Main Content -->
-
+                    <div class="internal-view">
                             {{charts.diskUsageInfo}}
 
                             {{view.dashboard_systemInfo}}
 
                             {{view.myPlan}}
-
+                    </div>
                 </td>
                 <td id='toolbar-right' class='dark-back' ><!-- Addons -->
 
