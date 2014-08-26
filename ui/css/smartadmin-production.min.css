@@ -17901,21 +17901,6 @@ html {
     position: relative;
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
-    background: url(../img/mybg.png) #fff;
-    direction: ltr;
-}
-
-body.mobile-view-activated.hidden-menu {
-    overflow-x: hidden;
-}
-
-body.modal-open {
-    overflow: hidden!important;
-}
 
 a:active,a:focus,a:hover,button,button:active,button:focus,embed,input::-moz-focus-inner,object {
     outline: 0;

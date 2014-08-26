@@ -20,7 +20,8 @@ exports.resetInterfaces = function(){
 
 exports.resetInterfaces();
 
-exports.createConfig = function(domain, node_ports, log_location, directives){ // node_ports is an array (first http, second https)
+//ssl_info {key: "", crt: ""}  OR NULL
+exports.createConfig = function(domain, node_ports, log_location, directives, ssl_info){ // node_ports is an array (first http, second https)
     var config_str = "map $http_upgrade $connection_upgrade {\n"
         +"  default upgrade;\n"
         +"  '' close;\n"
@@ -35,18 +36,29 @@ exports.createConfig = function(domain, node_ports, log_location, directives){ /
         directives = ""
     }
 
-    var sports = ["80", "443"];
+    var sports = ["80"];
+    if(has_ssl)
+        sports.push("443");
+
+    config_str +=
+        'upstream jxcore_target{\n'
+            +'server 127.0.0.1:10008;\n'
+            +'keepalive 9999999;\n'
+        '}\n';
+
     for(var i in sports){
         var sport = sports[i];
         for(var o in ifc_list){
             var ip = ifc_list[o];
             var str_config =
                 "server{\n"
-                    +"  listen "+ip+":"+sport+";\n"
+                    +"  listen "+ip+":"+sport+ (sport=='443'?'ssl;':';') + '\n'
                     +"  server_name "+domain+";\n"
-
+                    +(sport=='443')?"  ssl on;\n":''
+                    +(sport=='443')?"  ssl_certificate_key " + ssl_info.key : ""
+                    +(sport=='443')?"  ssl_certificate " + ssl_info.crt : ""
                     +"  location / {\n"
-                    +"    proxy_pass http://127.0.0.1:"+node_ports[i]+";\n"
+                    +"    proxy_pass http://jxcore_target;\n"
                     +"    proxy_read_timeout 9999999;\n"
                     +"    proxy_http_version 1.1;\n"
                     +"    proxy_set_header Upgrade $http_upgrade;\n"
@@ -57,6 +69,7 @@ exports.createConfig = function(domain, node_ports, log_location, directives){ /
                     +"    alias "+log_location+";\n"
                     +"    add_header Content-type text/plain;\n"
                     +"  }\n"
+                    +"  "+directives
                     +"}\n";
 
             config_str += str_config + "\n\n";
