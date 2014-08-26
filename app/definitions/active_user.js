@@ -265,15 +265,24 @@ exports.defineMethods = function(){
                 var fname = loc + path.sep + files[o];
                 var is_dir = fs.statSync(fname).isDirectory();
                 if(is_dir){
-                    _nodes.push({isParent:true, name:files[o], children:[{name:loading}]});
+                    _nodes.push({isParent:true, name:files[o]});
                 }
                 else
-                    _nodes.push({name:files[o]});
+                {
+                    var fname = files[o];
+                    var ext = path.extname(fname);
+                    if(ext && ext != ""){
+                        fname = fname.substr(0, fname.length-ext.length);
+                    }
+                    _nodes.push({full_name:files[o], name:fname, ext:ext});
+                }
             }
 
-            if(params.up == "#"){
-                _nodes = [{name:'/', children:_nodes, open:true}];
+            if(params.up != '#'){
+                _nodes.unshift({name:'..'});
             }
+
+            console.log("files list", _nodes);
 
             server.sendCallBack(env, {nodes:_nodes, id:params.id});
         });

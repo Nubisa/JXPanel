@@ -52,7 +52,7 @@
             <tr>
                     <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;">
 
-                        <div id="files_holder" style="overflow:scroll;">
+                        <div id="files_holder" style="overflow:hidden;height:100%">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
                         </div>
@@ -91,12 +91,9 @@
 
         if(typeof jQuery != 'undefined' && typeof init_file_tools != 'undefined' && typeof CodeMirror != 'undefined'
                 && typeof jxcore != 'undefined' && jxcore.IsConnected){
-            var elm_editor = document.getElementById("code_editor_content_holder");
-            clearInterval(editorInter);
-            var scr = document.createElement("script");
-            scr.src = "/js/jquery.ztree.core-3.5.min.js";
+            window.minimize_menu(true);
 
-            elm_editor.parentNode.appendChild(scr);
+            clearInterval(editorInter);
             Init();
         }
     }, 10);
@@ -505,7 +502,7 @@
                 }
 
                 if(!treeNode){
-                    $.fn.zTree.init($("#"+treeId), setting, ret_val.nodes);
+                    renderTree(treeId, ret_val.nodes);
                 }
                 else if(ret_val.nodes && ret_val.nodes.length){
                     var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
@@ -558,12 +555,41 @@
             }, true);
         };
 
-        function createTree(){
+        function colorize(ext){
+            if(!ext)
+                return '';
+            var next = ext.toLowerCase();
+            if(next == '.js' || next == '.html' || next== '.json' || next == '.css' || next == '.htm'){
+                return "<span style='color:#336699'>"+ext+"</span>";
+            }
+
+            return ext;
+        }
+
+        function renderTree(treeId, nodes){
+            var host = document.getElementById(treeId);
+            host.innerHTML = '';
+
+            for(var o in nodes){
+                var li = document.createElement('li');
+                li.innerHTML = nodes[o].name + colorize(nodes[o].ext);
+                li.style.cssText = 'margin-top:5px;'
+                if(nodes[o].isParent)
+                {
+
+                }
+                else{
+                    li.style.marginLeft = "15px";
+                }
+                host.appendChild(li);
+            }
+        }
+
+        function loadView(){
             var files_host = document.getElementById("editor_files");
             var host = document.createElement("ul");
             host.id="files_{{defaults.getUniqueId}}";
             host.className="ztree";
-            host.style.cssText="margin-left: -8px;"
             files_host.appendChild(host);
             document.treeId = host.id;
 
@@ -571,12 +597,9 @@
             createEditor("text/javascript", null, null);
         }
 
-        var loadTreeInter = setInterval(function(){
-            if($.fn.zTree){
-                clearInterval(loadTreeInter);
-                createTree();
-            }
-        }, 10);
+        loadView();
+
+
     };
 </script>
 
