@@ -1,9 +1,41 @@
-<ul>
-    <li id="Menu-dashboard">
-        <a href="dashboard.html" title="{{label.Home}}"><i class="fa fa-lg fa-fw fa-home"></i>{{label.Dashboard}}</a>
-    </li>
-    {{menu.createMenu}}
-    <li id="MenuLogout">
-        <a href="#" data-action="userLogout" data-action-ok="utils.logOut()" data-logout-msg="{{label.logoutQuestion}}"><i class="fa fa-lg fa-fw fa-power-off"></i>{{label.Logout}}</a>
-    </li>
-</ul>
+<!--    {-{menu.createMenu}-} -->
+<td id='left-page'>
+    <table id='menu-bar' cellpadding="0" cellspacing="0">
+        <tbody>
+        <tr>
+            <td id='menu-top'>
+                <div class='bold-menu'>Management</div>
+
+                <div class='normal-menu' id='hostingp'>Hosting Plans</div>
+                <div class='normal-menu' id='users'>Users</div>
+                <div class='normal-menu' id='domains'>Domains</div>
+
+                <div class='bold-menu' style='margin-top:10px;'>Tools & Services</div>
+
+                <div class='normal-menu' id='jxcore'>JXcore</div>
+                <div class='normal-menu' id='npmw'>NPM Wizard</div>
+                <div class='normal-menu' id='filem'>File Manager</div>
+                <div class='normal-menu' id='remotem'>Remote Management</div>
+                <div class='normal-menu' id='ftpm'>FTP Manager</div>
+                <div class='normal-menu' id='configuration'>Configuration</div>
+
+                <div class='bold-menu' style='margin-top:10px;'>Extras</div>
+
+                <div class='normal-menu' id='addonm'>Add-On Manager</div>
+                <div class='normal-menu' id='help'>Help</div>
+
+                <div class='minimize-left-menu'>&nbsp;[&nbsp;-&nbsp;]</div>
+
+            </td>
+        </tr>
+        <tr>
+            <td id='menu-middle'  class='dark-back'>
+
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</td>
+<td id='space-tab'>
+</td>
