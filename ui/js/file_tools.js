@@ -9,7 +9,7 @@ var init_file_tools = function(){
             return;
         }
 
-        var loc = fileTree.path == "" ? "/":loc;
+        var loc = fileTree.path == "" ? "/":fileTree.path;
 
         $.SmartMessageBox({
             title : "{{label.Location}} : "+loc,
@@ -42,7 +42,9 @@ var init_file_tools = function(){
                     utils.bubble("danger", "Oops!", "{{label.MustDefineFileFolderName}}", 4000);
                 }
                 else{
+                    fileTree.loading = true;
                     toServer("addFileFolder", {up:loc, name:name, opt:selected}, function(ret_val){
+                        fileTree.loading = false;
                         if(ret_val.err){
                             alert($(ret_val.err.toString()).text());
 
@@ -66,23 +68,32 @@ var init_file_tools = function(){
         });
     };
 
+    var getParent = function(loc){
+        loc = loc.split('/');
+        loc = loc.splice(0,loc.length-1);
+        if(loc.length){
+            loc = loc.join('/');
+        }
+        else
+            loc = "#";
+
+        return loc;
+    };
+
 
     var removeFile = function(){
-        if(!document.treeId)
+        if(fileTree.loading)
             return;
 
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
-
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length || !nodes[0].parentTId)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFileFolder}}", 4000);
-            return;
+        var loc = fileTree.path == "" ? "/":fileTree.path;
+        if(fileTree.activeFile && fileTree.activeFile.length){
+            loc = fileTree.activeFile;
         }
 
-        var loc = getPathLocation(document.treeId, nodes[0]);
+        if(loc == '/'){
+            utils.bubble("warning", "Opps!", "{{label.CantDeleteRoot}}", 4000);
+            return;
+        }
 
         $.SmartMessageBox({
             title : "{{label.DeletingFileFolder}} : "+loc,
@@ -92,7 +103,9 @@ var init_file_tools = function(){
             if (ButtonPress == "{{label.No}}") {
                 return 0;
             }
+            fileTree.loading = true;
             jxcore.Call("removeFileFolder", {up:loc}, function(ret_val){
+                fileTree.loading = false;
                 if(ret_val.err){
                     alert(JSON.stringify(ret_val.err));
 
@@ -108,36 +121,34 @@ var init_file_tools = function(){
                 if(editors[loc]){
                     editors[loc].host.ax.onclick();
                 }
-                var parent = zTree.getNodeByTId(nodes[0].parentTId);
-                loc = getPathLocation(document.treeId, parent);
-                getFiles(loc, document.treeId, parent);
-            });
+                loc = getParent(loc);
+                getFiles(loc);
+            }, true);
         });
     };
 
 
     var renameFile = function(){
-        if(!document.treeId)
+        if(fileTree.loading)
             return;
 
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
+        var loc = fileTree.path == "" ? "/":fileTree.path;
+        if(fileTree.activeFile && fileTree.activeFile.length){
+            loc = fileTree.activeFile;
+        }
 
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length || !nodes[0].parentTId)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFileFolder}}", 4000);
+        if(loc == '/'){
+            utils.bubble("warning", "Opps!", "{{label.CantRenameRoot}}", 4000);
             return;
         }
 
-        var loc = getPathLocation(document.treeId, nodes[0]);
-
+        var fname = loc.split('/');
+        fname = fname[fname.length-1];
         $.SmartMessageBox({
             title : "{{label.FileFolderRenaming}} : "+loc,
             content : "{{label.EnterNewFileFolderName}}..",
             input: "text",
-            inputValue : nodes[0].name,
+            inputValue : fname,
             placeHolder: "{{label.EnterNewFileFolderName}}",
             buttons : "[{{label.Submit}}][{{label.Cancel}}]"
         }, function(ButtonPress, name) {
@@ -166,7 +177,9 @@ var init_file_tools = function(){
                 return;
             }
 
+            fileTree.loading = true;
             toServer("renameFileFolder", {up:loc, down:locTo}, function(ret_val){
+                fileTree.loading = false;
                 if(ret_val.err){
                     alert(JSON.stringify(ret_val.err));
 
@@ -182,54 +195,35 @@ var init_file_tools = function(){
                 if(editors[loc]){
                     editors[loc].host.ax.onclick();
                 }
-                var parent = zTree.getNodeByTId(nodes[0].parentTId);
-                loc = getPathLocation(document.treeId, parent);
-                getFiles(loc, document.treeId, parent);
+                loc = getParent(loc);
+                getFiles(loc);
             }, true);
         });
     };
 
 
     var refreshTree = function(){
-        if(!document.treeId)
-            return;
-
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
-
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length || !nodes[0].children)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFolder}}", 4000);
-            return;
-        }
-
-        var loc = getPathLocation(document.treeId, nodes[0]);
-        getFiles(loc, document.treeId, nodes[0]);
+        var loc = fileTree.path == "" ? "#":fileTree.path;
+        getFiles(loc);
     };
 
     var downloadFile = function(){
-        if(!document.treeId)
+        if(fileTree.loading)
             return;
 
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
-
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFileFolderDownload}}", 4000);
-            return;
+        var loc = fileTree.path == "" ? "/":fileTree.path;
+        if(fileTree.activeFile && fileTree.activeFile.length){
+            loc = fileTree.activeFile;
         }
 
-        var loc = getPathLocation(document.treeId, nodes[0]);
         if(loc == '/'){
             utils.bubble("warning", "Opps!", "{{label.CantDownloadRoot}}", 4000);
             return;
         }
+
+        fileTree.loading = true;
         toServer("downloadFile", {up:loc}, function(ret_val){
+            fileTree.loading = false;
             if(ret_val.err){
                 alert(JSON.stringify(ret_val.err));
 
@@ -257,27 +251,10 @@ var init_file_tools = function(){
 
 
     var uploadFile = function(){
-        if(!document.treeId)
+        if(fileTree.loading)
             return;
 
-        var suspended = "{{user.suspended_txt}}";
-        if (suspended){
-            utils.jxAddMessage("danger", suspended);
-            return;
-        }
-
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
-
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length || !nodes[0].children)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFileFolderUpload}}", 4000);
-            return;
-        }
-
-        var loc = getPathLocation(document.treeId, nodes[0]);
+        var loc = fileTree.path == "" ? "/":fileTree.path;
         var uploadHTML = '<span style="background-color: #f2f2f2;color:#000000;padding:10px;display: block;overflow:hidden;">'
             +'<iframe scrolling="no" style="width:98%;height:35px;overflow:hidden;border:none;" src="/uploads.html?#'
             + escape(loc) +'"></iframe></span>';
@@ -287,13 +264,13 @@ var init_file_tools = function(){
             content : "{{label.SelectFileToUpload}}<br/><br/>" + uploadHTML,
             buttons : "[{{label.Close}}]"
         }, function(ButtonPress) {
-            getFiles(loc, document.treeId, nodes[0]);
+            getFiles(loc);
             return 0;
         });
     };
 
-    var getInfo = function(folder, treeNode, cb){
-        toServer("getFileInfo", {up:folder, id:document.treeId}, function(ret_val){
+    var getInfo = function(folder, cb){
+        toServer("getFileInfo", {up:folder}, function(ret_val){
 
             if(ret_val.err){
                 alert("ERROR : " + JSON.stringify(ret_val.err));
@@ -306,31 +283,25 @@ var init_file_tools = function(){
                 return;
             }
 
-            cb(ret_val.info, folder, ret_val.id, treeNode);
+            cb(ret_val.info, folder);
         }, true);
     };
 
     var chmod_file = function(){
-        if(!document.treeId)
+        if(fileTree.loading)
             return;
 
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
-
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFileFolderCHMOD}}", 4000);
-            return;
+        var loc = fileTree.path == "" ? "/":fileTree.path;
+        if(fileTree.activeFile && fileTree.activeFile.length){
+            loc = fileTree.activeFile;
         }
-
-        var loc = getPathLocation(document.treeId, nodes[0]);
         if(loc == '/'){
             utils.bubble("warning", "Opps!", "{{label.CantCHMODRoot}}", 4000);
             return;
         }
-        getInfo(loc, nodes[0], function(info, path, treeId, treeNode){
+        fileTree.loading = true;
+        getInfo(loc, function(info, path){
+            fileTree.loading = false;
             var file_mode = parseInt(info.mode.toString(8), 10) + "";
             if(file_mode.length > 3){
                 file_mode = file_mode.substr(file_mode.length-3, 3);
@@ -361,7 +332,9 @@ var init_file_tools = function(){
                     return;
                 }
 
+                fileTree.loading = true;
                 toServer("chFile", {up:loc, to:mode}, function(ret_val){
+                    fileTree.loading = false;
                     if(ret_val.err){
                         alert(JSON.stringify(ret_val.err));
 

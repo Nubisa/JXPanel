@@ -62,7 +62,7 @@
 
 </style>
 
-<span id="buttons" style="padding:8px;background:#3A3F42">
+<span id="buttons" style="padding:8px;background:#3A3F42;border-top:1px solid #444">
 <i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;
 <a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" class="jxbtn">
     <i class="fa fa-refresh"></i> {{label.Refresh}}
@@ -133,10 +133,9 @@
 
         if(typeof jQuery != 'undefined' && typeof init_file_tools != 'undefined' && typeof CodeMirror != 'undefined'
                 && typeof jxcore != 'undefined' && jxcore.IsConnected){
-            window.minimize_menu(true);
-
             clearInterval(editorInter);
             Init();
+            window.minimize_menu($( ".minimize-left-menu" ), true);
         }
     }, 10);
 
@@ -207,7 +206,7 @@
             }
         });
 
-        var tabsResize = function(){
+        window.tabsResize = function(){
             var eh = getDocHeight();
             var title_holder = document.getElementById('code_editor_title_holder');
             var content_holder = document.getElementById('code_editor_content_holder');
@@ -472,7 +471,8 @@
             return false;
         };
 
-        var treeClick = function(fname, isParent) {
+        var prevActive = null;
+        var treeClick = function(fname, isParent, $this) {
 
             if(fileTree.loading){
                 return;
@@ -496,7 +496,14 @@
 
             if(isParent){
                 getFiles(fullname);
+                fileTree.activeFile = "";
             }else{
+                if(prevActive){
+                    prevActive.css('fontWeight', 300);
+                }
+                prevActive = $this;
+                $this.css('fontWeight', 500);
+                fileTree.activeFile = fullname;
                 var _loc = fullname.toLowerCase();
 
                 if(checkExtension(_loc, [".js", ".json", ".jxp"])){
@@ -691,7 +698,7 @@
                 }
             });
             $('.file_item').click(function(){
-                 treeClick($(this)[0].fullname, $(this)[0].isParent);
+                 treeClick($(this)[0].fullname, $(this)[0].isParent, $(this));
             });
         }
 

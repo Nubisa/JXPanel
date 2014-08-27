@@ -181,6 +181,8 @@ exports.Labels = {
     "UnableToRead": "Unable to read this information",
     "OSname": "OS",
     "Loading": "Loading...",
+    "CantDeleteRoot": "Can't delete root folder",
+    "CantRenameRoot": "Can't rename root folder",
     "FileNotFound": "File not found",
     "FileTypeNotSupportedTitle":"Not Supported",
     "FileTypeNotSupportedContent":"Editing this file type is not supported.",
