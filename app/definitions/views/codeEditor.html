@@ -65,25 +65,25 @@
 <span id="buttons" style="padding:8px;background:#3A3F42;border-top:1px solid #444">
 <i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;
 <a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" class="jxbtn">
-    <i class="fa fa-refresh"></i> {{label.Refresh}}
+    <i class="fa fa-refresh"></i> <span class="dummy-label">{{label.Refresh}}</span>
 </a>
 <a id="btn_add" data-original-title="{{label.AddTooltip}}" class="jxbtn">
-    <i class="fa fa-plus"></i> {{label.Add}}
+    <i class="fa fa-plus"></i> <span class="dummy-label">{{label.Add}}</span>
 </a>
 <a id="btn_remove" data-original-title="{{label.DeleteTooltip}}"  class="jxbtn">
-    <i class="fa fa-times"></i> {{label.Delete}}
+    <i class="fa fa-times"></i> <span class="dummy-label">{{label.Delete}}</span>
 </a>
 <a id="btn_rename" data-original-title="{{label.RenameTooltip}}" class="jxbtn">
-    <i class="fa fa-pencil"></i> {{label.Rename}}
+    <i class="fa fa-pencil"></i> <span class="dummy-label">{{label.Rename}}</span>
 </a>
 <a id="btn_download" data-original-title="{{label.DownloadTooltip}}" class="jxbtn">
-    <i class="fa fa-share-square-o "></i> {{label.Download}}
+    <i class="fa fa-share-square-o "></i> <span class="dummy-label">{{label.Download}}</span>
 </a>
 <a id="btn_upload" data-original-title="{{label.UploadTooltip}}" class="jxbtn">
-    <i class="fa fa-share-square-o "></i> {{label.Upload}}
+    <i class="fa fa-share-square-o "></i> <span class="dummy-label">{{label.Upload}}</span>
 </a>
 <a id="btn_chmod" data-original-title="{{label.CHMODTooltip}}" class="jxbtn">
-    <i class="fa fa-wrench "></i> {{label.CHMOD}}
+    <i class="fa fa-wrench "></i> <span class="dummy-label">{{label.CHMOD}}</span>
 </a>
 </span>
 <div class="note" style="margin-bottom:2px;margin-top:8px;">{{label.CodeEditorTop}}</div>
@@ -92,7 +92,7 @@
         <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;margin-top:10px;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
-                    <td style="width:10%;padding-right:5px;vertical-align:top;max-width:180px;min-width:180px;overflow:hidden;">
+                    <td class="files_td" style="width:10%;padding-right:5px;vertical-align:top;max-width:175px;min-width:175px;overflow:hidden;">
 
                         <div id="files_holder" style="overflow-y:scroll;overflow-x:hidden;height:100%; border-bottom:dotted 1px #cccccc;">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
@@ -226,6 +226,27 @@
                     ed.style.height = (eh) + "px";
                     ed.style.maxHeight = (eh) + "px";
                 }
+            }
+
+            var w = utils.getWindowWidth();
+            var low = w<650;
+            if(window.prevWidth != low ){
+                if(low){
+                    $(".dummy-label").css('display', 'none');
+                    $(".dummyFile").css('display', 'none');
+                    $('.files_td')[0].style.minWidth = "90px";
+                    $('.files_td')[0].style.maxWidth = "90px";
+                    $('.files_td')[0].style.width = "90px";
+                }
+                else
+                {
+                    $(".dummy-label").css('display', '');
+                    $(".dummyFile").css('display', '');
+                    $('.files_td')[0].style.minWidth = "175px";
+                    $('.files_td')[0].style.maxWidth = "175px";
+                    $('.files_td')[0].style.width = "175px";
+                }
+                window.prevWidth = low;
             }
         };
 
@@ -401,7 +422,7 @@
                     title_holder._childs[_this._eid]._a.style.color = "";
                 }, true);
             };
-            btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
+            btn.innerHTML += '<i class="fa fa-fw fa-save"></i> <span class="dummy-label">{{label.Save}}</span>';
             btn.disabled = "disabled";
             document.getElementById('buttons').appendChild(btn);
 
@@ -661,18 +682,18 @@
 
                 if(nodes[o].isParent)
                 {
-                    li.innerHTML = '<img src="/icons/folder.png" style="border:none;padding-right:5px;"/>';
+                    li.innerHTML = '<img class="dummyFile" src="/icons/folder.png" style="border:none;padding-right:5px;"/>';
                     li.isParent = true;
                     li.fullname = nodes[o].name;
                 }
                 else{
                     if(ext.indexOf('span')>=0){
                         li.editable = true;
-                        li.innerHTML = '<img src="/icons/editable.png" style="border:none;padding-right:5px;"/>';
+                        li.innerHTML = '<img class="dummyFile" src="/icons/editable.png" style="border:none;padding-right:5px;"/>';
                         li.style.color = "#000000";
                     }
                     else{
-                        li.innerHTML = '<img src="/icons/file.png" style="border:none;padding-right:5px;"/>';
+                        li.innerHTML = '<img class="dummyFile" src="/icons/file.png" style="border:none;padding-right:5px;"/>';
                         li.style.color = "#666666";
                     }
                     li.fullname = nodes[o].fullname;
@@ -701,6 +722,13 @@
             $('.file_item').click(function(){
                  treeClick($(this)[0].fullname, $(this)[0].isParent, $(this));
             });
+
+            if(window.prevWidth){
+                $(".dummyFile").css('display', 'none');
+            }
+            else{
+                $(".dummyFile").css('display', '');
+            }
         }
 
         function loadView(){

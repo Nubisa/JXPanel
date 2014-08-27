@@ -215,7 +215,7 @@
     utils.getWindowHeight = function(){
         var h;
         if(!window.innerWidth){
-            if(!(document.documentElement.clientWidth == 0)){
+            if(!(document.documentElement.clientHeight == 0)){
                 h=document.documentElement.clientHeight;
             } else{
                 h=document.body.clientHeight;
@@ -226,6 +226,26 @@
 
         if(h==undefined || h==null)
             h = 600; /*assume min height is 600*/
+        else{
+            try{h=parseInt(h);}catch(e){h=600;}
+        }
+        return h;
+    };
+
+    utils.getWindowWidth = function(){
+        var h;
+        if(!window.innerWidth){
+            if(!(document.documentElement.clientWidth == 0)){
+                h=document.documentElement.clientWidth;
+            } else{
+                h=document.body.clientWidth;
+            }
+        } else {
+            h = window.innerWidth;
+        }
+
+        if(h==undefined || h==null)
+            h = 600; /*assume min width is 600*/
         else{
             try{h=parseInt(h);}catch(e){h=600;}
         }
