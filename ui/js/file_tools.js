@@ -1,31 +1,6 @@
 var init_file_tools = function(){
-    window.getPathLocation = function(treeId, treeNode){
-        var zTree = $.fn.zTree.getZTreeObj(treeId);
-
-        if(!zTree || zTree.jx_loading){
-            return false;
-        }
-
-        var loc = treeNode.name;
-        var _node = treeNode;
-        while(_node && _node.parentTId){
-            var parent = zTree.getNodeByTId(_node.parentTId);
-            if(parent){
-                if(parent.name == "/")
-                    loc = "/" + loc;
-                else
-                    loc = parent.name + "/" + loc;
-                _node = parent;
-            }
-            else{
-                _node = null;
-            }
-        }
-        return loc;
-    };
-
     var addFile = function(){
-        if(!document.treeId)
+        if(fileTree.loading)
             return;
 
         var suspended = "{{user.suspended_txt}}";
@@ -34,17 +9,7 @@ var init_file_tools = function(){
             return;
         }
 
-        var zTree = $.fn.zTree.getZTreeObj(document.treeId);
-        if(!zTree)
-            return;
-        var nodes = zTree.getSelectedNodes();
-        if(!nodes || !nodes.length || !nodes[0].children)
-        {
-            utils.bubble("warning", "Oops!", "{{label.SelectFolder}}", 4000);
-            return;
-        }
-
-        var loc = getPathLocation(document.treeId, nodes[0]);
+        var loc = fileTree.path == "" ? "/":loc;
 
         $.SmartMessageBox({
             title : "{{label.Location}} : "+loc,
@@ -90,7 +55,7 @@ var init_file_tools = function(){
                             return;
                         }
 
-                        getFiles(loc, document.treeId, nodes[0]);
+                        getFiles(loc == "/" ? "#" : loc);
                         if(loc == "/")
                             loc = "";
                         utils.bubble("success", selected + " {{label.Created}}", loc + "/" + name, 4000);

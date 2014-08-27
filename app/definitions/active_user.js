@@ -274,12 +274,12 @@ exports.defineMethods = function(){
                     if(ext && ext != ""){
                         fname = fname.substr(0, fname.length-ext.length);
                     }
-                    _nodes.push({full_name:files[o], name:fname, ext:ext});
+                    _nodes.push({fullname:files[o], name:fname, ext:ext});
                 }
             }
 
             if(params.up != '#'){
-                _nodes.unshift({name:'..'});
+                _nodes.unshift({name:'..', isParent:true});
             }
 
             console.log("files list", _nodes);

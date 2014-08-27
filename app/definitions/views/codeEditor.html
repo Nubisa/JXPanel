@@ -19,49 +19,91 @@
 <script src="/cm/mode/xml/xml.js"></script>
 <script src="/cm/mode/css/css.js"></script>
 <script src="/cm/addon/selection/active-line.js"></script>
-<link rel="stylesheet" href="/css/zTreeStyle.css" />
 
-<div class="note" style="margin-bottom:4px;cursor:default;">{{label.CodeEditorTop}}</div>
-<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #369;"></i>&nbsp;&nbsp;
-<a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<style>
+    li {
+        list-style-image: none;
+        list-style: none;
+        list-style-type: none;
+    }
+    ul {
+        list-style-image: none;
+        list-style: none;
+        list-style-type: none;
+    }
+
+    .nav-tabs li.active{
+        box-shadow: none;
+        font-weight:400;
+    }
+    .nav-tabs li a, .nav-tabs li.active a, .nav-tabs li.active a:focus {
+        border:none;
+        box-shadow: none;
+        background-color:transparent;
+        margin-top:1px;
+    }
+    .nav-tabs li.active a:hover
+    {
+        border:none;
+        box-shadow: none;
+        background-color:transparent;
+        color:#333333;
+    }
+    .nav-tabs li a:hover{
+        border:none;
+        box-shadow: none;
+        background-color:transparent;
+        color:#FF6600;
+        text-decoration: underline;
+    }
+    .nav li{
+        margin: -2px;
+    }
+
+</style>
+
+<span id="buttons" style="padding:8px;background:#3A3F42">
+<i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;
+<a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" class="jxbtn">
     <i class="fa fa-refresh"></i> {{label.Refresh}}
 </a>
-<a id="btn_add" data-original-title="{{label.AddTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<a id="btn_add" data-original-title="{{label.AddTooltip}}" class="jxbtn">
     <i class="fa fa-plus"></i> {{label.Add}}
 </a>
-<a id="btn_remove" data-original-title="{{label.DeleteTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<a id="btn_remove" data-original-title="{{label.DeleteTooltip}}"  class="jxbtn">
     <i class="fa fa-times"></i> {{label.Delete}}
 </a>
-<a id="btn_rename" data-original-title="{{label.RenameTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<a id="btn_rename" data-original-title="{{label.RenameTooltip}}" class="jxbtn">
     <i class="fa fa-pencil"></i> {{label.Rename}}
 </a>
-<a id="btn_download" data-original-title="{{label.DownloadTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<a id="btn_download" data-original-title="{{label.DownloadTooltip}}" class="jxbtn">
     <i class="fa fa-share-square-o "></i> {{label.Download}}
 </a>
-<a id="btn_upload" data-original-title="{{label.UploadTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<a id="btn_upload" data-original-title="{{label.UploadTooltip}}" class="jxbtn">
     <i class="fa fa-share-square-o "></i> {{label.Upload}}
 </a>
-<a id="btn_chmod" data-original-title="{{label.CHMODTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+<a id="btn_chmod" data-original-title="{{label.CHMODTooltip}}" class="jxbtn">
     <i class="fa fa-wrench "></i> {{label.CHMOD}}
 </a>
-
+</span>
+<div class="note" style="margin-bottom:2px;margin-top:8px;">{{label.CodeEditorTop}}</div>
 <div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
     <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;">
         <table id="editor_table" style="display:none;padding: 0px;margin:0px;table-layout:fixed;margin-top:10px;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
-                    <td style="width:20%;padding-right:5px;vertical-align:top;max-width:215px;overflow:hidden;">
+                    <td style="width:10%;padding-right:5px;vertical-align:top;max-width:180px;min-width:180px;overflow:hidden;">
 
-                        <div id="files_holder" style="overflow:hidden;height:100%">
+                        <div id="files_holder" style="overflow-y:scroll;overflow-x:hidden;height:100%">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
                         </div>
                         </div>
                     </td>
                     <td style="width: 1px;background-color:#f2f2f2;"><div style="width:1px;"></div></td>
-                    <td style="width:80%;vertical-align:top;padding-left:5px;">
+                    <td style="width:90%;vertical-align:top;padding-left:5px;">
 
-                        <div id="editor_holder" style="overflow:hidden">
+                        <div id="editor_holder" style="overflow:hidden;margin-top:-8px;">
                             <ul id="code_editor_title_holder" class="nav nav-tabs">
                                 <li class="active">
                                     <a data-toggle="tab"><i class="fa fa-fw fa-file"></i>{{label.Empty}}</a>
@@ -135,23 +177,23 @@
         };
 
         var getDocHeight = function(){
-            var he = utils.getWindowHeight()-65;
+            var he = utils.getWindowHeight()-45;
 
             var ed_holder = document.getElementById('editor_holder');
 
             var row = document.getElementById('editor_table_row');
-            row.style.height = (he-20) + "px";
-            row.style.maxHeight = (he-20) + "px";
+            row.style.height = (he-40) + "px";
+            row.style.maxHeight = (he-40) + "px";
             row.style.overflow = 'hidden';
             document.getElementById('panel-main').style.overflow = "hidden";
             var tab = document.getElementById('editor_table');
             tab.style.display = '';
 
             document.getElementById('files_holder').style.maxHeight = (he-65) + "px";
-            ed_holder.style.maxHeight = (he-60) + "px";
+            ed_holder.style.maxHeight = (he-50) + "px";
             ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
 
-            return he-123;
+            return he-94;
         };
 
         document.rCount = 0;
@@ -177,9 +219,6 @@
                     var ed = content_holder._childs[o]._editor;
                     ed.style.height = parseInt(eh) + "px";
                     ed.style.maxHeight = parseInt(eh) + "px";
-                }
-                for(var o in editors){
-                    editors[o].refresh();
                 }
             }
             else{
@@ -240,6 +279,7 @@
                 clearSelection();
                 title_holder._childs[this._target].className = "active";
                 content_holder._childs[this._target].className = "tab-pane fade active in";
+                clearSaveButton(title_holder._childs[this._target].btn);
             };
             a["data-toggle"] = "tab";
 
@@ -284,6 +324,7 @@
 
                     title_holder._childs[old].className = "active";
                     content_holder._childs[old].className = "tab-pane fade active in";
+                    clearSaveButton(title_holder._childs[old].btn);
                 }
 
                 setTimeout(tabsResize,1);
@@ -303,16 +344,74 @@
             return div_code_editor;
         };
 
+        window.fileTree = {loaded_extensions:{}};
+
         var loadMode = function(loc){
+            if(!fileTree.loaded_extensions[loc]){
+                fileTree.loaded_extensions[loc] = 1;
+            }
+            else
+                return;
             var elm_editor = document.getElementById("code_editor_content_holder");
             var scr = document.createElement("script");
             scr.src = "/cm/mode/" + loc;
             elm_editor.parentNode.appendChild(scr);
         };
 
+        function clearSaveButton(btn){
+            if(fileTree.saveButton){
+                fileTree.saveButton.parentNode.removeChild(fileTree.saveButton);
+                fileTree.saveButton = null;
+            }
+
+            if(btn){
+                fileTree.saveButton = btn;
+                document.getElementById('buttons').appendChild(btn);
+            }
+        }
+
         var editor_count = 0;
 
-        var createEditor = function(type, _fname, location){
+        function createButton(fname, loc, eid){
+            var btn = document.createElement("a");
+ //<a id="btn_refresh" data-original-title="{{label.RefreshTooltip}}" data-placement="top" rel="tooltip" class="jxbtn">
+            btn.className = "jxbtn jxbtn_disabled";
+
+            btn._name = fname;
+            btn._location = loc;
+            btn._eid = eid;
+            btn._disabled = true;
+            btn.onclick = function(){
+                if(this._disabled)
+                    return;
+                var _this = this;
+                toServer("saveFile", {up:this._location, src:editors[this._location].getValue()}, function(ret_val){
+                    if(ret_val.err){
+                        alert(ret_val.err);
+                        if(ret_val.relogin){
+                            location.href = "/index.html";
+                        }
+                        return;
+                    }
+                    utils.bubble("success", "{{label.FileSavedTitle}}", "{{label.FileSavedContent}}", 4000);
+                    _this.disabled = "disabled";
+                    _this._disabled = true;
+                    _this.className = "jxbtn jxbtn_disabled";
+                    var title_holder = document.getElementById('code_editor_title_holder');
+                    title_holder._childs[_this._eid]._a.style.color = "";
+                }, true);
+            };
+            btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
+            btn.disabled = "disabled";
+            document.getElementById('buttons').appendChild(btn);
+
+            fileTree.saveButton = btn;
+            var title_holder = document.getElementById('code_editor_title_holder');
+            title_holder._childs[eid].btn = btn;
+            editors[loc].btn = btn;
+        }
+
+        var createEditor = function(type, _fname, loc){
             var fname = _fname;
             if(!fname)
                 fname = "{{label.Empty}}";
@@ -336,52 +435,27 @@
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
             };
 
-            var btn = null;
-            if(!_fname)
-                opts.readOnly = true;
-            else{
-                var span = document.createElement("span");
-                span.innerHTML = '<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #369;"></i>&nbsp;&nbsp;';
-                btn = document.createElement("button");
-                btn.className = "btn btn-success jxbtn";
-                btn.style.cssText = "margin-bottom:2px;margin-top:2px;padding:0px 10px;";
-                btn._name = fname;
-                btn._location = location;
-                btn._eid = eid;
-                btn.onclick = function(){
-                    var _this = this;
-                    toServer("saveFile", {up:this._location, src:editors[this._location].getValue()}, function(ret_val){
-                        if(ret_val.err){
-                            alert(ret_val.err);
-                            if(ret_val.relogin){
-                                location.href = "/index.html";
-                            }
-                            return;
-                        }
-                        utils.bubble("success", "{{label.FileSavedTitle}}", "{{label.FileSavedContent}}", 4000);
-                        _this.disabled = "disabled";
-                        var title_holder = document.getElementById('code_editor_title_holder');
-                        title_holder._childs[_this._eid]._a.style.color = "";
-                    }, true);
-                };
-                btn.innerHTML += '<i class="fa fa-fw fa-save"></i>{{label.Save}}';
-                btn.disabled = "disabled";
-                span.appendChild(btn);
-                host_editor.parentNode.insertBefore(span, host_editor.parentNode.firstChild);
-            }
+            clearSaveButton();
 
             host_editor.appendChild(elm_editor);
 
-            editors[location] = CodeMirror.fromTextArea(elm_editor, opts);
-            editors[location].btn = btn;
-            editors[location]._eid = eid;
-            editors[location].host = host_editor;
+            editors[loc] = CodeMirror.fromTextArea(elm_editor, opts);
+            if(!_fname)
+                opts.readOnly = true;
+            else{
+                createButton(fname, loc, eid);
+            }
+
+            editors[loc]._eid = eid;
+            editors[loc].host = host_editor;
             if(_fname){
-                editors[location].on('change', function(inst, obj){
-                    if(inst.btn.loaded){
+                editors[loc].on('change', function(inst, obj){
+                    if(inst.btn && inst.btn.loaded){
                         var title_holder = document.getElementById('code_editor_title_holder');
                         title_holder._childs[inst._eid]._a.style.color = "#b00000";
                         inst.btn.disabled = null;
+                        inst.btn._disabled = false;
+                        inst.btn.className = "jxbtn jxbtn_save";
                     }
                     else
                         inst.btn.loaded = true;
@@ -398,81 +472,86 @@
             return false;
         };
 
-        var treeClick = function(ev, treeId, treeNode, clickFlag) {
-            var zTree = $.fn.zTree.getZTreeObj(treeId);
+        var treeClick = function(fname, isParent) {
 
-            if(zTree.jx_loading){
-                return false;
+            if(fileTree.loading){
+                return;
             }
 
-            var loc = getPathLocation(treeId, treeNode);
+            var fullname;
 
-            if(treeNode.children && treeNode.children.length){
-                zTree.jx_loading = true;
-
-                if(treeNode.children.length == 1 &&
-                        (treeNode.children[0].name == "{{label.Loading}}" || treeNode.children[0].name == "{{label.Empty}}")){
-                    getFiles(loc, treeId, treeNode);
-                }
-                else{
-                    zTree.jx_loading = false;
-                }
+            if(fname != '..'){
+                if(fileTree.path.length)
+                    fullname = fileTree.path + "/" + fname;
+                else
+                    fullname = fname;
             }else{
-                var _loc = loc.toLowerCase();
+                var arr = fileTree.path.split("/");
+                if(arr.length == 1){
+                    fullname = "#"
+                }else{
+                    fullname = arr.splice(arr.length-1,1).join("/");
+                }
+            }
+
+            if(isParent){
+                getFiles(fullname);
+            }else{
+                var _loc = fullname.toLowerCase();
 
                 if(checkExtension(_loc, [".js", ".json", ".jxp"])){
-                    getFile(treeNode.name, loc, treeId, "text/javascript");
+                    getFile(fullname, fname, "js");
                     return;
                 }
 
                 if(checkExtension(_loc, [".css"])){
-                    getFile(treeNode.name, loc, treeId, "css");
+                    getFile(fullname, fname, "css");
                     return;
                 }
 
                 if(checkExtension(_loc, [".php"])){
                     loadMode("php/php.js");
-                    getFile(treeNode.name, loc, treeId, "php");
+                    getFile(fullname, fname, "php");
                     return;
                 }
 
                 if(checkExtension(_loc, [".go"])){
                     loadMode("go/go.js");
-                    getFile(treeNode.name, loc, treeId, "go");
+                    getFile(fullname, fname, "go");
                     return;
                 }
 
                 if(checkExtension(_loc, [".py"])){
                     loadMode("python/python.js");
-                    getFile(treeNode.name, loc, treeId, "python");
+                    getFile(fullname, fname, "python");
                     return;
                 }
 
                 if(checkExtension(_loc, [".rb"])){
                     loadMode("ruby/ruby.js");
-                    getFile(treeNode.name, loc, treeId, "ruby");
+                    getFile(fullname, fname, "ruby");
                     return;
                 }
 
                 if(checkExtension(_loc, [".md", ".mk", ".conf", ".ini", ".htaaccess"])){
                     loadMode("markdown/markdown.js");
-                    getFile(treeNode.name, loc, treeId, "markdown");
+                    getFile(fullname, fname, "markdown");
                     return;
                 }
 
                 if(checkExtension(_loc, [ ".htm", ".html", ".xml"])){
-                    getFile(treeNode.name, loc, treeId, "xml");
+                    getFile(fullname, fname, "xml");
                     return;
                 }
 
                 if(checkExtension(_loc, [".coffee"])){
                     loadMode("coffeescript/coffeescript.js");
-                    getFile(treeNode.name, loc, treeId, "coffeescript");
+                    getFile(fullname, fname, "coffeescript");
                     return;
                 }
 
-                if(loc.indexOf(".")<0 || checkExtension(_loc, [".txt", ".ini", ".bat", ".sh", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
-                    getFile(treeNode.name, loc, treeId, "text");
+                if(fname.indexOf(".")<0 || checkExtension(_loc, [".txt", ".ini", ".bat", ".sh", ".java", ".cs", ".aspx", ".lua", ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore"])){
+                    getFile(fullname, fname, "text");
                     return;
                 }
 
@@ -480,49 +559,33 @@
             }
         };
 
-        var setting = {
-            callback: {
-                onExpand: treeClick,
-                onClick: treeClick
-            }
-        };
+        window.getFiles = function(folder){
+            fileTree.loading = true;
+            fileTree.elm.innerHTML = "{{label.Loading}}";
+            toServer("getFiles", {up:folder}, function(ret_val){
 
-        window.getFiles = function(folder, treeId, treeNode){
-            toServer("getFiles", {up:folder, id:treeId}, function(ret_val){
+                fileTree.loading = false;
 
                 if(ret_val.err){
                     alert("ERROR : " + JSON.stringify(ret_val.err));
                     if(ret_val.relogin){
                         location.href = "/index.html";
                     }
-                    var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
-                    if(zTree)
-                        zTree.jx_loading = false;
                     return;
                 }
 
-                if(!treeNode){
-                    renderTree(treeId, ret_val.nodes);
+                if(folder != "#"){
+                    fileTree.path = folder;
                 }
-                else if(ret_val.nodes && ret_val.nodes.length){
-                    var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
-
-                    zTree.jx_loading = false;
-                    zTree.removeChildNodes(treeNode);
-
-                    zTree.addNodes(treeNode, ret_val.nodes);
-
-                    zTree.expandNode(treeNode, true, false);
-                }else{
-                    var zTree = $.fn.zTree.getZTreeObj(ret_val.id);
-                    zTree.jx_loading = false;
-                    treeNode.children[0].name = "{{label.Empty}}";
-                    zTree.expandNode(treeNode, false, false);
+                else{
+                    fileTree.path = "";
                 }
+
+                renderTree(ret_val.nodes);
             }, true);
         };
 
-        var getFile = function(fname, location, treeId, type){
+        var getFile = function(loc, fname, type){
             var title_holder = document.getElementById('code_editor_title_holder');
             for(var o in title_holder._childs){
                 if(title_holder._childs[o]._name == fname){
@@ -531,7 +594,7 @@
                 }
             }
 
-            toServer("getFile", {up:location, id:treeId, tp:type, fn:fname}, function(ret_val){
+            toServer("getFile", {up:loc, tp:type, fn:fname}, function(ret_val){
 
                 if(ret_val.err){
                     alert("ERROR : " + JSON.stringify(ret_val.err));
@@ -555,34 +618,81 @@
             }, true);
         };
 
+        var editor_types = [
+            ".txt", ".ini", ".bat", ".sh", ".java", ".cs", ".aspx", ".lua",
+            ".vb", ".sql", ".perl", ".c", ".cc", ".cpp", ".hpp", ".h", ".gitignore",
+            ".js", ".json", ".jxp", ".css", ".php", ".go",
+            ".md", ".mk", ".conf", ".ini", ".htaaccess", ".py", ".rb",
+            ".htm", ".html", ".xml", ".coffee"
+        ];
+
         function colorize(ext){
-            if(!ext)
-                return '';
+            if(!ext || ext.length==0){
+                return "<span></span>";
+            }
             var next = ext.toLowerCase();
-            if(next == '.js' || next == '.html' || next== '.json' || next == '.css' || next == '.htm'){
-                return "<span style='color:#336699'>"+ext+"</span>";
+            for(var o in editor_types){
+                if(editor_types[o] == next){
+                    return "<span style='color:#336699'>"+ext+"</span>";
+                }
             }
 
             return ext;
         }
 
-        function renderTree(treeId, nodes){
-            var host = document.getElementById(treeId);
+        function renderTree(nodes){
+            var host = fileTree.elm;
             host.innerHTML = '';
 
             for(var o in nodes){
                 var li = document.createElement('li');
-                li.innerHTML = nodes[o].name + colorize(nodes[o].ext);
-                li.style.cssText = 'margin-top:5px;'
+
+                li.className = 'file_item';
+                li.style.cssText = 'margin-top:5px;cursor:pointer;margin-left:-36px'
+                var ext = colorize(nodes[o].ext);
+
                 if(nodes[o].isParent)
                 {
-
+                    li.innerHTML = '<img src="/icons/folder.png" style="border:none;padding-right:5px;"/>';
+                    li.isParent = true;
+                    li.fullname = nodes[o].name;
                 }
                 else{
-                    li.style.marginLeft = "15px";
+                    if(ext.indexOf('span')>=0){
+                        li.editable = true;
+                        li.innerHTML = '<img src="/icons/editable.png" style="border:none;padding-right:5px;"/>';
+                        li.style.color = "#000000";
+                    }
+                    else{
+                        li.innerHTML = '<img src="/icons/file.png" style="border:none;padding-right:5px;"/>';
+                        li.style.color = "#666666";
+                    }
+                    li.fullname = nodes[o].fullname;
                 }
+                li.innerHTML += nodes[o].name + ext;
                 host.appendChild(li);
             }
+
+            $('.file_item').hover(function(){
+               $(this).css('textDecoration', 'underline');
+               if($(this)[0].editable){
+                   $(this).css('color','#336699');
+               }
+               else{
+                   $(this).css('color','#333333');
+               }
+            },function(){
+                $(this).css('textDecoration', '');
+                if($(this)[0].editable){
+                    $(this).css('color','#000000');
+                }
+                else{
+                    $(this).css('color','#666666');
+                }
+            });
+            $('.file_item').click(function(){
+                 treeClick($(this)[0].fullname, $(this)[0].isParent);
+            });
         }
 
         function loadView(){
@@ -591,9 +701,11 @@
             host.id="files_{{defaults.getUniqueId}}";
             host.className="ztree";
             files_host.appendChild(host);
-            document.treeId = host.id;
+            fileTree.hostId = host.id;
+            fileTree.elm = host;
+            fileTree.path = "";
 
-            getFiles("#", host.id, null);
+            getFiles("#");
             createEditor("text/javascript", null, null);
         }
 
