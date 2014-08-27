@@ -94,14 +94,14 @@
             <tr>
                     <td style="width:10%;padding-right:5px;vertical-align:top;max-width:180px;min-width:180px;overflow:hidden;">
 
-                        <div id="files_holder" style="overflow-y:scroll;overflow-x:hidden;height:100%">
+                        <div id="files_holder" style="overflow-y:scroll;overflow-x:hidden;height:100%; border-bottom:dotted 1px #cccccc;">
                         <div id="editor_files"  style="margin:0px;padding:0px;">
 
                         </div>
                         </div>
                     </td>
                     <td style="width: 1px;background-color:#f2f2f2;"><div style="width:1px;"></div></td>
-                    <td style="width:90%;vertical-align:top;padding-left:5px;">
+                    <td style="width:90%;vertical-align:top;padding-left:0px;">
 
                         <div id="editor_holder" style="overflow:hidden;margin-top:-8px;">
                             <ul id="code_editor_title_holder" class="nav nav-tabs">
@@ -188,9 +188,9 @@
             var tab = document.getElementById('editor_table');
             tab.style.display = '';
 
-            document.getElementById('files_holder').style.maxHeight = (he-65) + "px";
+            document.getElementById('files_holder').style.maxHeight = (he-67) + "px";
             ed_holder.style.maxHeight = (he-50) + "px";
-            ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
+            ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-3) + "px";
 
             return he-94;
         };
@@ -212,7 +212,7 @@
             var content_holder = document.getElementById('code_editor_content_holder');
 
             if(title_holder.clientHeight - 30 > 5){
-                var diff = title_holder.clientHeight - 30;
+                var diff = title_holder.clientHeight - 33;
                 eh -= diff;
                 for(var o in content_holder._childs){
                     var ed = content_holder._childs[o]._editor;
@@ -259,7 +259,7 @@
             var pp = document.createElement("p");
             var div_code_editor = document.createElement("div");
             div_code_editor.id = id + "_code_editor";
-            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-top:dotted 1px #ccc;border-bottom:dotted 1px #ccc;margin-top:2px;height: "+eh+"px;overflow:hidden";
+            div_code_editor.style.cssText = "position:relative;margin:0px;padding:0px;border-bottom:dotted 1px #ccc;height: "+eh+"px;overflow:hidden";
             pp.appendChild(div_code_editor);
             div.appendChild(pp);
             content_holder.appendChild(div);
@@ -276,6 +276,7 @@
                 if(!title_holder._childs[this._target])
                     return false;
                 clearSelection();
+                window.tabsResize();
                 title_holder._childs[this._target].className = "active";
                 content_holder._childs[this._target].className = "tab-pane fade active in";
                 clearSaveButton(title_holder._childs[this._target].btn);
