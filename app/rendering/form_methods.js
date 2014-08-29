@@ -56,7 +56,11 @@ methods.tryLogin = function(env, params){
                     maxUserCount: 1e5,
                     canCreatePlan: true,
                     canCreateUser: true,
-                    planMaximums: {}
+                    planMaximums: {},
+                    plan_custom_socket : true,
+                    plan_sys_exec : true,
+                    plan_local_native_modules : true,
+                    plan_ssh : true
                 });
 
                 database.AddUser(database.unlimitedPlanName, params.username, { person_name : params.username, firstUser:true, ftp_access : true, panel_access : true });

@@ -49,8 +49,6 @@ var ReadDB = function(cb){ // KRIS FILL IN
                     Users[o].domains = {};
                 }
             }
-
-            Plans[exports.unlimitedPlanName].plan_ssh = true;
             exports.DB = DB;
         }
         if (cb) cb(err);
