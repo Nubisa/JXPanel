@@ -1,6 +1,6 @@
 var fs = require('fs');
 var pathModule = require('path');
-var os_info = require('./os_info').OSInfo();
+var os_info = jxcore.utils.OSInfo();
 var nginx = require('./nginx');
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;

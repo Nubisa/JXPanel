@@ -1,6 +1,6 @@
 var path = require('path');
 var fs = require('fs');
-var osinfo = require('../app/install/os_info').OSInfo();
+var osinfo = jxcore.utils.OSInfo();
 
 var tools_dir = path.join(__dirname, "../server_apps");
 

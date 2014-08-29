@@ -1,9 +1,11 @@
+var path = require("path");
+exports.apps_folder = path.join(__dirname, "../../server_apps"); // ignored from git
+
 var form_lang = require('../definitions/form_lang');
 var _active_user = require('../definitions/active_user');
 var system_tools = require('../system_tools');
 var server = require('jxm');
-var os_info = require("./../install/os_info");
-var path = require("path");
+
 
 // site defaults are only ENGLISH!
 exports.EN = {
@@ -85,10 +87,11 @@ exports.defineMethods = function(){
     });
 };
 
-exports.dirNativeModules = path.join(os_info.apps_folder, "native_modules" ) + path.sep;
-exports.dirAppConfigs = path.join(os_info.apps_folder, "app_configs" ) + path.sep;
+
+exports.dirNativeModules = path.join(exports.apps_folder, "native_modules" ) + path.sep;
+exports.dirAppConfigs = path.join(exports.apps_folder, "app_configs" ) + path.sep;
 exports.dirMonitorCertificates = path.join(__dirname, "../spawner") + path.sep;
-exports.dirNginxConfigs = path.join(os_info.apps_folder, "nginx/conf/jxcore") + path.sep;
+exports.dirNginxConfigs = path.join(exports.apps_folder, "nginx/conf/jxcore") + path.sep;
 exports.defaultAppMinPort = 10000;
 exports.defaultAppMaxPort = 20000;
 

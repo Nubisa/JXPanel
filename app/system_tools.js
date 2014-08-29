@@ -3,11 +3,11 @@ var path = require('path');
 var http = require("http");
 var https = require("https");
 var database = require("./install/database");
-var os_info = require("./install/os_info");
 var exec = require('child_process').exec;
 var hosting_tools = require("./hosting_tools");
 var folder_utils = require('./definitions/user_folders');
 var form_lang = require('./definitions/form_lang');
+var site_defaults = require('./definitions/site_defaults');
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -404,15 +404,15 @@ exports.installJX = function (active_user, cb) {
             exports.rmdirSync(path.dirname(jxPath));
         }
 
-        var os_str = os_info.OSInfo().OS_STR;
+        var os_str = jxcore.utils.OSInfo().OS_STR;
 
-        var dir = path.join(os_info.apps_folder, "jx_" + os_str) + path.sep;
+        var dir = path.join(site_defaults.apps_folder, "jx_" + os_str) + path.sep;
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
 
         var basename = "jx_" + os_str;
-        var zipFile = path.join(os_info.apps_folder, basename + ".zip");
+        var zipFile = path.join(site_defaults.apps_folder, basename + ".zip");
         var url = "https://s3.amazonaws.com/nodejx/" + basename + ".zip";
 
         active_user.session.status = form_lang.Get(active_user.lang, "JXcoreDownloading", true);
@@ -423,7 +423,7 @@ exports.installJX = function (active_user, cb) {
             }
 
             // unzipping
-            exec("unzip -u " + zipFile, {cwd: os_info.apps_folder, maxBuffer: 1e7}, function (err, stdout, stderr) {
+            exec("unzip -u " + zipFile, {cwd: site_defaults.apps_folder, maxBuffer: 1e7}, function (err, stdout, stderr) {
                 if (err !== null) {
                     cb("Error" + JSON.stringify(err) + (stderr || stdout));
                 } else {
