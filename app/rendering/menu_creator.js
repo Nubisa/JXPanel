@@ -23,11 +23,11 @@ exports.hasView = function(active_user, file){
         return !plan.suspended;
     }
 
-    if(file == "../ui//jxconfig.html"){
+    if(file == "../ui//jxcore.html"){
         return plan.name == database.unlimitedPlanName;
     }
 
-    if(file == "../ui//jxmodules.html"){
+    if(file == "../ui//npmw.html"){
         return plan.name == database.unlimitedPlanName;
     }
 
@@ -61,10 +61,10 @@ exports.render = function(active_user){
             + '<a href="#"><img src="img/jx.png" style="padding-right: 13px; vertical-align: text-bottom"/>{{label.JXcoreUpperCase}}</a>'
             + '<ul>'
             + '<li id="Menu-jxconfig">'
-            + '<a href="jxconfig.html">{{label.JXcoreConfiguration}}</a>'
+            + '<a href="jxcore.html">{{label.JXcoreConfiguration}}</a>'
             + '</li>'
             + '<li id="Menu-jxmodules">'
-            + '<a href="jxmodules.html">{{label.JXcoreNPMModules}}</a>'
+            + '<a href="npmw.html">{{label.JXcoreNPMModules}}</a>'
             + '</li>'
             + '</ul>'
             + '</li>';

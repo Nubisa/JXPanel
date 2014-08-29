@@ -9,17 +9,20 @@ var fs = require("fs");
 var validations = require('./../validations');
 var database = require("./../../install/database");
 var system_tools = require("./../../system_tools");
+var hosting_tools = require("./../../hosting_tools");
 var site_defaults = require("./../site_defaults");
+var page_utils = require('./../../rendering/page_utils');
+
 
 exports.form = function () {
 
     var func = function () {
         this.name = path.basename(__filename, ".js");
 
-        this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
+        this.icon = '<img id="jxcore_img" class="menu-icon" src="icons/jxcore.png">';
 
-        this.onSubmitSuccess = "jxconfig.html";
-        this.onSubmitCancel = "jxconfig.html";
+        this.onSubmitSuccess = "jxcore.html";
+        this.onSubmitCancel = "jxcore.html";
 
         this.controls = [
 
@@ -52,12 +55,13 @@ exports.form = function () {
 
                         var cfg = database.getConfig();
 
+                        var not_installed = '<code>' + form_lang.Get(active_user.lang, "JXcoreNotInstalled", true) +'</code>';
                         if (cfg.jxPath) {
                             var str = cfg.jxPath;
-                            if (!fs.existsSync(cfg.jxPath)) str += '<br><code>' + form_lang.Get(active_user.lang, "JXcoreNotInstalled", true) +'</code>';
+                            if (!fs.existsSync(cfg.jxPath)) str += '<br>' + not_installed;
                             return str;
                         } else {
-                            return "";
+                            return not_installed;
                         }
                     }
                 }
@@ -74,8 +78,11 @@ exports.form = function () {
 
                         var icon = cfg.jxPath ? "fa-refresh" : "fa-download";
 
-                        var str =  '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxInstall();"><span class="btn-label"><i class="fa fa-lg fa-fw ' + icon + '"></i></span>'
-                            + form_lang.Get(active_user.lang, cfg.jxPath ? "Reinstall" : "Install", true) + '</button>';
+//                        var str =  '<button type="button" class="btn btn-labeled btn-success" onclick="return utils.jxInstall();"><span class="btn-label"><i class="fa fa-lg fa-fw ' + icon + '"></i></span>'
+//                            + form_lang.Get(active_user.lang, cfg.jxPath ? "Reinstall" : "Install", true) + '</button>';
+
+                        var label = form_lang.Get(active_user.lang, cfg.jxPath ? "Reinstall" : "Install", true);
+                        var str = page_utils.getSingleButton(label, icon, 'return utils.jxInstall();');
 
                         if (cfg.jxPath)
                             str += '<p class="note">' + form_lang.Get(active_user.lang, "JXcoreReinstall_Description", true) + '</p>';
@@ -96,22 +103,22 @@ exports.form = function () {
                     label: "JXcoreMonitorStatus",
                     method: tool.createSimpleText,
                     getDescription : function(active_user, values) {
-                        return active_user.session.monitor.isOnline
-                        ? form_lang.Get(active_user.lang, "JXcoreMonitorStatusStop_Description", true)
-                        : form_lang.Get(active_user.lang, "JXcoreMonitorStatusStart_Description", true);
+                        return form_lang.Get(active_user.lang, active_user.session.monitor.isOnline ? "JXcoreMonitorStatusStop_Description" :"JXcoreMonitorStatusStart_Description", true);
                     },
                     getValue : function(active_user) {
 
-                            var btnStart = '<button type="submit" class="btn btn-labeled btn-success" onclick="return utils.jxMonitorStartStop(true);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-play"></i></span>'
-                                + form_lang.Get(active_user.lang, "Start", true) + '</button>';
+                        var jxPath = hosting_tools.getJXPath();
 
-                            var btnStop = '<button type="button" class="btn btn-labeled btn-danger" onclick="return utils.jxMonitorStartStop(false);" style="margin-left: 20px;"><span class="btn-label"><i class="fa fa-lg fa-fw fa-stop"></i></span>'
-                                + form_lang.Get(active_user.lang, "Stop", true) + '</button>';
+                        var style = "margin-left: 15px;"
+                        var btnStart = page_utils.getSingleButton(form_lang.Get(active_user.lang, "Start", true), "fa-play", 'return utils.jxMonitorStartStop(true);', style);
+                        var btnStop = page_utils.getSingleButton(form_lang.Get(active_user.lang, "Stop", true), "fa-stop", 'return utils.jxMonitorStartStop(false);', style);
 
+                        if (jxPath.err) {
+                            btnStart = ". " + form_lang.Get(active_user.lang, jxPath.err, true);
+                        }
 
-                            return active_user.session.monitor.isOnline
-                                ? '<i class="fa-lg fa fa-check text-success"></i>' + " " + form_lang.Get(active_user.lang, "Online", true) +  btnStop
-                                : '<i class="fa-lg fa fa-times text-danger"></i>' + " " + form_lang.Get(active_user.lang, "Offline", true) +  btnStart;
+                        var ret = form_lang.GetBool(active_user.lang, active_user.session.monitor.isOnline, "Online" + btnStop, "Offline" + btnStart);
+                        return ret;
                     }
                 }
             },

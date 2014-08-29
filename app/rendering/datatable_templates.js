@@ -139,7 +139,7 @@ var getHTML = function (active_user, table) {
             if (val && val.indexOf && val.indexOf("onclick") !== -1) str = val;
 
             if (colName === "_checkbox")
-                str = record.name !== active_user.username ? "" : '<input type="checkbox" id="jxrow_' + record.name + '"></input>';
+                str = record.name === active_user.username ? "" : '<input type="checkbox" id="jxrow_' + record.name + '"></input>';
             else if (colName === "_id")
                 str = cnt++;
 
