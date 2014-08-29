@@ -148,7 +148,6 @@ var Init = function(){
                 screenKeys: true
             });
 
-            var send_data = "";
             terminal.on('data', function(data) {
                 run_command(data);
             });
