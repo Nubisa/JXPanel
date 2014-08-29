@@ -124,6 +124,9 @@ var Init = function(){
     var createTerminal = function(){
         var ed_holder = document.getElementById('editor_holder');
         var term = document.getElementById('x_terminal');
+        if(window.terminal){
+            terminal.destroy();
+        }
         if(term){
            term.parentNode.removeChild(term);
         }
@@ -135,10 +138,6 @@ var Init = function(){
         ed_holder.appendChild(term);
 
         setTimeout(function(){
-            if(window.terminal){
-                terminal.destroy();
-            }
-
             var col = parseInt(parseInt(parseInt(term.clientWidth)/8));
             var row = parseInt(parseInt(term.clientHeight)/15);
 
@@ -163,8 +162,10 @@ var Init = function(){
     };
 
     window.terminalReady = function(){
-        createTerminal();
-        connectTerminal();
+        setTimeout(function(){
+            createTerminal();
+            connectTerminal();
+        },1);
     };
 
     var connectTerminal = function(){
@@ -221,8 +222,19 @@ var Init = function(){
             terminal.echo("Session is closed");
             return;
         }
+        var data = params.data;
 
-        terminal.write(params.data);
+        for(var n=0;n<data.length;n++){
+            if(data.charCodeAt(n) == 32){
+                if(n+1<data.length){
+                    if(data.charCodeAt(n+1) == 13){
+                        terminal.write('\n\r');
+                    }
+                }
+            }
+        }
+
+        terminal.write(data);
     }
 };
 </script>
