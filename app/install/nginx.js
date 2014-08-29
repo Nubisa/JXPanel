@@ -1,10 +1,11 @@
 var fs = require('fs');
 var pathModule = require('path');
-var os_info = require('./os_info').OSInfo();
+var os_info = jxcore.utils.OSInfo();
+var site_defaults = require("../definitions/site_defaults");
 
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
-var nginx_dir = os_info.appsFolder + sep + "nginx";
+var nginx_dir = site_defaults.apps_folder + sep + "nginx";
 var nginx_process =  nginx_dir + sep + "sbin" + sep + "nginx";
 
 exports.needsReload = false;
@@ -101,7 +102,7 @@ exports.reload = function(onlyIfNeeded){
 
 exports.testConfig = function(configString) {
 
-    var testRootDir = pathModule.join(os_info.appsFolder, "nxginx_test_" + Date.now());
+    var testRootDir = pathModule.join(site_defaults.apps_folder, "nxginx_test_" + Date.now());
 
     var dirs = [];
     dirs.push(testRootDir)
@@ -115,7 +116,7 @@ exports.testConfig = function(configString) {
     }
 
     // copying original nginx.conf file
-    var cmd = "cp " + pathModule.join(os_info.appsFolder, "nginx/conf") + sep + "* " + pathModule.join(testRootDir, "conf") + sep;
+    var cmd = "cp " + pathModule.join(site_defaults.apps_folder, "nginx/conf") + sep + "* " + pathModule.join(testRootDir, "conf") + sep;
     jxcore.utils.cmdSync(cmd);
 
     var logFile = pathModule.join(testRootDir, "logs/error.log")

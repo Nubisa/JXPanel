@@ -117,7 +117,7 @@ var getHTML = function (active_user, table) {
         var single_row = [];
 
         if (record.name === active_user.username)
-            single_row["_class"] = "success";
+            single_row["_class"] = "warning";
 
         for (var x in columns) {
             var colName = columns[x];
@@ -139,7 +139,7 @@ var getHTML = function (active_user, table) {
             if (val && val.indexOf && val.indexOf("onclick") !== -1) str = val;
 
             if (colName === "_checkbox")
-                str = '<input type="checkbox" id="jxrow_' + record.name + '"></input>';
+                str = record.name !== active_user.username ? "" : '<input type="checkbox" id="jxrow_' + record.name + '"></input>';
             else if (colName === "_id")
                 str = cnt++;
 

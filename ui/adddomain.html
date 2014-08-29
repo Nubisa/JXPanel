@@ -1,105 +1,55 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-    {{view.header}} - {{toSub.pageTitle:DomainsUpperCase}}
+    {{view.header}} {{toSub.pageTitle:DomainsUpperCase}}
 </head>
-<body class="smart-style-3 fixed-navigation fixed-header fixed-ribbon fixed-page-footer">
-<!-- possible classes: minified, fixed-ribbon, fixed-header, fixed-width-->
-
-<!-- HEADER -->
-<header id="header">
-    <div id="logo-group">
-
-        <!-- PLACE YOUR LOGO HERE -->
-        <span id="logo"> <img src="img/logo.png" alt="{{defaults.panelName}}"> </span>
-        <!-- END LOGO PLACEHOLDER -->
+<body>
+<!-- Your HTML -->
+<div id='panel-main'>
+    <div id='page-title'>
+        {{view.topNav}}
     </div>
+    <table id='all-page' cellpadding="0" cellspacing="0">
+        <tbody>
+        <tr>
+            {{view.leftMenu}}
 
-    {{view.topNav}}
-    <!-- end pulled right: nav area -->
+            <td id='right-page'><!-- Main Content -->
+                <div class="internal-view">
+                    {{user.suspended}}
 
-</header>
-<!-- END HEADER -->
+                    <ul id="myTab1" class="nav nav-tabs bordered">
+                        <li class="active">
+                            <a href="#s1" data-toggle="tab">{{form.addDomain:icon}} {{label.DomainConfiguration}}</a>
+                        </li>
+                        <li class="disabled" id="jxAppLog_Tab">
+                            <a href="#">{{form.appLog:icon}} {{label.AppLog}}</a>
+                        </li>
+                        <li class="" id="jxAppConfig_Tab">
+                            <a href="#s3" data-toggle="tab"><i class="fa fa-lg fa-gear"></i> {{label.JXcoreAppConfig}}</a>
+                        </li>
+                    </ul>
 
-<!-- Left panel : Navigation area -->
-<!-- Note: This width of the aside area can be adjusted through LESS variables -->
-<aside id="left-panel">
-    <!-- User info -->
-    {{view.userInfo}}
-    <nav>
-        {{view.leftMenu}}
-    </nav>
-			<span class="minifyme" data-action="minifyMenu"> 
-				<i class="fa fa-arrow-circle-left hit"></i> 
-			</span>
-
-</aside>
-<!-- END NAVIGATION -->
-
-<!-- MAIN PANEL -->
-<div id="main" role="main">
-
-    <!-- RIBBON -->
-    <div id="ribbon">
-        <!-- breadcrumb -->
-        <ol class="breadcrumb">
-            <li>{{label.Home}}</li><li>{{label.DomainsUpperCase}}</li><li>{{form.addDomain:displayName}}</li>
-        </ol>
-
-    </div>
-    <!-- END RIBBON -->
-
-    <!-- MAIN CONTENT -->
-    <div id="content" style="padding-top:50px">
-
-        {{user.suspended}}
-
-        <p id="jxFormMessage"></p>
-
-        <section id="widget-grid" class="">
-
-            <ul id="myTab1" class="nav nav-tabs bordered">
-                <li class="active">
-                    <a href="#s1" data-toggle="tab">{{form.addDomain:icon}} {{label.DomainConfiguration}}</a>
-                </li>
-                <li class="disabled" id="jxAppLog_Tab">
-                    <a href="#">{{form.appLog:icon}} {{label.AppLog}}</a>
-                </li>
-                <li class="" id="jxAppConfig_Tab">
-                    <a href="#s3" data-toggle="tab"><i class="fa fa-lg fa-gear"></i> {{label.JXcoreAppConfig}}</a>
-                </li>
-            </ul>
-
-            <div id="myTabContent1" class="tab-content padding-10">
-                <div class="tab-pane fade in active" id="s1">
-                    {{forms.addDomain}}
+                    <div id="myTabContent1" class="tab-content padding-10">
+                        <div class="tab-pane fade in active" id="s1">
+                            {{forms.addDomain}}
+                        </div>
+                        <div class="tab-pane fade" id="s3">
+                            {{hosting.appConfig}}
+                        </div>
+                    </div>
                 </div>
-                <div class="tab-pane fade" id="s3">
-                    {{hosting.appConfig}}
-                </div>
-            </div>
+            </td>
+            <td id='toolbar-right' class='dark-back' ><!-- Addons -->
 
-        </section>
-
-    </div>
-    <!-- END MAIN CONTENT -->
-
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
-<!-- END MAIN PANEL -->
-
-<!-- PAGE FOOTER -->
-{{view.footer}}
-<!-- END PAGE FOOTER -->
-
-<!-- SHORTCUT AREA : With large tiles (activated via clicking user name tag)
-Note: These tiles are completely responsive,
-you can add as many as you like
--->
-{{view.shortcut}}
-<!-- END SHORTCUT AREA -->
 
 {{view.includes}}
+{{view.chartIncludes}}
 
 </body>
-
 </html>

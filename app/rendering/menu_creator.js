@@ -48,7 +48,7 @@ exports.render = function(active_user){
 
     if(plan.canCreatePlan){
         str += '<li id="Menu-plans">'
-            + '<a href="plans.html"><i class="fa fa-lg fa-fw fa-cogs"></i>{{label.DataPlans}}</a>'
+            + '<a href="hostingp.html"><i class="fa fa-lg fa-fw fa-cogs"></i>{{label.DataPlans}}</a>'
             + '</li>';
     }
 

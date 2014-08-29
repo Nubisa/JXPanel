@@ -104,65 +104,29 @@
     };
 </script>
 
-<!--<article class="col-sm-12 col-md-16 col-lg-12">-->
-<!--<article class="sortable-grid ui-sortable">-->
+<p id="jxFormMessage"></p>
 
-    <!-- Widget ID (each widget will need unique ID)-->
-    <!--<div class="jarviswidget jarviswidget-color-darken" id="wid-id-0" data-widget-togglebutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" style="display: none;">-->
+<div id="jxform">
+    {{form.contents}}
+</div>
 
-        <!--<header>-->
-            <!--{{form.icon}}-->
-            <!--<h2 style="width:1px;overflow:visible"><nobr><strong>{{form.displayName}}</strong></nobr></h2>-->
+<div class="form-group" id="jxform_buttons" style="display: none; margin-bottom: 30px;">
+    <label class="col-md-2 control-label"></label>
 
-        <!--</header>-->
+    <div class="col-md-4" style="padding-left: 0px">
+        <span id="buttons" style="padding:6px;background:#3A3F42;border:1px solid #444;border-radius: 2px;">
+            <i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>
+            <button id="jxFormBtnSubmit" type="submit" class="jxbtn" onclick="{{form.submitOnClick}}">
+                <i class="fa fa-check"></i> <span class="dummy-label">{{label.Apply}}</span>
+            </button>
+            <button type="button" class="jxbtn" onclick="location = '{{form.onSubmitCancel}}';">
+                <i class="fa fa-times"></i> <span class="dummy-label">{{label.Cancel}}</span>
+            </button>
+        </span>
+    </div>
+</div>
 
-        <!-- widget div-->
-        <!--<div>-->
-
-            <!-- widget edit box -->
-            <!--<div class="jarviswidget-editbox">-->
-
-
-            <!--</div>-->
-            <!-- end widget edit box -->
-
-            <!-- widget content -->
-            <!--<div class="widget-body">-->
-
-                <div id="jxform">
-                    {{form.contents}}
-                </div>
-
-                <div class="form-group" id="jxform_buttons" style="display: none; margin-bottom: 30px;">
-                    <label class="col-md-2 control-label"></label>
-                    <div class="col-md-4" style="padding-left: 0px">
-                        <button id="jxFormBtnSubmit" type="submit" class="btn btn-labeled btn-primary"  onclick="{{form.submitOnClick}}">
-                             <span class="btn-label">
-                              <i class="glyphicon glyphicon-ok"></i>
-                             </span>
-                                    {{label.Apply}}
-                        </button>
-                        &nbsp;
-                        <button type="button" class="btn btn-labeled btn-danger" onclick="location = '{{form.onSubmitCancel}}';">
-                             <span class="btn-label">
-                              <i class="glyphicon glyphicon-remove"></i>
-                             </span>
-                            {{label.Cancel}}
-                        </button>
-                    </div>
-                </div>
-
-                <br>
-            <!--</div>-->
-            <!-- end widget div -->
-
-        <!--</div>-->
-        <!-- end widget -->
-
-    <!--</div>-->
-
-<!--</article>-->
-<!-- WIDGET END -->
+<br>
 
 
 <script>

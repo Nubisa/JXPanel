@@ -25,9 +25,9 @@
 
 </script>
 
-<button type="submit" class="btn btn-labeled btn-success" onclick="return window.jxInstallNPM();">
-    <span class="btn-label"><i class="glyphicon glyphicon-plus"></i></span> {{label.JXcoreNPMAddModule}}
-</button>
-<button type="button" id="jxbtn_remove" class="btn btn-labeled btn-danger" onclick="if (window.jxRemoveRows) return window.jxRemoveRows();">
-    <span class="btn-label"><i class="glyphicon glyphicon-trash"></i></span> {{label.RemoveSelected}}
-</button>
+<a id="btn_refresh" data-original-title="{{label.JXcoreNPMAddModule}}" class="jxbtn" onclick="return window.jxInstallNPM();">
+    <i class="fa fa-plus"></i> <span class="dummy-label">{{label.JXcoreNPMAddModule}}</span>
+</a>
+<a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows();">
+    <i class="fa fa-trash-o"></i> <span class="dummy-label">{{label.RemoveSelected}}</span>
+</a>

@@ -3,7 +3,6 @@ var pathModule = require('path');
 var _active_user = require('./active_user');
 var form_lang = require('./form_lang');
 var site_defaults = require('./site_defaults');
-var osinfo = require('../install/os_info').OSInfo();
 var db = require('../install/database');
 var system_tools = require('../system_tools');
 
@@ -46,7 +45,7 @@ exports.getUserPath = function(plan_name, user_name){
         subplan = db.getParentPlanName(subplan);
     }
 
-    var location = osinfo.appsFolder + pathModule.sep + arr.join(pathModule.sep) + pathModule.sep + (user_name || "");
+    var location = site_defaults.apps_folder + pathModule.sep + arr.join(pathModule.sep) + pathModule.sep + (user_name || "");
 
     return location;
 };
