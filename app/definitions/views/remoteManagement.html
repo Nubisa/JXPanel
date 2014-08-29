@@ -5,19 +5,23 @@
 </style>
 <link rel="stylesheet" href="/css/jquery.terminal.css" />
 
-<div class="note" style="margin-bottom:4px;cursor:default;">{{label.TerminalTop}}</div>
-<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #369;"></i>&nbsp;&nbsp;
-<a id="btn_restart" data-original-title="{{label.RestartTerminalTooltip}}" data-placement="top" rel="tooltip" class="jxbtn btn-info btn-xs">
+
+<div style="margin-left:-6px;margin-top:0px;">
+<span id="buttons" style="padding:6px;background:#3A3F42;border:1px solid #444;border-radius: 2px;">
+<i class="fa fa-fw fa-align-justify" style="cursor:default;color: #757a7b;"></i>&nbsp;&nbsp;
+<a id="btn_restart" data-original-title="{{label.RestartTerminalTooltip}}" class="jxbtn">
     <i class="fa fa-refresh"></i> {{label.Restart}}
 </a>
+</span>
+</div>
+<div class="note" style="margin-bottom:4px;padding-top:4px;margin-left:-6px;cursor:default;">{{label.TerminalTop}}</div>
 
-
-<div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px">
-    <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;width:100%">
-        <table id="editor_table" style="display:none;width:100%;padding: 0px;margin:0px;table-layout:fixed;margin-top:10px;" cellpadding="0" cellspacing="0">
+<div id="editor_table_row" class="row" style="padding-bottom:0px;margin-bottom:0px; overflow:hidden;">
+    <div class="col-sm-12" style="padding-bottom:0px;margin-bottom:0px;width:100%;">
+        <table id="editor_table" style="display:none;width:100%;padding: 0px;margin:0px;table-layout:fixed;" cellpadding="0" cellspacing="0">
             <tbody >
             <tr>
-                <td style="vertical-align:top;padding-left:5px;">
+                <td style="vertical-align:top;">
                     <div id="editor_holder" style="width:100%;overflow-y:scroll">
 
                     </div>
@@ -53,25 +57,23 @@ var editorInter = setInterval(function(){
 var Init = function(){
 
     var getDocHeight = function(){
-        var he = utils.getWindowHeight() - 145;
+        var he = utils.getWindowHeight()-45;
 
         var ed_holder = document.getElementById('editor_holder');
 
         var row = document.getElementById('editor_table_row');
-        row.style.height = (he-20) + "px";
-        row.style.maxHeight = (he-20) + "px";
+        row.style.height = (he-40) + "px";
+        row.style.maxHeight = (he-40) + "px";
         row.style.overflow = 'hidden';
-        document.getElementById('main').style.padding = "0px";
-        document.getElementById('main').style.overflow = "hidden";
+        document.getElementById('panel-main').style.overflow = "hidden";
         var tab = document.getElementById('editor_table');
         tab.style.display = '';
-        tab.style.height = (he-60) + "px";
 
-        ed_holder.style.height = (he-60) + "px";
-        ed_holder.style.maxHeight = (he-60) + "px";
-        ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-10) + "px";
+        ed_holder.style.height = (he-50) + "px";
+        ed_holder.style.maxHeight = (he-50) + "px";
+        ed_holder.style.maxWidth = (ed_holder.parentNode.clientWidth-3) + "px";
 
-        return he-123;
+        return he-94;
     };
 
     document.rCount = 0;
