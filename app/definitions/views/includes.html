@@ -128,6 +128,8 @@
                 jxcore.Call(a,b,c);
             };
 
+            $("#jxFormMessage").hide();
+
             if (window.jxTemplateReadyForjxm) {
                 window.jxTemplateReadyForjxm();
             }
@@ -310,10 +312,12 @@
         if (p) {
             if(!type && !txt){
                 p.innerHTML = "";
+                $("#jxFormMessage").hide();
                 return;
             }
 
             p.innerHTML += "<p class='alert alert-" + type + "' style='padding:3px;margin:2px;'> <strong></strong> " + txt + " </p>";
+            $("#jxFormMessage").show();
         } else {
             location.href = location.href + "#";
         }

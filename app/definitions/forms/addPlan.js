@@ -38,8 +38,8 @@ exports.form = function () {
 
         this.icon = '<span class="widget-icon"> <i class="fa fa-gear"></i> </span>';
 
-        this.onSubmitSuccess = "plans.html";
-        this.onSubmitCancel = "plans.html";
+        this.onSubmitSuccess = "hostingp.html";
+        this.onSubmitCancel = "hostingp.html";
 
         this.displayNameLabel_Add = "AddPlan";
         this.displayNameLabel_Edit = "EditPlan";
