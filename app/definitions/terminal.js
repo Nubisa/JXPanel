@@ -43,8 +43,8 @@ exports.defineMethods = function(){
 
         var child = require('pty.js').spawn('bash', [], {
             name: 'xterm-color',
-            cols: 80,
-            rows: 30,
+            cols: params.cols,
+            rows: params.rows,
             cwd: home,
             gid: active_user.gid,
             uid: active_user.uid
@@ -62,21 +62,6 @@ exports.defineMethods = function(){
         var toClient = function(_socket, data, err) {
             if(!data || !data.indexOf)
                 return;
-            if(data.length==4 && ( data.indexOf("[3G")==1 || data.indexOf("[1G")==1 || data.indexOf("[0J")==1 ) )
-            {
-                return;
-            }
-            var ind = data.indexOf("]0;");
-            if(ind >= 0){
-                var ln = data.length;
-                for(var i=0;i<ln;i++){
-                    if(data.charCodeAt(i) == 7){
-                        var str = data.substr(ind, i-ind);
-                        data = data.replace(str, "");
-                        break;
-                    }
-                }
-            }
 
             server.sendToGroup(_socket.owner.groupIdPrefix + "Term", "updateTerminal", {data:data, e:err});
         };
@@ -138,7 +123,10 @@ exports.defineMethods = function(){
            return;
         }
 
-        active_user.terminal.write(params.c + '\n');
+        if(params.enter)
+            active_user.terminal.write('\n');
+        else
+            active_user.terminal.write(params.c);
         server.sendCallBack(env, {done:true});
     });
 };

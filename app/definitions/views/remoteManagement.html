@@ -40,17 +40,17 @@ var editorInter = setInterval(function(){
         var elm_editor = document.getElementById("editor_table");
         clearInterval(editorInter);
         var scr2 = document.createElement("script");
-        scr2.src = "/js/jquery.terminal-min.js";
-        var scr3 = document.createElement("script");
-        scr3.src = "/js/jquery.mousewheel-min.js";
-
+       // scr2.src = "/js/jquery.terminal-min.js";
+       // var scr3 = document.createElement("script");
+       // scr3.src = "/js/jquery.mousewheel-min.js";
+        scr2.src = '/js/term.js';
         Init();
 
         scr2.onload = function(){
-          document.terminalReady();
+          window.refreshTerminal();
         };
         elm_editor.parentNode.appendChild(scr2);
-        elm_editor.parentNode.appendChild(scr3);
+       // elm_editor.parentNode.appendChild(scr3);
     }
 }, 10);
 
@@ -77,70 +77,103 @@ var Init = function(){
     };
 
     document.rCount = 0;
-    utils.addEvent(window, "resize", function(){
+    window.refreshTerminal = function(){
         document.rCount++;
         if(document.rCount===1){
             setTimeout(function(){
                 document.rCount = 0;
                 getDocHeight();
-            }, 1000);
+                terminalReady();
+            }, 2000);
         }
-    });
+    };
+
+    utils.addEvent(window, "resize", refreshTerminal);
+
+    window.term_commands = [];
+    window.run_command = function(command) {
+        if(!command)
+            return;
+
+        if(terminal.___disabled){
+            terminal.write("Use Restart Button above to Restart the session");
+            return;
+        }
+
+        if(!terminal._g ){
+            terminal.write("{{label.TerminalPleaseWait}}");
+            return;
+        }
+
+        term_commands.push(command);
+        var isEnter = command.length && command.charCodeAt(0) == 13;
+        if(isEnter){
+            command = "";
+        }
+        toServer("sendToTerminal", {g:terminal._g, c:command, enter: isEnter}, function(ret_val){
+            if(ret_val.err){
+                alert(ret_val.err);
+                if(ret_val.relogin){
+                    location.href = "/index.html";
+                }
+                return;
+            }
+        });
+    };
 
     var createTerminal = function(){
-        getDocHeight();
         var ed_holder = document.getElementById('editor_holder');
+        var term = document.getElementById('x_terminal');
+        if(term){
+           term.parentNode.removeChild(term);
+        }
 
-        var term = document.createElement("div");
+        term = document.createElement("div");
         term.id = "x_terminal";
         term.className = "note";
         term.style.cssText = "background:black;color:white;min-height:98%";
         ed_holder.appendChild(term);
 
-        window.term_commands = [];
-
-        window.terminal = $(term).terminal(function(command, tm) {
-            if(terminal.___disabled){
-                terminal.error("Use Restart Button above to Restart the session");
-                return;
+        setTimeout(function(){
+            if(window.terminal){
+                terminal.destroy();
             }
 
-            if(!terminal._g ){
-                terminal.error("{{label.TerminalPleaseWait}}");
-                return;
-            }
+            var col = parseInt(parseInt(parseInt(term.clientWidth)/8));
+            var row = parseInt(parseInt(term.clientHeight)/15);
 
-            if (command !== '') {
-                term_commands.push(command);
-                toServer("sendToTerminal", {g:terminal._g, c:command}, function(ret_val){
-                    if(ret_val.err){
-                        alert(ret_val.err);
-                        if(ret_val.relogin){
-                            location.href = "/index.html";
-                        }
-                        return;
-                    }
-                });
-            } else {
-                terminal.echo('');
-            }
-        }, {
-            exit:false,
-            greetings: '\x1b[1;32m{{label.TerminalConnectingToServer}}',
-            name: 'js_term',
-            height: ed_holder.clientHeight-20,
-            outputLimit:-1,
-            prompt: '>'});
+            window.terminal = new Terminal({
+                cols: col,
+                rows: row,
+                screenKeys: true
+            });
+
+            var send_data = "";
+            terminal.on('data', function(data) {
+                run_command(data);
+            });
+
+            terminal.on('title', function(title) {
+                //document.title = title;
+            });
+
+            terminal.open(term);
+
+            terminal.echo = terminal.write;
+        },1);
     };
 
-    document.terminalReady = function(){
-        document.terminalReady = null;
+    window.terminalReady = function(){
         createTerminal();
         connectTerminal();
     };
 
     var connectTerminal = function(){
-        toServer("connectToTerminal", null, function(ret_val){
+        var term = document.createElement("div");
+        var col = parseInt(parseInt(parseInt(term.clientWidth)/8));
+        var row = parseInt(parseInt(term.clientHeight)/15);
+
+        toServer("connectToTerminal", {cols:col, rows:row}, function(ret_val){
             if(ret_val.err){
                 alert(ret_val.err);
                 if(ret_val.relogin){
@@ -159,9 +192,10 @@ var Init = function(){
                 return;
             }
 
-            terminal.echo("\x1b[1;32m{{label.TerminalConnectedToServer}}");
             terminal._g = ret_val.g;
             terminal.___disabled = false;
+            terminal.write("\x1b[1;32m{{label.TerminalConnectedToServer}}\n");
+            terminal.write("\r");
         }, true);
     };
 
@@ -189,40 +223,7 @@ var Init = function(){
             return;
         }
 
-        params.data = params.data.replace(/\r/g, "");
-
-        window.lines += params.data;
-
-        window.linesCount ++;
-        if(window.linesCount == 1){
-            setTimeout(function(){
-                if(window.lines.trim().lastIndexOf("\n") == window.lines.trim().length-2){
-                    window.lines = window.lines.trim().substr(0, window.lines.trim().length-2);
-                }
-                for(var o in term_commands){
-                    if(window.lines.indexOf(term_commands[o])===0){
-                        window.lines = window.lines.substr(term_commands[o].length+1);
-                        window.term_commands = [];
-                        break;
-                    }
-                }
-
-                terminal.echo(window.lines, {flush:false});
-
-                window.flushCount++;
-
-                if(window.flushCount == 1){
-                    setTimeout(function(){
-                        window.flushCount = 0;
-                        terminal.flush();
-                    },100);
-                }
-                window.lines = null;
-                window.lines = "";
-                window.linesCount = 0;
-                terminal.___disabled = false;
-            },10);
-        }
+        terminal.write(params.data);
     }
 };
 </script>
