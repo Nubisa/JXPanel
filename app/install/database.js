@@ -49,6 +49,11 @@ var ReadDB = function(cb){ // KRIS FILL IN
                     Users[o].domains = {};
                 }
             }
+            Plans[exports.unlimitedPlanName].plan_custom_socket = true;
+            Plans[exports.unlimitedPlanName].plan_sys_exec = true;
+            Plans[exports.unlimitedPlanName].plan_local_native_modules = true;
+            Plans[exports.unlimitedPlanName].plan_ssh = true;
+
             exports.DB = DB;
         }
         if (cb) cb(err);
