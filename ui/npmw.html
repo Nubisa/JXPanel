@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    {{view.header}} {{toSub.pageTitle:JXcoreNPMModules}}
+</head>
+<body>
+<!-- Your HTML -->
+<div id='panel-main'>
+    <div id='page-title'>
+        {{view.topNav}}
+    </div>
+    <table id='all-page' cellpadding="0" cellspacing="0">
+        <tbody>
+        <tr>
+            {{view.leftMenu}}
+
+            <td id='right-page'><!-- Main Content -->
+                <div class="internal-view">
+                    {{datatable.modules}}
+                </div>
+            </td>
+            <td id='toolbar-right' class='dark-back' ><!-- Addons -->
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+{{view.includes}}
+{{view.chartIncludes}}
+
+</body>
+</html>

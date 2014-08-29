@@ -40,6 +40,13 @@
     padding-right: 5px;
 }
 
+.jxbuttons {
+    padding:6px;
+    background:#3A3F42;
+    border:1px solid #444;
+    border-radius: 2px;
+}
+
 .jxbtn{
     color:#f8f8f8;
     margin:0px;
