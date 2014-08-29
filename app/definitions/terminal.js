@@ -120,7 +120,8 @@ exports.defineMethods = function(){
             return;
         }
 
-        var ssh = database.getPlan(active_user.plan).plan_ssh;
+        var plan = database.getPlan(active_user.plan);
+        var ssh = plan.plan_ssh;
 
         if(!ssh || plan.suspended){
             server.sendCallBack(env, {msg:form_lang.Get("EN", "SSHNotAllowed")});
