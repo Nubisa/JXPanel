@@ -81,3 +81,29 @@ exports.createUserFolder = function(location) {
 
     return true;
 };
+
+
+exports.moveUserHome = function(user_name, new_plan_name) {
+
+    var user = db.getUser(user_name);
+    var old_home = exports.getUserPath(user.plan, user_name);
+    var new_home = exports.createUserHome(new_plan_name, user_name);
+
+    if (new_home.err)
+        return new_home;
+
+    var cmd = "mv " + old_home + " " + pathModule.dirname(new_home.home) + pathModule.sep;
+    var res = jxcore.utils.cmdSync(cmd);
+    if (res.exitCode)
+        return {err:res.out};
+
+    // extra check
+    if (!fs.existsSync(new_home.home))
+        return { err:"UserHomeDirNotMoved" };
+
+//    system_tools.getUserIDS(user_name);
+//    if (ids)
+//        exports.markFile(new_home.home, ids.uid, ids.gid);
+
+    return new_home.home;
+};

@@ -1,5 +1,6 @@
 var _active_user = require('../definitions/active_user');
 var form_lang = require('../definitions/form_lang');
+var user_folders = require('../definitions/user_folders');
 var datatables = require('./datatable_templates');
 var forms = require('./form_templates');
 var util = require("util");
@@ -302,19 +303,30 @@ methods.sessionApply = function(env, params){
                 if (!user)
                     return sendError("DBCannotGetUser");
 
-                update(user, json);
-                ret = database.updateUser(update_name, user);
+                var old_plan = user.plan;
+                var new_plan = json.plan;
 
-                if (params.controls["person_password"]) {
-                    var res = system_tools.updatePassword(update_name, params.controls["person_password"]);
-                    if (res.err)
+                if (old_plan !== new_plan) {
+                    var res = user_folders.moveUserHome(update_name, new_plan);
+                    if (res.err) {}
                         ret = res.err;
                 }
 
-                if (!json.panel_access && user.plan !== database.unlimitedPlanName) {
-                    // user cannot update by himself panel_access field
-                    if (active_user.username !== update_name)
-                        _active_user.clearUserByName(update_name);
+                if (!ret) {
+                    update(user, json);
+                    ret = database.updateUser(update_name, user);
+
+                    if (params.controls["person_password"]) {
+                        var res = system_tools.updatePassword(update_name, params.controls["person_password"]);
+                        if (res.err)
+                            ret = res.err;
+                    }
+
+                    if (!json.panel_access && user.plan !== database.unlimitedPlanName) {
+                        // user cannot update by himself panel_access field
+                        if (active_user.username !== update_name)
+                            _active_user.clearUserByName(update_name);
+                    }
                 }
             } else {
                 ret = database.AddUser(json.plan, json.name, json);

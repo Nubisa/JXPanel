@@ -243,6 +243,7 @@ exports.Labels = {
     "UserUnknown" : "Unknown user.",
     "UserAuthentication" : "User authentication",
     "UserHomeDirNotExists" : "User's home directory does not exists.",
+    "UserHomeDirNotMoved" : "User's home directory could not be moved.",
     "EmailInvalid" : "Invalid e-mail address.",
 
 
