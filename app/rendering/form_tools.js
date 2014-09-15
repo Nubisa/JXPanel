@@ -33,6 +33,9 @@ var getData = function(label, _title, input_id, active_user, options) {
     if (options.extra && options.extra.noEditDisplayValue)
         ret.value = options.extra.noEditDisplayValue;
 
+    ret.class = "form-group";
+    if (options.hidden) ret.class += " hidden";
+
     return ret;
 };
 
@@ -67,7 +70,7 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
         _type = "textarea";
     }
 
-    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
+    var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
         +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
@@ -102,7 +105,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
     _title = form_lang.Get(active_user.lang, _title) || _title;
     label = form_lang.Get(active_user.lang, label) || label;
 
-    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
+    var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
         +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
@@ -149,7 +152,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
     var _type = "checkbox";
 
-    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
+    var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
         + '<label class="col-md-2 control-label">'+label + data.required_label + '</label><div class="col-md-10">';
 
     if (options && options.extra && typeof options.extra.noEditDisplayValue !== "undefined") {
@@ -197,7 +200,7 @@ exports.createSimpleText = function(label, _title, input_id, _value, active_user
     _title = form_lang.Get(active_user.lang, _title) || _title;
     label = form_lang.Get(active_user.lang, label) || label;
 
-    var _html = '<div class="form-group" id="' + data.fakeId + '_group">'
+    var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
         +'<label class="col-md-2 control-label">'+label + '</label>'
         +'<div class="col-md-10">'
         +'<div style="margin-top: 7px;">' + _value + '</div>'
