@@ -87,23 +87,31 @@ exports.moveUserHome = function(user_name, new_plan_name) {
 
     var user = db.getUser(user_name);
     var old_home = exports.getUserPath(user.plan, user_name);
-    var new_home = exports.createUserHome(new_plan_name, user_name);
 
-    if (new_home.err)
-        return new_home;
+    var new_home = exports.getUserPath(new_plan_name, user_name);
+    var new_profile_dir = pathModule.dirname(new_home); // plan's folder
 
-    var cmd = "mv " + old_home + " " + pathModule.dirname(new_home.home) + pathModule.sep;
+    if (!fs.existsSync(new_profile_dir)) {
+        var res = exports.createUserFolder(new_profile_dir);
+        if (res.err)
+            return res;
+    }
+
+//    var cmd = "mv " + old_home + " " + pathModule.dirname(new_home.home) + pathModule.sep;
+    var cmd = 'usermod -m -d ' + new_home + ' ' + user_name;
     var res = jxcore.utils.cmdSync(cmd);
-    if (res.exitCode)
+    if (res.exitCode) {
+        console.error(cmd, res);
         return {err:res.out};
+    }
 
     // extra check
-    if (!fs.existsSync(new_home.home))
+    if (!fs.existsSync(new_home))
         return { err:"UserHomeDirNotMoved" };
 
-//    system_tools.getUserIDS(user_name);
-//    if (ids)
-//        exports.markFile(new_home.home, ids.uid, ids.gid);
+    var ids = system_tools.getUserIDS(user_name);
+    if (ids)
+        exports.markFile(new_home, ids.uid, ids.gid);
 
-    return new_home.home;
+    return new_home;
 };
