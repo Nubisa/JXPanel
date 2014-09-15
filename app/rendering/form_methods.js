@@ -308,7 +308,7 @@ methods.sessionApply = function(env, params){
 
                 if (old_plan !== new_plan) {
                     var res = user_folders.moveUserHome(update_name, new_plan);
-                    if (res.err) {}
+                    if (res.err)
                         ret = res.err;
                 }
 
@@ -330,11 +330,19 @@ methods.sessionApply = function(env, params){
                 }
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
-                if (!ret && !params.controls["person_username_reuse"]) {
-                    var res = system_tools.addSystemUser(json, params.controls["person_password"]);
-                    if (res.err) {
-                        ret = res.err;
-                        database.deleteUser(json.name);
+                if (!ret) {
+                    if (!params.controls["person_username_reuse"]) {
+                        var res = system_tools.addSystemUser(json, params.controls["person_password"]);
+                        if (res.err) {
+                            ret = res.err;
+                            database.deleteUser(json.name);
+                        }
+                    } else {
+                        // we should move home dir if exists
+                        var new_plan = json.plan;
+                        var res = user_folders.moveUserHome(update_name, new_plan);
+                        if (res.err)
+                            ret = res.err;
                     }
                 }
             }
