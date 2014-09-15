@@ -158,7 +158,7 @@
             var _yes = ButtonPressed === "{{label.Yes}}";
 
             if (_with || _without || _yes) {
-                window.toServer('removeFromTableData', { dt : '{{datatable.name}}', ids : ids, with : _with || _without }, function(param) {
+                window.toServer('removeFromTableData', { dt : '{{datatable.name}}', ids : ids, with : _with }, function(param) {
                     if (!param.err)
                         location.reload();
                     else
