@@ -369,8 +369,8 @@ exports.Labels = {
 
     "RemoveSelectedDomainsQuestion" : "Are you sure to remove selected domains?",
     "RemoveSelectedDomainInfo" : "Would you like to delete also files and folders including user's files?",
-    "RemoveWithUserFiles" : "Remove also user files",
-    "RemoveWithoutUserFiles" : "Remove only user, leave user files intact",
+    "RemoveWithUserFiles" : "Remove everything",
+    "RemoveWithoutUserFiles" : "Remove the user, but move user files to the archive",
 
     //charts
     "DiskUsageInformation": "Disk Usage",

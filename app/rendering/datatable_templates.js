@@ -386,7 +386,7 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
 
     var active_user = _active_user.getUser(sessionId);
 
-    var homeDirs = withUserFiles ? getHomePaths(active_user) : null;
+    var homeDirs = getHomePaths(active_user);
 
     var table = getTable(table_name);
     if (!table) {
@@ -451,8 +451,21 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
             if (ret1.err) {
                 errors.push(form_lang.Get(active_user.lang, ret1.err, true));
             }
-            if (withUserFiles && homeDirs && homeDirs.users[usersToRemove[o]])
-                system_tools.rmdirSync(homeDirs.users[usersToRemove[o]]);
+            if (homeDirs && homeDirs.users[usersToRemove[o]]) {
+                if (withUserFiles) {
+                    system_tools.rmdirSync(homeDirs.users[usersToRemove[o]]);
+                } else {
+                    // moving user's the folder to _deleted
+                    var deletedFolder = site_defaults.apps_folder + path.sep + "deleted" + path.sep;
+                    if (!fs.existsSync(deletedFolder))
+                        fs.mkdirSync(deletedFolder);
+
+                    var d = new Date();
+                    var str = d.getDate() + "-" + d.getMonth() + "-" + d.getFullYear();
+                    var cmd = "mv " + homeDirs.users[usersToRemove[o]] + " " + deletedFolder + usersToRemove[o] + "_" + str;
+                    var res = jxcore.utils.cmdSync(cmd);
+                }
+            }
         }
 
         // removing plans folders
