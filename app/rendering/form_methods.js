@@ -154,7 +154,12 @@ var sessionAdd = function(env, active_user, params){
 
 
                if(!res.result){
-                   messages.push({ msg:res.msg, id : fakeId});
+                   var ob = { id : fakeId};
+                   for (var o in res) {
+                       if (o !== "result")
+                        ob[o] = res[o];
+                   }
+                   messages.push(ob);
                }
            }
         }
@@ -313,7 +318,7 @@ methods.sessionApply = function(env, params){
                 }
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
-                if (!ret) {
+                if (!ret && !params.controls["person_username_reuse"]) {
                     var res = system_tools.addSystemUser(json, params.controls["person_password"]);
                     if (res.err) {
                         ret = res.err;

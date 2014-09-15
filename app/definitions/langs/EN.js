@@ -106,6 +106,7 @@ exports.Labels = {
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
     "Username" : "System user name",
+    "UsernameReuse" : "Reuse existing system user",
     "UsernameEnter" : "Please enter your username",
     "UsernameEnterRequired" : "Please enter valid username",
 
@@ -124,6 +125,7 @@ exports.Labels = {
     "DataPlansContentList": "Hosting plans are set of rules which define hosting options and limits. You can use a hosting plan for multiple users.",
 
     "CredentialsFailed": "Incorrect username and/or password",
+    "PasswordFailed": "Incorrect password",
     "WelcomeDashboard": "Welcome %s!",
 
     "BlockLeftHeader" : "About SmartAdmin - Are you up to date?",
@@ -237,7 +239,9 @@ exports.Labels = {
     // user form
     "UserAlreadyExists" : "User with this name already exists.",
     "UserSystemAlreadyExists" : "System user with this name already exists.",
+    "UserSystemReuse" : "Would you like to reuse him?",
     "UserUnknown" : "Unknown user.",
+    "UserAuthentication" : "User authentication",
     "UserHomeDirNotExists" : "User's home directory does not exists.",
     "EmailInvalid" : "Invalid e-mail address.",
 
@@ -366,7 +370,7 @@ exports.Labels = {
     "RemoveSelectedDomainsQuestion" : "Are you sure to remove selected domains?",
     "RemoveSelectedDomainInfo" : "Would you like to delete also files and folders including user's files?",
     "RemoveWithUserFiles" : "Remove also user files",
-    "RemoveWithoutUserFiles" : "Remove only records, leave user files intact",
+    "RemoveWithoutUserFiles" : "Remove only user, leave user files intact",
 
     //charts
     "DiskUsageInformation": "Disk Usage",

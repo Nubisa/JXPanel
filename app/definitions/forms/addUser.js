@@ -93,6 +93,18 @@ exports.form = function () {
             },
 
             {
+                name: "person_username_reuse",
+                details: {
+                    label: "UsernameReuse",
+                    method: tool.createCheckBox,
+                    options: { hidden : true },
+                    dbName: false,
+                    hideOnEdit : true
+                },
+                validation : new validations.Boolean()
+            },
+
+            {
                 name: "person_password",
                 details: {
                     label: "Password",

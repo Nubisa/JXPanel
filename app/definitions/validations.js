@@ -9,6 +9,7 @@ var nginx = require("../install/nginx");
 var _active_user = require("../definitions/active_user");
 var path = require('path');
 var fs = require("fs");
+var pam = require('authenticate-pam');
 
 
 /**
@@ -169,18 +170,44 @@ exports.MaxPort = function(min_port_field) {
 
 exports.UserName = function() {
 
-    this.validate = function (env, active_user, val) {
+    this.validate = function (env, active_user, val, params) {
 
         var reg = /[^0-9A-Za-z_]/;
 
         if (val.match(reg) !== null || val.length >31)
             return {result: false, msg: form_lang.Get(active_user.lang, "UsernameEnterRequired", true)};
 
-        if (system_tools.systemUserExists(val))
-            return {result: false, msg: form_lang.Get(active_user.lang, "UserSystemAlreadyExists", true)};
-
         if (database.getUser(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "UserAlreadyExists", true)};
+
+        if (system_tools.systemUserExists(val)) {
+            var pwd = params.controls['person_password'];
+            var reuse = params.controls['person_username_reuse'];
+
+            var ret = jxcore.utils.cmdSync('id -g -n ' + params.controls['person_username']);
+            if (ret.out.toString().trim() === "jxman") {
+
+                if (!reuse) {
+                    var fakeId = active_user.session.forms[params.form].fakeIdsReversed['person_username_reuse'];
+                    return {result: false,
+                        msg: form_lang.Get(active_user.lang, "UserSystemAlreadyExists", true),
+                        ru : fakeId }; // reuse user
+                }
+
+                // user checked "reuse" checkbox
+                var error = null;
+                pam.authenticate(val, pwd, function(err) {
+                    error = err;
+                    jxcore.utils.continue();
+                });
+                jxcore.utils.jump();
+                if (error)
+                    return {result: false, msg: form_lang.Get(active_user.lang, "PasswordFailed", true)};
+
+            } else {
+                return {result: false, msg: form_lang.Get(active_user.lang, "UserSystemAlreadyExists", true)};
+            }
+        }
 
         return {result: true};
     };

@@ -65,8 +65,22 @@
 
                     if (param.arr) {
                         _this.hideErrors();
-                        for(var o in param.arr)
-                            _this.showError(param.arr[o].id, param.arr[o].msg);
+                        for(var o in param.arr) {
+                            if (param.arr[o].ru) {
+
+                                utils.jxConfirm('<i class="fa fa-user txt-color-orangeDark"></i> ' + "{{label.UserSystemAlreadyExists}}", "{{label.UserSystemReuse}}", function(ButtonPressed) {
+                                    if (ButtonPressed === "{{label.Yes}}") {
+                                        $('#' + param.arr[o].ru + "_group").removeClass("hidden");
+                                        $('#' + param.arr[o].ru).prop("checked", true);
+                                        setTimeout(_this.apply, 50);
+                                    } else {
+                                        _this.showError(param.arr[o].id, param.arr[o].msg);
+                                    }
+                                });
+                            } else {
+                                _this.showError(param.arr[o].id, param.arr[o].msg);
+                            }
+                        }
                     } else {
                         document.location = "{{form.onSubmitSuccess}}";
                     }
