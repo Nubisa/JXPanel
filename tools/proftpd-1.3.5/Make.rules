@@ -1,5 +1,5 @@
-prefix=/home/gonzo/Github/JXPanel/server_apps/ftp
-exec_prefix=/home/gonzo/Github/JXPanel/server_apps/ftp
+prefix=/home/nubisa/GitHub/JXPanel/server_apps/ftp
+exec_prefix=/home/nubisa/GitHub/JXPanel/server_apps/ftp
 bindir=${exec_prefix}/bin
 datadir=${datarootdir}
 libdir=${exec_prefix}/lib
@@ -17,7 +17,7 @@ AR=ar
 CC=gcc
 PLATFORM=-DLINUX 
 LDFLAGS=-L$(top_srcdir)/lib  
-LIBEXECDIR=/home/gonzo/Github/JXPanel/server_apps/ftp/libexec
+LIBEXECDIR=/home/nubisa/GitHub/JXPanel/server_apps/ftp/libexec
 LIBS=-lsupp -lcrypt -ldl   -L$(top_srcdir)/lib/libcap -lcap  -lpam
 LIBTOOL=$(SHELL) $(top_builddir)/libtool
 RANLIB=ranlib

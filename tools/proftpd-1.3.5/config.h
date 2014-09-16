@@ -12,7 +12,7 @@
  *************************************************************************/
 
 /* Define to be the build options. */
-#define PR_BUILD_OPTS " '--prefix=/home/gonzo/Github/JXPanel/server_apps/ftp'"
+#define PR_BUILD_OPTS " '--prefix=/home/nubisa/GitHub/JXPanel/server_apps/ftp'"
 
 /* Define to be the build CFLAGS.  */
 #define PR_BUILD_CFLAGS "-O2 -Wall"
@@ -230,7 +230,7 @@
 #define SIZEOF_INT 4
 
 /* The number of bytes in a long.  */
-#define SIZEOF_LONG 8
+#define SIZEOF_LONG 4
 
 /* The number of bytes in a long long.  */
 #define SIZEOF_LONG_LONG 8
@@ -239,16 +239,16 @@
 #define SIZEOF_OFF_T 8
 
 /* The number of bytes in a size_t.  */
-#define SIZEOF_SIZE_T 8
+#define SIZEOF_SIZE_T 4
 
 /* The number of bytes in a time_t.  */
-#define SIZEOF_TIME_T 8
+#define SIZEOF_TIME_T 4
 
 /* The number of bytes in a pointer to a char.  */
-#define SIZEOF_CHAR_P 8
+#define SIZEOF_CHAR_P 4
 
 /* The number of bytes in a pointer to a void.  */
-#define SIZEOF_VOID_P 8
+#define SIZEOF_VOID_P 4
 
 /* Define if you have the backtrace function.  */
 /* #undef HAVE_BACKTRACE */
@@ -862,31 +862,31 @@
 #endif /* STDERR_FILENO */
 
 #ifndef PR_CONFIG_DIR
-#define PR_CONFIG_DIR "/home/gonzo/Github/JXPanel/server_apps/ftp/etc"
+#define PR_CONFIG_DIR "/home/nubisa/GitHub/JXPanel/server_apps/ftp/etc"
 #endif /* PR_CONFIG_DIR */
 
 #ifndef PR_INCLUDE_DIR
-#define PR_INCLUDE_DIR "/home/gonzo/Github/JXPanel/server_apps/ftp/include"
+#define PR_INCLUDE_DIR "/home/nubisa/GitHub/JXPanel/server_apps/ftp/include"
 #endif /* PR_INCLUDE_DIR */
 
 #ifndef PR_LIBEXEC_DIR
-#define PR_LIBEXEC_DIR "/home/gonzo/Github/JXPanel/server_apps/ftp/libexec"
+#define PR_LIBEXEC_DIR "/home/nubisa/GitHub/JXPanel/server_apps/ftp/libexec"
 #endif /* PR_LIBEXEC_DIR */
 
 #ifndef PR_LOCALE_DIR
-#define PR_LOCALE_DIR "/home/gonzo/Github/JXPanel/server_apps/ftp/share/locale"
+#define PR_LOCALE_DIR "/home/nubisa/GitHub/JXPanel/server_apps/ftp/share/locale"
 #endif /* PR_LOCALE_DIR */
 
 #ifndef PR_RUN_DIR
-#define PR_RUN_DIR "/home/gonzo/Github/JXPanel/server_apps/ftp/var"
+#define PR_RUN_DIR "/home/nubisa/GitHub/JXPanel/server_apps/ftp/var"
 #endif /* PR_RUN_DIR */
 
 #ifndef PR_CONFIG_FILE_PATH
-#define PR_CONFIG_FILE_PATH "/home/gonzo/Github/JXPanel/server_apps/ftp/etc/proftpd.conf"
+#define PR_CONFIG_FILE_PATH "/home/nubisa/GitHub/JXPanel/server_apps/ftp/etc/proftpd.conf"
 #endif /* PR_CONFIG_FILE_PATH */
 
 #ifndef PR_PID_FILE_PATH
-#define PR_PID_FILE_PATH "/home/gonzo/Github/JXPanel/server_apps/ftp/var/proftpd.pid"
+#define PR_PID_FILE_PATH "/home/nubisa/GitHub/JXPanel/server_apps/ftp/var/proftpd.pid"
 #endif /* PR_PID_FILE_PATH */
 
 #ifndef PR_LASTLOG_PATH
@@ -895,7 +895,7 @@
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #ifndef _FILE_OFFSET_BITS
-/* #undef _FILE_OFFSET_BITS */
+#define _FILE_OFFSET_BITS 64
 #endif /* _FILE_OFFSET_BITS */
 
 /* Define for large files, on AIX-style hosts. */
