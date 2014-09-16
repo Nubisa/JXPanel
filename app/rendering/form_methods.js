@@ -14,6 +14,7 @@ var system_tools = require('../system_tools');
 var hosting_tools = require('../hosting_tools');
 var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
+var ftp = require("./../install/ftp");
 
 
 methods.tryLogin = function(env, params){
@@ -65,6 +66,11 @@ methods.tryLogin = function(env, params){
                 });
 
                 database.AddUser(database.unlimitedPlanName, params.username, { person_name : params.username, firstUser:true, ftp_access : true, panel_access : true });
+
+                var res = ftp.allowUser(params.username);
+                if (res.err)
+                    console.log(res.err);
+
                 try{
                     var ret = system_tools.addSystemUser({plan:database.unlimitedPlanName, name:params.username }, null, 1);
                     if(ret.err){
@@ -346,6 +352,11 @@ methods.sessionApply = function(env, params){
                     }
                 }
             }
+
+            var res = json.ftp_access ? ftp.allowUser(update_name) : ftp.denyUser(update_name);
+            if (res.err)
+                ret = res.err;
+
         } catch(ex) {
             ret = ex.toString();
             if(json && !isUpdate && database.getUser(json.name))
