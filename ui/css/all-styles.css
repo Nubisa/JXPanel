@@ -1,4 +1,4 @@
-html { height:100%; }
+html { height:100%; background: none!important;}
 body { 
   position:absolute; top:0; bottom:0; right:0; left:0; 
   background:#3A3F42;
@@ -11,10 +11,11 @@ body {
   cursor:default;
   overflow-y:scroll;
   overflow-x:hidden;
+  height: 100%;
 }
 
 #panel-main{
-  min-height: 100%;
+  height: 100%;
   width:100%;
 }
 
