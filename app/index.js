@@ -32,6 +32,20 @@ if(process.argv[2] === "nginx") {
     return;
 }
 
+if(process.argv[2] === "ftp") {
+
+    var ftp = require("./install/ftp");
+    if (process.argv[3] === "start") ftp.start(); else
+    if (process.argv[3] === "stop") ftp.stop(); else
+    if (process.argv[3] === "reload") ftp.restart(false);
+//    if (process.argv[3] === "test") ftp.denyUser("nubisa");
+//    if (process.argv[3] === "allow") ftp.allowUser(process.argv[4]);
+//    if (process.argv[3] === "deny") ftp.denyUser(process.argv[4]);
+
+    return;
+}
+
+
 if(icheck.requireInstallation()){
     if(process.argv[2] != "install" && process.argv[2] != "reinstall"){
         jxcore.utils.console.log("To install "+site_defaults.EN.panelName+", use\n" + process.argv[0] + " index install");
