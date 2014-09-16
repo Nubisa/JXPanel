@@ -334,6 +334,14 @@ var logic = [
         }
 
         return form_lang.Get(gl.lang, gl[val], true);
+    }},
+    {from: "{{user.$$}}", to: "$$", "$": function (val, gl) {
+        if (val == "ftpAccess") {
+            var user = database.getUser(gl.active_user.username);
+            var fname = path.join(__dirname, '../definitions/forms/addUser.js');
+            var frm = require(fname).form();
+            return tools.getFieldDisplayValue(gl.active_user, frm, "ftp_access", user);
+        }
     }}
 ];
 
