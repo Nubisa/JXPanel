@@ -40,57 +40,33 @@ exports.render = function(active_user){
 
     var str = '';
 
-    if(plan.canCreateUser){
-        str += '<li id="Menu-users">'
-            + '<a href="users.html"><i class="fa fa-lg fa-fw fa-user"></i>{{label.UsersUpperCase}}</a>'
-            + '</li>';
-    }
-
     if(plan.canCreatePlan){
-        str += '<li id="Menu-plans">'
-            + '<a href="hostingp.html"><i class="fa fa-lg fa-fw fa-cogs"></i>{{label.DataPlans}}</a>'
-            + '</li>';
+        str += "<div class='normal-menu' id='hostingp'>{{label.DataPlans}}</div>";
     }
 
-    str += '<li id="Menu-domains">'
-         + '<a href="domains.html"><i class="fa fa-lg fa-fw fa-external-link"></i>{{label.DomainsUpperCase}}</a>'
-         + '</li>'
+    if(plan.canCreateUser){
+        str += "<div class='normal-menu' id='users'>{{label.UsersUpperCase}}</div>";
+    }
+
+    str += "<div class='normal-menu' id='domains'>{{label.DomainsUpperCase}}</div>";
+
+    str += "<div class='bold-menu' style='margin-top:10px;'>{{label.ToolsAndServices}}</div>";
 
     if(plan.name == "Unlimited"){
-        str += '<li>'
-            + '<a href="#"><img src="img/jx.png" style="padding-right: 13px; vertical-align: text-bottom"/>{{label.JXcoreUpperCase}}</a>'
-            + '<ul>'
-            + '<li id="Menu-jxconfig">'
-            + '<a href="jxcore.html">{{label.JXcoreConfiguration}}</a>'
-            + '</li>'
-            + '<li id="Menu-jxmodules">'
-            + '<a href="npmw.html">{{label.JXcoreNPMModules}}</a>'
-            + '</li>'
-            + '</ul>'
-            + '</li>';
+        str += "<div class='normal-menu' id='jxcore'>{{label.JXcoreUpperCase}}</div>";
+        str += "<div class='normal-menu' id='npmw'>{{label.JXcoreNPMModules}}</div>";
     }
 
-    str += '<li id="Menu-cdatatable">'
-        + '<a href="cdatatable.html"><i class="fa fa-lg fa-fw fa-dashboard"></i>{{label.stats}}</a>'
-        + '</li>';
+    str += "<div class='normal-menu' id='filem'>{{label.fileManager}}</div>";
 
-    str += '<li id="Menu-editor">'
-        + '<a href="editor.html"><i class="fa fa-lg fa-fw fa-hdd-o"></i>{{label.fileManager}}</a>'
-        + '</li>';
-
-    str += '<li id="Menu-xxx">'
-        + '<a href="cform.html"><i class="fa fa-lg fa-fw fa-briefcase"></i>{{label.serviceManagement}}</a>'
-        + '</li>';
-
-    if(plan.plan_ssh){
-        str += '<li id="Menu-console">'
-            + '<a href="console.html"><i class="fa fa-lg fa-fw fa-laptop"></i>{{label.RemoteManagement}}</a>'
-            + '</li>';
+    if(plan.plan_ssh) {
+        str += "<div class='normal-menu' id='remotem'>{{label.RemoteManagement}}</div>";
     }
 
-    str += '<li id="Menu-xxx3">'
-        + '<a href="cform.html"><i class="fa fa-lg fa-fw fa-question"></i>{{label.help}}</a>'
-        + '</li>';
+    str += "<div class='normal-menu' id='configuration'>{{label.Configuration}}</div>";
+    str += "<div class='bold-menu' style='margin-top:10px;'>{{label.Extras}}</div>";
+    str += "<div class='normal-menu' id='addonm'>{{label.AddOnManager}}</div>";
+    str += "<div class='normal-menu' id='help'>{{label.help}}</div>";
 
     return str;
 };
