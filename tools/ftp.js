@@ -41,6 +41,7 @@ var conf = fs.readFileSync(conf_file) + "";
 conf = conf.replace("{{user.name}}", user_name);
 conf = conf.replace("{{user.group}}", user_group);
 conf = conf.replace("{{panel.name}}", panel_name);
+conf = conf.replace("{{process.pidfile}}", path.join(ftp_dir, "etc/pid"));
 fs.writeFileSync(conf_file, conf);
 log("[OK] Settings", "green");
 log("FTP server is successfully installed", "green");
