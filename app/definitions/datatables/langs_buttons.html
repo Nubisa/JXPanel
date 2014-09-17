@@ -1,0 +1,110 @@
+<!--<label class="jxradio"><input type="radio" id="jxlrb_ALL" name="jxlrb">Show all languages</label>-->
+<!--<label class="jxradio"><input type="radio" id="jxlrb_EN" name="jxlrb">United States</label>-->
+<!--<label class="jxradio"><input type="radio" id="jxlrb_PL" name="jxlrb">Poland</label>-->
+<!--{{lang.radios}}-->
+<a id="btn_refresh" data-original-title="{{label.Save}}" class="jxbtn" onclick="return window.jx_langs.save();">
+    <i class="fa fa-save"></i><span class="dummy-label">{{label.Save}}</span>
+</a>
+<!--<label class="jxradio"><input type="checkbox" class="jxradio" id="jxl_only_undefined"/>Show only not defined</label>-->
+
+
+
+<script type="text/javascript">
+
+
+    window.jx_langs = {};
+    window.jx_langs.supported = "{{lang.supported}}".split(",");
+    window.jx_langs.modified = {};
+
+    window.jx_langs.save = function() {
+
+        var cnt = 0;
+        for(var o in window.jx_langs.modified)
+            cnt++;
+
+        if (!cnt) {
+            utils.jxAddMessage("warning", "{{label.NoChanges}}");
+            return;
+        }
+
+        window.toServer('langUpdate', window.jx_langs.modified, function(param) {
+//                alert(JSON.stringify(param));
+
+            if (!param.changed)
+                return;
+
+            for(var o in param.changed) {
+                var parsed = param.changed[o].split("_");
+                var lang = parsed[0];
+                var int_id = parsed[1];
+
+                var id = "jxl_" + lang + "_" + int_id;
+
+                $("#" + id).each(function() {
+
+                    this.jx_org_value = this.value;
+                    window.jx_langs.checkLangInput(this);
+                    var ok = '<span class="input-group-addon" id="ok'+ id +'"><i class="fa fa-check"></i></span>';
+                    var oke = document.getElementById("ok" + id);
+                    if (!oke)
+                        $(ok).insertAfter("#" + id);
+                });
+            }
+
+            //window.jx_langs.modified = {};
+
+            utils.jxAddMessage("success", "{{label.FileSavedContent}}");
+        });
+
+        return false;
+    };
+
+
+    window.jx_langs.checkLangInput = function(el) {
+
+        var id = el.id.replace('jxl_', '');  // e.g. "PL_2"
+        var parsed_id = id.split("_");
+        var int = parsed_id[parsed_id.length-1];
+
+        var div = $("#jxld_" + id);
+
+        if (el.value !== el.jx_org_value){
+            window.jx_langs.modified[id] = el.value;
+            div.removeClass("has-success");
+            div.addClass("has-warning");
+            $("#ok"+el.id).remove();
+
+            var edited = '<span class="input-group-addon" id="ed'+ el.id +'"><i class="fa fa-save"></i></span>';
+            var ede = document.getElementById("ed" + el.id);
+            if (!ede)
+                $(edited).insertAfter("#" + el.id);
+        } else {
+            delete window.jx_langs.modified[id];
+            div.removeClass("has-warning");
+            div.addClass("has-success");
+            $("#ed"+el.id).remove();
+        }
+    };
+
+    window.jx_langs.initializeLangs = function() {
+
+        var inputs = $("input[id^=jxl_]");
+        inputs.each(function() {
+            this.jx_org_value = this.value;
+        });
+
+        inputs.on('input', function(el) {
+            window.jx_langs.checkLangInput(el.target);
+        });
+        inputs = null;
+
+//        $("#jxl_only_undefined").change(function(el) {
+//            var all = !$(el).val();
+//
+//            $("[id^=#jxd_]").each(function() {
+//
+//            });
+//        });
+    };
+
+</script>

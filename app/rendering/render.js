@@ -49,10 +49,6 @@ var smart_rule = [
                 return "";
             }
 
-            if (val === "langs") {
-                return form_lang.getSupportedLangs(gl.active_user).html;
-            }
-
             return !gl.active_user[val] ? "":gl.active_user[val];
         }
     },
@@ -146,6 +142,22 @@ var smart_rule = [
         if (val === "appConfig")
             return hosting_tools.appGetConfigAsString(gl.active_user);
 
+        return "";
+    }
+    },
+    {from:"{{lang.$$}}", to:"$$", "$":function(val, gl) {
+
+        if (val === "switch") {
+            return form_lang.getSupportedLangs(gl.active_user).html;
+        }
+
+        if (val === "supported") {
+            return form_lang.getSupportedLangs(gl.active_user).supported;
+        }
+
+        if (val === "radios") {
+            return form_lang.getLangRadios(gl.active_user);
+        }
         return "";
     }
     }

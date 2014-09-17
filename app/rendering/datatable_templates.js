@@ -219,7 +219,7 @@ var getModules = function(active_user, table) {
 //  [ "val1", val2, true ]           // row2
 // ]
 
-exports.getDataTable = function(rows) {
+exports.getDataTable = function(rows, columnClasses) {
 
     var cols = rows[0];
 
@@ -230,7 +230,12 @@ exports.getDataTable = function(rows) {
 
         if (rowID + "" === "0") {
             for(var colID in cols) {
-                thead.push("<td>" + cols[colID] + "</td>")
+
+                var td = "<td>";
+                if (columnClasses && columnClasses[cols[colID]]) {
+                    td = '<td class="' + columnClasses[cols[colID]] +'">';
+                }
+                thead.push(td + cols[colID] + "</td>")
             }
         } else {
             var _class = rows[rowID]["_class"] || "";
@@ -279,6 +284,9 @@ exports.render = function (sessionId, table_name, getContents) {
         // data contents of the table
         if (table_name === "modules")
             return getModules(active_user, table);
+        else
+        if (table_name === "langs")
+            return exports.getLangs(active_user, table);
         else
             return getHTML(active_user, table);
     }
@@ -623,4 +631,74 @@ exports.getMyPlanAsTable = function (active_user) {
     var result = rep(tmp, logic);
 
     return result;
+};
+
+
+exports.getLangs = function (active_user, table) {
+
+    var columns = table.settings.columns;
+    var arr = [];
+    arr.push([]); // columns
+    for (var a in columns) {
+        var displayName = columns[a];
+        if (displayName == "_checkbox") displayName = ""; else
+        if (displayName == "_id") displayName = "ID"; else
+        displayName = form_lang.Get(active_user.lang, displayName, true);
+        arr[0].push(displayName);
+    }
+
+    var cnt = 1;
+    for(var i in form_lang.langs.EN) {
+
+        var _id = form_lang.ids.indexOf(i);
+
+        var single_row = [];
+        for (var x in columns) {
+            var colName = columns[x];
+            var str = "";
+            if (colName === "_checkbox")
+                str = '<input type="checkbox" id="jxrow_' + i + '"></input>';
+            else if (colName === "_id")
+                str = cnt++;
+            else if (colName === "Original")
+                str =  form_lang.langs.EN[i];
+            else if (colName === "Translation") {
+
+                var divs = [];
+                for(var _lang in form_lang.langs) {
+
+                    if (_lang === "EN") continue;
+
+                    var _str = "";
+                    var _class = ""
+                    if (form_lang.langs[_lang] && form_lang.langs[_lang][i] && form_lang.langs[_lang][i] != form_lang.langs.EN[i]) {
+                        if (form_lang.show_only_undefined) {
+                            continue;
+                        }
+                        _str = form_lang.langs[_lang][i];
+                        _class = "has-success";
+                    } else {
+                        _str = "";
+                        _class = "has-warning";
+                    }
+
+                    divs.push('<div class="input-group ' + _class +' jxl" id="jxld_' + _lang  + "_" + _id +'" ><span class="input-group-addon"><i class="flag flag-'+_lang.toLowerCase()+'"></i></span>'
+                        +'<input type="textarea" placeholder="'+ form_lang.Get(_lang, "Undefined", true) +'" id="jxl_' + _lang  + "_" + _id +'" class="form-control langs" value="' + _str + '"></input>'
+                        +'</div>');
+                }
+                str += divs.join("<br>");
+//                str += '<br><input type="button" value="' + form_lang.Get(active_user.lang, "Save", true) + '" id="jxb_' + _id +'"></input>';
+            }
+            else if (colName === "Apply") {
+
+            }
+            single_row.push(str);
+        }
+        arr.push(single_row);
+    }
+
+    var columnClasses = {};
+    columnClasses[form_lang.Get(active_user.lang, "Original", true)] = "original";
+    columnClasses[form_lang.Get(active_user.lang, "Translation", true)] = "translation";
+    return { err: false, html: exports.getDataTable(arr, columnClasses )};
 };

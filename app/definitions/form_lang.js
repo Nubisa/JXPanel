@@ -3,10 +3,10 @@ var fs = require("fs");
 var path = require("path");
 
 var langs = {};
+var ids = [];  // [0] = "Empty" , etc.
 
-//langs.EN = require("./langs/EN.js").Labels;
-//langs.PL = require("./langs/PL.js").Labels;
-
+exports.langs = langs;
+exports.ids = ids;
 
 var countries = {
     "BD": "Bangladesh",
@@ -264,7 +264,7 @@ var countries = {
 };
 
 // patch for EN
-countries.EN = countries.GB;
+countries.EN = countries.US;
 
 var dir = path.join(__dirname, "langs") + path.sep;
 var files = fs.readdirSync(dir);
@@ -280,8 +280,19 @@ for(var i in files) {
 
     if (m.Labels) {
         var bname = path.basename(file, path.extname(file));
+        if (bname.length !== 2)
+            continue;
+
         langs[bname] = m.Labels;
         m = null;
+
+        if (bname == "EN") {
+            // let's start ids from 1
+            ids.push("fakefor0item");
+            for (var o in langs[bname]) {
+                ids.push(o)
+            }
+        }
     }
 }
 
@@ -333,14 +344,16 @@ exports.GetBool = function(lang, val, labelTrue, labelFalse) {
         : '<i class="fa-lg fa fa-times text-danger" style="display: inline;"></i> ' + exports.Get(lang, labelFalse, true);
 };
 
-
+// displays lang selection on top nav bar
 exports.getSupportedLangs = function (active_user) {
     var ret = {};
     var html = [];
+    var supported = [];
 
-    var lang = active_user.lang;
-    var alias = lang;
-    if (lang === "EN") alias = "GB";
+    var alias = active_user.lang;
+    var lang = alias;
+    if (lang === "EN") alias = "US";
+    lang = countries[lang] || lang;
     html.push('<a href="#" class="dropdown-toggle jxbtn" data-toggle="dropdown" style="background: none;!important">');
     html.push('<img src="img/blank.gif" class="flag flag-' + alias.toLocaleLowerCase() + '" alt="' + countries[lang] + '"><span style="margin-left: 5px; margin-right: 5px;">' + lang + '</span><i class="fa fa-angle-down"></i></a>');
 
@@ -348,7 +361,7 @@ exports.getSupportedLangs = function (active_user) {
     html.push('<ul class="dropdown-menu pull-right">');
     for (var i in langs) {
         var alias = i;
-        if (i === "EN") alias = "GB";
+        if (i === "EN") alias = "US";
 
         ret[i] = countries[i] || exports.Get("EN", "LanguageUnsupported", true);
 
@@ -358,13 +371,75 @@ exports.getSupportedLangs = function (active_user) {
             html.push('<li>');
 
         html.push('<a href="#" onclick="return utils.jxSwitchLang(\'' + i + '\')">');
-        html.push('<img src="img/blank.gif" class="flag flag-' + alias.toLowerCase() + '" alt="' + ret[i] + '"> ' + ret[i] + ' </a>');
+//        html.push('<img src="img/blank.gif" class="flag flag-' + alias.toLowerCase() + '" alt="' + ret[i] + '"> ' + ret[i] + ' </a>');
+        html.push(exports.getFlag(alias));
         html.push('</li>');
+
+        supported.push(i);
     }
     html.push('</ul>');
 
-
-    return { langs: ret, html: html.join("\n") }
+    return { langs: ret, html: html.join("\n"), supported : supported.join(",") };
 };
 
-//exports.get
+exports.getLangRadios = function() {
+
+    var getRadio = function(lang) {
+        var str = lang === "ALL" ? "Show all languages" : countries[o];
+        return '<label class="jxradio"><input type="radio" id="jxlrb_' + lang + '" name="jxlrb">' + str + '</label>';
+    };
+
+    var html = [];
+    html.push(getRadio("ALL"));
+    for(var o in langs) {
+        if (o !== "EN")
+            html.push(getRadio(o));
+    }
+
+    return html.join("\n");
+};
+
+exports.getFlag = function(lang) {
+    var str = countries[lang];
+
+    if (!str) str = exports.Get("EN", "LanguageUnsupported", true);
+
+    return '<img src="img/blank.gif" class="flag flag-' + lang.toLowerCase() + '" alt="' + str + '"> ' + str + ' </a>';
+};
+
+// function expects arr of { id : 2, PL : "Pusty", TR : "ssss" etc }
+// where id is index of export.ids array
+exports.langUpdate = function(arr) {
+
+    var changed = {}
+    var ret = [];
+    for(var o in arr) {
+
+        var parsed = o.split("_");
+        var lang = parsed[0];
+        var int_id = parsed[1];
+        var new_value = arr[o];
+
+        var sid = ids[int_id];
+
+        if (!new_value) {
+            debugger;
+        }
+
+        if (langs[lang] && langs[lang][sid] !== new_value) {
+            console.log("Modified value", sid, " in ", lang, "dictionary. Old value:",langs[lang][sid], ", new value:", new_value);
+            langs[lang][sid] = new_value;
+
+            ret.push(o);
+            changed[lang] = true;
+        }
+    }
+
+    for (var lang in changed) {
+        if (lang == "EN") continue;
+        var fname = dir + lang.toUpperCase() + ".js";
+        fs.writeFileSync(fname, "exports.Labels = \n" + JSON.stringify(langs[lang], null, 4));
+    }
+
+    return ret;
+};

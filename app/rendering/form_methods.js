@@ -749,5 +749,22 @@ methods.jxInstall = function (env, params) {
 };
 
 
+methods.langUpdate = function (env, params) {
+
+    var active_user = _active_user.checkAdmin(env);
+    if (!active_user)
+        return;
+
+    if (typeof params.show_only_undefined !== "undefined") {
+        form_lang.show_only_undefined = params.show_only_undefined;
+        server.sendCallBack(env, { err : false });
+        return;
+    }
+
+    console.log(params);
+    var changed = form_lang.langUpdate(params);
+    server.sendCallBack(env, { err : false, changed : changed });
+};
+
 
 module.exports = methods;

@@ -39,6 +39,8 @@ exports.Labels = {
     "Usage" : "Usage",
     "Undefined" : "undefined",
     "NoChanges" : "No changes has been made",
+    "Original" : "Original",
+    "Translation" : "Translation",
 
     "help":"Help",
     "logout":"Logout",

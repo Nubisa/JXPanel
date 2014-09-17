@@ -47,6 +47,29 @@
     border-radius: 2px;
 }
 
+.jxbuttons input[type=radio], .jxbuttons input[type=checkbox] {
+    margin-right: 7px;
+}
+
+.jxradio{
+    color:#f8f8f8;
+    margin:0px;
+    border:none;
+    font-size:9pt;
+    padding: 0px; margin: 0px;margin-right:2px;padding-left:6px;padding-right:5px;cursor:pointer;
+    text-align: center;
+    z-index:999999;
+    background: #454a4b; /* Old browsers */
+    background: -moz-linear-gradient(top,  #454a4b 0%, #414647 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#454a4b), color-stop(100%,#414647)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #454a4b 0%,#414647 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #454a4b 0%,#414647 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #454a4b 0%,#414647 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #454a4b 0%,#414647 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#454a4b', endColorstr='#414647',GradientType=0 ); /* IE6-9 */
+}
+
+
 .jxbtn{
     color:#f8f8f8;
     margin:0px;
@@ -82,8 +105,36 @@
 }
 
 .jxTable td {
-    vertical-align: middle !important;
+    vertical-align: middle!important;
 }
 #content {
     background-color: #fafafa !important;
+}
+
+
+.jxTable td.original {
+    width: 25%!important;
+}
+
+.jxTable td.translation {
+    width: 100%!important;
+}
+
+.jxTable input.langs {
+    /*width: 100%;*/
+    /*display: inline-block;*/
+    /*margin-left: 10px;*/
+    vertical-align: middle;
+}
+
+div.jxl {
+    /*display: table-row;*/
+    margin-bottom: 2px;
+    width: 100%;
+    /*white-space: nowrap;*/
+    /*vertical-align: middle;*/
+}
+
+div.jxl span {
+    width: 30px!important;
 }
