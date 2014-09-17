@@ -37,6 +37,8 @@ exports.Labels = {
     "Name" : "Name",
     "Value" : "Value",
     "Usage" : "Usage",
+    "Undefined" : "undefined",
+    "NoChanges" : "No changes has been made",
 
     "help":"Help",
     "logout":"Logout",
@@ -55,6 +57,7 @@ exports.Labels = {
     "users":"users",
 
     "LanguageUnsupported" : "Unsupported language",
+    "LanguageDictionary" : "Language dictionary",
 
     "RefreshTooltip":"Refresh selected folder",
     "AddTooltip":"Add a new file or folder",

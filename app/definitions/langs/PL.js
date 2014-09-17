@@ -36,7 +36,8 @@ exports.Labels = {
     "Denied" : "Zablokowany",
     "Name" : "Nazwa",
     "Value" : "Wartość",
-    "Usage" : "Wykorzystanie",
+    "Usage" : "Usage",
+    "Undefined" : "niezdefiniowany",
 
     "help":"Pomoc",
     "logoutQuestion":"Czy na pewno chcesz się wylogować?",
