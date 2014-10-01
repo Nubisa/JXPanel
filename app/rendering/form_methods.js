@@ -15,6 +15,7 @@ var hosting_tools = require('../hosting_tools');
 var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
 var ftp = require("./../install/ftp");
+var apps_tools = require("./apps_tools");
 
 
 methods.tryLogin = function(env, params){
@@ -337,7 +338,7 @@ methods.sessionApply = function(env, params){
             } else {
                 ret = database.AddUser(json.plan, json.name, json);
                 if (!ret) {
-                    if (!params.controls["person_username_reuse"]) {
+                    if (!params.controls["person_username_ok"]) {
                         var res = system_tools.addSystemUser(json, params.controls["person_password"]);
                         if (res.err) {
                             ret = res.err;
@@ -372,6 +373,7 @@ methods.sessionApply = function(env, params){
                 var domain = database.getDomain(update_name);
                 var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
                 var jx_app_path_changed = domain.jx_app_path !== json.jx_app_path;
+                var jx_app_type_changed = domain.jx_app_type !== json.jx_app_type;
                 var jx_app_options = hosting_tools.appGetOptions(update_name);
                 var ssl_changed = domain.ssl !== json.ssl || domain.ssl_crt !== json.ssl_crt || domain.ssl_key !== json.ssl_key;
                 if (!domain)
@@ -381,7 +383,7 @@ methods.sessionApply = function(env, params){
                 ret = database.updateDomain(update_name, domain);
 
                 if (!ret) {
-                    if (jx_app_path_changed) {
+                    if (jx_app_path_changed || jx_app_type_changed) {
                         if (jx_app_options && !jx_app_options.err) {
                             var file = jx_app_options.cfg_path;
                             if (fs.existsSync(file)) {
@@ -733,6 +735,28 @@ methods.appViewLog = function (env, params) {
         }
     }
     server.sendCallBack(env, {err: false, log : log,  size : size});
+};
+
+
+methods.appInstall = function (env, params) {
+    var active_user = _active_user.checkUser(env, true);
+    if (!active_user)
+        return;
+
+    var domain_name = _active_user.isRecordUpdating(active_user, "addDomain");
+
+    //  if the call was made from addDomain form, session.edits exists
+    if (!domain_name) {
+        server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "Access Denied", true) });
+        return;
+    }
+
+    apps_tools.installUninstall(active_user, domain_name, params.id, params.op, function(par) {
+        var err = par.err ? form_lang.Get(active_user.lang, par.err, true) : false;
+        server.sendCallBack(env, {err: err });
+    });
+
+
 };
 
 

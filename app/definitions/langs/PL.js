@@ -15,7 +15,7 @@ exports.Labels =
     "Logout": "Wyloguj",
     "Login": "Zaloguj",
     "Exit": "Wyjdź",
-    "Admin": "Admin",
+    "Admin": "Administrator",
     "Dashboard": "Pulpit",
     "Control Panel": "Panel sterowania",
     "Account": "Konto",
@@ -36,7 +36,7 @@ exports.Labels =
     "Denied": "Zablokowany",
     "Name": "Nazwa",
     "Value": "Wartość",
-    "Usage": "Usage",
+    "Usage": "Wykorzystanie",
     "Undefined": "niezdefiniowany",
     "Original": "Oryginal",
     "Translation": "Tlumaczenie",
@@ -362,5 +362,6 @@ exports.Labels =
     "JXcoreNPMInstalled": "NPM module successfully installed.",
     "JXcoreNPMInstalling": "Installing NPM module",
     "NginxConfDirCannotCreate": "Cannot create Nginx config directory",
-    "NginxDirectivesInvalid": "Provided directives failed on test."
+    "NginxDirectivesInvalid": "Provided directives failed on test.",
+    "NoChanges": "Nie dokonano zadnych zmian"
 }

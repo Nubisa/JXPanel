@@ -75,15 +75,23 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         return {err : form_lang.Get(active_user.lang, "AccessDeniedToEditRecord", null, [ noun, name ] ) };
     };
 
+    var accessDeniedError0 = {err : form_lang.Get(active_user.lang, "AccessDenied",  true) };
+
     var isUpdate = null;
     var values = null;
 
     if (formName === "jxconfig") {
+        if (!_active_user.isAdmin(active_user))
+            return accessDeniedError0;
         isUpdate = { };
         values = database.getConfig();
     } else
-    if (formName === "appLog") {
-        isUpdate = { };
+    if (formName.slice(0,3) === "app") {
+        isUpdate = {};
+        var domain_name = _active_user.isRecordUpdating(active_user, formName);
+        if (!domain_name)
+            return accessDeniedError0;
+
     } else
     if (_active_user.isRecordUpdating(active_user, formName)) {
         isUpdate = {};
@@ -174,8 +182,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             if (!isUpdate && controls[i].OnInsert === false)
                 continue;
 
-            var str = "<code>" + form_lang.Get(active_user.lang, controls[i].INFO, true) + "</code>";
-            arr.push(tool.createSimpleText(" ", null, null, str, active_user, null));
+            var str = (controls[i].prefix || "") + form_lang.Get(active_user.lang, controls[i].INFO, true) + (controls[i].suffix || "");
+            arr.push(tool.createSimpleText(" ", null, null, str, active_user, {}));
             continue;
         }
 
@@ -205,7 +213,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
         if (!isUpdate && ctrl.cannotInsert) {
             if (ctrl.getValue && typeof ctrl.getValue === "function") {
-                val = ctrl.getValue(active_user, values);
+                val = null; //ctrl.getValue(active_user, values);
             }
             ctrl.options.extra.noEditDisplayValue = form_lang.Get(active_user.lang, "ValueOnlyForEdit", true);
         }
@@ -219,6 +227,15 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
         if (ctrl.getValuesList)
             ctrl.options.values = ctrl.getValuesList(active_user);
+
+//        if (!isUpdate && active_user.username=== "nubisa" && formName==="addUser") {
+//            if (name === "person_name") val = "kris2";
+//            if (name === "person_username") val = "kris2";
+//            if (name === "person_password") val = "pokein2013";
+//            if (name === "person_repeat_password") val = "pokein2013";
+//            if (name === "person_email") val = "x@x.x";
+//            if (name === "plan_table_id") val = "for kris";
+//        }
 
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, active_user, ctrl.options));
     }

@@ -3,6 +3,7 @@
  */
 
 var tool = require('./../../rendering/form_tools');
+var apps_tools = require('./../../rendering/apps_tools');
 var form_lang = require('../form_lang');
 var _active_user = require('../active_user');
 var path = require("path");
@@ -45,6 +46,9 @@ exports.form = function () {
 
         this.displayNameLabel_Add = "AddDomain";
         this.displayNameLabel_Edit = "EditDomain";
+
+        this.subPages = [ "/adddomain.html", "/applog.html" ];
+        this.subForms = [ "appLog" ];
 
         this.controls = [
             {"BEGIN": "Domain Details"},
@@ -163,6 +167,16 @@ exports.form = function () {
             },
 
             {
+                name: "jx_app_type",
+                details: {
+                    label: "JXcoreAppType",
+                    method: tool.createComboBox,
+                    options: { required : true, values : [ "custom", "Ghost", "NodeBB", "Meteor" ], default : "custom" }
+                },
+                validation : new validations.AppType()
+            },
+
+            {
                 name: "jx_app_path",
                 details: {
                     label: "JXcoreAppPath",
@@ -183,9 +197,57 @@ exports.form = function () {
 
             {"END" : 1},
 
+            {"BEGIN": "JXcoreAppApp"},
+
+            {"INFO": "JXcoreAppAppInfo"  },
+
+            {
+                name: "jx_app_ghost",
+                details: {
+                    label: "Ghost",
+                    method: tool.createSimpleText,
+                    options: { },
+                    cannotInsert : true,
+                    getValue: function (active_user, values, listOrForm) {
+                        var domain_name = values["name"];
+                        return apps_tools.getAppStatus(active_user, domain_name, "Ghost");
+                    }
+                }
+            },
+
+            {
+                name: "jx_app_nodebb",
+                details: {
+                    label: "NodeBB",
+                    method: tool.createSimpleText,
+                    options: { },
+                    cannotInsert : true,
+                    getValue: function (active_user, values, listOrForm) {
+                        var domain_name = values["name"];
+                        return apps_tools.getAppStatus(active_user, domain_name, "NodeBB");
+                    }
+                }
+            },
+
+            {
+                name: "jx_app_meteor",
+                details: {
+                    label: "Meteor",
+                    method: tool.createSimpleText,
+                    options: { },
+                    cannotInsert : true,
+                    getValue: function (active_user, values, listOrForm) {
+                        var domain_name = values["name"];
+                        return apps_tools.getAppStatus(active_user, domain_name, "Meteor");
+                    }
+                }
+            },
+
+            {"END" : 1},
+
             {"BEGIN": "SSL"},
 
-            {"INFO": "ValuesOnlyForEdit", OnEdit : false },
+            {"INFO": "ValuesOnlyForEdit", OnEdit : false, prefix : "<code>", suffix : "</code>" },
 
             {
                 name: "ssl",

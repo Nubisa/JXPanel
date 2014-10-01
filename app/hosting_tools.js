@@ -14,6 +14,7 @@ var user_folders = require("./definitions/user_folders");
 var system_tools = require("./system_tools");
 var nginxconf = require("./spawner/nginxconf");
 var nginx = require("./install/nginx");
+var apps_tools = require("./rendering/apps_tools");
 
 // iterating through domains and assigning http/https port
 exports.setPortRange = function (min, max) {
@@ -167,7 +168,17 @@ exports.appGetOptions = function (domain_name, domain_data) {
 
     var appDir = path.join(user_folders.getUserPath(user.plan, domain.owner), domain_name) + path.sep;
 
-    var appPath = appDir + domain.jx_app_path;
+    var appPath = path.join(appDir, domain.jx_app_path);
+
+    var app3rdparty = domain.jx_app_type === 'custom' ? false : domain.jx_app_type;
+    if (app3rdparty) {
+        var appData = apps_tools.getData(domain_name, domain.jx_app_type);
+        if (appData.err)
+            return { err : appData.err };
+
+        appPath = appData.path;
+    }
+
     var appPathReplaced = appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
     var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jxcore.config";
     var logPath = path.join(appDir, "jxcore_logs/index.txt");

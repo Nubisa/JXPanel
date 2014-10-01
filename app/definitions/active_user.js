@@ -114,6 +114,7 @@ exports.checkUser = function(env, checkIfSuspended, form_name) {
     }
 
     if (checkIfSuspended && active_user.suspended_txt) {
+        // suspended user cannot add but can edit
         if (!form_name || !exports.isRecordUpdating(active_user, form_name)) {
             server.sendCallBack(env, {err: active_user.suspended_txt, hideForm : true });
             return null;
@@ -126,12 +127,16 @@ exports.checkUser = function(env, checkIfSuspended, form_name) {
 exports.checkAdmin = function(env) {
     var active_user = exports.checkUser(env);
 
-    if (active_user.plan !== database.unlimitedPlanName) {
+    if (!exports.isAdmin(active_user)) {
         server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "Access Denied", true) });
         return;
     }
 
     return active_user;
+};
+
+exports.isAdmin = function(active_user) {
+    return active_user.plan === database.unlimitedPlanName;
 };
 
 exports.getForm = function(sessionId, form_name){

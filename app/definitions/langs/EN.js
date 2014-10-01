@@ -319,9 +319,18 @@ exports.Labels = {
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",
     "JXEnabled" : "JXcore",
-    "JXcoreAppPath" : "Application file path",
+    "JXcoreAppPath" : "Custom application file path",
     "JXcoreAppStatus" : "Application status",
-    "JXcoreAppPath_Description" : "The path is relative to domain root folder.",
+    "JXcoreAppPath_Description" : "The path is relative to domain root folder. It will be used only if you have chosen the `custom` option above.",
+    "JXcoreAppAppNoInstallationFile" : "Cannot find installation zip file for the application.",
+    "JXcoreAppAppColdNotInstall" : "Cannot install the application.",
+    "JXcoreAppAppColdNotUnInstall" : "Cannot uninstall the application.",
+    "JXcoreAppAppInstallDir" : "Installation directory",
+    "JXcoreAppAppInstallDir_Description" : "The path is relative to domain root folder.",
+    "JXcoreAppAppURL" : "Application's URL path",
+    "JXcoreAppAppURL_Description" : "Define, how the application will be accessible. You may specify a subdomain name (i.e. type `subdomain` for http://subdomain.domain.com) or by path (i.e. type `/app for http://domain.com/app).",
+    "JXcoreAppAppNotInstalled" : "The application %s is not installed.",
+
 
     "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
     "NoPlanOwned" : "You have no hosting plan of your own. Please add one.",
@@ -435,8 +444,11 @@ exports.Labels = {
     "JXcoreAppLogClear" : "Clear log",
     "JXcoreAppLogLines" : "Show last # lines",
     "JXcoreAppLogLines_Description" : "Displays only last # lines of the log file. Enter empty value to display the whole log.",
-
-
+    "JXcoreAppType" : "Choose your application",
+    "JXcoreAppType_Description" : "Only one of the applications can run for the domain at a time.",
+    "JXcoreAppApp" : "Third party Apps",
+    "JXcoreAppAppInstalling" : "Installing %s application",
+    "JXcoreAppAppInfo" : "You may have multiple applications installed, but only one can be active at a time.",
 
     "JXcoreNPMModules" : "NPM Wizard",
     "JXcoreNPMAddModule" : "Install new module",

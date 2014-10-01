@@ -22,16 +22,26 @@ var getData = function(label, _title, input_id, active_user, options) {
     ret.required_label = ret.required ? "&nbsp;<span style='color:red;'>*</span>" : "&nbsp;&nbsp;";
     ret.required_class = ret.required ? " required" : "";
 
-    ret.fakeId = "a" + jxcore.utils.uniqueId();
-    if (!active_user.session.forms[options.extra.formName].fakeIds) {
-        active_user.session.forms[options.extra.formName].fakeIds = {};
-        active_user.session.forms[options.extra.formName].fakeIdsReversed = {};
-    }
-    active_user.session.forms[options.extra.formName].fakeIds[ret.fakeId] = input_id;
-    active_user.session.forms[options.extra.formName].fakeIdsReversed[input_id] = ret.fakeId;
+    if (options.extra) {
 
-    if (options.extra && options.extra.noEditDisplayValue)
-        ret.value = options.extra.noEditDisplayValue;
+        if (!active_user.session.forms[options.extra.formName].fakeIds) {
+            active_user.session.forms[options.extra.formName].fakeIds = {};
+            active_user.session.forms[options.extra.formName].fakeIdsReversed = {};
+        }
+
+        if (!active_user.session.forms[options.extra.formName].fakeIdsReversed[input_id]) {
+            ret.fakeId = "a" + jxcore.utils.uniqueId();
+
+            active_user.session.forms[options.extra.formName].fakeIds[ret.fakeId] = input_id;
+            active_user.session.forms[options.extra.formName].fakeIdsReversed[input_id] = ret.fakeId;
+        } else {
+            ret.fakeId = active_user.session.forms[options.extra.formName].fakeIdsReversed[input_id];
+        }
+
+        if (options.extra.noEditDisplayValue)
+            ret.value = options.extra.noEditDisplayValue;
+
+    }
 
     ret.class = "form-group";
     if (options.hidden) ret.class += " hidden";
@@ -102,6 +112,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
 
     var data = getData(label, _title, input_id, active_user, options);
 
+    _value = _value || options.default || "";
     _title = form_lang.Get(active_user.lang, _title) || _title;
     label = form_lang.Get(active_user.lang, label) || label;
 
@@ -164,7 +175,9 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
     _html += '<div class="checkbox"><label>';
     _html += '<input id="'+data.fakeId+'" class="checkbox style-0'+data.required_class+'" type="'+_type+'" '+_value+' />';
 
-    _html += '<span>&nbsp;</span></label></div>';
+    _html += '<span>&nbsp;</span>';
+     if (options && options.checkbox_text) _html += options.checkbox_text;
+    _html += '</label></div>';
 
     if(data.description)
         _html += '<p class="note">'+data.description+'</p>';
@@ -174,7 +187,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
 //    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
 
-    return {html:_html, js:""};
+    return {html:_html, js:"", fakeId : data.fakeId};
 };
 
 
