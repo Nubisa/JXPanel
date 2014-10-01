@@ -182,14 +182,18 @@ var apply_smart = function(file, req, res, data){
     if (_user) {
         if (req.path.slice(-5) === ".html") {
 
-            var pairs = [];
-            pairs.push([ "/adddomain.html", "/applog.html" ]);
             var match = false;
-            for(var o in pairs) {
-                var pair = pairs[o];
-                if (pair.indexOf(req.path) !== -1 && pair.indexOf(_user.session.lastPath) !== -1) {
-                    match = true;
-                    break;
+            if (_user.session && _user.session.edits && _user.session.edits.subPages) {
+
+                var subPages = _user.session.edits.subPages;
+                if (subPages.indexOf(_user.session.lastPath) !== -1) {
+                    for(var o in subPages) {
+                        var pair = subPages[o];
+                        if (pair.indexOf(req.path) !== -1) {
+                            match = true;
+                            break;
+                        }
+                    }
                 }
             }
 

@@ -528,6 +528,10 @@ exports.edit = function (sessionId, table_name, id) {
     if (!table)
         return { err : form_lang.Get(active_user.lang, "UnknownDataTable") };
 
+    var form = getForm(table);
+        if (!form)
+            return { err : form_lang.Get(active_user.lang, "UnknownForm") };
+
     if (!id)
         return { err : form_lang.Get(active_user.lang, "EmptySelection") };
 
@@ -535,6 +539,13 @@ exports.edit = function (sessionId, table_name, id) {
     active_user.session.edits[table.settings.addForm] = { ID : id };
     active_user.session.edits.lastForm = table.settings.addForm;
     active_user.session.lastPath = "/" + table.settings.addFormURL;
+
+    active_user.session.edits.subPages = form.subPages;
+    if (form.subForms) {
+        for (var a in form.subForms) {
+            active_user.session.edits[form.subForms[a]] = { ID : id };
+        }
+    }
 
     return {err : false, url : table.settings.addFormURL};
 };
