@@ -4,6 +4,7 @@
     }
 
     window.jxForms["{{form.id}}"] = {
+        ntc : {},
         apply:function(){
             var _this = window.jxForms["{{form.id}}"];
 
@@ -63,20 +64,30 @@
             if(!failed){
                 window.toServer('sessionApply', {form: '{{form.id}}', controls: values }, function (param) {
 
+                    var ntc_displayed = false;
                     if (param.arr) {
                         _this.hideErrors();
                         for(var o in param.arr) {
-                            if (param.arr[o].ru) {
+                            if (param.arr[o].ntc && !ntc_displayed) { // need to confirm
 
-                                utils.jxConfirm('<i class="fa fa-user txt-color-orangeDark"></i> ' + "{{label.UserSystemAlreadyExists}}", "{{label.UserSystemReuse}}", function(ButtonPressed) {
+                                var ntc = param.arr[o].ntc;
+                                utils.jxConfirm('<i class="fa fa-user txt-color-orangeDark"></i> ' + ntc.title, ntc.msg, function(ButtonPressed) {
+
                                     if (ButtonPressed === "{{label.Yes}}") {
-                                        $('#' + param.arr[o].ru + "_group").removeClass("hidden");
-                                        $('#' + param.arr[o].ru).prop("checked", true);
-                                        setTimeout(_this.apply, 50);
+
+                                        _this.ntc[ntc.id] = ntc.id_ok;
+                                        var div = document.getElementById(ntc.id_ok + '_group');
+                                        if (!div)
+                                            $(ntc.html).insertAfter("#" + ntc.id + "_group");
+
+                                        $('#' + ntc.id_ok).prop("checked", true);
+                                        $('#' + ntc.id_ok + '_group').css("margin-top","-20px");
+//                                        setTimeout(_this.apply, 50);
                                     } else {
-                                        _this.showError(param.arr[o].id, param.arr[o].msg);
+                                        _this.showError(ntc.id, ntc.title);
                                     }
                                 });
+                                ntc_displayed = true;
                             } else {
                                 _this.showError(param.arr[o].id, param.arr[o].msg);
                             }
@@ -101,7 +112,7 @@
             var _this = window.jxForms["{{form.id}}"];
 
             if (id && document.getElementById(id)) {
-                var str = '<span class="help-block" id="'+id+'_note"><i class="fa fa-warning"></i> ' + msg + '</span>';
+                var str = '<span class="help-block" id="'+id+'_note" style="margin-bottom: 0px;"><i class="fa fa-warning"></i> ' + msg + '</span>';
                 $(str).insertAfter("#" + id);
 //                $("#" + id + "_group").removeClass("has-success");
                 $("#" + id + "_group").addClass("has-error");
@@ -231,6 +242,13 @@
 
             });
             return false;
+        };
+
+
+        utils.jxAppInstall = function(appName, install) {
+            window.jxstatus = install ? "{{label.JXcoreAppAppInstalling}}" : "{{label.JXcoreAppAppUnInstalling}}";
+            window.jxstatus = window.jxstatus.replace("%s", appName);
+            return utils.jxCall("appInstall", install, appName);
         };
 
     };

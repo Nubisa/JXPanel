@@ -10,6 +10,18 @@ var _active_user = require("../definitions/active_user");
 var path = require('path');
 var fs = require("fs");
 var pam = require('authenticate-pam');
+var form_tools = require('../rendering/form_tools');
+var apps_tools = require('../rendering/apps_tools');
+
+// forces the form to ask user a question in order to confirm something
+var needToConfirm = function(active_user, formName, input_id, title, confirm_text) {
+    var options = { extra : { formName : formName } };
+    options.checkbox_text = form_lang.Get(active_user.lang, "UsernameReuse", true);
+    var res = form_tools.createCheckBox("", "", input_id + "_ok", true, active_user, options );
+    var fakeId = active_user.session.forms[formName].fakeIdsReversed[input_id];
+    var ntc = { id: fakeId, id_ok : res.fakeId, title : title, msg : confirm_text, html : res.html };
+    return { result : false, ntc : ntc};
+};
 
 
 /**
@@ -182,16 +194,16 @@ exports.UserName = function() {
 
         if (system_tools.systemUserExists(val)) {
             var pwd = params.controls['person_password'];
-            var reuse = params.controls['person_username_reuse'];
+            var reuse = params.controls['person_username_ok'];
 
             var ret = jxcore.utils.cmdSync('id -g -n ' + params.controls['person_username']);
             if (ret.out.toString().trim() === "jxman") {
 
                 if (!reuse) {
-                    var fakeId = active_user.session.forms[params.form].fakeIdsReversed['person_username_reuse'];
-                    return {result: false,
-                        msg: form_lang.Get(active_user.lang, "UserSystemAlreadyExists", true),
-                        ru : fakeId }; // reuse user
+                    var fakeId = active_user.session.forms[params.form].fakeIdsReversed['person_username'];
+                    var title = form_lang.Get(active_user.lang, "UserSystemAlreadyExists", true);
+                    var txt = form_lang.Get(active_user.lang, "UserSystemReuse", true);
+                    return needToConfirm(active_user, params.form, "person_username", title, txt);
                 }
 
                 // user checked "reuse" checkbox
@@ -344,3 +356,24 @@ exports.SSLCertFileName = function(testConfig) {
     };
 };
 
+// validates app's file name
+exports.AppType = function() {
+
+    this.validate = function (env, active_user, val, params) {
+
+        if (val == "custom") {
+            var ret = new exports.FileName().validate(env, active_user, val, params);
+            return ret;
+        }
+
+        var domain_name = _active_user.isRecordUpdating(active_user, params.form);
+        if (!domain_name)
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainNotFound", true)};
+
+        var appData = apps_tools.getData(domain_name, val, true);
+        if (appData.err)
+            return { result: false, msg : form_lang.Get(active_user.lang, appData.err, true) };
+
+        return {result: true};
+    };
+};

@@ -33,6 +33,9 @@
             if (!param.changed)
                 return;
 
+            document.location.reload();
+            return;
+
             for(var o in param.changed) {
                 var parsed = param.changed[o].split("_");
                 var lang = parsed[0];
