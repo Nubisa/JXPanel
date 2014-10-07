@@ -1,0 +1,8 @@
+{
+    "name": "MongoDB support for JXPanel",
+    "id" : "mongodb",
+    "version" : "0.0.1",
+    "title" : "MongoDB Manager",
+    "description" : "MongoDB Manager"
+
+}

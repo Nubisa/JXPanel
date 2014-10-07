@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    var addDB = function() {
+        $.SmartMessageBox({
+            title : "{{label.AddonMongoAddDB}}",
+            content : "{{label.AddonMongoAddDBEnterName}}",
+            input: "text",
+            inputValue : "",
+            placeHolder: "{{label.AddonMongoAddDBEnterName}}",
+            buttons : "[{{label.Submit}}][{{label.Cancel}}]"
+        }, function(ButtonPress, name) {
+            if (ButtonPress == "{{label.Cancel}}") {
+                return 0;
+            }
+
+            window.toServer("addDB", name, function(param) {
+                if (param.err)
+                    utils.jxAddMessage("danger", param.err)
+                else
+                    document.location.reload();
+            }, true);
+        });
+    };
+</script>
+
+<div style="margin-top: 30px;">
+    {{table}}
+</div>

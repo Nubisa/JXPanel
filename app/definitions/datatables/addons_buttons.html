@@ -1,0 +1,36 @@
+<script>
+    window.jxInstallNPM = function() {
+        utils.jxAskValue('<i class="fa fa-download txt-color-orangeDark"></i> ' + "{{label.AddOnAddNew}}", "{{label.JXcoreNPMEnterName}}", function(ok, value) {
+
+            if (ok) {
+                if (!value) {
+                    utils.jxAddMessage('danger', "{{label.JXcoreNPMEnterName}}");
+                    return;
+                }
+
+                window.jxstatus = "{{label.JXcoreNPMInstalling}}";
+                window.toServer("installNPM", value, function(param) {
+                    if (param.err)
+                        utils.jxAddMessage('danger', "{{label.JXcoreNPMCouldNotInstall}} " + param.err);
+                    else {
+                        document.location.reload();
+//                        utils.jxAddMessage('success', "{{label.JXcoreNPMInstalled}}");
+                    }
+
+                }, true, true);
+            }
+        });
+        return false;
+    };
+
+</script>
+
+<a id="btn_refresh" data-original-title="{{label.AddOnAddNew}}" class="jxbtn" onclick="alert('Not yet implemented')">
+    <i class="fa fa-plus"></i><span class="dummy-label">{{label.AddOnAddNew}}</span>
+</a>
+<!--<a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows(true);">-->
+    <!--<i class="fa fa-trash-o"></i><span class="dummy-label">{{label.RemoveSelected}}</span>-->
+<!--</a>-->
+<a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="alert('Not yet implemented')">
+    <i class="fa fa-trash-o"></i><span class="dummy-label">{{label.RemoveSelected}}</span>
+</a>

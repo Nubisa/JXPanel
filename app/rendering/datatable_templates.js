@@ -210,6 +210,67 @@ var getModules = function(active_user, table) {
 };
 
 
+
+// gets information about npm modules installed in global module path
+var getAddons = function(active_user, table) {
+
+    var data = [];
+    try {
+        var addonsDir = path.normalize(site_defaults.dirAddons);
+        var folders = fs.readdirSync(addonsDir);
+
+        for (var a = 0, len = folders.length; a < len; a++) {
+            if (folders[a].slice(0, 1) !== ".") {
+
+                var file = path.join(addonsDir, "/", folders[a], "/package.json");
+
+                try {
+                    if (fs.existsSync(file)) {
+                        var json = JSON.parse(fs.readFileSync(file));
+                        data.push(json);
+                    }
+                } catch (ex) {
+                }
+            }
+        }
+    } catch (ex) {
+    }
+
+
+    var columns = table.settings.columns;
+    var arr = [];
+    arr.push([]); // columns
+    for (var a in columns) {
+        var displayName = columns[a];
+        if (displayName == "_checkbox") displayName = "";
+        if (displayName == "_id") displayName = "ID";
+        arr[0].push(displayName);
+    }
+
+    var cnt = 1;
+    for (var i in data) {
+
+        var addon = data[i];
+
+        var single_row = [];
+        for (var x in columns) {
+            var colName = columns[x];
+            var str = addon[colName] || "";
+            if (str) str = '<a href="/addon.html?' + addon.id + '">' + str + '</a>';
+            if (colName === "_checkbox")
+                str = '<input type="checkbox" id="jxrow_' + addon.id + '"></input>';
+            else if (colName === "_id")
+                str = cnt++;
+
+            single_row.push(str);
+        }
+        arr.push(single_row);
+    }
+
+    return { err: false, html: exports.getDataTable(arr)};
+};
+
+
 // each rows is array of cells
 // first row is column array
 // e.g.
@@ -253,9 +314,16 @@ exports.getDataTable = function(rows, columnClasses) {
         }
     }
 
-    return "<thead><tr>" + thead.join("\n") + "</tr></thead>\n<tbody>" + tbody.join("\n") + "</tbody>";
+    return '<table id="dt_basic" class="table table-striped table-bordered table-hover jxTable">' +
+           "<thead><tr>" + thead.join("\n") + "</tr></thead>\n<tbody>" + tbody.join("\n") + "</tbody>" +
+           "</table>";
 };
 
+
+exports.getClientTableScript = function() {
+    var containerFilejs = path.join(__dirname, "../definitions/datatables/datatable_js.html");
+    return fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
+};
 
 exports.render = function (sessionId, table_name, getContents) {
 
@@ -271,8 +339,9 @@ exports.render = function (sessionId, table_name, getContents) {
     if (!getContents) {
         // general template of the table (without data contents)
         var containerFile = path.join(__dirname, "../definitions/datatables/datatable.html");
+        var containerFilejs = path.join(__dirname, "../definitions/datatables/datatable_js.html");
         if (fs.existsSync(containerFile)) {
-            var widget = fs.readFileSync(containerFile).toString();
+            var widget = fs.readFileSync(containerFile).toString() + exports.getClientTableScript();
             logic.globals = { name: table_name, contents: "<thead><tr><td></td></tr></thead><tbody><tr><td></td></tr></tbody>", active_user: active_user, table : table};
             var result = rep(widget, logic);
 
@@ -284,6 +353,9 @@ exports.render = function (sessionId, table_name, getContents) {
         // data contents of the table
         if (table_name === "modules")
             return getModules(active_user, table);
+        else
+        if (table_name === "addons")
+            return getAddons(active_user, table);
         else
         if (table_name === "langs")
             return exports.getLangs(active_user, table);

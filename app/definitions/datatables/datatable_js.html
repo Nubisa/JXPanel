@@ -1,0 +1,83 @@
+<script type="text/javascript">
+
+    var refreshtable = function () {
+
+        /* // DOM Position key index //
+
+         l - Length changing (dropdown)
+         f - Filtering input (search)
+         t - The Table! (datatable)
+         i - Information (records)
+         p - Pagination (paging)
+         r - pRocessing
+         < and > - div elements
+         <"#id" and > - div with an id
+         <"class" and > - div with a class
+         <"#id.class" and > - div with an id and class
+
+         Also see: http://legacy.datatables.net/usage/features
+         */
+
+        /* BASIC ;*/
+
+        $('#dt_basic').dataTable();
+
+
+        /* END BASIC */
+
+        /* COLUMN FILTER  */
+        var otable = $('#datatable_fixed_column').DataTable({
+            "bFilter": false,
+            //"bInfo": false,
+            "bLengthChange": false,
+            //"bAutoWidth": false,
+            //"bPaginate": false,
+            //"bStateSave": true // saves sort state using localStorage
+            "sDom": "<'dt-toolbar'<'col-xs-6'f><'col-xs-6'<'toolbar'>>r>" +
+                    "t" +
+                    "<'dt-toolbar-footer'<'col-xs-6'i><'col-xs-6'p>>"
+
+        });
+
+        // custom toolbar
+        $("div.toolbar").html('<div class="text-right"><img src="img/logo.png" alt="SmartAdmin" style="width: 111px; margin-top: 3px; margin-right: 10px;"></div>');
+
+        // Apply the filter
+        $("#datatable_fixed_column thead th input[type=text]").on('keyup change', function () {
+
+            otable
+                    .column($(this).parent().index() + ':visible')
+                    .search(this.value)
+                    .draw();
+
+        });
+        /* END COLUMN FILTER */
+
+        /* COLUMN SHOW - HIDE */
+        $('#datatable_col_reorder').dataTable({
+            "sDom": "<'dt-toolbar'<'col-xs-6'f><'col-xs-6'C>r>" +
+                    "t" +
+                    "<'dt-toolbar-footer'<'col-xs-6'i><'col-xs-6'p>>"
+        });
+
+        /* END COLUMN SHOW - HIDE */
+
+    };
+
+
+    utils.jxGetSelection = function() {
+        var ids = [];
+        $('input:checkbox[id^=jxrow_]:checked').each(function() {
+            var id = $(this).attr('id').replace("jxrow_", "");
+            ids.push(id);
+        });
+        return ids;
+    };
+
+    utils.jxCallSelection = function(method_name, args) {
+        args = args || {};
+        args.selection = utils.jxGetSelection();
+        utils.jxCall(method_name, args);
+        return false;
+    };
+</script>

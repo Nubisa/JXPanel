@@ -89,6 +89,7 @@ exports.defineMethods = function(){
 
 
 exports.dirNativeModules = path.join(exports.apps_folder, "native_modules" ) + path.sep;
+exports.dirAddons = path.join(exports.apps_folder, "addons" ) + path.sep;
 exports.dirAppConfigs = path.join(exports.apps_folder, "app_configs" ) + path.sep;
 exports.dirMonitorCertificates = path.join(__dirname, "../spawner") + path.sep;
 exports.dirNginxConfigs = path.join(exports.apps_folder, "nginx/conf/jxcore") + path.sep;

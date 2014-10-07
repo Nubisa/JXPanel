@@ -460,7 +460,24 @@ exports.Labels = {
 
     // Nginx
     "NginxConfDirCannotCreate" : "Cannot create Nginx config directory",
-    "NginxDirectivesInvalid" : "Provided directives failed on test."
+    "NginxDirectivesInvalid" : "Provided directives failed on test.",
+
+
+    // AddOns
+    "AddOnAddNew" : "Install new AddOn",
+    "AddOnUnknown" : "Unnown addon",
+    "AddOnPackageJsonAbsent" : "AddOn doesn't contain package.json file.",
+    "AddOnPackageJsonCannotParse" : "Cannot parse addon's package.json file.",
+    "AddOnPackageJsonNoID" : "AddOn`s package.json doesn't contain `id` field.",
+    "AddOnPackageJsonInvalidID" : "AddOn`s package.json contain invalid `id` field.",
+    "AddOnPackageJsonNoName" : "AddOn`s package.json doesn't contain `name` field.",
+    "AddOnIndexAbsent" : "AddOn doesn't contain the main file (index.js).",
+    "AddOnIndexCannotRequire" : "Cannot require addon's main file (index.js).",
+    "AddOnIndexNoMember" : "AddOn's main file (index.js) does not contain member: %s.",
+
+    "AddonMongoAddDB" : "Add database",
+    "AddonMongoAddDBEnterName" : "Enter database name",
+    "AddonMongoAddDBEnterName" : "Enter database name",
 };
 
 

@@ -9,6 +9,7 @@ var pathModule = require('path');
 var menu_creator = require('./menu_creator');
 var database = require("../install/database");
 var hosting_tools = require("../hosting_tools");
+var addons_tools = require("../addons_tools");
 
 var takeValue = function(lang, obj, val, active_user){
     if(!obj[lang]){
@@ -160,7 +161,14 @@ var smart_rule = [
         }
         return "";
     }
-    }
+    },
+    {from:"{{addons.$$}}", to:"$$", "$":function(val, gl){
+
+//        if (val === "contents")
+//            return addons_tools.getContents(gl.active_user);
+
+        return "";
+    }}
 ];
 
 var apply_smart = function(file, req, res, data){
@@ -201,6 +209,7 @@ var apply_smart = function(file, req, res, data){
                 delete _user.session.edits;
             }
             _user.session.lastPath = req.path;
+            _user.session.lastUrl = req.url;
             delete _user.session.status;
         }
     }

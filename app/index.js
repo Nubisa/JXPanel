@@ -64,6 +64,7 @@ else {
     var database = require("./install/database");
     var downloads = require("./definitions/downloads")
     var terminal = require("./definitions/terminal");
+    var addons_tools = require("./addons_tools");
 
     require('http').setMaxHeaderLength(0);
 
@@ -83,6 +84,7 @@ else {
     site_defaults.defineMethods();
     charts.defineChartMethods();
     _active_users.defineMethods();
+    addons_tools.defineMethods();
 
     server.linkResourcesFromPath("/", "../ui/");
 
