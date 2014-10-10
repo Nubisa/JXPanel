@@ -125,15 +125,12 @@ var getContents = function (env, active_user, cb) {
     }
 
     var addon = active_user.session.addons[addon_name];
+    env.addon = { name : addon_name, args : addon_args, json : res.json };
 
     var wasError = false;
     try {
         addon.request(env, addon_args, function (err, html) {
             if (!wasError) {
-
-                html = active_user.session.addon_factory.header.renderButtons()
-                     + "<h1>" + res.json.title + "</h1>"
-                     + html;
                 cb(err, html);
             }
         });
@@ -145,6 +142,8 @@ var getContents = function (env, active_user, cb) {
 
 exports.defineMethods = function () {
 
+    // this method gets called by addon.html with addon name after ?, e.g.:
+    // addon.html?mongodb
     server.addJSMethod("getAddon", function (env, params) {
         var active_user = _active_user.getUser(env.SessionID);
         if (!active_user) {
@@ -179,8 +178,10 @@ var extension_class = function (env, active_user) {
 
     var __env = env;
     var __active_user = active_user;
+    var __this = this;
 
-    var buttons = [];
+    var __buttons = [];
+    var __tabs = {};
 
     this.table = {
         render: function (arr) {
@@ -194,21 +195,49 @@ var extension_class = function (env, active_user) {
         }
     };
 
+    this.tabs = {
+        create: function (id, tabs) {
+
+            var str = '<ul id="' + id + '" class="nav nav-tabs bordered">';
+
+            var currentTab = env.addon.args.tab || null;
+            var url = "/addon.html?" + env.addon.name + "&tab=";
+
+            for (var a in tabs) {
+                var tab = tabs[a];
+                if (!currentTab) currentTab = tab.id; // first tab will be active, if no other tab is specified
+                if (currentTab === tab.id)
+                    str += '<li class="active" id="' + tab.id + '">';
+                else
+                    str += '<li id="' + tab.id + '">';
+
+                var icon = tab.icon || '<i class="fa fa-lg fa-gear">';
+                str += '<a href="' + url + tab.id + '">' + icon + '</i> ' + tab.label + '</a></li>';
+            }
+
+            str += '</ul>';
+
+            __tabs.html = str;
+            __tabs.current = currentTab;
+            return str;
+        }
+    };
+
     this.header = {
         addClientButton: function (caption, onclick_name, args) {
             var onclick = onclick_name + "(" + (JSON.stringify(args) || "").replace(/"/g, "'") + "); return false";
             var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, false);
-            buttons.push(btn);
+            __buttons.push(btn);
         },
         addServerButton: function (caption, method_name, args, addSelection) {
             var _name = addSelection ? "utils.jxCallSelection" : "utils.jxCall";
 
             var onclick = _name + "('" + method_name +"', " + (JSON.stringify(args) || "{}").replace(/"/g, "'") + "); return false";
             var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, false);
-            buttons.push(btn);
+            __buttons.push(btn);
         },
         renderButtons: function () {
-            if (!buttons.length)
+            if (!__buttons.length)
                 return "";
 
             var html = '<div style="margin-left:-6px;margin-top:0px;">' +
@@ -219,8 +248,8 @@ var extension_class = function (env, active_user) {
                 '</div>';
 
             var str = "";
-            for (var a in buttons)
-                str += buttons[a];
+            for (var a in __buttons)
+                str += __buttons[a];
 
             return html.replace("{{datatable.buttons}}", str);
         }
@@ -251,11 +280,30 @@ var extension_class = function (env, active_user) {
             database.updateUser(user_name, user);
         }
     };
-    var _db = this.db;
 
     this.render = function (html) {
         smart_rule.globals = {"sessionId":__env.sessionId, "active_user": __active_user, "lang":__active_user.lang  };
-        return smart_replace(html, smart_rule);
+        html = smart_replace(html, smart_rule);
+
+        var file = "";
+        var file_name = path.join(site_defaults.dirAddons, env.addon.name, __tabs.current + ".html");
+        if (fs.existsSync(file_name)) {
+            file = fs.readFileSync(file_name).toString();
+        }
+
+        if (__tabs.html) {
+            html = __tabs.html
+                 + '<div id="myTabContent1" class="tab-content padding-10"><div class="tab-pane fade in active">'
+                 + html
+                 + '</div>';
+        }
+
+        if (file.indexOf("{{contents}}") !== -1)
+            html = file.replace("{{contents}}", html);
+        else
+            html = file + html;
+
+        return __this.header.renderButtons() + "<br><h1>" + env.addon.json.title + "</h1>" + html;
     };
 
     this.activeUser = this.db.getUser();

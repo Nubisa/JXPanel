@@ -13,7 +13,9 @@ exports.request = function(env, args, cb) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
 
-    if (args.table || !args.form) {
+    var html = "";
+
+    if (!args.tab || args.tab === "databases") {
         // constructing a table
         var table = [];
         var columns = ["", "ID", "name", "value1", "value2"];
@@ -35,10 +37,10 @@ exports.request = function(env, args, cb) {
             id++;
         }
 
-        var str = addonFactory.table.render(table);
+        html = addonFactory.table.render(table);
     }
 
-    if (args.form) {
+    if (args.tab === "form") {
         addonFactory.header.addServerButton("Some button", "");
 
         var form = addonFactory.form.new("my_form");
@@ -54,16 +56,19 @@ exports.request = function(env, args, cb) {
             cb();
         });
 
-        str = form.render();
+        html = form.render();
     }
 
+    var tabs = [
+        {id: "databases", label: "Databases", icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">'},
+        {id: "form", label: "Sample Addon's Form"},
+        {id: "tab3", label: "Empty Tab"}
+    ];
 
-    var index = fs.readFileSync( path.join(__dirname,"./index.html")).toString();
-    index = index.replace("{{table}}", str);
+    addonFactory.tabs.create("osiem", tabs);
 
-    //console.log(table);
     // returning html
-    cb(false, addonFactory.render(index));
+    cb(false, addonFactory.render(html));
 };
 
 var getUserData = function(addonFactory) {
