@@ -11,32 +11,36 @@ var db = require("./db");
 // should return html, which will be displayed in main frame
 exports.request = function(env, args, cb) {
 
-    // constructing a table
-    var table = [];
-    var columns = ["", "ID", "name", "value1", "value2"];
-    table.push(columns);
-
     var addonFactory = jxpanel.getAddonFactory(env);
-    addonFactory.header.addServerButton("Add database", "addDB");
-    addonFactory.header.addServerButton("Remove database", "removeDB", null, true);
 
-    var userData = getUserData(addonFactory);
-    var dbs = userData.mongo.dbs;
+    if (args.table || !args.form) {
+        // constructing a table
+        var table = [];
+        var columns = ["", "ID", "name", "value1", "value2"];
+        table.push(columns);
 
-    var id = 1;
-    for(var a in dbs) {
-        if (a === "length") continue;
+        addonFactory.header.addServerButton("Add database", "addDB");
+        addonFactory.header.addServerButton("Remove database", "removeDB", null, true);
+        addonFactory.header.addClientButton("Go to the form", "goToTheForm");
 
-        var chk = '<input type="checkbox" id="jxrow_' + a + '"></input>';
-        table.push([chk, id, a, "", "" ]);
-        id++;
-    }
+        var userData = getUserData(addonFactory);
+        var dbs = userData.mongo.dbs;
 
-    if (args.table) {
+        var id = 1;
+        for(var a in dbs) {
+            if (a === "length") continue;
+
+            var chk = '<input type="checkbox" id="jxrow_' + a + '"></input>';
+            table.push([chk, id, a, "", "" ]);
+            id++;
+        }
+
         var str = addonFactory.table.render(table);
     }
 
     if (args.form) {
+        addonFactory.header.addServerButton("Some button", "");
+
         var form = addonFactory.form.new("my_form");
         form.addSection("Text boxes");
         form.addControl("text", "txt1", { label : "my txt1", value : "some value", required : true });
