@@ -167,6 +167,7 @@ exports.Labels = {
     "and" : "and",
     "or" : "or",
 
+    "ControlIdDuplicate": "Duplicate control ID (%s).",
     // Pages
 
     "UsersManagement" : "User Management",
@@ -465,7 +466,7 @@ exports.Labels = {
 
     // AddOns
     "AddOnAddNew" : "Install new AddOn",
-    "AddOnUnknown" : "Unnown addon",
+    "AddOnUnknown" : "Unknown addon",
     "AddOnPackageJsonAbsent" : "AddOn doesn't contain package.json file.",
     "AddOnPackageJsonCannotParse" : "Cannot parse addon's package.json file.",
     "AddOnPackageJsonNoID" : "AddOn`s package.json doesn't contain `id` field.",
@@ -476,8 +477,7 @@ exports.Labels = {
     "AddOnIndexNoMember" : "AddOn's main file (index.js) does not contain member: %s.",
 
     "AddonMongoAddDB" : "Add database",
-    "AddonMongoAddDBEnterName" : "Enter database name",
-    "AddonMongoAddDBEnterName" : "Enter database name",
+    "AddonMongoAddDBEnterName" : "Enter database name"
 };
 
 

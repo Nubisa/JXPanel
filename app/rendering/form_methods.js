@@ -12,6 +12,7 @@ var fs = require('fs');
 var path = require('path');
 var system_tools = require('../system_tools');
 var hosting_tools = require('../hosting_tools');
+var addons_tools = require('../addons_tools');
 var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
 var ftp = require("./../install/ftp");
@@ -295,6 +296,14 @@ methods.sessionApply = function(env, params){
 
     if (!cnt)
         return sendError("FormEmpty");
+
+    if (activeForm.addonForm) {
+
+        activeInstance.callOnSubmit(json, function() {
+            sendError(false)
+        });
+        return;
+    }
 
     var isUpdate = _active_user.isRecordUpdating(active_user, params.form);
     var update_name = isUpdate ? isUpdate : json.name;

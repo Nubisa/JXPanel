@@ -9,7 +9,7 @@ var db = require("./db");
 
 // this is addon's response on url: addon.html?addon_name
 // should return html, which will be displayed in main frame
-exports.request = function(env, cb) {
+exports.request = function(env, args, cb) {
 
     // constructing a table
     var table = [];
@@ -18,7 +18,7 @@ exports.request = function(env, cb) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
     addonFactory.header.addServerButton("Add database", "addDB");
-    addonFactory.header.addServerButton("Remove databse", "removeDB", null, true);
+    addonFactory.header.addServerButton("Remove database", "removeDB", null, true);
 
     var userData = getUserData(addonFactory);
     var dbs = userData.mongo.dbs;
@@ -32,10 +32,32 @@ exports.request = function(env, cb) {
         id++;
     }
 
-    var str = addonFactory.table.render(table);
+    if (args.table) {
+        var str = addonFactory.table.render(table);
+    }
+
+    if (args.form) {
+        var form = addonFactory.form.new("my_form");
+        form.addSection("Text boxes");
+        form.addControl("text", "txt1", { label : "my txt1", value : "some value", required : true });
+        form.addControl("text", "txt2", { label : "my txt2", value : "some value 2" });
+        form.addSection("Others");
+        form.addControl("checkbox", "chk1", { label : "my chk1", value : 1 });
+        form.addControl("combobox", "chk11", { label : "my combo1", value : 3, values : [1,2,3] });
+
+        form.on('submit', function(values, cb) {
+            console.log("values from form", values);
+            cb();
+        });
+
+        str = form.render();
+    }
+
+
     var index = fs.readFileSync( path.join(__dirname,"./index.html")).toString();
     index = index.replace("{{table}}", str);
 
+    //console.log(table);
     // returning html
     cb(false, addonFactory.render(index));
 };
@@ -76,7 +98,7 @@ jxpanel.server.addJSMethod("addDB", function(env, params) {
 
 jxpanel.server.addJSMethod("removeDB", function(env, params) {
 
-    console.log(params);
+    //console.log(params);
 
     var addonFactory = jxpanel.getAddonFactory(env);
 
@@ -93,3 +115,5 @@ jxpanel.server.addJSMethod("removeDB", function(env, params) {
 
     jxpanel.server.sendCallBack(env, {err : false } );
 });
+
+

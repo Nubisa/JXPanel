@@ -1,4 +1,5 @@
 var form_lang = require('../definitions/form_lang');
+var page_utils = require('./page_utils');
 var path = require("path");
 var fs = require("fs");
 var database = require("../install/database");
@@ -130,7 +131,7 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
     if(options && options.values){
         for(var o in options.values){
             var str = "value='"+options.values[o]+"' ";
-            if(_value && _value.trim().length){
+            if(_value && _value.toString().trim().length){
                 if(options.values[o] == _value)
                     str += " selected";
             }
@@ -224,6 +225,26 @@ exports.createSimpleText = function(label, _title, input_id, _value, active_user
 
     return {html: _html, js: js};
 };
+
+
+exports.createButtons = function(active_user, formInstance) {
+
+    var str = '<div class="form-group" id="jxform_buttons" style="margin-bottom: 30px; margin-top: 20px;">'
+             +'<label class="col-md-2 control-label"></label>'
+             +'<div class="col-md-4" style="padding-left: 0px">';
+
+    var buttons = '<button type="submit" onclick="return false;" style="display: none;"></button>'
+                 + page_utils.getSingleButton(form_lang.Get(active_user.lang, "Apply", true),
+                        "fa-check", formInstance.submitOnClick || "window.jxForms['"+ formInstance.name +"'].apply()", false)
+                 + page_utils.getSingleButton(form_lang.Get(active_user.lang, "Cancel", true),
+                    "fa-times", "location = '" + formInstance.onSubmitCancel + "';", false);
+
+    str += page_utils.getButtonsGroup(buttons);
+    str +=  '</div></div><br><br>';
+
+    return exports.createLegend("").html + str;
+};
+
 
 exports.end = "</fieldset></form>";
 

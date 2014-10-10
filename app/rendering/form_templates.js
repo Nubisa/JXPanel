@@ -39,6 +39,11 @@ var logic = [
     }}
 ];
 
+exports.getClientFormScript = function() {
+    var containerFilejs = path.join(__dirname, "../definitions/forms/container_js.html");
+    return fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
+};
+
 
 exports.renderForm = function(sessionId, formName, onlyControls){
     var html = "";
@@ -60,7 +65,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             return form_lang.Get(active_user.lang, "NoTemplate", null, [ "form" ]);
         }
 
-        var widget = fs.readFileSync(containerFile).toString();
+        var widget = exports.getClientFormScript() + fs.readFileSync(containerFile).toString();
         var _icon = (!activeForm.icon)? "": activeForm.icon;
         logic.globals = { name: formName, contents: "", active_user:active_user, icon:_icon, form: activeForm, lang:active_user.lang};
         var result = rep(widget, logic);
@@ -252,12 +257,11 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
 
-
 //    var includeHtmlFile = path.join(__dirname, "../definitions/forms/" + formName + "_include.html");
 //    var includeHtml = fs.existsSync(includeHtmlFile) ? fs.readFileSync(includeHtmlFile).toString() : "";
 //
 //    var includeHtmlJS = path.join(__dirname, "../definitions/forms/" + formName + "_include.js");
 //    var includeJS = fs.existsSync(includeHtmlJS) ? fs.readFileSync(includeHtmlJS).toString() : "";
 
-    return { err : false, html: tool.begin + html + tool.end, js : scr };
+    return { err : false, html: tool.begin + html + tool.end + tool.createButtons(active_user, activeForm), js : scr };
 };

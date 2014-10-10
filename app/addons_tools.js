@@ -9,6 +9,7 @@ var form_lang = require("./definitions/form_lang");
 var _active_user = require("./definitions/active_user");
 var path = require("path");
 var fs = require("fs");
+var url = require("url");
 var exec = require('child_process').exec;
 var https = require("https");
 var user_folders = require("./definitions/user_folders");
@@ -19,6 +20,9 @@ var datatables = require("./rendering/datatable_templates");
 var page_utils = require("./rendering/page_utils");
 var server = require("jxm");
 var smart_replace = require('./rendering/smart_search').replace;
+var tools = require('./rendering/form_tools');
+var form_templates = require('./rendering/form_templates');
+var events = require("events");
 
 
 var checkUpacked = function (addon_dir) {
@@ -56,6 +60,7 @@ var checkUpacked = function (addon_dir) {
     try {
         var addon = require(index_path);
     } catch (ex) {
+        console.error(ex);
         return { err: "AddOnIndexCannotRequire" };
     }
 
@@ -84,15 +89,19 @@ var copy = function () {
 
 var getContents = function (env, active_user, cb) {
 
-    // e.g. /addonm.html/mongodb/id/1/par/2
-    var parsed = active_user.session.lastUrl.split("?");
+    // e.g. /addonm.html?mongodb&id=1&par=2
+    var tmp = active_user.session.lastUrl.replace(new RegExp("&", "g"), "?").split("?");
+    var addon_name = tmp[1] || "";
+
     // [0] = addonm.html
     // [1] = mongodb (addon id)
     // [2] = 1st param name
     // [3] = 1st param value
     // [4] = 2nd param name
     // [5] = 2nd param value
-    var addon_name = parsed[1] || "";
+
+    var parsedUrl = url.parse(active_user.session.lastUrl, true);
+    var addon_args = parsedUrl.query;
 
     if (!addon_name) {
         cb({ err: "AddOnUnknown" });
@@ -119,7 +128,7 @@ var getContents = function (env, active_user, cb) {
 
     var wasError = false;
     try {
-        addon.request(env, function (err, html) {
+        addon.request(env, addon_args, function (err, html) {
             if (!wasError) {
 
                 html = active_user.session.addon_factory.header.renderButtons()
@@ -158,6 +167,10 @@ var smart_rule = [
         var res = form_lang.Get(gl.lang, val);
         return !res ? "" : res;
     }
+    },
+    {from: "{{form.$$}}", to: "$$", "$": function (val, gl) {
+        return gl.form[val];
+    }
     }
 ];
 
@@ -172,6 +185,12 @@ var extension_class = function (env, active_user) {
     this.table = {
         render: function (arr) {
             return datatables.getDataTable(arr) + datatables.getClientTableScript() + '<script type="text/javascript">refreshtable();</script>';
+        }
+    };
+
+    this.form = {
+        new : function(id, options) {
+            return new form(id, env, active_user, options)
         }
     };
 
@@ -240,7 +259,128 @@ var extension_class = function (env, active_user) {
     };
 
     this.activeUser = this.db.getUser();
+
 };
+
+
+var form = function(id, env, active_user, options) {
+
+    if (!options) options = {};
+
+    var __env = env;
+    var __active_user = active_user;
+    var __this = this;
+
+    var section_started = false;
+    var controls = [];
+    var ids = [];
+
+    this.onSubmitSuccess = options.onSubmitSuccess || "addonm.html";
+    this.onSubmitCancel = options.onSubmitCancel || "addonm.html";
+
+    this.id = id;
+    this.name = id;
+    this.controls = [];
+
+    if(!active_user.session.forms[id])
+        active_user.session.forms[id] = {};
+
+    active_user.session.forms[id].activeInstance = __this;
+    active_user.session.forms[id].addonForm = true;
+
+
+    var __eventEmitter = new events.EventEmitter();
+    this.on = function (event, cb) {
+        __eventEmitter.on(event, cb);
+    };
+
+
+    this.addControl = function(type, id, options) {
+
+        if (ids.indexOf(id) !== -1)
+            throw form_lang.Get(__active_user.lang, "ControlIdDuplicate", true, [id]);
+
+        ids.push(id);
+
+        if (!options) options = { };
+        options.extra = options.extra || {};
+        options.extra.formName = __this.name;
+
+        if (type === "section") {
+            if (section_started) controls.push(tools.endFieldSet());
+            controls.push(tools.startFieldSet());
+            controls.push(tools.createLegend(options.label || __this.name).html);
+            section_started = true;
+            return;
+        }
+
+        var method = null;
+        if (type === "text" || type === "password" || type === "textarea")
+            method = tools.createTextBox;
+        else
+        if (type === "checkbox")
+            method = tools.createCheckBox;
+        else
+        if (type === "combobox")
+            method = tools.createComboBox;
+        else
+        if (type === "simpleText")
+            method = tools.createSimpleText;
+
+        controls.push(method(options.label, options.label, id, options.value, __active_user, options).html);
+
+        /*
+         {
+         name: "domain_name",
+         details: {
+         label: "DomainName",
+         method: tool.createTextBox,
+         options: { required: true, prefix: "www." },
+         dbName: "name", // alias to `name` in object database.getDomain();
+         cannotEdit: true
+         },
+         validation : new validations.Domain()
+         },
+         */
+
+        this.controls.push( {
+            name : id,
+            details : {
+                label : options.label,
+                options : options
+            }
+        });
+    };
+
+    var cnt = 0;
+    this.addSection = function(label) {
+        __this.addControl("section", "section" + (cnt++), { label : label });
+    };
+
+    this.render = function() {
+        if (section_started) {
+            controls.push(tools.endFieldSet());
+            section_started = false;
+        }
+
+        var script = form_templates.getClientFormScript();
+        smart_rule.globals = {"sessionId":__env.sessionId, "active_user": __active_user, "lang":__active_user.lang, form : __this  };
+        script = smart_replace(script, smart_rule);
+
+        return script + tools.begin + controls.join("\n") + tools.end + tools.createButtons(__active_user, __this);
+    };
+
+    this.callOnSubmit = function(err, values, cb) {
+        __eventEmitter.emit("submit", err, values, cb);
+    };
+};
+
+//exports.sessionApply = function(env, active_user, formName, json, cb) {
+//
+//    var form = active_user.session.forms[formName];
+//    form.activeInstance.callOnSubmit(null, json, cb);
+//};
+
 
 global.jxpanel = {
     getAddonFactory: function (env) {

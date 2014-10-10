@@ -48,18 +48,22 @@ exports.getProgressBar = function(maxValue, value, unit) {
 
 exports.getSingleButton = function(label, iconClass, onclick, additionalStyle) {
 
-    var str = '';
-
-    if (additionalStyle !== false)
-        str += '<span id="buttons" class="jxbuttons" style="' + additionalStyle + '">'
-              +'<i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;';
-
-    str += '<a id="btn_refresh" data-original-title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
+    var str = '<a id="btn_refresh" data-original-title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
           +'<i class="fa ' + iconClass + '"></i><span class="dummy-label">' + label + '</span>'
           +'</a>';
 
     if (additionalStyle !== false)
-        str += '</span>';
+        str = exports.getButtonsGroup(str, additionalStyle);
 
     return str;
+};
+
+
+exports.getButtonsGroup = function(html, additionalStyle) {
+
+    additionalStyle = additionalStyle || "";
+    return '<span id="buttons" class="jxbuttons" style="' + additionalStyle + '">'
+             +'<i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;'
+             + html
+             +'</span>';
 };

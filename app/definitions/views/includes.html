@@ -206,7 +206,7 @@
         });
     };
 
-    window.utils = {};
+    window.utils = window.utils || {};
     utils.setActive = function(name){
         if(document.getElementById(name)){
             document.getElementById(name).className = "active";
