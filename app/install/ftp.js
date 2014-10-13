@@ -28,6 +28,10 @@ exports.start = function() {
 };
 
 exports.restart = function() {
+
+    if (!fs.existsSync(pid_file))
+        return true;
+
     var cmd = "kill -HUP `cat " + pid_file + "`";
     var ret = jxcore.utils.cmdSync(cmd);
     if (ret.exitCode)
@@ -89,9 +93,9 @@ var saveConfig = function() {
         tmp += "  AllowUser OR " + allowedUsers.join(",") + "\n";
 
     conf_str = conf_str.replace(/<Limit LOGIN>([\s\S]*?)<\/Limit>/, "<Limit LOGIN>" + tmp + "<\/Limit>");
-    console.log("tmp", tmp);
+//    console.log("tmp", tmp);
 
-    console.log("allowedUsers", allowedUsers);
+//    console.log("allowedUsers", allowedUsers);
 
     fs.writeFileSync(conf_file, conf_str);
 
