@@ -18,6 +18,20 @@ var Db = require('mongodb').Db,
 
 exports.AddDB = function(env, db_name, cb) {
 
+
+    var addonFactory = jxpanel.getAddonFactory(env);
+
+    var dbs = addonFactory.db.get("dbs") || { __id : 0 };
+
+    var new_name = addonFactory.activeUser.name + "#" + (dbs.__id + 1);
+    dbs[new_name] = true;
+    dbs.__id++;
+
+    addonFactory.db.set("dbs", dbs);
+
+    cb();
+    return;
+
 //    var db = new Db("mydb", new Server("localhost", 27017));
 //    db.open(function(err, db) {
 //        cb(err || "We are connected");
@@ -73,8 +87,27 @@ exports.AddDB = function(env, db_name, cb) {
 };
 
 
-exports.RemoveDB = function(db_name) {
+exports.RemoveDB = function(dbnames, cb) {
 
+    var addonFactory = jxpanel.getAddonFactory(env);
+
+    var dbs = addonFactory.db.get("dbs");
+
+    if (dbs) {
+
+        if (dbs === "all") {
+            dbs = {};
+        } else {
+            for(var a in dbnames) {
+                var db_name = dbnames[a];
+                delete dbs[db_name];
+            }
+        }
+
+        addonFactory.db.set("dbs", dbs);
+    }
+
+    cb(false)
 };
 
 

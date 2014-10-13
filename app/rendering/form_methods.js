@@ -17,6 +17,7 @@ var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
 var ftp = require("./../install/ftp");
 var apps_tools = require("./apps_tools");
+var events = require("../events")
 
 
 methods.tryLogin = function(env, params){
@@ -366,6 +367,9 @@ methods.sessionApply = function(env, params){
             var res = json.ftp_access ? ftp.allowUser(update_name) : ftp.denyUser(update_name);
             if (res.err)
                 ret = res.err;
+
+            if (!ret)
+                events.call(active_user, isUpdate ? "userUpdate" : "userAdd", { name : update_name, values : json });
 
         } catch(ex) {
             ret = ex.toString();

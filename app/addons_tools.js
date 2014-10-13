@@ -24,6 +24,7 @@ var tools = require('./rendering/form_tools');
 var form_templates = require('./rendering/form_templates');
 var events = require("events");
 
+var addons = {};
 
 var checkUpacked = function (addon_dir) {
 
@@ -58,27 +59,53 @@ var checkUpacked = function (addon_dir) {
         return { err: "AddOnIndexAbsent" };
 
     try {
-        var addon = require(index_path);
+        var index = require(index_path);
     } catch (ex) {
         console.error(ex);
         return { err: "AddOnIndexCannotRequire" };
     }
 
-    if (typeof addon.request !== 'function')
+    if (typeof index.request !== 'function')
         return { err: "AddOnIndexNoMember|request"}
 
-    return { json: json, addon: addon};
+    // events.js is optional
+    var events_path = path.join(addon_dir, "events.js");
+    var events = null;
+    if (fs.existsSync(events_path)) {
+        try {
+            events = require(events_path);
+        } catch (ex) {
+            // invalid file
+            return { err : "AddOnEventsCannotRequire" };
+        }
+    }
+
+    return { json: json, index: index, events : events, id :json.id };
 };
 
-var unload = function (active_user, addon_name) {
+var unload = function (addon_name) {
 
-    if (active_user.session.addons) {
-        delete active_user.session.addons[addon_name];
-    }
+    delete addons[addon_name];
     var index_path = path.join(site_defaults.dirAddons, addon_name, "index.js");
     delete require.cache[index_path];
 
     copy();
+};
+
+
+var load = function(addon_name) {
+
+    if (!addons[addon_name]) {
+        // loading addon
+        var addon_dir = path.join(site_defaults.dirAddons, addon_name);
+        var res = checkUpacked(addon_dir);
+        if (res.err) {
+            return res;
+        }
+        addons[addon_name] = res;
+    }
+
+    return addons[addon_name];
 };
 
 var copy = function () {
@@ -108,27 +135,20 @@ var getContents = function (env, active_user, cb) {
         return;
     }
 
-    unload(active_user, addon_name);
+    // just for development process
+    unload(addon_name);
 
-    if (!active_user.session.addons)
-        active_user.session.addons = {};
-
-    if (!active_user.session.addons[addon_name]) {
-        // loading addon
-        var addon_dir = path.join(site_defaults.dirAddons, addon_name);
-        var res = checkUpacked(addon_dir);
-        if (res.err) {
-            cb(res.err);
-            return res;
-        }
-        active_user.session.addons[res.json.id] = { instance : res.addon, name : addon_name, args : addon_args, json : res.json };
+    var addon = load(addon_name);
+    if (addon.err) {
+        cb( { err : addon.err });
+        return;
     }
 
-    active_user.session.addonCurrent = active_user.session.addons[addon_name];
+    active_user.session.addonCurrent = { instance : addon, args : addon_args };
 
     var wasError = false;
     try {
-        active_user.session.addonCurrent.instance.request(env, addon_args, function (err, html) {
+        active_user.session.addonCurrent.instance.index.request(env, addon_args, function (err, html) {
             if (!wasError) {
                 cb(err, html);
             }
@@ -173,13 +193,12 @@ var smart_rule = [
 ];
 
 
-var extension_class = function (env, active_user, addon) {
+var extension_class = function (env, active_user, addonCurrent) {
 
     var __env = env;
     var __active_user = active_user;
     var __this = this;
-    var __addon = addon;
-
+    var __addon = addonCurrent;
 
     var __buttons = [];
     var __tabs = {};
@@ -202,8 +221,7 @@ var extension_class = function (env, active_user, addon) {
             var str = '<ul id="' + id + '" class="nav nav-tabs bordered">';
 
             var currentTab = __addon.args.tab || null;
-            var url = "/addon.html?" + __addon.name + "&tab=";
-            var url = "/addon.html?" + __addon.name + "&tab=";
+            var url = "/addon.html?" + __addon.instance.id + "&tab=";
 
             for (var a in tabs) {
                 var tab = tabs[a];
@@ -284,8 +302,8 @@ var extension_class = function (env, active_user, addon) {
         },
         get : function(sid) {
             var user = database.getUser(__active_user.username);
-            if (user && user.addons && user.addons[__addon.name]) {
-                return user.addons[__addon.name][sid];
+            if (user && user.addons && user.addons[__addon.instance.id]) {
+                return user.addons[__addon.instance.id][sid];
             }
 
             return null;
@@ -293,14 +311,14 @@ var extension_class = function (env, active_user, addon) {
         set : function(sid, value) {
             var user = database.getUser(__active_user.username);
             if (!user.addons) user.addons = {};
-            if (!user.addons[__addon.name]) user.addons[__addon.name] = {};
-            user.addons[__addon.name][sid] = value;
+            if (!user.addons[__addon.instance.id]) user.addons[__addon.instance.id] = {};
+            user.addons[__addon.instance.id][sid] = value;
             database.updateUser(user.name, user);
         },
         remove : function(sid) {
             var user = database.getUser(__active_user.username);
-            if (user && user.addons && user.addons[__addon.name]) {
-                delete user.addons[__addon.name][sid];
+            if (user && user.addons && user.addons[__addon.instance.id]) {
+                delete user.addons[__addon.instance.id][sid];
             }
             database.updateUser(user.name, user);
         }
@@ -311,7 +329,7 @@ var extension_class = function (env, active_user, addon) {
         html = smart_replace(html, smart_rule);
 
         var file = "";
-        var file_name = path.join(site_defaults.dirAddons, __addon.name, __tabs.current + ".html");
+        var file_name = path.join(site_defaults.dirAddons, __addon.instance.id, __tabs.current + ".html");
         if (fs.existsSync(file_name)) {
             file = fs.readFileSync(file_name).toString();
         }
@@ -328,7 +346,7 @@ var extension_class = function (env, active_user, addon) {
         else
             html = file + html;
 
-        return __this.header.renderButtons() + "<br><h1>" + __addon.json.title + "</h1>" + html;
+        return __this.header.renderButtons() + "<br><h1>" + __addon.instance.json.title + "</h1>" + html;
     };
 
     this.activeUser = this.db.getUser();
@@ -389,7 +407,7 @@ var form = function(id, env, active_user, options, factory) {
         }
 
         var forms = __factory.db.get("__forms");
-        var value = forms && forms[__this.id] ? forms[__this.id][id] || options.value : options.value;
+        var value = forms && forms[__this.id] ? forms[__this.id][id] : options.value;
 
         var method = null;
         if (type === "text" || type === "password" || type === "textarea")
@@ -476,4 +494,22 @@ global.jxpanel = {
         return active_user.session.addonCurrent.factory;
     },
     server: require("jxm")
+};
+
+
+
+exports.callEvent = function(event_name, args) {
+
+    var ls = fs.readdirSync(site_defaults.dirAddons);
+    for(var o in ls) {
+        var addon_name = ls[o];
+        var addon = load(addon_name);
+        if (addon.err || !addon.events || !addon.events.event) continue;
+
+        try {
+            addon.events.event(event_name, args);
+        } catch (ex) {
+            // do nothing
+        }
+    }
 };

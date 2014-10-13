@@ -72,37 +72,17 @@ exports.request = function(env, args, cb) {
 
 jxpanel.server.addJSMethod("addDB", function(env, params) {
 
-    var addonFactory = jxpanel.getAddonFactory(env);
-
-    var dbs = addonFactory.db.get("dbs") || { __id : 0 };
-
-    var new_name = addonFactory.activeUser.name + "#" + (dbs.__id + 1);
-    dbs[new_name] = true;
-    dbs.__id++;
-
-    addonFactory.db.set("dbs", dbs);
-    jxpanel.server.sendCallBack(env, {err : false } );
+    db.AddDB(env, null, function(err) {
+        jxpanel.server.sendCallBack(env, {err : err } );
+    });
 });
 
 
 jxpanel.server.addJSMethod("removeDB", function(env, params) {
 
-    //console.log(params);
-
-    var addonFactory = jxpanel.getAddonFactory(env);
-
-    var dbs = addonFactory.db.get("dbs");
-
-    if (dbs) {
-        for(var a in params.op.selection) {
-            var db_name = params.op.selection[a];
-            delete dbs[db_name];
-        }
-
-        addonFactory.db.set("dbs", dbs);
-    }
-
-    jxpanel.server.sendCallBack(env, {err : false } );
+    db.RemoveDB(params.op.selection, function(err) {
+        jxpanel.server.sendCallBack(env, {err : err } );
+    });
 });
 
 

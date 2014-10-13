@@ -10,6 +10,7 @@ var rep = require('./smart_search').replace;
 var database = require("./../install/database");
 var system_tools = require("./../system_tools");
 var hosting_tools = require("./../hosting_tools");
+var events = require("./../events");
 var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
 var folder_utils = require("../definitions/user_folders");
@@ -554,6 +555,8 @@ exports.remove = function (sessionId, table_name, ids, withUserFiles, cb) {
                     var res = jxcore.utils.cmdSync(cmd);
                 }
             }
+
+            events.call(active_user, "userRemove", { name : usersToRemove[o]});
         }
 
         // removing plans folders

@@ -475,6 +475,7 @@ exports.Labels = {
     "AddOnIndexAbsent" : "AddOn doesn't contain the main file (index.js).",
     "AddOnIndexCannotRequire" : "Cannot require addon's main file (index.js).",
     "AddOnIndexNoMember" : "AddOn's main file (index.js) does not contain member: %s.",
+    "AddOnEventsCannotRequire" : "Cannot require addon's events.js file.",
 
     "AddonMongoAddDB" : "Add database",
     "AddonMongoAddDBEnterName" : "Enter database name"
