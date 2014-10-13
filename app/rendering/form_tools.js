@@ -6,7 +6,7 @@ var database = require("../install/database");
 
 exports.begin = '<form class="form-horizontal" onsubmit="return false;">';
 
-var getData = function(label, _title, input_id, active_user, options) {
+var getData = function(label, _title, input_id, _value, active_user, options) {
     var ret = { prefix : "", description: ""};
     if (!options) {
         return ret;
@@ -47,6 +47,12 @@ var getData = function(label, _title, input_id, active_user, options) {
     ret.class = "form-group";
     if (options.hidden) ret.class += " hidden";
 
+    ret.title = form_lang.Get(active_user.lang, _title, true);
+    ret.label = form_lang.Get(active_user.lang, label, true);
+
+    var _default = options.default || options.default === "" || options.default === false || options.default === 0 ? options.default : "";
+    ret.value = _value || _value === "" || _value === false || _value === 0 ? _value : _default;
+
     return ret;
 };
 
@@ -68,11 +74,7 @@ exports.endFieldSet = function(){
 
 exports.createTextBox = function(label, _title, input_id, _value, active_user, options){
 
-    var data = getData(label, _title, input_id, active_user, options);
-
-    _value = _value || options.default || "";
-    _title = form_lang.Get(active_user.lang, _title) || _title;
-    label = form_lang.Get(active_user.lang, label) || label;
+    var data = getData(label, _title, input_id, _value, active_user, options);
 
     var _type = "text";
     if(options.password)
@@ -82,7 +84,7 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
     }
 
     var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
-        +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
+        +'<label class="col-md-2 control-label">'+data.label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
     if (options && options.extra && options.extra.noEditDisplayValue) {
@@ -91,10 +93,10 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
     }
 
     if(!options.multiline)
-        _html += '<input id="'+data.fakeId+'" class="form-control'+data.required_class+'" autocomplete="off" placeholder="'+_title+'" type="'+_type+'" value="'+_value+'" />';
+        _html += '<input id="'+data.fakeId+'" class="form-control'+data.required_class+'" autocomplete="off" placeholder="'+data.title+'" type="'+_type+'" value="'+data.value+'" />';
     else{
         var _rows = options.rows ? options.rows:5;
-        _html += '<textarea id="'+data.fakeId+'" class="form-control'+data.required_class+'" autocomplete="off" placeholder="'+_title+'" rows="'+_rows+'">'+_value+'</textarea>';
+        _html += '<textarea id="'+data.fakeId+'" class="form-control'+data.required_class+'" autocomplete="off" placeholder="'+data.title+'" rows="'+_rows+'">'+data.value+'</textarea>';
     }
 
     if(data.description)
@@ -104,21 +106,15 @@ exports.createTextBox = function(label, _title, input_id, _value, active_user, o
          '</div>'
         +'</div>';
 
-//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId + "'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
-
     return {html:_html, js:""};
 };
 
 exports.createComboBox = function(label, _title, input_id, _value, active_user, options){
 
-    var data = getData(label, _title, input_id, active_user, options);
-
-    _value = _value || options.default || "";
-    _title = form_lang.Get(active_user.lang, _title) || _title;
-    label = form_lang.Get(active_user.lang, label) || label;
+    var data = getData(label, _title, input_id, _value, active_user, options);
 
     var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
-        +'<label class="col-md-2 control-label">'+label + data.required_label + '</label>'
+        +'<label class="col-md-2 control-label">'+data.label + data.required_label + '</label>'
         +'<div class="col-md-10">';
 
     if (options && options.extra && options.extra.noEditDisplayValue) {
@@ -131,8 +127,8 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
     if(options && options.values){
         for(var o in options.values){
             var str = "value='"+options.values[o]+"' ";
-            if(_value && _value.toString().trim().length){
-                if(options.values[o] == _value)
+            if(data.value && data.value.toString().trim().length){
+                if(options.values[o] == data.value)
                     str += " selected";
             }
             _html += "<option " + str + ">" + options.values[o] + "</option>";
@@ -148,25 +144,20 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
         '</div>'
         +'</div>';
 
-//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'select', required:"+data.required+", name:'"+_title+"' };";
-
     return {html:_html, js:""};
 };
 
 // <input type="checkbox" class="checkbox style-0" checked="checked">
 exports.createCheckBox = function(label, _title, input_id, _value, active_user, options){
 
-    var data = getData(label, _title, input_id, active_user, options);
+    var data = getData(label, _title, input_id, _value, active_user, options);
 
-    _value = _value || options.default || "";
-    _value = !_value?  "" : "checked='checked'";
-    _title = form_lang.Get(active_user.lang, _title) || _title;
-    label = form_lang.Get(active_user.lang, label) || label;
+    _value = !data.value?  "" : "checked='checked'";
 
     var _type = "checkbox";
 
     var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
-        + '<label class="col-md-2 control-label">'+label + data.required_label + '</label><div class="col-md-10">';
+        + '<label class="col-md-2 control-label">'+data.label + data.required_label + '</label><div class="col-md-10">';
 
     if (options && options.extra && typeof options.extra.noEditDisplayValue !== "undefined") {
         var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
@@ -194,31 +185,22 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
 
 exports.createHidden = function(label, _title, input_id, _value, active_user, options){
-    var data = getData(label, _title, input_id, active_user, options);
-
-    _value = _value || "";
-    _title = form_lang.Get(active_user.lang, _title) || _title;
+    var data = getData(label, _title, input_id, _value, active_user, options);
 
     var _type = "hidden";
-
-    var _html = '<input id="'+data.fakeId+'" class="checkbox style-0" type="'+_type+'" '+_value+' />';
-//    var _js = "window.jxForms[_form_name].controls['" + data.fakeId+"'] = {type:'"+_type+"', required:"+data.required+", name:'"+_title+"' };";
+    var _html = '<input id="'+data.fakeId+'" class="checkbox style-0" type="'+_type+'" '+ data.value +' />';
 
     return {html:_html, js:""};
 };
 
 
 exports.createSimpleText = function(label, _title, input_id, _value, active_user, options){
-    var data = getData(label, _title, input_id, active_user, options);
-
-    _value = _value || data.value || "";
-    _title = form_lang.Get(active_user.lang, _title) || _title;
-    label = form_lang.Get(active_user.lang, label) || label;
+    var data = getData(label, _title, input_id, _value, active_user, options);
 
     var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
-        +'<label class="col-md-2 control-label">'+label + '</label>'
+        +'<label class="col-md-2 control-label">'+data.label + '</label>'
         +'<div class="col-md-10">'
-        +'<div style="margin-top: 7px;">' + _value + '</div>'
+        +'<div style="margin-top: 7px;">' + data.value + '</div>'
         + (data.description ? '<p class="note">'+data.description+'</p>' : "")
         +'</div></div>';
 
