@@ -300,7 +300,7 @@ methods.sessionApply = function(env, params){
     if (activeForm.addonForm) {
 
         activeInstance.callOnSubmit(json, function() {
-            sendError(false)
+            sendError(false);
         });
         return;
     }

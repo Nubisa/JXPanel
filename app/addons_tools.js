@@ -121,15 +121,14 @@ var getContents = function (env, active_user, cb) {
             cb(res.err);
             return res;
         }
-        active_user.session.addons[res.json.id] = res.addon;
+        active_user.session.addons[res.json.id] = { instance : res.addon, name : addon_name, args : addon_args, json : res.json };
     }
 
-    var addon = active_user.session.addons[addon_name];
-    env.addon = { name : addon_name, args : addon_args, json : res.json };
+    active_user.session.addonCurrent = active_user.session.addons[addon_name];
 
     var wasError = false;
     try {
-        addon.request(env, addon_args, function (err, html) {
+        active_user.session.addonCurrent.instance.request(env, addon_args, function (err, html) {
             if (!wasError) {
                 cb(err, html);
             }
@@ -174,11 +173,13 @@ var smart_rule = [
 ];
 
 
-var extension_class = function (env, active_user) {
+var extension_class = function (env, active_user, addon) {
 
     var __env = env;
     var __active_user = active_user;
     var __this = this;
+    var __addon = addon;
+
 
     var __buttons = [];
     var __tabs = {};
@@ -191,7 +192,7 @@ var extension_class = function (env, active_user) {
 
     this.form = {
         new : function(id, options) {
-            return new form(id, env, active_user, options)
+            return new form(id, __env, __active_user, options, __this)
         }
     };
 
@@ -200,8 +201,9 @@ var extension_class = function (env, active_user) {
 
             var str = '<ul id="' + id + '" class="nav nav-tabs bordered">';
 
-            var currentTab = env.addon.args.tab || null;
-            var url = "/addon.html?" + env.addon.name + "&tab=";
+            var currentTab = __addon.args.tab || null;
+            var url = "/addon.html?" + __addon.name + "&tab=";
+            var url = "/addon.html?" + __addon.name + "&tab=";
 
             for (var a in tabs) {
                 var tab = tabs[a];
@@ -269,6 +271,7 @@ var extension_class = function (env, active_user) {
             var user = database.getUser(user_name);
             // returning copy of the user object
             var copy = JSON.parse(JSON.stringify(user));
+
             return copy.data || {};
         },
         updateUserData : function(user_name, data) {
@@ -278,6 +281,28 @@ var extension_class = function (env, active_user) {
             var user = database.getUser(user_name);
             user.data = JSON.parse(JSON.stringify(data));
             database.updateUser(user_name, user);
+        },
+        get : function(sid) {
+            var user = database.getUser(__active_user.username);
+            if (user && user.addons && user.addons[__addon.name]) {
+                return user.addons[__addon.name][sid];
+            }
+
+            return null;
+        },
+        set : function(sid, value) {
+            var user = database.getUser(__active_user.username);
+            if (!user.addons) user.addons = {};
+            if (!user.addons[__addon.name]) user.addons[__addon.name] = {};
+            user.addons[__addon.name][sid] = value;
+            database.updateUser(user.name, user);
+        },
+        remove : function(sid) {
+            var user = database.getUser(__active_user.username);
+            if (user && user.addons && user.addons[__addon.name]) {
+                delete user.addons[__addon.name][sid];
+            }
+            database.updateUser(user.name, user);
         }
     };
 
@@ -286,7 +311,7 @@ var extension_class = function (env, active_user) {
         html = smart_replace(html, smart_rule);
 
         var file = "";
-        var file_name = path.join(site_defaults.dirAddons, env.addon.name, __tabs.current + ".html");
+        var file_name = path.join(site_defaults.dirAddons, __addon.name, __tabs.current + ".html");
         if (fs.existsSync(file_name)) {
             file = fs.readFileSync(file_name).toString();
         }
@@ -303,7 +328,7 @@ var extension_class = function (env, active_user) {
         else
             html = file + html;
 
-        return __this.header.renderButtons() + "<br><h1>" + env.addon.json.title + "</h1>" + html;
+        return __this.header.renderButtons() + "<br><h1>" + __addon.json.title + "</h1>" + html;
     };
 
     this.activeUser = this.db.getUser();
@@ -311,13 +336,14 @@ var extension_class = function (env, active_user) {
 };
 
 
-var form = function(id, env, active_user, options) {
+var form = function(id, env, active_user, options, factory) {
 
     if (!options) options = {};
 
     var __env = env;
     var __active_user = active_user;
     var __this = this;
+    var __factory = factory;
 
     var section_started = false;
     var controls = [];
@@ -362,6 +388,9 @@ var form = function(id, env, active_user, options) {
             return;
         }
 
+        var forms = __factory.db.get("__forms");
+        var value = forms && forms[__this.id] ? forms[__this.id][id] || options.value : options.value;
+
         var method = null;
         if (type === "text" || type === "password" || type === "textarea")
             method = tools.createTextBox;
@@ -375,17 +404,17 @@ var form = function(id, env, active_user, options) {
         if (type === "simpleText")
             method = tools.createSimpleText;
 
-        controls.push(method(options.label, options.label, id, options.value, __active_user, options).html);
+        controls.push(method(options.label, options.label, id, value, __active_user, options).html);
 
         /*
          {
          name: "domain_name",
          details: {
-         label: "DomainName",
-         method: tool.createTextBox,
-         options: { required: true, prefix: "www." },
-         dbName: "name", // alias to `name` in object database.getDomain();
-         cannotEdit: true
+             label: "DomainName",
+             method: tool.createTextBox,
+             options: { required: true, prefix: "www." },
+             dbName: "name", // alias to `name` in object database.getDomain();
+             cannotEdit: true
          },
          validation : new validations.Domain()
          },
@@ -418,16 +447,17 @@ var form = function(id, env, active_user, options) {
         return script + tools.begin + controls.join("\n") + tools.end + tools.createButtons(__active_user, __this);
     };
 
-    this.callOnSubmit = function(err, values, cb) {
-        __eventEmitter.emit("submit", err, values, cb);
+    this.callOnSubmit = function(values, cb) {
+        __eventEmitter.emit("submit", values, function(save) {
+            if (save) {
+                var forms = __factory.db.get("__forms") || {};
+                forms[__this.id] = values;
+                __factory.db.set("__forms", forms);
+            }
+            cb();
+        });
     };
 };
-
-//exports.sessionApply = function(env, active_user, formName, json, cb) {
-//
-//    var form = active_user.session.forms[formName];
-//    form.activeInstance.callOnSubmit(null, json, cb);
-//};
 
 
 global.jxpanel = {
@@ -437,10 +467,13 @@ global.jxpanel = {
             return {err: form_lang.Get("EN", "Access Denied") };
         }
 
-        //if (!active_user.session.addon_factory)
-        active_user.session.addon_factory = new extension_class(env, active_user);
+        if (!active_user.session.addonCurrent )
+            return {err: form_lang.Get("EN", "AddOnUnknown") };
 
-        return active_user.session.addon_factory;
+        //if (!active_user.session.addon_factory)
+        active_user.session.addonCurrent.factory = new extension_class(env, active_user, active_user.session.addonCurrent);
+
+        return active_user.session.addonCurrent.factory;
     },
     server: require("jxm")
 };

@@ -158,6 +158,7 @@ exports.createCheckBox = function(label, _title, input_id, _value, active_user, 
 
     var data = getData(label, _title, input_id, active_user, options);
 
+    _value = _value || options.default || "";
     _value = !_value?  "" : "checked='checked'";
     _title = form_lang.Get(active_user.lang, _title) || _title;
     label = form_lang.Get(active_user.lang, label) || label;

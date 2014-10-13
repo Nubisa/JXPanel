@@ -25,7 +25,8 @@ var hosting_tools = require("./../app/hosting_tools");
 
 database.ReadDB(function(err) {
     if (err) console.error(err); else {
-        console.log(util.inspect(database.DB, { depth : null }));
+//        console.log(util.inspect(database.DB, { depth : null }));
+        console.log(JSON.stringify(database.DB, null, 4));
 
         //console.log(util.inspect( ));
 //        hosting_tools.appGetOptions("test11.com");
