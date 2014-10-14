@@ -378,6 +378,7 @@ exports.Labels = {
     // datatables
     "UnknownDataTable" : "Unknown table name.",
     "EmptySelection" : "Select the rows first.",
+    "SelectOnlyOneRow" : "Please select only one row.",
     "RemoveSelected" : "Remove selected",
     "RemoveSelectedHeader" : "Warning!",
     "RemoveSelectedQuestion" : "Are you sure to remove selected records?",
@@ -476,6 +477,7 @@ exports.Labels = {
     "AddOnIndexCannotRequire" : "Cannot require addon's main file (index.js).",
     "AddOnIndexNoMember" : "AddOn's main file (index.js) does not contain member: %s.",
     "AddOnEventsCannotRequire" : "Cannot require addon's events.js file.",
+    "AddOnEventsErrorWhileCalling" : "Error while calling addon's event: %s.",
 
     "AddonMongoAddDB" : "Add database",
     "AddonMongoAddDBEnterName" : "Enter database name"

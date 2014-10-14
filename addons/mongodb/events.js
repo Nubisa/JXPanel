@@ -18,6 +18,8 @@ exports.event = function(event_name, args, cb) {
 
 
 
-exports.uninstall = function() {
+exports.uninstall = function(cb) {
+    jxcore.utils.console.log("Event fired. Addon Uninstall", "blue");
 
+    cb(false);
 };

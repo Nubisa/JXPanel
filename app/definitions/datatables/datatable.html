@@ -41,11 +41,16 @@
         utils.jxAddMessage(type, msg);
     };
 
-    window.jxRemoveRows = function(noExtraQuestion) {
+    window.jxRemoveRows = function(noExtraQuestion, onlyOneRow) {
         var ids = utils.jxGetSelection();
 
         if (!ids.length) {
             addMessage("{{label.EmptySelection}}");
+            return;
+        }
+
+        if (ids.length !== 1 && onlyOneRow) {
+            addMessage("{{label.SelectOnlyOneRow}}");
             return;
         }
 

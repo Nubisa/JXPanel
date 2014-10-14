@@ -80,7 +80,7 @@ var checkUpacked = function (addon_dir) {
         }
     }
 
-    return { json: json, index: index, events : events, id :json.id };
+    return { json: json, index: index, events : events, id :json.id, dir : addon_dir };
 };
 
 var unload = function (addon_name) {
@@ -88,12 +88,12 @@ var unload = function (addon_name) {
     delete addons[addon_name];
     var index_path = path.join(site_defaults.dirAddons, addon_name, "index.js");
     delete require.cache[index_path];
-
-    copy();
 };
 
 
 var load = function(addon_name) {
+
+    copy();
 
     if (!addons[addon_name]) {
         // loading addon
@@ -511,5 +511,46 @@ exports.callEvent = function(event_name, args) {
         } catch (ex) {
             // do nothing
         }
+    }
+};
+
+
+var remove = function(addon) {
+    unload(addon.id);
+    var res = jxcore.utils.cmdSync("rm -rf " + addon.dir);
+    if (res.exitCode)
+        return {err : res.out };
+
+    return true;
+};
+
+
+exports.uninstall = function(addon_name, cb) {
+
+    var addon = load(addon_name);
+    if (addon.err) {
+        cb(addon.err);
+        return;
+    }
+
+    if (addon.events && addon.events.uninstall) {
+
+        try {
+            addon.events.uninstall(function(err) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+
+                var res = remove(addon);
+                cb(res.err);
+            });
+        } catch(ex) {
+            cb("AddOnEventsErrorWhileCalling|uninstall|" +  ex.toString());
+        }
+
+    } else {
+        var res = remove(addon);
+        cb(res.err);
     }
 };

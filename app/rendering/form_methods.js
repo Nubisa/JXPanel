@@ -533,14 +533,27 @@ methods.getForm = function(env, params) {
 
 methods.removeFromTableData = function(env, params) {
 
+    var active_user = _active_user.checkUser(env, true, params.form);
+    if (!active_user)
+        return;
+
     if (params.dt === "modules") {
         var ret = uninstallNPM(env, params);
-        server.sendCallBack(env, {err : ret.err });
-    } else {
-        datatables.remove(env.SessionID, params.dt, params.ids, params.with, function(err) {
-            server.sendCallBack(env, {err : err });
-        });
+        server.sendCallBack(env, {err: ret.err });
+        return;
     }
+
+    if (params.dt === "addons") {
+
+        addons_tools.uninstall(params.ids[0], function(err) {
+            server.sendCallBack(env, {err: form_lang.Get(active_user.lang, err, true) });
+        });
+        return;
+    }
+
+    datatables.remove(env.SessionID, params.dt, params.ids, params.with, function(err) {
+        server.sendCallBack(env, {err : err });
+    });
 };
 
 // called when user clicked Apply on the form
