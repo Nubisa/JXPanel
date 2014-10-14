@@ -23,9 +23,28 @@
         return false;
     };
 
+
+    window.uploadFile = function(){
+
+        var uploadHTML = '<span style="background-color: #f2f2f2;color:#000000;padding:10px;display: block;overflow:hidden;">'
+                +'<iframe scrolling="no" style="width:98%;height:35px;overflow:hidden;border:none;" src="/uploads.html?#__addon__'
+                +'"></iframe></span>';
+
+        $.SmartMessageBox({
+            title : '<i class="fa fa-upload txt-color-orangeDark"></i> {{label.Upload}}',
+            content : "{{label.SelectFileToUpload}}<br/><br/>" + uploadHTML,
+            buttons : "[{{label.Close}}]"
+        }, function(ButtonPress) {
+            document.location.reload();
+            return 0;
+        });
+
+        return false;
+    };
+
 </script>
 
-<a id="btn_refresh" data-original-title="{{label.AddOnAddNew}}" class="jxbtn" onclick="alert('Not yet implemented')">
+<a id="btn_refresh" data-original-title="{{label.AddOnAddNew}}" class="jxbtn" onclick="return window.uploadFile();">
     <i class="fa fa-plus"></i><span class="dummy-label">{{label.AddOnAddNew}}</span>
 </a>
 <a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows(true, true);">

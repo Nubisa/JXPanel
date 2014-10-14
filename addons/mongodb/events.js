@@ -11,15 +11,9 @@ exports.event = function(event_name, args, cb) {
 
     if (event_name === "userRemove") {
         db.RemoveDB("all", function(err) {
-            cb(err);
+            if (cb) cb(err);
         });
     }
-};
 
-
-
-exports.uninstall = function(cb) {
-    jxcore.utils.console.log("Event fired. Addon Uninstall", "blue");
-
-    cb(false);
+    if (cb) cb();
 };

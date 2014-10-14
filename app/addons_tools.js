@@ -32,7 +32,7 @@ var checkUpacked = function (addon_dir) {
         return { err: "AddOnUnknown" };
 
     var json_path = path.join(addon_dir, "package.json");
-    if (!fs.existsSync(addon_dir))
+    if (!fs.existsSync(json_path))
         return { err: "AddOnPackageJsonAbsent" };
 
     var json_str = fs.readFileSync(json_path).toString();
@@ -55,7 +55,7 @@ var checkUpacked = function (addon_dir) {
         return { err: "AddOnPackageJsonInvalidID" };
 
     var index_path = path.join(addon_dir, "index.js");
-    if (!fs.existsSync(addon_dir))
+    if (!fs.existsSync(index_path))
         return { err: "AddOnIndexAbsent" };
 
     try {
@@ -497,20 +497,48 @@ global.jxpanel = {
 };
 
 
+var callSingeEvent = function(addon, event_name, args, cb) {
 
+    if (!addon.events || !addon.events.event) {
+        // no error
+        if (cb) cb();
+        return;
+    }
+
+    if (!cb) {
+        try {
+            // if no callback, emit event and dont care for the result
+            addon.events.event(event_name, args);
+        } catch (ex) {
+            // do nothing
+        }
+        return;
+    }
+
+    if (cb) {
+        var wasError = null;
+        try {
+            addon.events.event(event_name, args, function(err) {
+                if (!wasError) cb(err);
+            });
+        } catch (ex) {
+            wasError = true;
+            cb("AddOnEventsErrorWhileCalling|" + event_name + "|" +  ex.toString());
+        }
+    }
+
+};
+
+// calls specific events for all addons
+// it calls without a callback - doesn't care for the result
 exports.callEvent = function(event_name, args) {
 
     var ls = fs.readdirSync(site_defaults.dirAddons);
     for(var o in ls) {
         var addon_name = ls[o];
         var addon = load(addon_name);
-        if (addon.err || !addon.events || !addon.events.event) continue;
-
-        try {
-            addon.events.event(event_name, args);
-        } catch (ex) {
-            // do nothing
-        }
+        if (!addon.err)
+            callSingeEvent(addon, event_name, args);
     }
 };
 
@@ -533,24 +561,75 @@ exports.uninstall = function(addon_name, cb) {
         return;
     }
 
-    if (addon.events && addon.events.uninstall) {
+    callSingeEvent(addon, "addonUninstall", null, function(err) {
 
-        try {
-            addon.events.uninstall(function(err) {
-                if (err) {
-                    cb(err);
-                    return;
-                }
-
-                var res = remove(addon);
-                cb(res.err);
-            });
-        } catch(ex) {
-            cb("AddOnEventsErrorWhileCalling|uninstall|" +  ex.toString());
+        if (err) {
+            cb(err);
+        } else {
+            var res = remove(addon);
+            cb(res.err);
         }
+    });
+};
 
-    } else {
-        var res = remove(addon);
-        cb(res.err);
+
+
+exports.install = function(zipFile, cb) {
+
+    var tmpDir = path.join(site_defaults.apps_folder, "__tmp" + jxcore.utils.uniqueId());
+    if (fs.existsSync(tmpDir))
+        fs.rmdirSync(tmpDir);
+
+    fs.mkdirSync(tmpDir);
+
+    var newZipFile = path.join(tmpDir, "file.zip");
+
+    var cmd = "cp " + zipFile + " " + newZipFile  +" && ";
+    cmd += "cd " + tmpDir + " && ";
+    cmd += "unzip -u " + newZipFile;
+
+    var res = jxcore.utils.cmdSync(cmd);
+//    console.log("zipFile", zipFile);
+//    console.log("newZipFile", newZipFile);
+//    console.log("cmd", cmd);
+//    console.log(res);
+
+    var addon = checkUpacked(tmpDir);
+    if (addon.err) {
+        jxcore.utils.cmdSync("rm -rf " + tmpDir);
+        cb(addon.err);
+        return;
     }
+
+    fs.unlinkSync(newZipFile);
+
+    var addon_dir = path.join(site_defaults.dirAddons, addon.json.id);
+    var update = false;
+    if (fs.existsSync(addon_dir)) {
+        update = true;
+        console.log("Addon updated");
+        unload(addon.json.id);
+        jxcore.utils.cmdSync("cp -rf " + tmpDir + path.sep + "* " + addon_dir + path.sep + " && rm -rf " + tmpDir);
+    } else {
+        console.log("Addon installed");
+        jxcore.utils.cmdSync("mv " + tmpDir + " " + addon_dir);
+    }
+
+    // now we can load the addon
+    var addon = load(addon.json.id);
+    if (addon.err) {
+        jxcore.utils.cmdSync("rm -rf " + addon_dir);
+        cb(addon.err);
+        return;
+    }
+
+    callSingeEvent(addon, update ? "addonUpdate" : "addonInstall", null, function(err) {
+
+        if (err) {
+            var res = remove(addon);
+            cb(err);
+        } else {
+            cb();
+        }
+    });
 };

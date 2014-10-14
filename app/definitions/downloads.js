@@ -3,6 +3,7 @@ var pathModule = require('path');
 var _active_user = require('./active_user');
 var server = require('jxm');
 var form_lang = require('./form_lang');
+var addons_tools = require("../addons_tools")
 
 var formidable = require('formidable'),
     util = require('util');
@@ -83,6 +84,15 @@ var saveFile = function(file, target, res, user){
     target = unescape(target);
     if(target && target.length && target[0] == '/'){
         target = target.substr(1, target.length-1);
+    }
+
+    if (target === "__addon__") {
+        addons_tools.install(file.path, function(err) {
+            res.writeHead(200, {'content-type': 'text/plain'});
+            res.end(form_lang.Get(lang, err || "UploadCompleted", true));
+        });
+
+        return;
     }
 
     target = home + pathModule.sep + target + pathModule.sep + file.name;
