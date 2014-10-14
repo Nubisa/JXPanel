@@ -260,7 +260,7 @@ var init_file_tools = function(){
             + escape(loc) +'"></iframe></span>';
 
         $.SmartMessageBox({
-            title : "{{label.Upload}} : "+loc,
+            title : '<i class="fa fa-upload txt-color-orangeDark"></i> {{label.Upload}} :' + loc,
             content : "{{label.SelectFileToUpload}}<br/><br/>" + uploadHTML,
             buttons : "[{{label.Close}}]"
         }, function(ButtonPress) {
