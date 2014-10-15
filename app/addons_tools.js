@@ -203,6 +203,11 @@ var extension_class = function (env, active_user, addonCurrent) {
     var __buttons = [];
     var __tabs = {};
 
+    this.url = {
+        addonsList : "addonm.html",
+        addon : "/addon.html?" + __addon.instance.id
+    };
+
     this.table = {
         render: function (arr) {
             return datatables.getDataTable(arr) + datatables.getClientTableScript() + '<script type="text/javascript">refreshtable();</script>';
@@ -215,13 +220,25 @@ var extension_class = function (env, active_user, addonCurrent) {
         }
     };
 
+    this.html = {
+        tickMark : function(value, labelTrue, labelFalse) {
+            return form_lang.GetBool(__active_user.lang, value, labelTrue, labelFalse);
+        },
+        getServerButton: function (caption, method_name, args, addSelection, additionalStyle) {
+            var _name = addSelection ? "utils.jxCallSelection" : "utils.jxCall";
+
+            var onclick = _name + "('" + method_name +"', " + (JSON.stringify(args) || "{}").replace(/"/g, "'") + "); return false";
+            var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, additionalStyle);
+            return btn;
+        }
+    };
+
     this.tabs = {
         create: function (id, tabs) {
 
             var str = '<ul id="' + id + '" class="nav nav-tabs bordered">';
 
             var currentTab = __addon.args.tab || null;
-            var url = "/addon.html?" + __addon.instance.id + "&tab=";
 
             for (var a in tabs) {
                 var tab = tabs[a];
@@ -232,7 +249,7 @@ var extension_class = function (env, active_user, addonCurrent) {
                     str += '<li id="' + tab.id + '">';
 
                 var icon = tab.icon || '<i class="fa fa-lg fa-gear">';
-                str += '<a href="' + url + tab.id + '">' + icon + '</i> ' + tab.label + '</a></li>';
+                str += '<a href="' + __this.url.addon + "&tab=" + tab.id + '">' + icon + '</i> ' + tab.label + '</a></li>';
             }
 
             str += '</ul>';
@@ -244,16 +261,12 @@ var extension_class = function (env, active_user, addonCurrent) {
     };
 
     this.header = {
-        addClientButton: function (caption, onclick_name, args) {
-            var onclick = onclick_name + "(" + (JSON.stringify(args) || "").replace(/"/g, "'") + "); return false";
+        addClientButton: function (caption, onclick) {
             var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, false);
             __buttons.push(btn);
         },
         addServerButton: function (caption, method_name, args, addSelection) {
-            var _name = addSelection ? "utils.jxCallSelection" : "utils.jxCall";
-
-            var onclick = _name + "('" + method_name +"', " + (JSON.stringify(args) || "{}").replace(/"/g, "'") + "); return false";
-            var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, false);
+            var btn = __this.html.getServerButton(caption, method_name, args, addSelection, false);
             __buttons.push(btn);
         },
         renderButtons: function () {
@@ -349,8 +362,23 @@ var extension_class = function (env, active_user, addonCurrent) {
         return __this.header.renderButtons() + "<br><h1>" + __addon.instance.json.title + "</h1>" + html;
     };
 
-    this.activeUser = this.db.getUser();
+    this.translate = function(text) {
+        return form_lang.Get(__active_user.lang, text, true);
+    };
 
+    this.activeUser = {
+        data : this.db.getUser(),
+        isAdmin : _active_user.isAdmin(__active_user)
+    };
+
+    this.status = {
+        set : function(label) {
+            __active_user.session.status = label;
+        },
+        clear : function() {
+            __active_user.session.status = null;
+        }
+    };
 };
 
 
@@ -367,8 +395,8 @@ var form = function(id, env, active_user, options, factory) {
     var controls = [];
     var ids = [];
 
-    this.onSubmitSuccess = options.onSubmitSuccess || "addonm.html";
-    this.onSubmitCancel = options.onSubmitCancel || "addonm.html";
+    this.onSubmitSuccess = options.onSubmitSuccess || __active_user.session.lastUrl;
+    this.onSubmitCancel = options.onSubmitCancel || __active_user.session.lastUrl;
 
     this.id = id;
     this.name = id;
@@ -419,8 +447,10 @@ var form = function(id, env, active_user, options, factory) {
         if (type === "combobox")
             method = tools.createComboBox;
         else
-        if (type === "simpleText")
+        if (type === "simpleText") {
             method = tools.createSimpleText;
+            value = options.value;
+        }
 
         controls.push(method(options.label, options.label, id, value, __active_user, options).html);
 

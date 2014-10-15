@@ -15,6 +15,7 @@ var Db = require('mongodb').Db,
     BSON = require('mongodb').pure().BSON,
     assert = require('assert');
 
+exports.port = null;
 
 exports.AddDB = function(env, db_name, cb) {
 
@@ -115,3 +116,24 @@ exports.ClearDB = function(db_name) {
 
 };
 
+
+
+
+exports.TestConnection = function() {
+
+    var connected = false;
+    var error = null;
+    MongoClient.connect("mongodb://localhost:" + exports.port + "/" + "jxpanel_test", function(err, db) {
+
+        connected = !err;
+        error = err;
+        if(!err) {
+            db.close();
+        }
+        jxcore.utils.continue();
+    });
+
+    jxcore.utils.jump();
+
+    return { connected : connected, err : error};
+};

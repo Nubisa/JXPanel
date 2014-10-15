@@ -41,6 +41,7 @@ exports.Labels = {
     "NoChanges" : "No changes has been made",
     "Original" : "Original",
     "Translation" : "Translation",
+    "UnknownCommand" : "Unknown command",
 
     "help":"Help",
     "logout":"Logout",

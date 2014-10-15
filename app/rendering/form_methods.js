@@ -295,7 +295,7 @@ methods.sessionApply = function(env, params){
         }
     }
 
-    if (!cnt)
+    if (!cnt && !activeForm.activeInstance.allowEmpty)
         return sendError("FormEmpty");
 
     if (activeForm.addonForm) {
