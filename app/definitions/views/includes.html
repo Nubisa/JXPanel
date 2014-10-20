@@ -291,7 +291,7 @@
             cb(ButtonPressed);
         });
     };
-    utils.jxAskValue = function(title, question, cb) {
+    utils.jxAskValue = function(title, question, cb, password) {
 
         if (!cb) return;
 
@@ -299,7 +299,7 @@
             title : title,
             content : question,
             buttons : "[{{label.Cancel}}][{{label.Accept}}]",
-            input : "text",
+            input : password ? "password" : "text",
             placeholder : "",
             inputValue : ""
         }, function(ButtonPress, Value) {

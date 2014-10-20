@@ -1,29 +1,4 @@
 <script>
-    window.jxInstallNPM = function() {
-        utils.jxAskValue('<i class="fa fa-download txt-color-orangeDark"></i> ' + "{{label.AddOnAddNew}}", "{{label.JXcoreNPMEnterName}}", function(ok, value) {
-
-            if (ok) {
-                if (!value) {
-                    utils.jxAddMessage('danger', "{{label.JXcoreNPMEnterName}}");
-                    return;
-                }
-
-                window.jxstatus = "{{label.JXcoreNPMInstalling}}";
-                window.toServer("installNPM", value, function(param) {
-                    if (param.err)
-                        utils.jxAddMessage('danger', "{{label.JXcoreNPMCouldNotInstall}} " + param.err);
-                    else {
-                        document.location.reload();
-//                        utils.jxAddMessage('success', "{{label.JXcoreNPMInstalled}}");
-                    }
-
-                }, true, true);
-            }
-        });
-        return false;
-    };
-
-
     window.uploadFile = function(){
 
         var uploadHTML = '<span style="background-color: #f2f2f2;color:#000000;padding:10px;display: block;overflow:hidden;">'

@@ -37,30 +37,39 @@ var isInstalled = function() {
 //};
 
 
-exports.mongoStatus = function(addonFactory) {
+exports.mongoStatus = function(addonFactory, cb) {
 
-    var ret = {};
+    var ret = { online : false, installed : false, adminExists : false };
     ret.installed = isInstalled();
-    var canConnect = db.TestConnection();
-    ret.online = canConnect.connected
 
-    ret.html = addonFactory.html.tickMark(ret.installed, "Installed", "NotInstalled");
+    db.ConnectAsAdmin(function(err, db, connectedWithoutAuth) {
 
-    if (ret.installed || ret.online)
-        ret.html += "<br>" + addonFactory.html.tickMark(ret.online, "Online", "Offline: " + canConnect.err);
+        ret.online = connectedWithoutAuth;
+        ret.adminExists = !err;
 
-    return ret;
+        ret.html = addonFactory.html.tickMark(ret.installed, "Installed", "NotInstalled");
+
+        if (ret.installed || ret.online)
+            ret.html += "<br>" + addonFactory.html.tickMark(ret.online, "Online", "Offline");
+
+        if (ret.installed && ret.online)
+            ret.html += "<br>" + addonFactory.html.tickMark(ret.adminExists, "Admin user exists", "Admin user does not exists");
+
+        cb(ret);
+    });
 };
 
 
 var getConfigPath = function() {
 
     var dirData = path.join(__dirname, "data");
+
+    console.error("dirData", dirData);
     if (!fs.existsSync(dirData))
         fs.mkdirSync(dirData);
 
     var configPath = path.join(dirData, "mongodb.conf");
-    if (!fs.existsSync(configPath))
+    //if (!fs.existsSync(configPath))
     {
         var cfg = [
                 'dbpath = ' + dirData,
@@ -76,23 +85,29 @@ var getConfigPath = function() {
     return configPath;
 };
 
-exports.mongoStartStop = function(op) {
+exports.mongoStop = function() {
+
+    var configPath = getConfigPath();
+
+    var res = jxcore.utils.cmdSync("mongod -f " + configPath + " --shutdown");
+    if (res.exitCode) {
+        var str = "Cannot shutdown MongoDB instance.";
+        console.error(str, res.out);
+        return { err : str };
+    }
+    return true;
+};
+
+
+exports.mongoStart = function() {
 
     var configPath = getConfigPath();
     var cmd = "mongod -f " + configPath;
 
-    if (op === "start") {
-        // system sync needed to run mongo in background
-        var res = jxcore.utils.systemSync(cmd + " --repair && " + cmd + " &");
-        if (res)
-            return { err : "Cannot start MongoDB engine. Exit code: " + res };
-
-    } else {
-        var res = jxcore.utils.cmdSync(cmd + " --shutdown");
-        if (res.exitCode)
-            return { err : res.out.toString() }
-
-    }
+    // system sync needed to run mongo in background
+    var res = jxcore.utils.systemSync(cmd + " --repair && " + cmd + " &");
+    if (res)
+        return { err : "Cannot start MongoDB engine. Exit code: " + res}
 
     return true;
 };
@@ -126,16 +141,17 @@ exports.mongoInstall = function(addonFactory, cb) {
             return;
         }
 
-        var res = exports.mongoStartStop("start");
-        cb(res.err);
+        // waiting for engine to start
+        setTimeout(function() {
+            db.CreateAdmin(cb);
+        }, 2000);
     });
 
     child.stdout.on('data', function (data) {
-        addonFactory.status.set(msg);;
+        addonFactory.status.set(msg);
     });
 
     child.stderr.on('data', function (data) {
         addonFactory.status.set("Error: " + data.toString());
     });
-
 };

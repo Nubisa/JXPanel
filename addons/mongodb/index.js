@@ -17,12 +17,16 @@ var getConfigForm = function(addonFactory, status) {
 
     var btn = null;
     if (!status.installed)
-        var btn = addonFactory.html.getServerButton("Install", "mongoInstall");
+        var btn = addonFactory.html.getServerButton("Install", "mongoShell", "install");
     else
     if (status.installed && !status.online)
-        var btn = addonFactory.html.getServerButton("Start", "mongoStartStop", "start");
-    else if (status.online)
-        var btn = addonFactory.html.getServerButton("Stop", "mongoStartStop", "stop");
+        var btn = addonFactory.html.getServerButton("Start", "mongoShell", "start");
+    else if (status.online) {
+        var btn = addonFactory.html.getServerButton("Stop", "mongoShell", "stop");
+
+        if (!status.isAdmin)
+            btn += addonFactory.html.getServerButton("Create admin user", "mongoShell", "createAdmin", null, "margin-left: 20px;");
+    }
 
     if (btn)
         form.addControl("simpleText", "txt2", { label : "Operation", value : btn, required : true });
@@ -56,118 +60,154 @@ exports.request = function(env, args, cb) {
 
     var initialized = addonFactory.db.get("initialized");
 
-    var status = shell.mongoStatus(addonFactory);
-    if (addonFactory.activeUser.isAdmin) {
-        if (!initialized || args.tab === "config" || !status.installed) {
-            args.tab = "config";
-            html = getConfigForm(addonFactory, status).render();
-        }
-    } else {
-        if (!status.installed) {
-            cb(false, "MongoDB engine is not installed.")
-            return;
-        }
-    }
+    var finalize = function() {
+        var tabs = [
+            {id: "databases", label: "Databases", icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">'},
+            {id: "form", label: "Sample Addon's Form"},
+            {id: "tab3", label: "Empty Tab"}
+        ];
 
-    if (!args.tab || args.tab === "databases") {
-        // constructing a table
-        var table = [];
-        var columns = ["", "ID", "name", "value1", "value2"];
-        table.push(columns);
+        if (addonFactory.activeUser.isAdmin)
+            tabs.push({id: "config", label: "Configuration"});
 
-        addonFactory.header.addServerButton("Add database", "addDB");
-        addonFactory.header.addServerButton("Remove database", "removeDB", null, true);
-        addonFactory.header.addClientButton("Go to the form", "goToTheForm(); return false;");
+        addonFactory.tabs.create("osiem", tabs);
 
-        var dbs = addonFactory.db.get("dbs") || {};
+        // returning html
+        cb(false, addonFactory.render(html));
+    };
 
-        var id = 1;
-        for(var a in dbs) {
-            if (a === "__id") continue;
 
-            var chk = '<input type="checkbox" id="jxrow_' + a + '"></input>';
-            table.push([chk, id, a, "", "" ]);
-            id++;
+    shell.mongoStatus(addonFactory, function(status) {
+
+        if (addonFactory.activeUser.isAdmin) {
+            if (!initialized || args.tab === "config" || !status.installed) {
+                args.tab = "config";
+                html = getConfigForm(addonFactory, status).render();
+            }
+        } else {
+            if (!status.installed) {
+                cb(false, "MongoDB engine is not installed.")
+                return;
+            }
         }
 
-        html = addonFactory.table.render(table);
-    }
+        if (!args.tab || args.tab === "databases") {
+            // constructing a table
+            var table = [];
+            var columns = ["", "ID", "Database Name", "User Name"];
+            table.push(columns);
 
-    if (args.tab === "form") {
-        addonFactory.header.addServerButton("Some button", "");
+//            addonFactory.header.addServerButton("Add database", "addDB");
+            addonFactory.header.addClientButton("Add database", "window.addDB(); return false;");
+            addonFactory.header.addServerButton("Remove database", "removeDB", null, true);
+            addonFactory.header.addClientButton("Change password", "window.changePWD(); return false;");
+//            addonFactory.header.addClientButton("Go to the form", "goToTheForm(); return false;");
 
-        var form = addonFactory.form.new("my_form");
-        form.addSection("Text boxes");
-        form.addControl("text", "txt1", { label : "my txt1", default : "some value", required : true });
-        form.addControl("text", "txt2", { label : "my txt2", default : "some value 2" });
-        form.addSection("Others");
-        form.addControl("checkbox", "chk1", { label : "my chk1", default : 1 });
-        form.addControl("combobox", "chk11", { label : "my combo1", default : 2, values : [1,2,3] });
+            db.GetUserDatabases(addonFactory.activeUser.data.name, function(err, dbs) {
 
-        form.on('submit', function(values, cb) {
-            console.log("values from form", values);
-            cb(true);
-        });
+                if (err) {
+                    cb(false, err);
+                    return;
+                }
 
-        html = form.render();
-    }
+                var id = 1;
+                for(var a in dbs) {
+                    var chk = '<input type="checkbox" id="jxrow_' + dbs[a] + '"></input>';
+                    table.push([chk, id, dbs[a], dbs[a]]);
+                    id++;
+                }
 
-    var tabs = [
-        {id: "databases", label: "Databases", icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">'},
-        {id: "form", label: "Sample Addon's Form"},
-        {id: "tab3", label: "Empty Tab"}
-    ];
+                html = addonFactory.table.render(table);
+                finalize();
+                return;
+            });
+        }
 
-    if (addonFactory.activeUser.isAdmin)
-        tabs.push({id: "config", label: "Configuration"});
+        if (args.tab === "form") {
+            addonFactory.header.addServerButton("Some button", "");
 
-    addonFactory.tabs.create("osiem", tabs);
+            var form = addonFactory.form.new("my_form");
+            form.addSection("Text boxes");
+            form.addControl("text", "txt1", { label : "my txt1", default : "some value", required : true });
+            form.addControl("text", "txt2", { label : "my txt2", default : "some value 2" });
+            form.addSection("Others");
+            form.addControl("checkbox", "chk1", { label : "my chk1", default : 1 });
+            form.addControl("combobox", "chk11", { label : "my combo1", default : 2, values : [1,2,3] });
 
-    // returning html
-    cb(false, addonFactory.render(html));
+            form.on('submit', function(values, cb) {
+                console.log("values from form", values);
+                cb(true);
+            });
+
+            html = form.render();
+        }
+
+        finalize();
+    });
 };
 
 jxpanel.server.addJSMethod("addDB", function(env, params) {
 
-    db.AddDB(env, null, function(err) {
+    db.AddDB(env, params.op.pwd, function(err) {
         jxpanel.server.sendCallBack(env, {err : err } );
     });
 });
 
 
-jxpanel.server.addJSMethod("removeDB", function(env, params) {
+jxpanel.server.addJSMethod("removeDB", function (env, params) {
 
-    db.RemoveDB(params.op.selection, function(err) {
-        jxpanel.server.sendCallBack(env, {err : err } );
+    db.RemoveDB(env, params.op.selection, function (err) {
+        jxpanel.server.sendCallBack(env, {err: err });
+    });
+});
+
+jxpanel.server.addJSMethod("changePWD", function (env, params) {
+
+    db.ChangeUsersPasswords(env, params.op.selection, params.op.pwd, function (err) {
+        jxpanel.server.sendCallBack(env, {err: err });
     });
 });
 
 
-jxpanel.server.addJSMethod("mongoStartStop", function(env, params) {
+
+jxpanel.server.addJSMethod("mongoShell", function(env, params) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
 
-
-    if (params.op === "start" || params.op === "stop")
-        var res = shell.mongoStartStop(params.op);
-    else
-        var res = { err : "UnknownCommand|: " + params.op };
-
-    if (res.err) {
-        res.err = addonFactory.translate(res.err);
-    }
-    jxpanel.server.sendCallBack(env, {err : res.err } );
-});
-
-
-jxpanel.server.addJSMethod("mongoInstall", function(env, params) {
-
-    var addonFactory = jxpanel.getAddonFactory(env);
-
-    shell.mongoInstall(addonFactory, function(err) {
-        if (err)
+    var sendBack = function(err) {
+        if (err) {
             err = addonFactory.translate(err);
+        }
         addonFactory.status.clear();
         jxpanel.server.sendCallBack(env, {err : err } );
-    });
+    };
+
+    if (params.op === "start") {
+        var res = shell.mongoStart();
+        sendBack(res.err);
+        return;
+    }
+
+    if (params.op === "stop") {
+        var res = shell.mongoStop();
+        sendBack(res.err);
+        return;
+    }
+
+    if (params.op === "install") {
+        shell.mongoInstall(addonFactory, function(err) {
+            sendBack(err);
+        });
+        return;
+    }
+
+    if (params.op === "createAdmin") {
+        db.CreateAdmin(function(err) {
+            sendBack(err);
+        });
+        return;
+    }
+
+    sendBack("UnknownCommand|: " + params.op);
 });
+

@@ -2,6 +2,47 @@
     var goToTheForm = function() {
         document.location = "/addon.html?mongodb&tab=form";
     };
+
+
+    window.addDB = function() {
+
+        utils.jxAskValue('<i class="fa fa-download txt-color-orangeDark"></i> ' + "Add database", "Please enter new password", function(ok, value) {
+
+            if (ok) {
+                if (!value) {
+                    utils.jxAddMessage('danger', "Please enter new password");
+                    return;
+                }
+                utils.jxCall("addDB", { pwd : value });
+            }
+        }, true);
+        return false;
+    };
+
+
+    window.changePWD = function() {
+
+        var selection = utils.jxGetSelection();
+
+        if (!selection.length) {
+            utils.jxAddMessage("danger", "{{label.EmptySelection}}");
+            return;
+        }
+
+        utils.jxAskValue('<i class="fa fa-download txt-color-orangeDark"></i> ' + "Change password", "Please enter new password", function(ok, value) {
+
+            if (ok) {
+                if (!value) {
+                    utils.jxAddMessage('danger', "Please enter new password");
+                    return;
+                }
+                utils.jxCall("changePWD", { selection : selection, pwd : value });
+            }
+        }, true);
+        return false;
+    };
+
+
 </script>
 
 This text is from databases.html
