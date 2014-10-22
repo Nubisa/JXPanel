@@ -122,7 +122,21 @@
 
             if (!_this.focused) {
                 _this.focused = true;
-                $("#" + id).focus();
+
+                var _input = $("#" + id);
+
+                // activating proper tab
+                _input.parents(".tab-pane").each(function(id, el) {
+                    var id = el.id.replace('tab-pane-', '');
+                    $("#" + id).parent().children().removeClass("active");
+                    $("#" + id).addClass("active");
+                });
+
+                // displaying proper tab pane
+                _input.parents(".tab-content").children(".tab-pane").removeClass("active in");
+                _input.parents(".tab-pane").addClass("active in");
+
+                _input.focus();
                 window.scrollBy(0,-100);
             }
         }
