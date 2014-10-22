@@ -100,7 +100,7 @@ exports.getTabs = function (id, tabs, currentTab) {
         else
             str += '<li id="' + tab.id + '">';
 
-        var icon = tab.icon || '<i class="fa fa-fw">';
+        var icon = tab.icon || '<i class="fa fa-fw fa-align-justify">';
         var href = "";
         if (tab.contents) {
             href = 'href="#tab-pane-' + tab.id + '" data-toggle="tab"';

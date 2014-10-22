@@ -266,6 +266,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
     var scr = "{ var _form_name='"+formName+"';";
 
+    var realTabCount = 0;
     for(var a in tabs) {
         tabs[a].contents = "";
         var arr = tabs[a].arr;
@@ -274,9 +275,13 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             html += arr[o].html;
             scr += arr[o].js;
         }
+        if (tabs[a].contents)
+            realTabCount++;
+        if (tabs[a].showAlways)
+            realTabCount = 999;
     }
 
-    if (tabs.length > 1)
+    if (realTabCount > 1)
         html = page_utils.getTabs("formTabs", tabs);
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
