@@ -204,6 +204,11 @@ exports.getDiskUsageSync = getdiskUsage;
 exports.getDiskUsage = function(folder, cb){
     var task = function(folder){
         var ts = require('./system_tools');
+
+        process.on('uncaughtException', function(err){
+            console.error("Error from system_tools.js getDiskUsage()", err);
+        });
+
         return ts.getDiskUsageSync(folder);
     };
 
@@ -216,6 +221,11 @@ exports.getTopSync = getTop;
 exports.getTop = function(is_up, env, cb){
     var task = function(val){
         var ts = require('./system_tools');
+
+        process.on('uncaughtException', function(err){
+            console.error("Error from system_tools.js getTop()", err);
+        });
+
         return {res:ts.getTopSync(val.b), e:val.e};
     };
 
@@ -228,6 +238,11 @@ exports.getDiskInfoSync = getDiskInfo;
 exports.getDiskInfo = function(env, cb){
     var task = function(env){
         var ts = require('./system_tools');
+
+        process.on('uncaughtException', function(err){
+            console.error("Error from system_tools.js getDiskInfo()", err);
+        });
+
         return {res:ts.getDiskInfoSync(), e:env};
     };
 

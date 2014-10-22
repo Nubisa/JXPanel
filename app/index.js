@@ -7,6 +7,11 @@ var fs = require('fs');
 var site_defaults = require('./definitions/site_defaults');
 var icheck = require('./install/install');
 
+process.on('uncaughtException', function(err) {
+   console.error("uncaughtException", err);
+});
+
+
 if(process.argv[2] == "help"){
     jxcore.utils.console.log("Command line options for "+site_defaults.EN.panelName);
     jxcore.utils.console.log("Start: jx index.js");

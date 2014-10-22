@@ -26,8 +26,8 @@ exports.doJobs = {
                cb();
             });
             process.on('uncaughtException', function(err){
-                if(err)
-                    console.error(err);
+                //if(err)
+                    console.error("Error from scheduler.js doJobs()", err);
             });
             process.check_users = require('./definitions/scheduler/user_sessions').check_users;
             process.check_quotas = require('./definitions/scheduler/user_disk_quota').check_quotas;
