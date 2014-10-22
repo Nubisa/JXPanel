@@ -68,25 +68,9 @@ var createUser = function(user) {
             console.log("authenticate admin", err);
 
 
-//            var options = { roles : [ { role: "dbOwner", db : user.db } ]};
-//            db.addUser(user.login, user.pwd, options, function(err, result) {
-//                console.log("addUser", err, result);
-//
-//                db.authenticate(user.login, user.pwd, function(err, result) {
-//                    console.log("autenticate", err, result);
-//
-//                    db.close();
-//                });
-//            });
-
-
-            var addUser = { addUser : user.login,
-                roles : [ "dbOwner"],
-                writeConcern: { w: 1}
-            };
-
-            db.command(addUser, function(err, result) {
-                console.log("command addUser", err, result);
+            var options = { roles : [ { role: "dbOwner", db : user.db } ]};
+            db.addUser(user.login, user.pwd, options, function(err, result) {
+                console.log("addUser", err, result);
 
                 db.authenticate(user.login, user.pwd, function(err, result) {
                     console.log("autenticate", err, result);
@@ -94,6 +78,22 @@ var createUser = function(user) {
                     db.close();
                 });
             });
+
+
+//            var addUser = { addUser : user.login,
+//                roles : [ "dbOwner"],
+//                writeConcern: { w: 1}
+//            };
+//
+//            db.command(addUser, function(err, result) {
+//                console.log("command addUser", err, result);
+//
+//                db.authenticate(user.login, user.pwd, function(err, result) {
+//                    console.log("autenticate", err, result);
+//
+//                    db.close();
+//                });
+//            });
         });
 
 
@@ -142,7 +142,7 @@ var updatePassword = function(user) {
 
 
 createUser(user);
-createUser(user11);
+//createUser(user11);
 //createUser(user1);
 //createUser(user2);
 

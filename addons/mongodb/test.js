@@ -80,9 +80,9 @@ var createAdmin = function() {
             roles : [
             { role: "userAdminAnyDatabase", db : "admin" },
 //            { role: "userAdmin", db : "admin" },
-            { role: "readWriteAnyDatabase", db : "admin" },
+//            { role: "readWriteAnyDatabase", db : "admin" },
 //            { role: "readWrite", db : "admin" },
-            { role: "dbAdminAnyDatabase", db : "admin" }
+//            { role: "dbAdminAnyDatabase", db : "admin" }
 //            { role: "dbAdmin", db : "admin" },
 //            { role: "clusterAdmin", db : "admin" },
 //            { role: "__system", db : "admin" },

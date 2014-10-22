@@ -24,7 +24,7 @@ var getConfigForm = function(addonFactory, status) {
     else if (status.online) {
         var btn = addonFactory.html.getServerButton("Stop", "mongoShell", "stop");
 
-        if (!status.isAdmin)
+        if (!status.adminExists)
             btn += addonFactory.html.getServerButton("Create admin user", "mongoShell", "createAdmin", null, "margin-left: 20px;");
     }
 
@@ -80,7 +80,7 @@ exports.request = function(env, args, cb) {
     shell.mongoStatus(addonFactory, function(status) {
 
         if (addonFactory.activeUser.isAdmin) {
-            if (!initialized || args.tab === "config" || !status.installed) {
+            if (!initialized || args.tab === "config" || !status.installed || !status.online) {
                 args.tab = "config";
                 html = getConfigForm(addonFactory, status).render();
             }
@@ -105,10 +105,10 @@ exports.request = function(env, args, cb) {
 
             db.GetUserDatabases(addonFactory.activeUser.data.name, function(err, dbs) {
 
-                if (err) {
-                    cb(false, err);
-                    return;
-                }
+//                if (err) {
+//                    cb(false, err);
+//                    return;
+//                }
 
                 var id = 1;
                 for(var a in dbs) {
