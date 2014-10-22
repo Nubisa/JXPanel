@@ -323,7 +323,10 @@ methods.sessionApply = function(env, params){
                 var old_plan = user.plan;
                 var new_plan = json.plan;
 
-                if (old_plan !== new_plan) {
+                if (typeof new_plan === "undefined" && active_user.username !== update_name)
+                    return sendError("PlanInvalid");
+
+                if (old_plan !== new_plan && typeof new_plan !== "undefined") {
                     var res = user_folders.moveUserHome(update_name, new_plan);
                     if (res.err)
                         ret = res.err;
