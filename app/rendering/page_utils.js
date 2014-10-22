@@ -67,3 +67,60 @@ exports.getButtonsGroup = function(html, additionalStyle) {
              + html
              +'</span>';
 };
+
+
+
+/**
+ * Returns html containing tabs and tab panes
+ * @param id - tabs control id
+ * @param tabs - array, e.g. :
+     tabs = [
+     {   id: "databases1",
+         label: "Databases1",
+         icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">',
+         url1 : "/addon.html?mongodb&tab=databases1"},
+     {
+         id: "contents1",
+         label: "Contents",
+         contents : 'this is some html contents'}
+     ];
+ * @param currentTab - e.g. "databases1"
+ * @returns {string} - html containing tabs
+ */
+exports.getTabs = function (id, tabs, currentTab) {
+
+    var str = '<ul id="' + id + '" class="nav nav-tabs bordered">';
+    var tab_contents = "";
+
+    for (var a in tabs) {
+        var tab = tabs[a];
+        if (!currentTab) currentTab = tab.id; // first tab will be active, if no other tab is specified
+        if (currentTab === tab.id)
+            str += '<li class="active" id="' + tab.id + '">';
+        else
+            str += '<li id="' + tab.id + '">';
+
+        var icon = tab.icon || '<i class="fa fa-fw">';
+        var href = "";
+        if (tab.contents) {
+            href = 'href="#tab-pane-' + tab.id + '" data-toggle="tab"';
+        } else {
+            if (!tab.url)
+                tab.url = "#";
+            href = 'href="' + tab.url + '"';
+        }
+        str += '<a ' + href + '>' + icon + '</i> ' + tab.label + '</a></li>';
+
+        if (tab.contents) {
+            var _class = currentTab === tab.id ? "tab-pane fade in active" : "tab-pane fade";
+            tab_contents += '<div class="' + _class + '" id="tab-pane-' + tab.id + '">' + tab.contents + '</div>';
+        }
+    }
+
+    if (tab_contents)
+        tab_contents = '<div class="tab-content padding-10">' + tab_contents + '</div>';
+
+    str += '</ul>';
+
+    return str + tab_contents;
+};

@@ -105,11 +105,6 @@ exports.request = function(env, args, cb) {
 
             db.GetUserDatabases(addonFactory.activeUser.data.name, function(err, dbs) {
 
-//                if (err) {
-//                    cb(false, err);
-//                    return;
-//                }
-
                 var id = 1;
                 for(var a in dbs) {
                     var chk = '<input type="checkbox" id="jxrow_' + dbs[a] + '"></input>';

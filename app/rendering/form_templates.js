@@ -6,6 +6,7 @@ var path = require("path");
 var rep = require('./smart_search').replace;
 var database = require("./../install/database");
 var site_defaults = require("./../definitions/site_defaults");
+var page_utils = require("./page_utils");
 
 var logic = [
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
@@ -164,10 +165,28 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
     var controls = activeForm.controls;
 
-    var arr = [];
+    var tabId = 0;
+    var tabs = [];
+    if (activeForm.tabs && activeForm.tabs.length) {
+        tabs = JSON.parse(JSON.stringify(activeForm.tabs));
+        for(var i in tabs) {
+            tabs[i].arr = [];
+            if (!tabs[i].id)
+                tabs[i].id = "formTab" + i;
+        }
+    } else {
+        tabs[0] = { arr : []};
+    }
+
+    var arr = tabs[0].arr;
     for(var i in controls) {
 
         if(controls[i].BEGIN != undefined){
+
+            var _tabId = parseInt(controls[i].tab);
+            tabId = isNaN(_tabId) ? 0 : _tabId;
+            arr = tabs[tabId].arr;
+
             arr.push({html:tool.startFieldSet(), js:""});
             if(controls[i].BEGIN){
                 arr.push(tool.createLegend( form_lang.Get(active_user.lang, controls[i].BEGIN, true) ));
@@ -245,15 +264,20 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         arr.push(ctrl.method(ctrl.label, ctrl.title || ctrl.label, name, val, active_user, ctrl.options));
     }
 
-    for(var o in arr)
-        html += arr[o].html;
-
     var scr = "{ var _form_name='"+formName+"';";
 
-    for(var o in arr)
-    {
-        scr += arr[o].js;
+    for(var a in tabs) {
+        tabs[a].contents = "";
+        var arr = tabs[a].arr;
+        for(var o in arr) {
+            tabs[a].contents += arr[o].html;
+            html += arr[o].html;
+            scr += arr[o].js;
+        }
     }
+
+    if (tabs.length > 1)
+        html = page_utils.getTabs("formTabs", tabs);
 
     scr += "}; window.jxForms['"+formName+"'].created = true;";
 

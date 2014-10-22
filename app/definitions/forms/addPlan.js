@@ -44,6 +44,11 @@ exports.form = function () {
         this.displayNameLabel_Add = "AddPlan";
         this.displayNameLabel_Edit = "EditPlan";
 
+        this.tabs = [
+            { label : "General" },
+            { label : "System options" }
+        ];
+
         this.controls = [
             {"BEGIN": "General"},
 
@@ -280,7 +285,8 @@ exports.form = function () {
                 validation : new validations.NginxDirectives()
             },
 
-            {"END" : 1}
+            {"END" : 1},
+
         ];
     };
 
