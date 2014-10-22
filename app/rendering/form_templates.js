@@ -7,6 +7,9 @@ var rep = require('./smart_search').replace;
 var database = require("./../install/database");
 var site_defaults = require("./../definitions/site_defaults");
 var page_utils = require("./page_utils");
+var addons_tools = require("../addons_tools");
+var validations = require("./../definitions/validations");
+var tools = require("./form_tools");
 
 var logic = [
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
@@ -45,6 +48,55 @@ exports.getClientFormScript = function() {
     return fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
 };
 
+
+var addMaximumsFromAddons = function(activeFormInstance) {
+
+    if (activeFormInstance.addonsCriteriaAdded)
+        return;
+
+    var ret = addons_tools.callEvent("hostingPlanCriteria");
+    if (ret) {
+        var newControls = [];
+        for (var addon_name in ret) {
+            newControls.push({ BEGIN : addon_name, tab : 1 });
+
+            for(var i in ret[addon_name]) {
+                var addon_control = ret[addon_name][i];
+                if (!addon_control.id) continue;
+
+                var method = tools.getMethod(addon_control.type);
+                if (!method)
+                    continue;
+
+                var options = addon_control.options;
+                if (!options) options = { };
+                options.extra = options.extra || {};
+                options.extra.formName = activeFormInstance.name;
+
+                var ctrl = {
+                    name : addon_name + "@" + addon_control.id,
+                    details : {
+                        label : options.label,
+                        options : options,
+                        method : method,
+                        definesMax: true
+                    },
+                    addon : addon_name,
+                    validation : validations.getValidationByObject(options.validation)
+                }
+
+                newControls.push(ctrl);
+            }
+
+            newControls.push({ END : 1 });
+        }
+    }
+
+    for(var o in newControls)
+        activeFormInstance.controls.push(newControls[o]);
+
+    activeFormInstance.addonsCriteriaAdded = true;
+};
 
 exports.renderForm = function(sessionId, formName, onlyControls){
     var html = "";
@@ -131,6 +183,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
 
     if (formName === "addPlan") {
+
+        addMaximumsFromAddons(activeForm);
 
         if (!isUpdate) {
             // getting owner of the plan

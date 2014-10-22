@@ -23,8 +23,10 @@ var smart_replace = require('./rendering/smart_search').replace;
 var tools = require('./rendering/form_tools');
 var form_templates = require('./rendering/form_templates');
 var events = require("events");
+var validations = require("./definitions/validations");
 
 var addons = {};
+exports.addons = addons;
 
 var checkUpacked = function (addon_dir) {
 
@@ -79,6 +81,13 @@ var checkUpacked = function (addon_dir) {
             return { err : "AddOnEventsCannotRequire" };
         }
     }
+
+    var hostingPlanCriteria = null;
+    if (events) {
+        //todo validate hostingPlanCriteria return value
+        hostingPlanCriteria = callSingeEvent(this, "hostingPlanCriteria");
+    }
+
 
     return { json: json, index: index, events : events, id :json.id, dir : addon_dir };
 };
@@ -437,22 +446,9 @@ var form = function(id, env, active_user, options, factory) {
         var forms = __factory.db.get("__forms");
         var value = forms && forms[__this.id] ? forms[__this.id][id] : options.value;
 
-        var method = null;
-        if (type === "text" || type === "password" || type === "textarea")
-            method = tools.createTextBox;
-        else
-        if (type === "checkbox")
-            method = tools.createCheckBox;
-        else
-        if (type === "combobox")
-            method = tools.createComboBox;
-        else
-        if (type === "simpleText") {
-            method = tools.createSimpleText;
-            value = options.value;
-        }
-
-        controls.push(method(options.label, options.label, id, value, __active_user, options).html);
+        var method = tools.getMethod(type);
+        if (method)
+            controls.push(method(options.label, options.label, id, value, __active_user, options).html);
 
         /*
          {
@@ -473,7 +469,8 @@ var form = function(id, env, active_user, options, factory) {
             details : {
                 label : options.label,
                 options : options
-            }
+            },
+            validation : validations.getValidationByObject(options.validation)
         });
     };
 
@@ -529,20 +526,23 @@ global.jxpanel = {
 
 var callSingeEvent = function(addon, event_name, args, cb) {
 
+    var ret = null;
+
     if (!addon.events || !addon.events.event) {
         // no error
         if (cb) cb();
-        return;
+        return ret;
     }
 
     if (!cb) {
         try {
-            // if no callback, emit event and dont care for the result
-            addon.events.event(event_name, args);
+            // if no callback, emit event and don't care for the callback result
+            // however, gathers immediate return values
+            ret = addon.events.event(event_name, args);
         } catch (ex) {
             // do nothing
         }
-        return;
+        return ret;
     }
 
     if (cb) {
@@ -557,19 +557,24 @@ var callSingeEvent = function(addon, event_name, args, cb) {
         }
     }
 
+    return ret;
 };
 
 // calls specific events for all addons
-// it calls without a callback - doesn't care for the result
+// it calls without a callback - doesn't care for the cb result
+// however, gathers immediate return values
 exports.callEvent = function(event_name, args) {
 
+    var ret = {};
     var ls = fs.readdirSync(site_defaults.dirAddons);
     for(var o in ls) {
         var addon_name = ls[o];
         var addon = load(addon_name);
         if (!addon.err)
-            callSingeEvent(addon, event_name, args);
+            ret[addon_name] = callSingeEvent(addon, event_name, args);
     }
+
+    return ret;
 };
 
 

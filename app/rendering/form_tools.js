@@ -361,3 +361,21 @@ exports.getFieldDisplayValue = function (active_user, activeInstance, field_name
 
     return val;
 };
+
+
+exports.getMethod = function(type) {
+
+    if (type === "text" || type === "password" || type === "textarea")
+        return exports.createTextBox;
+
+    if (type === "checkbox")
+        return exports.createCheckBox;
+
+    if (type === "combobox")
+        return exports.createComboBox;
+
+    if (type === "simpleText")
+        return exports.createSimpleText;
+
+    return null;
+};

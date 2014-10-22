@@ -285,7 +285,7 @@ exports.form = function () {
                 validation : new validations.NginxDirectives()
             },
 
-            {"END" : 1},
+            {"END" : 1}
 
         ];
     };

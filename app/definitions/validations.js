@@ -34,11 +34,6 @@ exports.String = function (minSize, maxSize) {
     this.min = parseInt(minSize);
     this.max = parseInt(maxSize);
 
-    if (isNaN(this.min) && isNaN(this.max)) {
-        // no params, so consider value to be validated
-        return {result: true};
-    }
-
     this.validate = function (env, active_user, val) {
         if (!isNaN(this.min) && val.trim().length < this.min) {
             return {result: false, msg: form_lang.Get(active_user.lang, "RequiresMinimumLength", null, [this.min])};
@@ -376,4 +371,38 @@ exports.AppType = function() {
 
         return {result: true};
     };
+};
+
+
+exports.getValidation = function(type, options) {
+
+    if (!options) options = {};
+
+    if (type === "Integer")
+        return new exports.Int(options);
+
+    if (type === "String")
+        return new exports.String(options.min, options.max);
+
+    if (type === "Boolean")
+        return new exports.Boolean();
+
+    if (type === "Username")
+        return new exports.UserName();
+
+    if (type === "Domain")
+        return new exports.Domain();
+
+    if (type === "Email")
+        return new exports.Email();
+
+    return null;
+};
+
+exports.getValidationByObject = function(obj) {
+
+  if (obj && obj.type)
+      return exports.getValidation(obj.type, obj.options || obj);
+
+  return null;
 };
