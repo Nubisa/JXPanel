@@ -398,10 +398,15 @@ var logic = [
             return form_lang.Get(gl.lang, gl.table.displayNameLabel || gl.name, true);
 
         if (val == "buttons") {
+            if (gl && gl.table && gl.table.buttonsOnlyForAdmin && !_active_user.isAdmin(gl.active_user))
+                return "";
+
             var containerFile = path.join(__dirname, "../definitions/datatables/" + gl.name + "_buttons.html");
             if (fs.existsSync(containerFile)) {
                 var txt = fs.readFileSync(containerFile).toString();
-                return rep(txt, logic);
+                txt = rep(txt, logic);
+
+                return page_utils.getButtonsGroup(txt, 'margin-left:-6px;margin-top:0px;');
             } else
                 return "";
         }

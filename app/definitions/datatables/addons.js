@@ -7,6 +7,7 @@ var path = require("path");
 
 exports.name = path.basename(__filename, ".js").toLowerCase();
 exports.displayNameLabel = "JXcoreNPMModules";
+exports.buttonsOnlyForAdmin = true;
 
 exports.settings = {
     columns :[ "_checkbox",  "_id", "name", "version", "description" ]
