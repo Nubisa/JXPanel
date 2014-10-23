@@ -116,6 +116,14 @@ var load = function(addon_name) {
     return addons[addon_name];
 };
 
+var loadAll = function() {
+
+    var ls = fs.readdirSync(site_defaults.dirAddons);
+    for(var o in ls)
+        load(ls[o]);
+};
+
+
 var copy = function () {
     // temporarily copies addons to server_apps folder
     var cmd = "cp -rf " + path.join(site_defaults.apps_folder, "../addons") + " " + site_defaults.apps_folder + path.sep;
@@ -582,16 +590,62 @@ var callSingeEvent = function(addon, event_name, args, cb) {
 // however, gathers immediate return values
 exports.callEvent = function(event_name, args) {
 
+    loadAll();
     var ret = {};
-    var ls = fs.readdirSync(site_defaults.dirAddons);
-    for(var o in ls) {
-        var addon_name = ls[o];
-        var addon = load(addon_name);
-        if (!addon.err)
-            ret[addon_name] = callSingeEvent(addon, event_name, args);
-    }
+    for(var addon_name in addons)
+        ret[addon_name] = callSingeEvent(addons[addon_name], event_name, args);
 
     return ret;
+};
+
+// checks if any of addon's custom maximums has been changed for any of users
+// and calls those addon's events
+exports.checkHostingPlanCriteriaChanged = function(plan, planData, planMaximumsData) {
+
+    // for now we're checking only maximums change values
+    if (!planMaximumsData)
+        return;
+
+    loadAll();
+
+    var users = database.getUsersByPlanName(plan.name, 1e7);
+    for(var o in users) {
+        var user = database.getUser(users[o]);
+        if (!user) continue;
+        var user_plan = database.getPlan(user.plan);
+        if (!user_plan) continue;
+
+        var user_changes = {};
+        var changed = false;
+        for(var field_name in planMaximumsData) {
+            // only fields containg addon_name@
+            if (field_name.indexOf("@") === -1) continue;
+
+            var parsed = field_name.split("@");
+            var addon_name = parsed[0];
+            var addon_field_name = parsed[1];
+            // there is no such addon
+            if (!addons[addon_name]) continue;
+
+            var ret = { };
+            ret.old = undefined;
+            if (user.plan === plan.name) {
+                ret.old = planMaximumsData[field_name].old;
+            } else {
+                if (user_plan.planMaximums && user_plan.planMaximums[field_name])
+                    ret.old = user_plan.planMaximums[field_name];
+            }
+
+            ret.new = planMaximumsData[field_name].new;
+            ret.checkSuspension = ret.new < ret.old;
+
+            user_changes[addon_field_name] = ret;
+            changed = true;
+        }
+
+        if (changed)
+            callSingeEvent(addons[addon_name], "hostingPlanCriteriaChanged", user_changes);
+    }
 };
 
 

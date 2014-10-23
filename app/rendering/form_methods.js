@@ -185,12 +185,15 @@ var sessionAdd = function(env, active_user, params){
 
 var update = function(base, ext){
     var changed = false;
+    var ret = {};
     for(var o in ext){
-        if (base[o] !== ext[o])
+        if (base[o] !== ext[o]) {
             changed = true;
+            ret[o] = { old : base[o], new : ext[o] };
+        }
         base[o] = ext[o];
     }
-    return changed;
+    return changed ? ret : false;
 };
 
 // translating fake ids into real ids
@@ -459,6 +462,9 @@ methods.sessionApply = function(env, params){
                 var changed1 = update(plan, json);
                 var changed2 = update(plan.planMaximums, planMaximums);
                 ret = database.updatePlan(update_name, plan);
+
+                if (!ret && (changed1 || changed2))
+                    addons_tools.checkHostingPlanCriteriaChanged(plan, changed1, changed2);
 
                 if (!ret && (changed1 || changed2)) {
                     var all_domains = database.getDomainsByPlanName(update_name, 1e5);

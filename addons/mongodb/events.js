@@ -8,19 +8,21 @@ var shell = require("./shell");
 // supported events:
 //      userAdd, userUpdate, userRemove,
 //      addonInstall, addonUninstall, addonUpdate
-//      hostingPlanCriteria
-exports.event = function(event_name, args, cb) {
+//      hostingPlanCriteria, hostingPlanCriteriaChanged
+exports.event = function(event_name, args) {
 
     jxcore.utils.console.log("Event fired. Addon listening", event_name, JSON.stringify(args), "blue");
 
     if (event_name === "userRemove") {
+        // which user?
         db.RemoveDB("all", function(err) {
-            if (cb) cb(err);
             return;
         });
     }
 
     if (event_name === "hostingPlanCriteria") {
+        // args null
+        // return required
 
         var intValidation = { type : "Integer", gte : 0 }
         var stringValidation = { type : "String", min : 2, max : 10 };
@@ -33,9 +35,15 @@ exports.event = function(event_name, args, cb) {
         return ret;
     }
 
+    if (event_name === "hostingPlanCriteriaChanged") {
+        // args is array of items like: { id : "maxDatabases", old: 5, new: 6 }
+        // return not required
+    }
+
     if (event_name === "addonUninstall") {
+        // args null
+        // return not required
         shell.mongoStop();
     }
 
-    if (cb) cb();
 };
