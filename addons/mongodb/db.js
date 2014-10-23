@@ -25,7 +25,7 @@ var admin = {
 exports.AddDB = function (env, pwd, cb) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
-    var user_name = addonFactory.activeUser.data.name;
+    var user_name = addonFactory.activeUser.name;
 
     exports.GetUserDatabases(user_name, function (err, dbs, nextId) {
 
@@ -181,7 +181,7 @@ exports.ConnectAsAdmin = function (dbname, cb) {
 };
 
 
-exports.CreateAdmin = function (cb) {
+exports.CreateAdmin = function (addonFactory, cb) {
 
 
     exports.Connect(function (err, db) {
@@ -238,6 +238,7 @@ exports.CreateAdmin = function (cb) {
                             return;
                         }
 
+                        addonFactory.db.set("initialized", true);
                         db.close();
                         cb();
                     });

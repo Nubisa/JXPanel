@@ -548,7 +548,7 @@ methods.removeFromTableData = function(env, params) {
 
     if (params.dt === "addons") {
 
-        addons_tools.uninstall(params.ids[0], function(err) {
+        addons_tools.uninstall(active_user, params.ids[0], function(err) {
             server.sendCallBack(env, {err: form_lang.Get(active_user.lang, err, true) });
         });
         return;

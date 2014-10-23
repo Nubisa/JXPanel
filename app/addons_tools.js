@@ -304,23 +304,23 @@ var extension_class = function (env, active_user, addonCurrent) {
             // returning copy of the user object
             return JSON.parse(JSON.stringify(user));
         },
-        getUserData : function(user_name) {
-            if (!user_name)
-                user_name = __active_user.username;
-            var user = database.getUser(user_name);
-            // returning copy of the user object
-            var copy = JSON.parse(JSON.stringify(user));
-
-            return copy.data || {};
-        },
-        updateUserData : function(user_name, data) {
-            if (!user_name)
-                user_name = __active_user.username;
-
-            var user = database.getUser(user_name);
-            user.data = JSON.parse(JSON.stringify(data));
-            database.updateUser(user_name, user);
-        },
+//        getUserData : function(user_name) {
+//            if (!user_name)
+//                user_name = __active_user.username;
+//            var user = database.getUser(user_name);
+//            // returning copy of the user object
+//            var copy = JSON.parse(JSON.stringify(user));
+//
+//            return copy.data || {};
+//        },
+//        updateUserData : function(user_name, data) {
+//            if (!user_name)
+//                user_name = __active_user.username;
+//
+//            var user = database.getUser(user_name);
+//            user.data = JSON.parse(JSON.stringify(data));
+//            database.updateUser(user_name, user);
+//        },
         get : function(sid) {
             var user = database.getUser(__active_user.username);
             if (user && user.addons && user.addons[__addon.instance.id]) {
@@ -342,6 +342,16 @@ var extension_class = function (env, active_user, addonCurrent) {
                 delete user.addons[__addon.instance.id][sid];
             }
             database.updateUser(user.name, user);
+        },
+        // returns planMaximums defined by this addon only
+        // they are also present in __this.db.getUser() object,
+        // but they contain prefix: addon_name@field_name
+        getHostingPlanCriteria : function(field_name) {
+            var user = __this.db.getUser();
+            var plan = database.getPlan(user.plan);
+            if (!plan || !plan.planMaximums) return null;
+
+            return plan.GetMaximum(__addon.instance.id + "@" + field_name);
         }
     };
 
@@ -375,7 +385,10 @@ var extension_class = function (env, active_user, addonCurrent) {
     };
 
     this.activeUser = {
-        data : this.db.getUser(),
+        getData : function () {
+            return this.db.getUser();
+        },
+        name : __active_user.username,
         isAdmin : _active_user.isAdmin(__active_user)
     };
 
@@ -488,7 +501,12 @@ var form = function(id, env, active_user, options, factory) {
         smart_rule.globals = {"sessionId":__env.sessionId, "active_user": __active_user, "lang":__active_user.lang, form : __this  };
         script = smart_replace(script, smart_rule);
 
-        return script + tools.begin + controls.join("\n") + tools.end + tools.createButtons(__active_user, __this);
+        script = script + tools.begin + controls.join("\n") + tools.end;
+
+        if (!options.noButtons)
+            script += tools.createButtons(__active_user, __this);
+
+        return script;
     };
 
     this.callOnSubmit = function(values, cb) {
@@ -633,7 +651,12 @@ var remove = function(addon) {
 };
 
 
-exports.uninstall = function(addon_name, cb) {
+exports.uninstall = function(active_user, addon_name, cb) {
+
+    if (!_active_user.isAdmin(active_user)) {
+        cb("Access Denied");
+        return;
+    }
 
     var addon = load(addon_name);
     if (addon.err) {
@@ -654,7 +677,12 @@ exports.uninstall = function(addon_name, cb) {
 
 
 
-exports.install = function(zipFile, cb) {
+exports.install = function(active_user, zipFile, cb) {
+
+    if (!_active_user.isAdmin(active_user)) {
+        cb("Access Denied");
+        return;
+    }
 
     var tmpDir = path.join(site_defaults.apps_folder, "__tmp" + jxcore.utils.uniqueId());
     if (fs.existsSync(tmpDir))

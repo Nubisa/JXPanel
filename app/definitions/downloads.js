@@ -87,7 +87,7 @@ var saveFile = function(file, target, res, user){
     }
 
     if (target === "__addon__") {
-        addons_tools.install(file.path, function(err) {
+        addons_tools.install(user, file.path, function(err) {
             res.writeHead(200, {'content-type': 'text/plain'});
             res.end(form_lang.Get(lang, err || "UploadCompleted", true));
         });

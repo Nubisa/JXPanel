@@ -8,6 +8,7 @@ var shell = require("./shell");
 // supported events:
 //      userAdd, userUpdate, userRemove,
 //      addonInstall, addonUninstall, addonUpdate
+//      hostingPlanCriteria
 exports.event = function(event_name, args, cb) {
 
     jxcore.utils.console.log("Event fired. Addon listening", event_name, JSON.stringify(args), "blue");
@@ -24,10 +25,10 @@ exports.event = function(event_name, args, cb) {
         var intValidation = { type : "Integer", gte : 0 }
         var stringValidation = { type : "String", min : 2, max : 10 };
         var ret = [];
-        var txt1 = { type : "text", id : "txt1", options : { label : "Databases", default : null, required : false, validation : intValidation } };
-        var txt2 = { type : "text", id : "txt2", options : { label : "my txt2", default : "some value 2", required : false, validation : stringValidation } };
+        var txt1 = { type : "text", id : "maxDatabases", options : { label : "Databases", default : null, required : false, validation : intValidation } };
+//        var txt2 = { type : "text", id : "txt2", options : { label : "my txt2", default : "some value 2", required : false, validation : stringValidation } };
         ret.push(txt1);
-        ret.push(txt2);
+        //ret.push(txt2);
 
         return ret;
     }

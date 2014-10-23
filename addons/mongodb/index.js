@@ -10,7 +10,7 @@ var shell = require("./shell");
 
 var getConfigForm = function(addonFactory, status) {
 
-    var form = addonFactory.form.new("mongo_form_config", { onSubmitSuccess : addonFactory.url.addon, onSubmitCancel : addonFactory.url.addon} );
+    var form = addonFactory.form.new("mongo_form_config", { onSubmitSuccess : addonFactory.url.addon, onSubmitCancel : addonFactory.url.addon, noButtons : true } );
     form.allowEmpty = true;
     form.addSection("MongoDB Engine");
     form.addControl("simpleText", "txt1", { label : "Status", value : status.html, required : true });
@@ -63,8 +63,8 @@ exports.request = function(env, args, cb) {
     var finalize = function() {
         var tabs = [
             {id: "databases", label: "Databases", icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">'},
-            {id: "form", label: "Sample Addon's Form"},
-            {id: "tab3", label: "Empty Tab"}
+            //{id: "form", label: "Sample Addon's Form"},
+            //{id: "tab3", label: "Empty Tab"}
         ];
 
         if (addonFactory.activeUser.isAdmin)
@@ -103,7 +103,7 @@ exports.request = function(env, args, cb) {
             addonFactory.header.addClientButton("Change password", "window.changePWD(); return false;");
 //            addonFactory.header.addClientButton("Go to the form", "goToTheForm(); return false;");
 
-            db.GetUserDatabases(addonFactory.activeUser.data.name, function(err, dbs) {
+            db.GetUserDatabases(addonFactory.activeUser.name, function(err, dbs) {
 
                 var id = 1;
                 for(var a in dbs) {
@@ -143,8 +143,23 @@ exports.request = function(env, args, cb) {
 
 jxpanel.server.addJSMethod("addDB", function(env, params) {
 
-    db.AddDB(env, params.op.pwd, function(err) {
-        jxpanel.server.sendCallBack(env, {err : err } );
+    var addonFactory = jxpanel.getAddonFactory(env);
+    var max = addonFactory.db.getHostingPlanCriteria("maxDatabases");
+
+    db.GetUserDatabases(addonFactory.activeUser.name, function(err, dbs) {
+        if (err) {
+            jxpanel.server.sendCallBack(env, {err : err } );
+            return;
+        }
+
+        if (dbs.length >= max) {
+            jxpanel.server.sendCallBack(env, {err : "You cannot add any more databases. Your current limit is: " + max } );
+            return;
+        }
+
+        db.AddDB(env, params.op.pwd, function(err) {
+            jxpanel.server.sendCallBack(env, {err : err } );
+        });
     });
 });
 
@@ -177,6 +192,9 @@ jxpanel.server.addJSMethod("mongoShell", function(env, params) {
         jxpanel.server.sendCallBack(env, {err : err } );
     };
 
+    if (!addonFactory.activeUser.isAdmin)
+        return sendBack("Access Denied");
+
     if (params.op === "start") {
         var res = shell.mongoStart();
         sendBack(res.err);
@@ -197,7 +215,7 @@ jxpanel.server.addJSMethod("mongoShell", function(env, params) {
     }
 
     if (params.op === "createAdmin") {
-        db.CreateAdmin(function(err) {
+        db.CreateAdmin(addonFactory, function(err) {
             sendBack(err);
         });
         return;
