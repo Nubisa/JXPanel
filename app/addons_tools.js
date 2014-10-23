@@ -26,7 +26,6 @@ var events = require("events");
 var validations = require("./definitions/validations");
 
 var addons = {};
-exports.addons = addons;
 
 var checkUpacked = function (addon_dir) {
 
@@ -102,7 +101,7 @@ var unload = function (addon_name) {
 
 var load = function(addon_name) {
 
-    copy();
+//    copy();
 
     if (!addons[addon_name]) {
         // loading addon
@@ -540,7 +539,7 @@ var callSingeEvent = function(addon, event_name, args, cb) {
             // however, gathers immediate return values
             ret = addon.events.event(event_name, args);
         } catch (ex) {
-            // do nothing
+            return { err : "AddOnEventsErrorWhileCalling|" + event_name + "|" +  ex.toString() };
         }
         return ret;
     }
@@ -579,6 +578,52 @@ exports.callEvent = function(event_name, args) {
 
 
 var remove = function(addon) {
+
+    // removing addon's controls from user form's instances
+    _active_user.removeAddonControls(addon.id);
+
+    // cleaning db from addon's entries
+    var removed = false;
+    var users = database.getUsersByPlanName(database.unlimitedPlanName, 1e7);
+    for (var o in users) {
+        var user = database.getUser(users[o]);
+        if (!user)
+            continue;
+
+        // removing e.g. user.addons[mongodb] value
+        if (user.addons && user.addons[addon.id]) {
+            delete user.addons[addon.id];
+            removed = true;
+        }
+
+        var plan = database.getPlan(user.plan);
+        if (!plan)
+            continue;
+
+        var prefix = addon.id + "@";
+        // removing e.g. user["mongodb@txt1"] value
+        for(var o in plan) {
+            if (o.slice(0, prefix.length) === prefix) {
+                delete plan[o];
+                removed = true;
+            }
+        }
+
+        // removing e.g. user.planMaximums["mongodb@txt1"] value
+        if (plan.planMaximums) {
+            for(var o in plan.planMaximums) {
+                if (o.slice(0, prefix.length) === prefix) {
+                    delete plan.planMaximums[o];
+                    removed = true;
+                }
+            }
+        }
+    }
+
+    if (removed)
+        database.updateDBFile();
+
+
     unload(addon.id);
     var res = jxcore.utils.cmdSync("rm -rf " + addon.dir);
     if (res.exitCode)
@@ -667,4 +712,11 @@ exports.install = function(zipFile, cb) {
             cb();
         }
     });
+};
+
+
+
+exports.getAddon = function(addon_name) {
+
+    return load(addon_name);
 };

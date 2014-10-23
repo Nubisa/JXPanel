@@ -3,6 +3,7 @@
  */
 
 var db = require("./db");
+var shell = require("./shell");
 
 // supported events:
 //      userAdd, userUpdate, userRemove,
@@ -29,6 +30,10 @@ exports.event = function(event_name, args, cb) {
         ret.push(txt2);
 
         return ret;
+    }
+
+    if (event_name === "addonUninstall") {
+        shell.mongoStop();
     }
 
     if (cb) cb();

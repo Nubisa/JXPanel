@@ -58,7 +58,7 @@ var addMaximumsFromAddons = function(activeFormInstance) {
     if (ret) {
         var newControls = [];
         for (var addon_name in ret) {
-            newControls.push({ BEGIN : addon_name, tab : 1 });
+            newControls.push({ BEGIN : addon_name, tab : 1, addon : addon_name });
 
             for(var i in ret[addon_name]) {
                 var addon_control = ret[addon_name][i];
@@ -88,7 +88,7 @@ var addMaximumsFromAddons = function(activeFormInstance) {
                 newControls.push(ctrl);
             }
 
-            newControls.push({ END : 1 });
+            newControls.push({ END : 1, addon : addon_name  });
         }
     }
 

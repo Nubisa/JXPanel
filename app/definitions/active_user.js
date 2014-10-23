@@ -212,6 +212,30 @@ exports.isRecordUpdating = function(active_user, formName) {
         return false;
 };
 
+// iterates through user sessions and form instances,
+// and removes dynamically added addon's controls
+exports.removeAddonControls = function(addon_name) {
+
+    for(var sessionId in users) {
+        if (!users[sessionId].session) continue;
+        var forms = users[sessionId].session.forms;
+        if (!forms) continue;
+        for (var form_name in forms) {
+            var activeInstance = forms[form_name].activeInstance;
+            if (!activeInstance || !activeInstance.addonsCriteriaAdded || !activeInstance.controls)
+                continue;
+
+            for(var o in activeInstance.controls) {
+                var ctrl = activeInstance.controls[o];
+                if (ctrl.addon && ctrl.addon === addon_name)
+                    delete activeInstance.controls[o];
+            }
+
+            delete activeInstance.addonsCriteriaAdded;
+        }
+    }
+};
+
 
 exports.defineMethods = function(){
     var scheduler = require('./scheduler/scheduler');
