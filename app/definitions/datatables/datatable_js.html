@@ -66,26 +66,18 @@
 
     window.utils = window.utils || {};
 
-    utils.jxGetSelection = function() {
+    utils.jxGetSelection = function(check) {
         var ids = [];
         $('input:checkbox[id^=jxrow_]:checked').each(function() {
             var id = $(this).attr('id').replace("jxrow_", "");
             ids.push(id);
         });
-        return ids;
-    };
 
-    utils.jxCallSelection = function(method_name, args) {
-        args = args || {};
-        args.selection = utils.jxGetSelection();
-
-        if (!args.selection.length) {
+        if (check && !ids.length) {
             utils.jxAddMessage("danger", "{{label.EmptySelection}}");
-            return;
+            return null;
         }
 
-
-        utils.jxCall(method_name, args);
-        return false;
+        return ids;
     };
 </script>

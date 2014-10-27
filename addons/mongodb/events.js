@@ -38,6 +38,13 @@ exports.event = function(event_name, args) {
     if (event_name === "hostingPlanCriteriaChanged") {
         // args is array of items like: { id : "maxDatabases", old: 5, new: 6 }
         // return not required
+
+        for(var field_name in args) {
+            var obj = args[field_name];
+            if (obj.checkSuspension) {
+
+            }
+        }
     }
 
     if (event_name === "addonUninstall") {

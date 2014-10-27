@@ -15,6 +15,7 @@ var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
 var folder_utils = require("../definitions/user_folders");
 var page_utils = require("./page_utils");
+var addons_tools = require("./../addons_tools");
 
 
 var getTable = function(table_name) {
@@ -212,31 +213,18 @@ var getModules = function(active_user, table) {
 
 
 
-// gets information about npm modules installed in global module path
+// gets list of addons
 var getAddons = function(active_user, table) {
 
     var data = [];
-    try {
-        var addonsDir = path.normalize(site_defaults.dirAddons);
-        var folders = fs.readdirSync(addonsDir);
 
-        for (var a = 0, len = folders.length; a < len; a++) {
-            if (folders[a].slice(0, 1) !== ".") {
+    var addons = addons_tools.loadAll();
+    for(var addon_name in addons) {
+        if (!_active_user.isAdmin(active_user) && addons[addon_name].json["adminOnly"])
+            continue
 
-                var file = path.join(addonsDir, "/", folders[a], "/package.json");
-
-                try {
-                    if (fs.existsSync(file)) {
-                        var json = JSON.parse(fs.readFileSync(file));
-                        data.push(json);
-                    }
-                } catch (ex) {
-                }
-            }
-        }
-    } catch (ex) {
+        data.push(addons[addon_name].json);
     }
-
 
     var columns = table.settings.columns;
     var arr = [];
@@ -321,9 +309,15 @@ exports.getDataTable = function(rows, columnClasses) {
 };
 
 
-exports.getClientTableScript = function() {
+exports.getClientTableScript = function(active_user) {
     var containerFilejs = path.join(__dirname, "../definitions/datatables/datatable_js.html");
-    return fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
+    var str = fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
+
+    if (str && active_user) {
+        logic.globals = { active_user: active_user };
+        str = rep(str, logic);
+    }
+    return str;
 };
 
 exports.render = function (sessionId, table_name, getContents) {

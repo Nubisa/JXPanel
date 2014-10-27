@@ -42,6 +42,8 @@ exports.Labels = {
     "Original" : "Original",
     "Translation" : "Translation",
     "UnknownCommand" : "Unknown command",
+    "DirectoryExpected" : "Directory expected",
+    "UnknownMethod" : "Unknown method",
 
     "help":"Help",
     "logout":"Logout",
@@ -369,6 +371,7 @@ exports.Labels = {
     "DBCannotGetParentPlan" : "Cannot read parent hosting plan from database.",
     "DBCannotGetDomain" : "Cannot read domain from database.",
     "DBCannotReadData" : "Cannot read data from database.",
+    "DBUnknown" : "Unknown database: %s.",
 
     "DBUserCannotCreatePlan" : "User cannot create plan.",
     "DBCannotRemoveRecord" : "Cannot remove record %s.",
@@ -378,7 +381,7 @@ exports.Labels = {
 
     // datatables
     "UnknownDataTable" : "Unknown table name.",
-    "EmptySelection" : "Select the rows first.",
+    "EmptySelection" : "Please select the rows first.",
     "SelectOnlyOneRow" : "Please select only one row.",
     "RemoveSelected" : "Remove selected",
     "RemoveSelectedHeader" : "Warning!",
@@ -479,6 +482,7 @@ exports.Labels = {
     "AddOnIndexNoMember" : "AddOn's main file (index.js) does not contain member: %s.",
     "AddOnEventsCannotRequire" : "Cannot require addon's events.js file.",
     "AddOnEventsErrorWhileCalling" : "Error while calling addon's event: %s.",
+    "AddOnMethodErrorWhileCalling" : "Error while calling addon's method: %s.",
 
     "AddonMongoAddDB" : "Add database",
     "AddonMongoAddDBEnterName" : "Enter database name"

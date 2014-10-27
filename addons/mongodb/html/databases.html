@@ -13,7 +13,7 @@
                     utils.jxAddMessage('danger', "Please enter new password");
                     return;
                 }
-                utils.jxCall("addDB", { pwd : value });
+                window.jxAddonCall("addDB", { pwd : value });
             }
         }, true);
         return false;
@@ -25,7 +25,7 @@
         var selection = utils.jxGetSelection();
 
         if (!selection.length) {
-            utils.jxAddMessage("danger", "{{label.EmptySelection}}");
+            utils.jxAddMessage("danger", "Select the rows first.");
             return;
         }
 
@@ -36,7 +36,7 @@
                     utils.jxAddMessage('danger', "Please enter new password");
                     return;
                 }
-                utils.jxCall("changePWD", { selection : selection, pwd : value });
+                window.jxAddonCall("changePWD", { selection : selection, pwd : value });
             }
         }, true);
         return false;
@@ -44,8 +44,6 @@
 
 
 </script>
-
-This text is from databases.html
 
 <div style="margin-top: 30px;">
     {{contents}}

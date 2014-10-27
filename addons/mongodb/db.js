@@ -22,9 +22,8 @@ var admin = {
     pwd: "jxpanel_admin_2015"
 };
 
-exports.AddDB = function (env, pwd, cb) {
+exports.AddDB = function (addonFactory, pwd, cb) {
 
-    var addonFactory = jxpanel.getAddonFactory(env);
     var user_name = addonFactory.activeUser.name;
 
     exports.GetUserDatabases(user_name, function (err, dbs, nextId) {
@@ -44,6 +43,12 @@ exports.AddDB = function (env, pwd, cb) {
                 return;
             }
 
+            var max = addonFactory.db.getHostingPlanCriteria("maxDatabases");
+            if (dbs.length >= max && max !== -1) {
+                cb("You cannot add any more databases. Your current limit is: " + max);
+                return;
+            }
+
             var options = { roles: [ "dbOwner" ] };
             db.addUser(new_name, pwd, options, function (err, result) {
 
@@ -56,6 +61,22 @@ exports.AddDB = function (env, pwd, cb) {
                 cb();
             });
         });
+    });
+};
+
+
+var checkDB = function(user_name, dbname, cb) {
+
+
+    exports.GetUserDatabases(user_name, function (err, dbs, nextId) {
+
+        if (err) {
+            cb(err);
+            return;
+        }
+
+        var exists = db.indexOf(dbname) !== -1;
+        cb(false, exists);
     });
 };
 
@@ -90,13 +111,18 @@ var removeSingleDB = function (dbname, cb) {
 };
 
 
-exports.RemoveDB = function (env, dbnames, cb) {
+exports.RemoveDB = function (addonFactory, dbnames, cb) {
+
+    if (!dbnames || !dbnames.length) {
+        cb("EmptySelection");
+        return;
+    }
 
     var len = dbnames.length;
     var errors = [];
     var _cb = function (err) {
         if (err)
-            errors.push(err);
+            errors.push(addonFactory.translate(err));
         len--;
 
         if (!len) {
@@ -104,8 +130,22 @@ exports.RemoveDB = function (env, dbnames, cb) {
         }
     };
 
-    for (var a in dbnames)
-        removeSingleDB(dbnames[a], _cb);
+    var user_name = addonFactory.activeUser.name;
+    exports.GetUserDatabases(user_name, function (err, dbs, nextId) {
+
+        if (err) {
+            cb(err);
+            return;
+        }
+
+        for (var a in dbnames) {
+            var exists = (dbs.indexOf(dbnames[a])) !== -1;
+            if (!exists)
+                _cb("DBUnknown|" + dbnames[a]);
+            else
+                removeSingleDB(dbnames[a], _cb);
+        }
+    });
 };
 
 
@@ -182,7 +222,6 @@ exports.ConnectAsAdmin = function (dbname, cb) {
 
 
 exports.CreateAdmin = function (addonFactory, cb) {
-
 
     exports.Connect(function (err, db) {
 
@@ -322,13 +361,18 @@ var changeSingleUserPassword = function (user_name, pwd, cb) {
 };
 
 
-exports.ChangeUsersPasswords = function (env, dbnames, pwd, cb) {
+exports.ChangeUsersPasswords = function (addonFactory, dbnames, pwd, cb) {
+
+    if (!dbnames || !dbnames.length) {
+        cb("EmptySelection");
+        return;
+    }
 
     var len = dbnames.length;
     var errors = [];
     var _cb = function (err) {
         if (err)
-            errors.push(err);
+            errors.push(addonFactory.translate(err));
         len--;
 
         if (!len) {
@@ -336,6 +380,21 @@ exports.ChangeUsersPasswords = function (env, dbnames, pwd, cb) {
         }
     };
 
-    for (var a in dbnames)
-        changeSingleUserPassword(dbnames[a], pwd, _cb);
+    var user_name = addonFactory.activeUser.name;
+    exports.GetUserDatabases(user_name, function (err, dbs, nextId) {
+
+        if (err) {
+            cb(err);
+            return;
+        }
+
+        for (var a in dbnames) {
+            var exists = (dbs.indexOf(dbnames[a])) !== -1;
+            if (!exists)
+                _cb("DBUnknown|" + dbnames[a]);
+            else
+                changeSingleUserPassword(dbnames[a], pwd, _cb);
+        }
+    });
+
 };

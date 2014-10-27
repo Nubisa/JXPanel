@@ -7,6 +7,7 @@ var path = require("path");
 var db = require("./db");
 var shell = require("./shell");
 
+var jxpanel = global.getJXPanelAPI(module);
 
 var getConfigForm = function(addonFactory, status) {
 
@@ -62,7 +63,7 @@ exports.request = function(env, args, cb) {
 
     var finalize = function() {
         var tabs = [
-            {id: "databases", label: "Databases", icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">'},
+            {id: "databases", label: "Databases", icon : '<img id="dashboard_img" class="menu-icon" src="icons/dashboard.png">'}
             //{id: "form", label: "Sample Addon's Form"},
             //{id: "tab3", label: "Empty Tab"}
         ];
@@ -141,46 +142,27 @@ exports.request = function(env, args, cb) {
     });
 };
 
-jxpanel.server.addJSMethod("addDB", function(env, params) {
+
+jxpanel.server.addJSMethod("addDB", function(env, params, cb) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
-    var max = addonFactory.db.getHostingPlanCriteria("maxDatabases");
-
-    db.GetUserDatabases(addonFactory.activeUser.name, function(err, dbs) {
-        if (err) {
-            jxpanel.server.sendCallBack(env, {err : err } );
-            return;
-        }
-
-        if (dbs.length >= max) {
-            jxpanel.server.sendCallBack(env, {err : "You cannot add any more databases. Your current limit is: " + max } );
-            return;
-        }
-
-        db.AddDB(env, params.op.pwd, function(err) {
-            jxpanel.server.sendCallBack(env, {err : err } );
-        });
-    });
+    db.AddDB(addonFactory, params.pwd, cb);
 });
 
 
-jxpanel.server.addJSMethod("removeDB", function (env, params) {
-
-    db.RemoveDB(env, params.op.selection, function (err) {
-        jxpanel.server.sendCallBack(env, {err: err });
-    });
+jxpanel.server.addJSMethod("removeDB", function (env, params, cb) {
+    var addonFactory = jxpanel.getAddonFactory(env);
+    db.RemoveDB(addonFactory, params.selection, cb);
 });
 
-jxpanel.server.addJSMethod("changePWD", function (env, params) {
-
-    db.ChangeUsersPasswords(env, params.op.selection, params.op.pwd, function (err) {
-        jxpanel.server.sendCallBack(env, {err: err });
-    });
+jxpanel.server.addJSMethod("changePWD", function (env, params, cb) {
+    var addonFactory = jxpanel.getAddonFactory(env);
+    db.ChangeUsersPasswords(addonFactory, params.selection, params.pwd, cb);
 });
 
 
 
-jxpanel.server.addJSMethod("mongoShell", function(env, params) {
+jxpanel.server.addJSMethod("mongoShell", function(env, params, cb) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
 
@@ -189,7 +171,7 @@ jxpanel.server.addJSMethod("mongoShell", function(env, params) {
             err = addonFactory.translate(err);
         }
         addonFactory.status.clear();
-        jxpanel.server.sendCallBack(env, {err : err } );
+        cb(err);
     };
 
     if (!addonFactory.activeUser.isAdmin)

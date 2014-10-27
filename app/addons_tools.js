@@ -17,6 +17,7 @@ var system_tools = require("./system_tools");
 var nginx = require("./install/nginx");
 var apps_tools = require("./rendering/apps_tools");
 var datatables = require("./rendering/datatable_templates");
+var datatables = require("./rendering/datatable_templates");
 var page_utils = require("./rendering/page_utils");
 var server = require("jxm");
 var smart_replace = require('./rendering/smart_search').replace;
@@ -26,6 +27,7 @@ var events = require("events");
 var validations = require("./definitions/validations");
 
 var addons = {};
+var addons_methods = {};
 
 var checkUpacked = function (addon_dir) {
 
@@ -75,6 +77,7 @@ var checkUpacked = function (addon_dir) {
     if (fs.existsSync(events_path)) {
         try {
             events = require(events_path);
+            events = require(events_path);
         } catch (ex) {
             // invalid file
             return { err : "AddOnEventsCannotRequire" };
@@ -87,13 +90,13 @@ var checkUpacked = function (addon_dir) {
         hostingPlanCriteria = callSingeEvent(this, "hostingPlanCriteria");
     }
 
-
     return { json: json, index: index, events : events, id :json.id, dir : addon_dir };
 };
 
 var unload = function (addon_name) {
 
     delete addons[addon_name];
+    delete addons_methods[addon_name];
     var index_path = path.join(site_defaults.dirAddons, addon_name, "index.js");
     delete require.cache[index_path];
 };
@@ -116,11 +119,16 @@ var load = function(addon_name) {
     return addons[addon_name];
 };
 
-var loadAll = function() {
+exports.loadAll = function() {
 
     var ls = fs.readdirSync(site_defaults.dirAddons);
-    for(var o in ls)
-        load(ls[o]);
+    for(var o in ls) {
+        var stats = fs.statSync(path.join(site_defaults.dirAddons, ls[o]));
+        if (stats.isDirectory())
+            load(ls[o]);
+    }
+
+    return addons;
 };
 
 
@@ -128,6 +136,12 @@ var copy = function () {
     // temporarily copies addons to server_apps folder
     var cmd = "cp -rf " + path.join(site_defaults.apps_folder, "../addons") + " " + site_defaults.apps_folder + path.sep;
     jxcore.utils.cmdSync(cmd);
+};
+
+var getArgs = function(active_user) {
+
+    var parsedUrl = url.parse(active_user.session.lastUrl, true);
+    return parsedUrl.query;
 };
 
 var getContents = function (env, active_user, cb) {
@@ -143,16 +157,13 @@ var getContents = function (env, active_user, cb) {
     // [4] = 2nd param name
     // [5] = 2nd param value
 
-    var parsedUrl = url.parse(active_user.session.lastUrl, true);
-    var addon_args = parsedUrl.query;
-
     if (!addon_name) {
         cb({ err: "AddOnUnknown" });
         return;
     }
 
     // just for development process
-    unload(addon_name);
+//    unload(addon_name);
 
     var addon = load(addon_name);
     if (addon.err) {
@@ -160,11 +171,10 @@ var getContents = function (env, active_user, cb) {
         return;
     }
 
-    active_user.session.addonCurrent = { instance : addon, args : addon_args };
-
     var wasError = false;
     try {
-        active_user.session.addonCurrent.instance.index.request(env, addon_args, function (err, html) {
+        var addon_args = getArgs(active_user);
+        addon.index.request(env, addon_args, function (err, html) {
             if (!wasError) {
                 cb(err, html);
             }
@@ -209,24 +219,24 @@ var smart_rule = [
 ];
 
 
-var extension_class = function (env, active_user, addonCurrent) {
+var extension_class = function (env, active_user, addon_id) {
 
     var __env = env;
     var __active_user = active_user;
     var __this = this;
-    var __addon = addonCurrent;
+    var __addon_id = addon_id;
 
     var __buttons = [];
     var __tabs = {};
 
     this.url = {
         addonsList : "addonm.html",
-        addon : "/addon.html?" + __addon.instance.id
+        addon : "/addon.html?" + __addon_id
     };
 
     this.table = {
         render: function (arr) {
-            return datatables.getDataTable(arr) + datatables.getClientTableScript() + '<script type="text/javascript">refreshtable();</script>';
+            return datatables.getDataTable(arr) + datatables.getClientTableScript(__active_user) + '<script type="text/javascript">refreshtable();</script>';
         }
     };
 
@@ -243,7 +253,9 @@ var extension_class = function (env, active_user, addonCurrent) {
         getServerButton: function (caption, method_name, args, addSelection, additionalStyle) {
             var _name = addSelection ? "utils.jxCallSelection" : "utils.jxCall";
 
-            var onclick = _name + "('" + method_name +"', " + (JSON.stringify(args) || "{}").replace(/"/g, "'") + "); return false";
+            if (!args) args = {};
+
+            var onclick = "window.jxAddonCall('" + method_name +"', " + (JSON.stringify(args)).replace(/"/g, "'") + ", " + addSelection + "); return false";
             var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, additionalStyle);
             return btn;
         }
@@ -254,7 +266,8 @@ var extension_class = function (env, active_user, addonCurrent) {
 
             var str = '<ul id="' + id + '" class="nav nav-tabs bordered">';
 
-            var currentTab = __addon.args.tab || null;
+            var args = getArgs(__active_user);
+            var currentTab = args.tab || null;
 
             for (var a in tabs) {
                 var tab = tabs[a];
@@ -312,6 +325,16 @@ var extension_class = function (env, active_user, addonCurrent) {
             // returning copy of the user object
             return JSON.parse(JSON.stringify(user));
         },
+        suspendUser : function(user_name, field_name) {
+            var user = database.getUser(user_name);
+            user.SuspendUser(__addon_id + "@" + field_name);
+            database.updateDBFile();
+        },
+        unSuspendUser : function(user_name, field_name) {
+            var user = database.getUser(user_name);
+            user.UnSuspendUser(__addon_id + "@" + field_name);
+            database.updateDBFile();
+        },
 //        getUserData : function(user_name) {
 //            if (!user_name)
 //                user_name = __active_user.username;
@@ -331,8 +354,8 @@ var extension_class = function (env, active_user, addonCurrent) {
 //        },
         get : function(sid) {
             var user = database.getUser(__active_user.username);
-            if (user && user.addons && user.addons[__addon.instance.id]) {
-                return user.addons[__addon.instance.id][sid];
+            if (user && user.addons && user.addons[__addon_id]) {
+                return user.addons[__addon_id][sid];
             }
 
             return null;
@@ -340,14 +363,14 @@ var extension_class = function (env, active_user, addonCurrent) {
         set : function(sid, value) {
             var user = database.getUser(__active_user.username);
             if (!user.addons) user.addons = {};
-            if (!user.addons[__addon.instance.id]) user.addons[__addon.instance.id] = {};
-            user.addons[__addon.instance.id][sid] = value;
+            if (!user.addons[__addon_id]) user.addons[__addon_id] = {};
+            user.addons[__addon_id][sid] = value;
             database.updateUser(user.name, user);
         },
         remove : function(sid) {
             var user = database.getUser(__active_user.username);
-            if (user && user.addons && user.addons[__addon.instance.id]) {
-                delete user.addons[__addon.instance.id][sid];
+            if (user && user.addons && user.addons[__addon_id]) {
+                delete user.addons[__addon_id][sid];
             }
             database.updateUser(user.name, user);
         },
@@ -359,7 +382,7 @@ var extension_class = function (env, active_user, addonCurrent) {
             var plan = database.getPlan(user.plan);
             if (!plan || !plan.planMaximums) return null;
 
-            return plan.GetMaximum(__addon.instance.id + "@" + field_name);
+            return plan.GetMaximum(__addon_id + "@" + field_name);
         }
     };
 
@@ -368,7 +391,7 @@ var extension_class = function (env, active_user, addonCurrent) {
         html = smart_replace(html, smart_rule);
 
         var file = "";
-        var file_name = path.join(site_defaults.dirAddons, __addon.instance.id, __tabs.current + ".html");
+        var file_name = path.join(site_defaults.dirAddons, __addon_id, "html", __tabs.current + ".html");
         if (fs.existsSync(file_name)) {
             file = fs.readFileSync(file_name).toString();
         }
@@ -385,7 +408,8 @@ var extension_class = function (env, active_user, addonCurrent) {
         else
             html = file + html;
 
-        return __this.header.renderButtons() + "<br><h1>" + __addon.instance.json.title + "</h1>" + html;
+        var title = addons[__addon_id].json.title;
+        return __this.header.renderButtons() + "<br><h1>" + title + "</h1>" + html;
     };
 
     this.translate = function(text) {
@@ -529,25 +553,99 @@ var form = function(id, env, active_user, options, factory) {
     };
 };
 
+// main method serving addons custom calls from client-side
+var addonCall = function(env, params) {
 
-global.jxpanel = {
-    getAddonFactory: function (env) {
-        var active_user = _active_user.getUser(env.SessionID);
-        if (!active_user) {
-            return {err: form_lang.Get("EN", "Access Denied") };
-        }
+    var active_user = _active_user.getUser(env.SessionID);
+    var lang = active_user ? active_user.lang : "EN";
+    var sendBack = function(err, params) {
+        var obj = {};
+        if (err) obj.err = form_lang.Get(lang, err, true);
+        if (params) obj.params = params;
+        server.sendCallBack(env, obj);
+        if (obj.err)
+            console.error("addonCall:", obj.err);
+    };
 
-        if (!active_user.session.addonCurrent )
-            return {err: form_lang.Get("EN", "AddOnUnknown") };
+    if (!active_user)
+        return sendBack("Access Denied");
 
-        //if (!active_user.session.addon_factory)
-        active_user.session.addonCurrent.factory = new extension_class(env, active_user, active_user.session.addonCurrent);
+    // for lastUrl = /addon.html?mongodb
+    // parsed.search will contain "?mongodb"
+    // I use this to obtain addons name
+    var parsedUrl = url.parse(active_user.session.lastUrl, true);
+    var addon_name = parsedUrl.search.slice(1);
 
-        return active_user.session.addonCurrent.factory;
-    },
-    server: require("jxm")
+    var method_name = params.op;
+
+    if (!method_name || !addons_methods[addon_name] || !addons_methods[addon_name][method_name])
+        return sendBack("UnknownMethod: " + method_name);
+
+    var wasError = false;
+    try {
+        addons_methods[addon_name][method_name](env, params, function(err, param) {
+            if (!wasError)
+                sendBack(err, params);
+        });
+        return;
+    } catch(ex) {
+        wasError = true;
+        return sendBack("AddOnMethodErrorWhileCalling|" + method_name + ". " + ex);
+    }
 };
 
+
+var getGlobal = function(addon_name) {
+    var __addon_name = addon_name;
+
+    this.getAddonFactory = function (env) {
+        var active_user = _active_user.getUser(env.SessionID);
+        if (!active_user)
+            return {err: form_lang.Get(active_user.lang, "Access Denied") };
+
+        return new extension_class(env, active_user, __addon_name);
+    };
+
+    this.server = {
+        addJSMethod : function(name, method) {
+
+            if (!addons_methods["__addonCall"]) {
+                server.addJSMethod("addonCall", addonCall);
+                addons_methods["__addonCall"] = true;
+            }
+
+            if (!addons_methods[__addon_name])
+                addons_methods[__addon_name] = {};
+
+            addons_methods[__addon_name][name] = method;
+        }
+    }
+};
+
+// returns instance of global panel api class for specific module
+// e.g. call : var jxpanel = global.getJXPanelAPI(this)
+global.getJXPanelAPI = function(module) {
+
+    if (!module)
+        throw "Cannot get JXPanel API. You must provide module reference as an argument.";
+
+    var fname = module.filename;
+    if (!fname && !fs.existsSync(fname))
+        throw "Cannot get JXPanel API. Invalid module reference.";
+
+    if (!module.parent && module.parent.filename !== __filename)
+        throw "Cannot get JXPanel API. Invalid module's parent.";
+
+    if (module.filename.slice(0, site_defaults.dirAddons.length) !== site_defaults.dirAddons)
+        throw "Cannot get JXPanel API. Invalid module path.";
+
+    var str = module.filename.slice(site_defaults.dirAddons.length);
+    var parsed = str.split(path.sep);
+
+    var addon_name = parsed[0];
+
+    return new getGlobal(addon_name);
+};
 
 var callSingeEvent = function(addon, event_name, args, cb) {
 
@@ -590,7 +688,7 @@ var callSingeEvent = function(addon, event_name, args, cb) {
 // however, gathers immediate return values
 exports.callEvent = function(event_name, args) {
 
-    loadAll();
+    exports.loadAll();
     var ret = {};
     for(var addon_name in addons)
         ret[addon_name] = callSingeEvent(addons[addon_name], event_name, args);
@@ -606,7 +704,7 @@ exports.checkHostingPlanCriteriaChanged = function(plan, planData, planMaximumsD
     if (!planMaximumsData)
         return;
 
-    loadAll();
+    exports.loadAll();
 
     var users = database.getUsersByPlanName(plan.name, 1e7);
     for(var o in users) {
@@ -628,6 +726,7 @@ exports.checkHostingPlanCriteriaChanged = function(plan, planData, planMaximumsD
             if (!addons[addon_name]) continue;
 
             var ret = { };
+            ret.user = user.name;
             ret.old = undefined;
             if (user.plan === plan.name) {
                 ret.old = planMaximumsData[field_name].old;
@@ -794,11 +893,4 @@ exports.install = function(active_user, zipFile, cb) {
             cb();
         }
     });
-};
-
-
-
-exports.getAddon = function(addon_name) {
-
-    return load(addon_name);
 };

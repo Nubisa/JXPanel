@@ -3,6 +3,6 @@
     "id" : "mongodb",
     "version" : "0.0.1",
     "title" : "MongoDB Manager",
-    "description" : "MongoDB Manager"
-
+    "description" : "MongoDB Manager",
+    "adminOnly" : false
 }

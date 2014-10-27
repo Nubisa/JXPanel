@@ -347,9 +347,15 @@
         });
     };
 
-    utils.jxCall = function (method_name, value, value2) {
+    utils.jxCall = function (method_name, op, id, args) {
 
-        window.toServer(method_name, { op: value, id : value2 }, function (param) {
+        var obj = { op : op };
+        if (id) obj.id = id;
+        if (args)
+            for(var o in args)
+                obj[o] = args[o];
+
+        window.toServer(method_name, obj, function (param) {
             if (param.err) {
                 utils.jxAddMessage('danger', param.err);
             } else {

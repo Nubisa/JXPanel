@@ -41,5 +41,20 @@
 
 {{view.includes}}
 
+<script type="text/javascript">
+    window.jxAddonCall = function(method_name, args, selection) {
+        args = args || {};
+
+        if (selection) {
+            args.selection = utils.jxGetSelection();
+            if (!args.selection)
+                return;
+        }
+
+        utils.jxCall("addonCall", method_name, null, args);
+        return false;
+    };
+</script>
+
 </body>
 </html>
