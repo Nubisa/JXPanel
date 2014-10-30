@@ -251,9 +251,12 @@ var extension_class = function (env, active_user, addon_id) {
             return form_lang.GetBool(__active_user.lang, value, labelTrue, labelFalse);
         },
         getServerButton: function (caption, method_name, args, addSelection, additionalStyle) {
-            var _name = addSelection ? "utils.jxCallSelection" : "utils.jxCall";
-
-            if (!args) args = {};
+            if (!args)
+                args = {};
+            else {
+                if (JSON.stringify(args).slice(0,1) !== "{")
+                    args = { arg : args };
+            }
 
             var onclick = "window.jxAddonCall('" + method_name +"', " + (JSON.stringify(args)).replace(/"/g, "'") + ", " + addSelection + "); return false";
             var btn = page_utils.getSingleButton(form_lang.Get(__active_user.lang, caption, true), "fa-plus", onclick, additionalStyle);
@@ -570,11 +573,15 @@ var addonCall = function(env, params) {
     if (!active_user)
         return sendBack("Access Denied");
 
-    // for lastUrl = /addon.html?mongodb
+    // for lastUrl = /addon.html?mongodb&tab=config
     // parsed.search will contain "?mongodb"
     // I use this to obtain addons name
     var parsedUrl = url.parse(active_user.session.lastUrl, true);
-    var addon_name = parsedUrl.search.slice(1);
+    var parsedArr = parsedUrl.search.replace(/&/g, "?").split("?");
+    var addon_name = parsedArr.length ? parsedArr[1] : null;
+
+    if (!addon_name || !addons[addon_name])
+        return sendBack("AddOnUnknown|" + addon_name);
 
     var method_name = params.op;
 
@@ -619,6 +626,15 @@ var getGlobal = function(addon_name) {
 
             addons_methods[__addon_name][name] = method;
         }
+    }
+
+    this.package = { json : null };
+    var json_path = path.join(site_defaults.dirAddons, addon_name, "package.json");
+    try {
+        var json_str = fs.readFileSync(json_path).toString();
+        this.package.json = JSON.parse(json_str);
+    } catch (ex) {
+        this.package.json = ex.toString();
     }
 };
 
@@ -893,4 +909,11 @@ exports.install = function(active_user, zipFile, cb) {
             cb();
         }
     });
+};
+
+
+
+exports.getAddon = function(addon_name) {
+
+    return load(addon_name);
 };
