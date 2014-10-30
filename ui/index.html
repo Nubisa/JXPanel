@@ -71,10 +71,14 @@
                                     <span id="buttons" class="jxbuttons" style="margin-top: 10px; float: right;">
                                         <i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;
 
-                                          <button id="btnSubmit" type="submit" class="jxbtn" disabled>
-                                              <i class="glyphicon glyphicon-log-in"></i>
-                                              <span class="dummy-label">{{label.SignIn}}</span>
-                                          </button>
+                                        <a id="btnSubmit" data-original-title="{{label.AddOnAddNew}}" class="jxbtn">
+                                            <i class="glyphicon glyphicon-log-in"></i><span class="dummy-label">{{label.SignIn}}</span>
+                                        </a>
+
+                                      <!--<button id="btnSubmit" type="submit" class="jxbtn" disabled>-->
+                                          <!--<i class="glyphicon glyphicon-log-in"></i>-->
+                                          <!--<span class="dummy-label">{{label.SignIn}}</span>-->
+                                      <!--</button>-->
                                     </span>
                                 </footer>
                             </form>
@@ -131,7 +135,7 @@
                             error.insertAfter(element.parent());
                         }
                     });
-                    $("#login-form").submit(function(e){
+                    var submitLogin = function(e){
                         document.getElementById("btnSubmit").disabled = "disabled";
                         var uname = document.getElementById("username{{utils.dateNow}}").value;
                         var pwd = document.getElementById("password{{utils.dateNow}}").value;
@@ -144,7 +148,7 @@
                                     if(result.err){
                                         document.getElementById('notify').innerHTML =
                                                 '<div class="note">'
-                                                        +'<span style="color:red">' + result.err + '</span>'
+                                                +'<span style="color:red">' + result.err + '</span>'
                                         '</div>';
 
                                         document.getElementById("btnSubmit").disabled = null;
@@ -155,7 +159,10 @@
                             }, 100);
                         }
                         return false;
-                    });
+                    };
+
+                    $("#login-form").submit(submitLogin);
+                    $("#btnSubmit").click(submitLogin);
                 });
             };
 		</script>
