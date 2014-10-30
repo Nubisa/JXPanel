@@ -90,6 +90,7 @@ exports.reload = function(onlyIfNeeded){
             return ret;
 
         exports.needsReload = false;
+        clog("Reloaded", "blue");
 
         return null;
     }

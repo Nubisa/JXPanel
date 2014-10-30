@@ -50,6 +50,11 @@ exports.form = function () {
         this.subPages = [ "/adddomain.html", "/applog.html" ];
         this.subForms = [ "appLog" ];
 
+        this.tabs = [
+            { label : "Domain Details", showAlways : true },
+            { label : "JXcoreAppApp" }
+        ];
+
         this.controls = [
             {"BEGIN": "Domain Details"},
 
@@ -197,54 +202,6 @@ exports.form = function () {
 
             {"END" : 1},
 
-            {"BEGIN": "JXcoreAppApp"},
-
-            {"INFO": "JXcoreAppAppInfo"  },
-
-            {
-                name: "jx_app_ghost",
-                details: {
-                    label: "Ghost",
-                    method: tool.createSimpleText,
-                    options: { },
-                    cannotInsert : true,
-                    getValue: function (active_user, values, listOrForm) {
-                        var domain_name = values["name"];
-                        return apps_tools.getAppStatus(active_user, domain_name, "Ghost");
-                    }
-                }
-            },
-
-            {
-                name: "jx_app_nodebb",
-                details: {
-                    label: "NodeBB",
-                    method: tool.createSimpleText,
-                    options: { },
-                    cannotInsert : true,
-                    getValue: function (active_user, values, listOrForm) {
-                        var domain_name = values["name"];
-                        return apps_tools.getAppStatus(active_user, domain_name, "NodeBB");
-                    }
-                }
-            },
-
-            {
-                name: "jx_app_meteor",
-                details: {
-                    label: "Meteor",
-                    method: tool.createSimpleText,
-                    options: { },
-                    cannotInsert : true,
-                    getValue: function (active_user, values, listOrForm) {
-                        var domain_name = values["name"];
-                        return apps_tools.getAppStatus(active_user, domain_name, "Meteor");
-                    }
-                }
-            },
-
-            {"END" : 1},
-
             {"BEGIN": "SSL"},
 
             {"INFO": "ValuesOnlyForEdit", OnEdit : false, prefix : "<code>", suffix : "</code>" },
@@ -282,7 +239,157 @@ exports.form = function () {
                 validation : new validations.SSLCertFileName(true)
             },
 
+            {"END" : 1},
+
+            {"INFO": "JXcoreAppAppInfo"  },
+
+            {"BEGIN": "Ghost", tab : 1},
+
+            {
+                name: "jx_app_ghost",
+                details: {
+                    label: "Ghost",
+                    method: tool.createSimpleText,
+                    options: { },
+                    cannotInsert : true,
+                    getValue: function (active_user, values, listOrForm) {
+                        var domain_name = values["name"];
+                        return apps_tools.getAppStatus(active_user, domain_name, "Ghost");
+                    }
+                }
+            },
+
+            {"END" : 1},
+
+            {"BEGIN": "NodeBB", tab : 1},
+
+            {
+                name: "jx_app_nodebb",
+                details: {
+                    label: "NodeBB",
+                    method: tool.createSimpleText,
+                    options: { },
+                    cannotInsert : true,
+                    getValue: function (active_user, values, listOrForm) {
+                        var domain_name = values["name"];
+                        return apps_tools.getAppStatus(active_user, domain_name, "NodeBB");
+                    }
+                }
+            },
+
+            {
+                name: "nodebb_mongodb_port",
+                details: {
+                    label: "MongoDB port",
+                    method: tool.createTextBox,
+                    options: { }
+                },
+                validation : new validations.Int(),
+                visibility : function(active_user, values, listOrForm) {
+                    var domain_name = values["name"];
+                    var data = apps_tools.getData(domain_name, "NodeBB");
+                    return data.exists;
+                }
+            },
+
+            {
+                name: "nodebb_mongodb_database",
+                details: {
+                    label: "MongoDB database",
+                    method: tool.createTextBox,
+                    options: { }
+                },
+//                validation : new validations.UserName()
+                visibility : function(active_user, values, listOrForm) {
+                    var domain_name = values["name"];
+                    var data = apps_tools.getData(domain_name, "NodeBB");
+                    return data.exists;
+                }
+            },
+
+            {
+                name: "nodebb_mongodb_username",
+                details: {
+                    label: "MongoDB username",
+                    method: tool.createTextBox,
+                    options: { }
+                },
+//                validation : new validations.UserName()
+                visibility : function(active_user, values, listOrForm) {
+                    var domain_name = values["name"];
+                    var data = apps_tools.getData(domain_name, "NodeBB");
+                    return data.exists;
+                }
+            },
+
+            {
+                name: "nodebb_mongodb_pwd",
+                details: {
+                    label: "MongoDB password",
+                    method: tool.createTextBox,
+                    options: { password : true },
+                    dbName: false
+                },
+                visibility : function(active_user, values, listOrForm) {
+                    var domain_name = values["name"];
+                    var data = apps_tools.getData(domain_name, "NodeBB");
+                    return data.exists;
+                }
+            },
+
+//            {
+//                name: "nodebb_admin_username",
+//                details: {
+//                    label: "Admin username",
+//                    method: tool.createTextBox,
+//                    options: { },
+//                    dbName: false
+//                }
+////                validation : new validations.UserName()
+//            },
+//
+//            {
+//                name: "nodebb_admin_email",
+//                details: {
+//                    label: "Admin email",
+//                    method: tool.createTextBox,
+//                    options: { },
+//                    dbName: false
+//                },
+//                validation : new validations.Email()
+//            },
+//
+//            {
+//                name: "nodebb_admin_pwd",
+//                details: {
+//                    label: "Admin password",
+//                    method: tool.createTextBox,
+//                    options: { password : true },
+//                    dbName: false
+//                }
+//            },
+
+
+            {"END" : 1},
+
+            {"BEGIN": "Meteor", tab : 1},
+
+            {
+                name: "jx_app_meteor",
+                details: {
+                    label: "Meteor",
+                    method: tool.createSimpleText,
+                    options: { },
+                    cannotInsert : true,
+                    getValue: function (active_user, values, listOrForm) {
+                        var domain_name = values["name"];
+                        return apps_tools.getAppStatus(active_user, domain_name, "Meteor");
+                    }
+                }
+            },
+
             {"END" : 1}
+
         ];
     };
 

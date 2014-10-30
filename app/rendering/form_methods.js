@@ -17,7 +17,8 @@ var site_defaults = require("./../definitions/site_defaults");
 var tools = require("./form_tools");
 var ftp = require("./../install/ftp");
 var apps_tools = require("./apps_tools");
-var events = require("../events")
+var events = require("../events");
+var ansi_regex = require("ansi-regex")();
 
 
 methods.tryLogin = function(env, params){
@@ -239,6 +240,10 @@ methods.sessionApply = function(env, params){
             }
         }
 
+        active_user.session.status = null;
+        if (errLabel)
+            errLabel = errLabel.replace(ansi_regex, "");
+
         server.sendCallBack(env, {arr: [ { msg: form_lang.Get(active_user.lang, errLabel, true), id : fakeId} ] });
     };
 
@@ -402,23 +407,37 @@ methods.sessionApply = function(env, params){
                 ret = database.updateDomain(update_name, domain);
 
                 if (!ret) {
-                    if (jx_app_path_changed || jx_app_type_changed) {
-                        if (jx_app_options && !jx_app_options.err) {
-                            var file = jx_app_options.cfg_path;
-                            if (fs.existsSync(file)) {
-                                fs.unlinkSync(file);
+
+                    var saveNginxConfig = function() {
+                        if (jx_web_log_changed || ssl_changed)
+                            return hosting_tools.appSaveNginxConfigPath(update_name, true);
+
+                        return null;
+                    };
+
+                    apps_tools.checkAppConfigChange(active_user, update_name, params.controls, function(err, changed) {
+                        if (err)
+                            return sendError(err);
+
+                        if (jx_app_path_changed || jx_app_type_changed || changed) {
+                            if (jx_app_options && !jx_app_options.err) {
+                                var file = jx_app_options.cfg_path;
+                                if (fs.existsSync(file)) {
+                                    fs.unlinkSync(file);
+                                }
                             }
+
+                            hosting_tools.appRestart(active_user, update_name, function(err) {
+                                if (err)
+                                    return sendError(err);
+                                else
+                                    return sendError(saveNginxConfig());
+                            });
+                        } else {
+                            return sendError(saveNginxConfig());
                         }
-                        hosting_tools.appRestart(active_user, update_name, function(err) {
-                            sendError(err);
-                        });
-                        return;
-                    }
-                    if (jx_web_log_changed || ssl_changed) {
-                        var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
-                        if (res.err)
-                            ret = res.err;
-                    }
+                    });
+                    return;
                 }
             } else {
                 var arr = hosting_tools.getFreePorts(2);
@@ -787,7 +806,7 @@ methods.appInstall = function (env, params) {
     }
 
     apps_tools.installUninstall(active_user, domain_name, params.id, params.op, function(par) {
-        var err = par.err ? form_lang.Get(active_user.lang, par.err, true) : false;
+        var err = par && par.err ? form_lang.Get(active_user.lang, par.err, true) : false;
         server.sendCallBack(env, {err: err });
     });
 
