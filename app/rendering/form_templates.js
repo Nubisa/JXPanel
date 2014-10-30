@@ -227,6 +227,8 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             tabs[i].arr = [];
             if (!tabs[i].id)
                 tabs[i].id = "formTab" + i;
+            if (tabs[i].label)
+                tabs[i].label = form_lang.Get(active_user.lang, tabs[i].label, true);
         }
     } else {
         tabs[0] = { arr : []};
@@ -269,6 +271,9 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         var name = controls[i].name;
         var ctrl = controls[i].details;
         if (!ctrl.method)
+            continue;
+
+        if (controls[i].visibility && !controls[i].visibility(active_user, values))
             continue;
 
         ctrl.options = ctrl.options || {};
