@@ -15,12 +15,15 @@ var Db = require('mongodb').Db,
     BSON = require('mongodb').pure().BSON,
     assert = require('assert');
 
-exports.port = null;
 
 var admin = {
     login: "jxpanel_admin",
     pwd: "jxpanel_admin_2015"
 };
+
+var jxpanel = global.getJXPanelAPI(module);
+exports.port = jxpanel.package.json.port;
+
 
 exports.AddDB = function (addonFactory, pwd, cb) {
 

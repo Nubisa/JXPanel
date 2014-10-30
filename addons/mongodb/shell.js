@@ -64,7 +64,7 @@ var getConfigPath = function() {
 
     var dirData = path.join(__dirname, "data");
 
-    console.error("dirData", dirData);
+//    console.error("dirData", dirData);
     if (!fs.existsSync(dirData))
         fs.mkdirSync(dirData);
 

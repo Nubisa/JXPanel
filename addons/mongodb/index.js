@@ -8,6 +8,7 @@ var db = require("./db");
 var shell = require("./shell");
 
 var jxpanel = global.getJXPanelAPI(module);
+var port = jxpanel.package.json.port;
 
 var getConfigForm = function(addonFactory, status) {
 
@@ -15,6 +16,7 @@ var getConfigForm = function(addonFactory, status) {
     form.allowEmpty = true;
     form.addSection("MongoDB Engine");
     form.addControl("simpleText", "txt1", { label : "Status", value : status.html, required : true });
+    form.addControl("simpleText", "txt2", { label : "Connection string", value : "mongodb://localhost:" + port, required : true });
 
     var btn = null;
     if (!status.installed)
@@ -30,7 +32,7 @@ var getConfigForm = function(addonFactory, status) {
     }
 
     if (btn)
-        form.addControl("simpleText", "txt2", { label : "Operation", value : btn, required : true });
+        form.addControl("simpleText", "txt22", { label : "Operation", value : btn, required : true });
 
 //    form.addControl("text", "txt2", { label : "my txt2", default : "some value 2" });
 //    form.addSection("Others");
@@ -52,13 +54,7 @@ var getConfigForm = function(addonFactory, status) {
 exports.request = function(env, args, cb) {
 
     var addonFactory = jxpanel.getAddonFactory(env);
-
-    if (!db.port) {
-        db.port = addonFactory.db.get("port") || 27027;  // mongodb has default 27017, let's not interfere with it
-    }
-
     var html = "";
-
     var initialized = addonFactory.db.get("initialized");
 
     var finalize = function() {
@@ -177,26 +173,26 @@ jxpanel.server.addJSMethod("mongoShell", function(env, params, cb) {
     if (!addonFactory.activeUser.isAdmin)
         return sendBack("Access Denied");
 
-    if (params.op === "start") {
+    if (params.arg === "start") {
         var res = shell.mongoStart();
         sendBack(res.err);
         return;
     }
 
-    if (params.op === "stop") {
+    if (params.arg === "stop") {
         var res = shell.mongoStop();
         sendBack(res.err);
         return;
     }
 
-    if (params.op === "install") {
+    if (params.arg === "install") {
         shell.mongoInstall(addonFactory, function(err) {
             sendBack(err);
         });
         return;
     }
 
-    if (params.op === "createAdmin") {
+    if (params.arg === "createAdmin") {
         db.CreateAdmin(addonFactory, function(err) {
             sendBack(err);
         });
