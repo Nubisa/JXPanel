@@ -16,7 +16,12 @@ runit() {
 }
 
 jx cpp.js;runit $?
-jx ftp.js $1;runit $?
+#jx ftp.js $1;runit $?
+
+OS_STR=$(jx -e "console.log(jxcore.utils.OSInfo().OS_STR)" 2>&1)
+
+cd nginx
+./build-nginx.sh $OS_STR
 
 echo "Done!"
 
