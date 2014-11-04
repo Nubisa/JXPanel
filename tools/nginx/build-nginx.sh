@@ -21,3 +21,4 @@ mv /nginx/nginx.jx $DIR/$1_nginx.jx
 cd $DIR
 rm -rf pcre-8.35
 make clean
+rm -rf /nginx

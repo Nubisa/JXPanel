@@ -1,12 +1,38 @@
+First
+run this as root:
+apt-get install -y git && cd ~ && mkdir GitHub && cd GitHub && git clone https://github.com/Nubisa/JXPanel
+
+
+
 UBUNTU
-    sudo apt-get -y install build-essential unzip gcc g++ libpam0g-dev automake autoconf
+    sudo apt-get -y install build-essential unzip gcc g++ libpam0g-dev automake autoconf git zip
     sudo apt-get install -y --reinstall zlibc zlib1g zlib1g-dev
     sudo apt-get install -y openssl*
 
 GENERAL
-    cd app/node_modules/authenticate-pam
-    jx install
+cd /home/nubisa
+curl http://jxcore.com/xi.sh | bash
 
-    cd app/node_modules/pty.js
-    jx install
+mkdir GitHub
+cd GitHub
+git clone https://github.com/Nubisa/JXPanel
+cd JXPanel
 
+cd app/node_modules/authenticate-pam
+# below cannot be made by root or sudo, otherwise there's error
+# npm WARN cannot run in wd authenticate-pam@0.2.2 node-gyp configure && node-gyp build (wd=/home/nubisa/GitHub/JXPanel/app/node_modules/authenticate-pam)
+jx install
+
+cd ../pty.js
+# below cannot be made by root or sudo, otherwise there's error
+# npm WARN cannot run in wd pty.js@0.2.4 node-gyp rebuild (wd=/home/nubisa/GitHub/JXPanel/app/node_modules/pty.js)
+jx install
+
+cd ../../
+jx install jxm
+
+cd ../../tools
+sudo ./install.sh JXPanel
+
+cd ../app
+sudo jx index.js install
