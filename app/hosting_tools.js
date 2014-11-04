@@ -9,6 +9,7 @@ var _active_user = require("./definitions/active_user");
 var path = require("path");
 var fs = require("fs");
 var exec = require('child_process').exec;
+var http = require("http");
 var https = require("https");
 var user_folders = require("./definitions/user_folders");
 var system_tools = require("./system_tools");
@@ -128,14 +129,14 @@ exports.appGetOptions = function (domain_name, domain_data) {
     if (!plan)
         return { err: "PlanInvalid" };
 
-    var json = {
-        "monitor": {
-            "https": {
-                "httpsKeyLocation": site_defaults.dirMonitorCertificates + "server.key",
-                "httpsCertLocation": site_defaults.dirMonitorCertificates + "server.crt"
-            }
-        }
-    };
+    var json = { monitor : {} };
+    if (isMonitorSecured()) {
+        json.monitor.https = {
+            "httpsKeyLocation": site_defaults.dirMonitorCertificates + "server.key",
+            "httpsCertLocation": site_defaults.dirMonitorCertificates + "server.crt"
+        };
+    }
+
     var add = function (field_name, value, isBool) {
         if (!value && isBool)
             value = false;
@@ -247,10 +248,12 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
     if (current !== cfg) {
         fs.writeFileSync(cfgPath, cfg);
         nginx.needsReload = true;
+    }
 
-        if (reloadIfNeeded) {
-            nginx.reload(true);
-        }
+    if (reloadIfNeeded) {
+        var res = nginx.reload(true);
+        if (res)
+            return { err : res };
     }
 
     return false;
@@ -623,7 +626,8 @@ exports.saveMonitorConfig = function (jxPath) {
         "monitor": {
             "log_path": dir + "jx_monitor_[WEEKOFYEAR]_[YEAR].log",
             //"users": [ "psaadm" ],
-            "https": {
+            // temporarily disabled SLL for monitor
+            "https1": {
                 "httpsKeyLocation": site_defaults.dirMonitorCertificates + "server.key",
                 "httpsCertLocation": site_defaults.dirMonitorCertificates + "server.crt"
             }
@@ -647,11 +651,43 @@ exports.getJXPath = function () {
     return { err: "JXcoreNotInstalled" }
 };
 
+var _isMonitorSecured = null;
+
+var isMonitorSecured = function() {
+
+    if (_isMonitorSecured !== null)
+        return _isMonitorSecured;
+
+    var jxpath = exports.getJXPath();
+    if (jxpath.err) {
+        // default
+        _isMonitorSecured = true;
+        return _isMonitorSecured;
+    }
+
+    var cfg_file = path.join(jxpath, "jx.config");
+    if (!fs.existsSync(cfg_file)) {
+        _isMonitorSecured = false;
+        return _isMonitorSecured;
+    }
+
+    try {
+        var str = fs.readFileSync(cfg_file).toString();
+        var json = JSON.parse(str);
+        _isMonitorSecured = json && json.monitor && json.monitor.https ? true : false;
+    } catch(ex) {
+        _isMonitorSecured = false;
+    }
+
+    return _isMonitorSecured;
+};
 
 exports.getMonitorJSON = function (parse, cb) {
     if (!cb) {
         return;
     }
+
+    var module = isMonitorSecured() ? https : http;
 
     var options = {
         hostname: 'localhost',
@@ -661,7 +697,7 @@ exports.getMonitorJSON = function (parse, cb) {
         rejectUnauthorized: false
     };
 
-    https.get(options,function (res) {
+    module.get(options,function (res) {
         var body = "";
 
         res.on('data', function (chunk) {
