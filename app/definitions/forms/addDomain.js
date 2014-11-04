@@ -271,6 +271,7 @@ exports.form = function () {
                     options: { },
                     cannotInsert : true,
                     getValue: function (active_user, values, listOrForm) {
+                        if (!values || !values["name"]) return false;
                         var domain_name = values["name"];
                         return apps_tools.getAppStatus(active_user, domain_name, "NodeBB");
                     }
@@ -286,6 +287,7 @@ exports.form = function () {
                 },
                 validation : new validations.Int(),
                 visibility : function(active_user, values, listOrForm) {
+                    if (!values || !values["name"]) return false;
                     var domain_name = values["name"];
                     var data = apps_tools.getData(domain_name, "NodeBB");
                     return data.exists;
@@ -301,6 +303,7 @@ exports.form = function () {
                 },
 //                validation : new validations.UserName()
                 visibility : function(active_user, values, listOrForm) {
+                    if (!values || values["name"]) return false;
                     var domain_name = values["name"];
                     var data = apps_tools.getData(domain_name, "NodeBB");
                     return data.exists;
@@ -316,6 +319,7 @@ exports.form = function () {
                 },
 //                validation : new validations.UserName()
                 visibility : function(active_user, values, listOrForm) {
+                    if (!values || !values["name"]) return false;
                     var domain_name = values["name"];
                     var data = apps_tools.getData(domain_name, "NodeBB");
                     return data.exists;
@@ -331,6 +335,7 @@ exports.form = function () {
                     dbName: false
                 },
                 visibility : function(active_user, values, listOrForm) {
+                    if (!values || !values["name"]) return false;
                     var domain_name = values["name"];
                     var data = apps_tools.getData(domain_name, "NodeBB");
                     return data.exists;

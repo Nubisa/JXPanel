@@ -409,8 +409,11 @@ methods.sessionApply = function(env, params){
                 if (!ret) {
 
                     var saveNginxConfig = function() {
-                        if (jx_web_log_changed || ssl_changed)
-                            return hosting_tools.appSaveNginxConfigPath(update_name, true);
+                        if (jx_web_log_changed || ssl_changed) {
+                            var res = hosting_tools.appSaveNginxConfigPath(update_name, true);
+                            if (res.err)
+                                return res.err;
+                        }
 
                         return null;
                     };
@@ -684,13 +687,11 @@ methods.appStartStop = function (env, params) {
         }
 
         hosting_tools.appStartStop(params.op, params.id, function(err, domain_name, online_before) {
-            if (err) err = form_lang.Get(active_user.lang, err, true);
 
             // JXPanel should know, whether user wanted to start or stop an app
             var domain = database.getDomain(params.id);
             domain.jx_enabled = params.op;
             database.updateDomain(params.id, domain);
-
 
             // reading new status of the app
             var addDomain = require("../definitions/forms/addDomain").form();
@@ -701,7 +702,7 @@ methods.appStartStop = function (env, params) {
                 active_user.session.monitor = { isOnline : !err2 && ret, json : ret };
                 var status = controls["jx_app_status"].details.getValue(active_user, { name : params.id });
                 active_user.session.monitor = null;
-                server.sendCallBack(env, {err: err || err2, status : status.err || status, div : params.div });
+                server.sendCallBack(env, {err: err ? err : err2, status : status, div : params.div });
             });
         });
     }

@@ -376,10 +376,11 @@
         window.jxstatus = start ? "{{label.JXcoreAppStarting}}" : "{{label.JXcoreAppStopping}}";
 
         window.toServer("appStartStop", { op: start, id : domain_name, div : div }, function (param) {
+
+            $("#jxAppStatus_" + div).html(param.status);
+
             if (param.err) {
                 utils.jxAddMessage('danger', param.err);
-            } else {
-                $("#jxAppStatus_" + div).html(param.status);
             }
         }, true, true);
 

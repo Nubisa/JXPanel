@@ -8,7 +8,7 @@ var http = require("http");
 var srv = http.createServer(function (req, res) {
     // sending back to client
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end("ok 2000, url = " + req.url );
+    res.end("ok, url = " + req.url );
 });
 
 srv.on('error', function (e) {
