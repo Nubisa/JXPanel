@@ -8,7 +8,24 @@ var clog = jxcore.utils.console.log;
 var nginx_dir = site_defaults.apps_folder + sep + "nginx";
 var nginx_process =  nginx_dir + sep + "sbin" + sep + "nginx";
 
+var nginxconf = require("../spawner/nginxconf");
+var server = require("jxm");
+
 exports.needsReload = false;
+
+var getPorts = function() {
+    var opts = null;
+
+    var dev_config = pathModule.join(__dirname, '../app.dev_config');
+    if(fs.existsSync(dev_config)){
+        opts = JSON.parse(fs.readFileSync(dev_config) + "");
+    }
+
+    return {
+        http : opts && opts.port ? opts.port : server.getConfig("httpServerPort") || 80,
+        https : opts && opts.securePort ? opts.securePort : server.getConfig("httpsServerPort") || 443
+    }
+};
 
 var updateConfFile = function() {
 
@@ -23,6 +40,21 @@ var updateConfFile = function() {
             fs.writeFileSync(conf_file, str);
         }
     }
+
+    var conf_dir = site_defaults.dirNginxConfigs ;//= pathModule.join(nginx_dir, "conf/jxcore/_default.conf");
+    if (!fs.existsSync(site_defaults.dirNginxConfigs))
+        fs.mkdirSync(site_defaults.dirNginxConfigs);
+
+    var conf_file_default = pathModule.join(site_defaults.dirNginxConfigs, "_default.conf");
+
+    var contents = "";
+    if (fs.existsSync(conf_file_default))
+        contents = fs.readFileSync(conf_file_default).toString();
+
+    var cfg = nginxconf.createDefaultConfig();
+
+    if (contents !== cfg)
+        fs.writeFileSync(conf_file_default, cfg);
 };
 
 
@@ -45,9 +77,12 @@ exports.start = function(){
     if(os_info.isDebian || os_info.isUbuntu || os_info.isRH){
         clog("Starting NGINX", "green");
         var ret = jxcore.utils.cmdSync(nginx_process + " -p "+ nginx_dir);
-        if(ret.exitCode !== 0)
+        if(ret.exitCode !== 0) {
+            console.error("Could not start nginx:", ret.out);
             return ret;
+        }
 
+        clog("Started", "blue");
         return null;
     }
     else{
@@ -62,9 +97,12 @@ exports.stop = function(){
         clog("Stopping NGINX", "green");
 
         var ret = jxcore.utils.cmdSync(nginx_process + " -s stop -p "+ nginx_dir);
-        if(ret.exitCode !== 0)
+        if(ret.exitCode !== 0) {
+            console.error("Could not stop nginx:", ret.out);
             return ret;
+        }
 
+        clog("Stopped", "blue");
         return null;
     }
     else{
@@ -73,7 +111,7 @@ exports.stop = function(){
     }
 };
 
-// returns null if it's successfull otherwise returns ret{exitCode, out}
+// returns null if it's successful otherwise returns ret{exitCode, out}
 exports.reload = function(onlyIfNeeded){
 
     if (onlyIfNeeded && !exports.needsReload)
@@ -86,8 +124,12 @@ exports.reload = function(onlyIfNeeded){
         updateConfFile();
 
         var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir);
-        if(ret.exitCode !== 0)
-            return ret;
+        if(ret.exitCode !== 0) {
+            console.error("Not reloaded:", ret.out);
+            // removing path from output to the user
+            var str = ret.out.replace(new RegExp(nginx_dir, "ig"), "[...]");
+            return str;
+        }
 
         exports.needsReload = false;
         clog("Reloaded", "blue");

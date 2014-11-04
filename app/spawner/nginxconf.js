@@ -41,7 +41,7 @@ exports.createConfig = function(domain, node_ports, log_location, directives, ss
         sports.push("443");
 
     config_str +=
-        'upstream jxcore_target{\n'
+        'upstream jxcore_target_' + domain + ' {\n'
        +'  server 127.0.0.1:'+ node_ports[0] +';\n'
       // when this was present, changes in domain's config and reloading nginx did not have immediate effect
       // since old connection was still kept
@@ -56,23 +56,70 @@ exports.createConfig = function(domain, node_ports, log_location, directives, ss
                 "server{\n"
                     +"  listen "+ip+":"+sport+ (sport=='443'?' ssl;':';') + '\n'
                     +"  server_name "+domain+";\n"
+                    +"  server_name www."+domain+";\n"
+                    +"  server_name ipv4."+domain+";\n"
                     +(sport=='443'?"  ssl on;\n":'')
                     +(sport=='443'?"  ssl_certificate_key " + ssl_info.key + ";\n" : "")
                     +(sport=='443'?"  ssl_certificate " + ssl_info.crt + ";\n" : "")
                     +"  location / {\n"
-                    +"    proxy_pass http://jxcore_target;\n"
+                    +"    proxy_pass http://jxcore_target_" + domain + ";\n"
                     +"    proxy_read_timeout 9999999;\n"
                     +"    proxy_http_version 1.1;\n"
                     +"    proxy_set_header Upgrade $http_upgrade;\n"
                     +"    proxy_set_header Connection \"Upgrade\";\n"
-                    +"  }\n"
+
+                    +"    proxy_set_header Host $host;\n"
+                    +"    proxy_set_header X-Real-IP $remote_addr;\n"
+
+                    +"  }\n";
+
+            if (log_location) str_config += ""
                     +"  location /jxcore_logs {\n"
                     +"    autoindex on;\n"
                     +"    alias "+log_location+";\n"
                     +"    add_header Content-type text/plain;\n"
-                    +"  }\n"
+                    +"  }\n";
+
+            str_config += ""
                     +directives
                     +"}\n";
+
+            config_str += str_config + "\n\n";
+        }
+    }
+
+    return config_str;
+};
+
+
+
+exports.createDefaultConfig = function(){ // node_ports is an array (first http, second https)
+
+    var sports = ["80", "443"];
+    var config_str = "";
+
+    for(var i in sports){
+        var sport = sports[i];
+        for(var o in ifc_list){
+            var ip = ifc_list[o];
+            var str_config =
+                "server{\n"
+                +"  listen "+ip+":"+sport+' default_server;' + '\n'
+//                +"  listen "+ip+":"+sport+ (sport=='443'?' ssl;':';') + '\n'
+//                +(sport=='443'?"  ssl on;\n":'')
+//                +"  location / {\n"
+//                +"    proxy_pass http://jxcore_target_" + domain + ";\n"
+//                +"    proxy_read_timeout 9999999;\n"
+//                +"    proxy_http_version 1.1;\n"
+//                +"    proxy_set_header Upgrade $http_upgrade;\n"
+//                +"    proxy_set_header Connection \"Upgrade\";\n"
+//
+                +"    proxy_set_header Host $host;\n"
+                +"    proxy_set_header X-Real-IP $remote_addr;\n"
+                + " return 404;"
+
+
+                +"}\n";
 
             config_str += str_config + "\n\n";
         }
