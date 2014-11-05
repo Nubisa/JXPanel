@@ -273,7 +273,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         if (!ctrl.method)
             continue;
 
-        if (controls[i].visibility && !controls[i].visibility(active_user, values))
+        if (controls[i].visibility && !controls[i].visibility(active_user, values, formName))
             continue;
 
         ctrl.options = ctrl.options || {};
@@ -305,7 +305,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             continue;
 
         if (ctrl.getDescription && typeof ctrl.getDescription === "function") {
-            ctrl.options.extra.description = ctrl.getDescription(active_user, values);
+            ctrl.options.extra.description = ctrl.getDescription(active_user, values, formName);
         }
 
         if (ctrl.getValuesList)

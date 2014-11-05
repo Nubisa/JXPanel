@@ -161,7 +161,7 @@ var sessionAdd = function(env, active_user, params){
                    continue;
                }
 
-               var res = valids[a].validate(env, active_user, params.controls[o], params);
+               var res = valids[a].validate(env, active_user, params.controls[o], params, o);
 
 
                if(!res.result){
@@ -843,6 +843,27 @@ methods.langUpdate = function (env, params) {
     console.log(params);
     var changed = form_lang.langUpdate(params);
     server.sendCallBack(env, { err : false, changed : changed });
+};
+
+
+methods.addSubDomain = function (env, params) {
+
+    var active_user = _active_user.checkUser(env);
+    if (!active_user)
+        return;
+
+    var domain = database.getDomain(params.id);
+    if (!domain)
+        return server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "DomainNotFound", true) });
+
+    if (domain.main_domain_name)
+        return server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "SubDomainCanOnlyAddToDomain", true) });
+
+    active_user.session.edits = active_user.session.edits || {};
+    // remembers main domain name
+    active_user.session.edits.addSubdomainForDomain = params.id;
+    active_user.session.edits.allowPage = "/adddomain.html";
+    server.sendCallBack(env, { err : false });
 };
 
 

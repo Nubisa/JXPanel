@@ -12,6 +12,7 @@ var fs = require("fs");
 var pam = require('authenticate-pam');
 var form_tools = require('../rendering/form_tools');
 var apps_tools = require('../rendering/apps_tools');
+var addDomain = require("../definitions/forms/addDomain");
 
 // forces the form to ask user a question in order to confirm something
 var needToConfirm = function(active_user, formName, input_id, title, confirm_text) {
@@ -225,11 +226,16 @@ exports.Domain = function() {
 
     this.validate = function (env, active_user, val) {
 
-        // todo: better email validation
-        var reg = new RegExp("^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,4}$", "i");
+        var reg = new RegExp("^([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.)+[a-zA-Z]{2,4}$", "i");
 
         if (!reg.test(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "DomainInvalid", true)};
+
+        var changed = false;
+        if (val.slice(0,4).toLowerCase() === "www.") {
+            val = val.slice(4);
+            changed = true;
+        }
 
         if (database.getDomain(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "DomainAlreadyExists", true)};
@@ -243,6 +249,53 @@ exports.Domain = function() {
         var needed = domains.length * 2 + 2;
         if (max - min < needed)
             return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, max - min] )};
+
+        // value update
+        if (changed) params.controls[field_name] = val;
+        return {result: true};
+    };
+};
+
+
+exports.SubDomain = function() {
+
+    this.validate = function (env, active_user, val, params, field_name) {
+
+        var reg = new RegExp("^([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.)+$", "i");
+
+        if (!reg.test(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "SubDomainInvalid", true)};
+
+        // value update
+        if (val.slice(0,4).toLowerCase() === "www.")
+            val = val.slice(4);
+
+        var main_domain = addDomain.getMainDomainName(active_user, params.form);
+        if (!main_domain)
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainNotFoundForSubdomain", true)};
+
+        if (val.slice(-main_domain.length) === main_domain)
+            return {result: false, msg: form_lang.Get(active_user.lang, "SubDomainName_Description", true, [ main_domain ])};
+
+        // expanding to full domain name
+        val = val + "." + main_domain;
+
+        if (database.getDomain(val))
+            return {result: false, msg: form_lang.Get(active_user.lang, "DomainAlreadyExists", true)};
+
+        var domains = database.getDomainsByUserName(null, 1e5);
+
+        var cfg = database.getConfig();
+        var min = cfg.jx_app_min_port;
+        var max = cfg.jx_app_max_port;
+
+        var needed = domains.length * 2 + 2;
+        if (max - min < needed)
+            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, max - min] )};
+
+        // value update
+        params.controls[field_name] = val;
+        params.controls["main_domain_name"] = main_domain;
 
         return {result: true};
     };

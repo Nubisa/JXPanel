@@ -206,8 +206,14 @@ var apply_smart = function(file, req, res, data){
             }
 
             if (_user.session.lastPath !== req.path && !match) {
-                if (_user.session.edits)
-                    delete _user.session.edits;
+                if (_user.session.edits) {
+                    var clear = true;
+                    if (_user.session.edits.allowPage)
+                        clear = _user.session.edits.allowPage !== req.path;
+
+                    if (clear)
+                        delete _user.session.edits;
+                }
 
                 delete _user.session.forms;
                 _user.session.forms = {};

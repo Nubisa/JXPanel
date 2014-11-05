@@ -34,6 +34,27 @@ var resetInterfaces = function () {
 }();
 
 
+exports.isSubdomain = function(active_user, formName) {
+
+    return exports.getMainDomainName(active_user, formName) ? true : false;
+};
+
+
+exports.getMainDomainName = function(active_user, formName) {
+
+    var isUpdate = _active_user.isRecordUpdating(active_user, formName);
+    if (!isUpdate)
+        return active_user.session.edits && active_user.session.edits.addSubdomainForDomain ? active_user.session.edits.addSubdomainForDomain : false;
+
+    // it is an update
+    var domain = database.getDomain(isUpdate);
+    if (!domain)
+        return false;
+
+    return domain.main_domain_name;
+};
+
+
 exports.form = function () {
 
     var func = function () {
@@ -67,7 +88,38 @@ exports.form = function () {
                     dbName: "name", // alias to `name` in object database.getDomain();
                     cannotEdit: true
                 },
-                validation : new validations.Domain()
+                validation : new validations.Domain(),
+                visibility : function(active_user, values, formName) {
+                    return !exports.isSubdomain(active_user, formName);
+                }
+            },
+
+            {
+                name: "subdomain_name",
+                details: {
+                    label: "SubDomainName",
+                    method: tool.createTextBox,
+                    options: { required: true, prefix: "www." },
+                    dbName: "name", // alias to `name` in object database.getDomain();
+                    cannotEdit: true,
+                    getDescription : function(active_user, values, formName) {
+                        return form_lang.Get(active_user.lang, "SubDomainName_Description", true, [ exports.getMainDomainName(active_user, formName) ] );
+                    }
+                },
+                validation : new validations.SubDomain(),
+                visibility : function(active_user, values, formName) {
+                    return exports.isSubdomain(active_user, formName);
+                }
+            },
+
+            {
+                name: "main_domain_name",
+                details: {
+                    label: "SubDomainName",
+                    method: null,
+                    options: { },
+                    cannotEdit: true
+                }
             },
 
             {

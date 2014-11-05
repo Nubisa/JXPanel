@@ -107,6 +107,7 @@ exports.Labels = {
     "AddPlan": "Add new hosting plan",
     "EditPlan": "Edit hosting plan",
     "AddDomain": "Add new domain",
+    "AddSubDomain": "Add new subdomain",
     "EditDomain": "Edit domain data",
     "AppLog": "JXcore Application Log",
 
@@ -312,6 +313,7 @@ exports.Labels = {
     "DomainInvalid" : "Please enter a valid domain name.",
     "DomainAlreadyExists" : "Domain already exists.",
     "DomainNotFound" : "Domain not found.",
+    "DomainNotFoundForSubdomain" : "Domain not found for subdomain.",
     "DomainCannotAdd" : "Cannot add domain.",
     "DomainCannotRemoveDir" : "Cannot remove domain's directory.",
     "DomainHomeDirDoesNotExist" : "Domain's home directory does not exist.",
@@ -319,6 +321,12 @@ exports.Labels = {
     "DomainEnableSSL_Description" : "When you enable SSL option, no changes in Node application are required. Just keep non-SSL (http) server running in your application, and SSL will be applied automatically with certificate files provided below.",
     "DomainSSLCertFile" : "SSL certificate file",
     "DomainSSLKeyFile" : "SSL certificate key file",
+
+    "SubDomainName" : "Subdomain",
+    "SubDomainName_Description" : "Please enter only subdomain name (without trailing %s).",
+    "SubDomainEnterName" : "Please enter subdomain name",
+    "SubDomainInvalid" : "Please enter a valid subdomain name.",
+    "SubDomainCanOnlyAddToDomain" : "Cannot add subdomain for another subdomain. Please, choose domain instead.",
 
     "IPv4" : "IPv4 address",
     "IPv6" : "IPv6 address",

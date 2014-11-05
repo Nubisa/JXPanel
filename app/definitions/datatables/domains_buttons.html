@@ -1,6 +1,34 @@
-<a id="btn_refresh" data-original-title="{{label.AddDomain}}" class="jxbtn" onclick="document.location = 'adddomain.html';">
+<script type="text/javascript">
+
+    window.addSubdomain = function() {
+        var ids = utils.jxGetSelection();
+
+        if (!ids.length) {
+            addMessage("{{label.EmptySelection}}");
+            return;
+        }
+
+        if (ids.length !== 1) {
+            addMessage("{{label.SelectOnlyOneRow}}");
+            return;
+        }
+
+        window.toServer("addSubDomain", { id : ids[0] }, function (param) {
+            if (param.err) {
+                utils.jxAddMessage('danger', param.err);
+            } else {
+                document.location = 'adddomain.html'
+            }
+        });
+    };
+</script>
+
+<a id="btn_add" data-original-title="{{label.AddDomain}}" class="jxbtn" onclick="document.location = 'adddomain.html';">
     <i class="fa fa-plus"></i><span class="dummy-label">{{label.AddDomain}}</span>
 </a>
-<a id="btn_add" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows();">
+<a id="btn_add_sub" data-original-title="{{label.AddSubDomain}}" class="jxbtn" onclick="return window.addSubdomain();">
+    <i class="fa fa-plus"></i><span class="dummy-label">{{label.AddSubDomain}}</span>
+</a>
+<a id="btn_remove" data-original-title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows(); return false;">
     <i class="fa fa-trash-o"></i><span class="dummy-label">{{label.RemoveSelected}}</span>
 </a>
