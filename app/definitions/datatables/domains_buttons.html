@@ -1,24 +1,48 @@
 <script type="text/javascript">
 
     window.addSubdomain = function() {
+
+        var add = function(domain) {
+            window.toServer("addSubDomain", { id : domain }, function (param) {
+                if (param.err) {
+                    utils.jxAddMessage('danger', param.err);
+                } else {
+                    document.location = 'adddomain.html'
+                }
+            });
+        };
+
         var ids = utils.jxGetSelection();
+        if (ids.length === 1)
+            return add(ids[0]);
 
-        if (!ids.length) {
-            addMessage("{{label.EmptySelection}}");
-            return;
-        }
 
-        if (ids.length !== 1) {
-            addMessage("{{label.SelectOnlyOneRow}}");
-            return;
-        }
+        window.toServer("getUserDomains", null, function (param) {
+            if (!param || param.err)
+                return  utils.jxAddMessage('danger', param.err);
 
-        window.toServer("addSubDomain", { id : ids[0] }, function (param) {
-            if (param.err) {
-                utils.jxAddMessage('danger', param.err);
-            } else {
-                document.location = 'adddomain.html'
-            }
+            if (!param.res)
+                return  utils.jxAddMessage('danger', "{{label.DomainsNone}}");
+
+            param.res = "[" + param.res.join("][") + "]";
+
+            $.SmartMessageBox({
+                title : '<i class="fa fa-globe txt-color-orangeDark"></i> {{label.AddSubDomain}}',
+                content : "{{label.DomainsSelectForSubdomain}}",
+                buttons : "[{{label.No}}][{{label.Yes}}]",
+                input : "select",
+                options: param.res,
+                placeholder : "Select"
+            }, function(ButtonPress, selected) {
+                if (ButtonPress == "{{label.Yes}}") {
+
+                    if (!selected || selected.indexOf(" ") !== -1)
+                        return  utils.jxAddMessage('danger', "{{label.DomainsSelectForSubdomain}}");
+
+                    add(selected);
+                }
+            });
+
         });
     };
 </script>

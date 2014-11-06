@@ -859,12 +859,88 @@ methods.addSubDomain = function (env, params) {
     if (domain.main_domain_name)
         return server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "SubDomainCanOnlyAddToDomain", true) });
 
+    var is_my_domain = database.isOwnerOfDomain(active_user.username, params.id);
+    var is_parents_domain = false;
+
+    if (!is_my_domain) {
+        if (!_active_user.isAdmin(active_user)) {
+            var parent_user = database.getParentUserByUserName(active_user.username);
+            if (!parent_user)
+                return server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "DBCannotGetParentUser", true) });
+
+            is_parents_domain = database.isOwnerOfDomain(parent_user.name, params.id)
+        } else {
+            // i am superuser
+            is_parents_domain = true;
+        }
+    }
+
+    if (!is_my_domain && !is_parents_domain)
+        return server.sendCallBack(env, { err : form_lang.Get(active_user.lang, "Access Denied", true) });
+
     active_user.session.edits = active_user.session.edits || {};
     // remembers main domain name
     active_user.session.edits.addSubdomainForDomain = params.id;
     active_user.session.edits.allowPage = "/adddomain.html";
     server.sendCallBack(env, { err : false });
 };
+
+
+methods.getUserDomains = function (env, params) {
+
+    var active_user = _active_user.checkUser(env);
+    if (!active_user)
+        return;
+
+    var user = database.getUser(active_user.username);
+    if (!user)
+        return server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "DBCannotGetUser", true) });
+
+    var my_domains = database.getDomainsByUserName(active_user.username);
+    var parent_user_domains = [];
+
+    if (!_active_user.isAdmin(active_user)) {
+        var plan = database.getPlan(user.plan);
+        if (!plan)
+            return server.sendCallBack(env, {err: form_lang.Get(active_user.lang, "DBCannotGetPlan", true) });
+
+        var parent_user_domains = database.getDomainsByUserName(plan.owner);
+    }
+
+    var arr = [], arr1 = [], arr2 = [];
+
+    if (my_domains.length) {
+        for(var o in my_domains) {
+            var d = database.getDomain(my_domains[o])
+            if (d && !d.main_domain_name)
+                arr1.push(my_domains[o]);
+        }
+    }
+
+    if (my_domains.length) {
+        for(var o in parent_user_domains) {
+            var d = database.getDomain(parent_user_domains[o])
+            if (d && !d.main_domain_name)
+                arr2.push(parent_user_domains[o]);
+        }
+    }
+
+    if (arr1.length) {
+        var header = arr2.length ? ["My domains:"] : [];
+        arr = arr.concat(header, arr1);
+    }
+    if (arr2.length) {
+        var header = arr1.length ? [""] : [];
+        arr = arr.concat(header, ["Parent user domains:"], arr2);
+    }
+
+    //console.log("getUserDomains", arr);
+    var err = arr.length ? false : form_lang.Get(active_user.lang, "DomainsNone", true);
+
+    server.sendCallBack(env, { err : err, res : arr });
+};
+
+
 
 
 module.exports = methods;

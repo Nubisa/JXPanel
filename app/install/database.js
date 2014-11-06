@@ -838,6 +838,21 @@ exports.getParentPlanName = function(name){
     return user.plan;
 };
 
+exports.getParentUserByUserName = function(user_name){
+    var me = Users[user_name];
+    if(!me)
+        return null;
+
+    var plan = Plans[me.plan];
+    if(!plan)
+        return null;
+
+    var user = Users[plan.owner];
+    return user;
+};
+
+
+
 exports.getUser = function(name){
     return Users[name];
 };

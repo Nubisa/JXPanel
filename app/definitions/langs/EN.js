@@ -321,6 +321,8 @@ exports.Labels = {
     "DomainEnableSSL_Description" : "When you enable SSL option, no changes in Node application are required. Just keep non-SSL (http) server running in your application, and SSL will be applied automatically with certificate files provided below.",
     "DomainSSLCertFile" : "SSL certificate file",
     "DomainSSLKeyFile" : "SSL certificate key file",
+    "DomainsNone" : "Neither you nor your parent user own any domain.",
+    "DomainsSelectForSubdomain": "Please select domain for new subdomain.",
 
     "SubDomainName" : "Subdomain",
     "SubDomainName_Description" : "Please enter only subdomain name (without trailing %s).",
