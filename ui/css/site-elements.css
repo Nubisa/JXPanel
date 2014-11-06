@@ -90,6 +90,12 @@
 
 .jxbtn:hover{
     color:#ffffff;
+    text-decoration: none;
+}
+
+.jxbtn:hover .dummy-label {
+    color:#ffffff;
+    text-decoration: underline;
 }
 
 .jxbtn_disabled, .jxbtn_disabled:hover{
