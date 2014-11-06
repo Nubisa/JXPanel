@@ -526,7 +526,7 @@
                 if(arr.length == 1){
                     fullname = "#"
                 }else{
-                    fullname = arr.splice(arr.length-1,1).join("/");
+                    fullname = arr.slice(0, arr.length-1).join("/");
                 }
             }
 
