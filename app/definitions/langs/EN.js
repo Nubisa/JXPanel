@@ -207,6 +207,7 @@ exports.Labels = {
     "FileTypeNotSupportedContent":"Editing this file type is not supported.",
     "FileSavedTitle":"Done!",
     "FileSavedContent":"File Saved Successfully",
+    "FileToBeSaved": "File is not saved, do you really want to abandon changes?",
     "FolderNotEmpty":"Folder is not empty",
     "FileExists":"File already exists",
     "FileDoesNotExist":"File does not exist",

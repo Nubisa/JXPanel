@@ -164,17 +164,31 @@
         };
 
         var removeTab = function(id){
+
             var title_holder = document.getElementById('code_editor_title_holder');
             var content_holder = document.getElementById('code_editor_content_holder');
 
-            title_holder.count--;
+            var remove = function() {
+                title_holder.count--;
 
-            title_holder.removeChild(title_holder._childs[id]);
-            title_holder._childs[id] = null;
-            delete(title_holder._childs[id]);
-            content_holder.removeChild(content_holder._childs[id]);
-            content_holder._childs[id] = null;
-            delete(content_holder._childs[id]);
+                title_holder.removeChild(title_holder._childs[id]);
+                title_holder._childs[id] = null;
+                delete(title_holder._childs[id]);
+                content_holder.removeChild(content_holder._childs[id]);
+                content_holder._childs[id] = null;
+                delete(content_holder._childs[id]);
+            };
+
+            var btnSave = title_holder._childs[id].btn;
+            if (btnSave && !btnSave._disabled) {
+                utils.jxConfirm('<i class="fa fa-save txt-color-orangeDark"></i> ' + "{{label.Save}}", "{{label.FileToBeSaved}}", function(ButtonPressed) {
+                    if (ButtonPressed === "{{label.Yes}}")
+                        remove();
+                });
+                return;
+            }
+
+           remove();
         };
 
         var getDocHeight = function(){
