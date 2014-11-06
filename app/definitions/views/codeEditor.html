@@ -481,7 +481,7 @@
             editors[loc]._eid = eid;
             editors[loc].host = host_editor;
             if(_fname){
-                editors[loc].on('change', function(inst, obj){
+                var _event = function(inst, obj) {
                     if(inst.btn && inst.btn.loaded){
                         var title_holder = document.getElementById('code_editor_title_holder');
                         title_holder._childs[inst._eid]._a.style.color = "#b00000";
@@ -491,7 +491,10 @@
                     }
                     else
                         inst.btn.loaded = true;
-                });
+                };
+
+                editors[loc].on('change', _event);
+                editors[loc].on('inputRead', _event);
             }
         };
 
