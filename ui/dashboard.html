@@ -15,22 +15,32 @@
                 {{view.leftMenu}}
 
                 <td id='right-page'><!-- Main Content -->
-                    <div class="internal-view">
-                        <div class="jarviswidget jarviswidget-color-blue" data-widget-fullscreenbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false">
-                            <header class="col-xs-12 col-sm-6">
+                    <div class="internal-view" role="main">
+                        <div class="row no-margin">
+                        <div class="jarviswidget jarviswidget-color-blue col-xs-12 col-sm-6" data-widget-fullscreenbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" role="widget">
+                            <header role="heading">
                                 <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
                                 <h2 style="width:1px;overflow:visible"><nobr>{{label.DiskUsageInformation}}</nobr></h2>
                             </header>
-                            <header class="col-xs-12 col-sm-6">
+                            <div role="content">
+                            {{charts.diskUsageInfo}}
+                            </div>
+                        </div>
+
+                        <div class="jarviswidget jarviswidget-color-blue col-xs-12 col-sm-6" data-widget-fullscreenbutton="false" data-widget-editbutton="false" data-widget-deletebutton="false" role="widget">
+                            <header>
                                 <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
                                 <h2 style="width:1px;overflow:visible"><nobr>{{label.SystemInfo}}</nobr></h2>
                             </header>
-                            <div class="row">
-                                {{charts.diskUsageInfo}}
-                                {{view.dashboard_systemInfo}}
+                            <div role="content">
+                            {{view.dashboard_systemInfo}}
                             </div>
                         </div>
+
+                        </div>
+                        <div>
                             {{view.myPlan}}
+                        </div>
                     </div>
                 </td>
                 <td id='toolbar-right' class='dark-back' ><!-- Addons -->
