@@ -508,33 +508,36 @@
                     $( this ).css('color','');
                 });
         var menu_min = false;
+        var menu_animating = false;
         window.minimize_menu = function($this, force){
+            if (menu_animating) return;
             if(!menu_min || force){
                 $('.menu-text, .bold-menu').each(function(index){
                     $(this).css('display', 'none');
                 });
                 $('.normal-menu').css('margin-left','2px');
-                $('#left-page').animate({'min-width':40, 'width':40, 'max-width':40});
+                menu_animating = true;
+                $('#left-page').animate({'min-width':40, 'width':40, 'max-width':40}, function(){
+                    menu_animating = false;
+                    menu_min = true;
+                    if(window.tabsResize) window.tabsResize();
+                });
                 $this.html('[&nbsp;+&nbsp;]');
                 $this.css('text-align', 'left');
             }else{
                 $('.normal-menu').css('margin-left','3px');
+                menu_animating = true;
                 $('#left-page').animate({'min-width':180, 'width':180, 'max-width':180}, function(){
+                    menu_animating = false;
+                    menu_min = false;
                     $('.menu-text, .bold-menu').each(function(index){
                         $(this).css('display', '');
                     });
+                    if(window.tabsResize) window.tabsResize();
                 });
                 $this.html('[&nbsp;-&nbsp;]');
                 $this.css('text-align', 'right');
             }
-            if(!force)
-                menu_min = !menu_min;
-            else
-                menu_min = true;
-
-            setTimeout(function(){
-                if(window.tabsResize) window.tabsResize();
-            },750);
         };
 
         $( ".minimize-left-menu" ).each(function(index){
@@ -542,6 +545,18 @@
                 minimize_menu($(this));
             });
         });
+
+        var _window_resize = function(){
+            var w = utils.getWindowWidth();
+            if (w) {
+                document.title = w + "|" + menu_min;
+                if ((menu_min && w > 650) || (!menu_min && w <=650))
+                    window.minimize_menu($( ".minimize-left-menu" ));
+            }
+        };
+
+        $(window).resize(_window_resize);
+        _window_resize();
     });
 
 </script>
