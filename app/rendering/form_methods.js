@@ -929,10 +929,8 @@ methods.getUserDomains = function (env, params) {
         var header = arr2.length ? ["My domains:"] : [];
         arr = arr.concat(header, arr1);
     }
-    if (arr2.length) {
-        var header = arr1.length ? [""] : [];
-        arr = arr.concat(header, ["Parent user domains:"], arr2);
-    }
+    if (arr2.length)
+        arr = arr.concat(["Parent user domains:"], arr2);
 
     //console.log("getUserDomains", arr);
     var err = arr.length ? false : form_lang.Get(active_user.lang, "DomainsNone", true);

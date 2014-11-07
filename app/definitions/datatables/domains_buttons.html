@@ -1,5 +1,48 @@
 <script type="text/javascript">
 
+    window.filterDomains = function() {
+        var str = $("#txtdcombofilter").val();
+
+        var no_results = document.getElementById("txtdcombo_no_results");
+        if (!no_results) {
+            $('#txtdcombo').append($('<option>', {
+                value: 1,
+                text: '{{label.NoResults}}',
+                id : "txtdcombo_no_results",
+                style: "display: none;"
+            }));
+            $('#Msgdcombo').css("top", "25%");
+        }
+
+        var count = $("#txtdcombo > option").length;
+        var _index = 0;
+        var _hidden = 0;
+        $("#txtdcombo > option").each(function() {
+
+            if (!this.value || this.value.indexOf(" ") !== -1) {
+                $(this).css("color", "#a57225");
+                $(this).css("font-weight", "bold");
+                return;
+            }
+
+            var contains = this.value.indexOf(str) !== -1;
+            if (contains)
+                $(this).show();
+            else {
+                _hidden++;
+                $(this).hide();
+            }
+            _index++;
+
+            if (_index === count) {
+                if (_hidden === count)
+                    $("#txtdcombo_no_results").show();
+                else
+                    $("#txtdcombo_no_results").hide();
+            }
+        });
+    };
+
     window.addSubdomain = function() {
 
         var add = function(domain) {
@@ -26,13 +69,23 @@
 
             param.res = "[" + param.res.join("][") + "]";
 
+            var filter =
+                    '<div class="icon-addon">'
+                    + '<input id="txtdcombofilter" class="form-control" type="text" value="" placeholder="{{label.FilterResults}}" onkeyup="window.filterDomains();"">&nbsp;</input>'
+                    + '<label class="glyphicon glyphicon-search" rel="tooltip"></label>'
+                    + '</div>'
+                    + '<div style="margin: 3px; margin-top: 7px;">{{label.DomainsSelectForSubdomain}}</div>';
+
             $.SmartMessageBox({
                 title : '<i class="fa fa-globe txt-color-orangeDark"></i> {{label.AddSubDomain}}',
-                content : "{{label.DomainsSelectForSubdomain}}",
+                content : "",
                 buttons : "[{{label.No}}][{{label.Yes}}]",
                 input : "select",
                 options: param.res,
-                placeholder : "Select"
+                placeholder : "Select",
+                beforeInput : filter,
+                inputAttr : 'style="display: inline; background-color: black; border: 1px solid lightgray; color: lightgray; font-weight: normal" size="8"',
+                inputId: "dcombo"
             }, function(ButtonPress, selected) {
                 if (ButtonPress == "{{label.Yes}}") {
 
@@ -43,6 +96,7 @@
                 }
             });
 
+            window.filterDomains();
         });
     };
 </script>

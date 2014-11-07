@@ -21,6 +21,8 @@ TODO
 - on jxPanel uninstall
     -- should we remove system users created before in panel?
 
+- nodebb + socket.io policy issue
+
 
 
 DONE

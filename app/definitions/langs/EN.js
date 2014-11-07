@@ -44,6 +44,8 @@ exports.Labels = {
     "UnknownCommand" : "Unknown command",
     "DirectoryExpected" : "Directory expected",
     "UnknownMethod" : "Unknown method",
+    "NoResults" : "No results",
+    "FilterResults" : "Filter results",
 
     "help":"Help",
     "logout":"Logout",
