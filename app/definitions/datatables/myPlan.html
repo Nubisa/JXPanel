@@ -3,7 +3,7 @@
         <div class="panel-heading">
             <!--<div class="alert alert-info fade in" style="padding: 0px; margin: 0px;">-->
                 <div class="panel-title">
-                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseUserPlan">
                         <i class="fa fa-lg fa-angle-down pull-right"></i>
                         <i class="fa fa-lg fa-angle-up pull-right"></i>{{label.PlanCurrent}}: <strong>{{plan.name}}</strong>
                         <span style="margin-left: 25px;">{{label.Status}}: {{plan.status}}</span>
@@ -12,7 +12,14 @@
                 </div>
             <!--</div>-->
         </div>
-        <div style="height: 0px;" id="collapseOne" class="panel-collapse collapse">
+
+        {{if.page:dashboard}}
+        <div id="collapseUserPlan" class="panel-collapse collapse in">
+        {{endif}}
+        {{if.page_not:dashboard}}
+        <div style="height: 0px;" id="collapseUserPlan" class="panel-collapse collapse">
+        {{endif}}
+
             <div class="panel-body no-padding">
                 <table class="table table-bordered">
                     <thead>

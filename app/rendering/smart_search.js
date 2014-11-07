@@ -148,7 +148,17 @@ var _replace = function(str, markers, _markers, from, togr, logic, gl){
         }
 
         //console.log(f, newstr)
-        str = str.replace(found[o], newstr);
+        if (gl.remove_block) {
+            var start = found[o];
+            var end = gl.remove_block.end;
+            if (gl.remove_block.remove) {
+                str = str.replace(new RegExp(start + "([\\s\\S]*?)" + end), "");
+            }
+            str = str.replace(start, "").replace(end, "");
+            delete gl.remove_block;
+        } else {
+            str = str.replace(found[o], newstr);
+        }
     }
 
     return str;

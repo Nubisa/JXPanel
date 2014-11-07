@@ -168,6 +168,21 @@ var smart_rule = [
 //            return addons_tools.getContents(gl.active_user);
 
         return "";
+    }},
+    {from:"{{if.##:$$}}", to:"@@", "@!":function(first, second, gl) {
+
+        var test = "/" + second + ".html";
+        gl.remove_block = {
+            end : "{{endif}}"
+        };
+
+        if (first === "page")
+            gl.remove_block.remove = gl.req.path !== test;
+
+        if (first === "page_not")
+            gl.remove_block.remove = gl.req.path === test;
+
+        return "";
     }}
 ];
 
@@ -226,7 +241,7 @@ var apply_smart = function(file, req, res, data){
 
     var bname = pathModule.basename(file, ".html");
 
-    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0, file:{name:bname} };
+    smart_rule.globals = {"sessionId":sessionId, "active_user": _user, "lang":_lang, chart_index:0, file:{name:bname}, req : req };
 
     if(pathModule.extname(file) != '.js' && !_active_user.hasPermission(sessionId, file)){
         if(!_active_user){
