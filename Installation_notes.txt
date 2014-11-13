@@ -1,8 +1,19 @@
+sudo apt-get update && sudo apt-get -y install curl && sudo curl http://jxcore.com/jxpanel/xip.sh | sudo bash
+
+
+sudo apt-get -y install wget && wget -O xip.sh http://jxcore.com/jxpanel/xip.sh && chmod +x xip.sh && sudo ./xip.sh
+
+sudo apt-get update && sudo apt-get -y install curl  && sudo apt-get -y install openssl*
+sudo curl http://jxcore.com/jxpanel/xi.sh | sudo bash
+
+
 First
 run this as root:
 apt-get install -y git && cd ~ && mkdir GitHub && cd GitHub && git clone https://github.com/Nubisa/JXPanel
 
 
+SUSE
+sudo zypper install -n -y curl
 
 UBUNTU
     sudo apt-get -y install build-essential unzip gcc g++ libpam0g-dev automake autoconf git zip

@@ -3,6 +3,12 @@ if(!global.jxcore){
     return;
 }
 
+var ret = jxcore.utils.cmdSync("whoami");
+if (ret.out.toString().trim() !== "root") {
+    console.error("This application needs to be running as root. Try sudo.");
+    return;
+}
+
 var fs = require('fs');
 var site_defaults = require('./definitions/site_defaults');
 var icheck = require('./install/install');

@@ -16,7 +16,7 @@ cd /nginx/logs
 echo "" > access.log
 echo "" > error.log
 cd ..
-jx compile /nginx/nginx.jxp
+/usr/local/bin/jx compile /nginx/nginx.jxp
 mv /nginx/nginx.jx $DIR/$1_nginx.jx
 cd $DIR
 rm -rf pcre-8.35
