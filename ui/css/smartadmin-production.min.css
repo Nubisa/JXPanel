@@ -23324,9 +23324,9 @@ label input[type=checkbox][disabled].checkbox+span:before,label input[type=check
         left: 0;
     }
 
-    #header {
-        background: #fff;
-    }
+    /*#header {*/
+        /*background: #fff;*/
+    /*}*/
 
     #ribbon {
         border-bottom: 1px solid #CFCFCF;
@@ -23530,9 +23530,9 @@ label input[type=checkbox][disabled].checkbox+span:before,label input[type=check
         left: 0;
     }
 
-    #header {
-        background: #fff;
-    }
+    /*#header {*/
+        /*background: #fff;*/
+    /*}*/
 
     #ribbon {
         border-bottom: 1px solid #CFCFCF;

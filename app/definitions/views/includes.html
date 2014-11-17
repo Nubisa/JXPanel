@@ -1,5 +1,5 @@
 <script src="/js/offline/ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="/js/offline/maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="/js/bootstrap/bootstrap.min.js"></script>
 
 <script src="/js/offline/ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 <!--<script>-->
@@ -449,7 +449,7 @@
 
         jxcore.OnError = function
                 (a,b){
-            document.title = "ERROR " + a  + b
+            utils.jxAddMessage("ERROR " + a  + b);
         };
 
         window.updateTerminal = function(params){
@@ -549,7 +549,6 @@
         var _window_resize = function(){
             var w = utils.getWindowWidth();
             if (w) {
-                document.title = w + "|" + menu_min;
                 if ((menu_min && w > 650) || (!menu_min && w <=650))
                     window.minimize_menu($( ".minimize-left-menu" ));
             }
