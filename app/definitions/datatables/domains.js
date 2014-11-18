@@ -26,7 +26,7 @@ exports.settings = {
         {
             name: "plan_table_id",
             displayName : "PlanID",
-            class : "hidden-480"
+            class : "hidden-xs"
         },
         {
             name: "port_http",

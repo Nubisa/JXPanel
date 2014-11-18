@@ -96,7 +96,7 @@ var getStatus = function(active_user, values, listOrForm, short) {
     if (json.indexOf(ret) === -1) {
         return short ? short_str + iconOffline : divStart + iconOffline + btnStart + btnViewLog + divEnd;
     } else {
-        return short ? short_str + iconOnline : + iconOnline + btnStop + btnViewLog + divEnd;
+        return short ? short_str + iconOnline : divStart + iconOnline + btnStop + btnViewLog + divEnd;
     }
 };
 

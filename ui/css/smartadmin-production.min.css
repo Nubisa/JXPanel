@@ -1335,7 +1335,7 @@ div.DTTT_collection a.DTTT_button,div.DTTT_collection button.DTTT_button,div.DTT
 .dt-toolbar {
     display: block;
     position: relative;
-    padding: 6px 7px 1px;
+    /*padding: 6px 7px 1px;*/
     width: 100%;
     float: left;
     border-bottom: 1px solid #ccc;

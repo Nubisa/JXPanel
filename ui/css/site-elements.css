@@ -163,7 +163,7 @@ div.jxl span {
         display:none!important
     }
     .dataTables_filter .form-control {
-        font-size: 12px;
+        width: 80%;
     }
 }
 
@@ -176,7 +176,6 @@ div.jxl span {
 .dataTables_filter .input-group-addon {
     height: 34px!important;
 }
-
 
 a.hplan span {
     margin-right: 25px;
