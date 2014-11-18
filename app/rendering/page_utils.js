@@ -48,7 +48,7 @@ exports.getProgressBar = function(maxValue, value, unit) {
 
 exports.getSingleButton = function(label, iconClass, onclick, additionalStyle) {
 
-    var str = '<a id="btn_refresh" data-original-title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
+    var str = '<a data-original-title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
           +'<i class="fa ' + iconClass + '"></i><span class="dummy-label">' + label + '</span>'
           +'</a>';
 
