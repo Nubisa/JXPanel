@@ -19,7 +19,8 @@ exports.form = function () {
     var func = function () {
         this.name = path.basename(__filename, ".js");
 
-        this.icon = '<img id="jxcore_img" class="menu-icon" src="icons/jxcore.png">';
+        //this.icon = '<img id="jxcore_img" class="menu-icon" src="icons/jxcore.png">';
+        this.icon = '<i class="fa fa-fw fa-lg fa-gear"></i>';
 
         this.onSubmitSuccess = "jxcore.html";
         this.onSubmitCancel = "jxcore.html";

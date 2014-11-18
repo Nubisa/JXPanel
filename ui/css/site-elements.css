@@ -144,3 +144,22 @@ div.jxl {
 div.jxl span {
     width: 30px!important;
 }
+
+
+@media (max-width:320px) {
+    .hidden-320 {
+        display:none!important
+    }
+}
+
+@media (max-width:480px) {
+    .hidden-480 {
+        display:none!important
+    }
+}
+
+@media (min-width:481px) {
+    .visible-480 {
+        display:none!important
+    }
+}

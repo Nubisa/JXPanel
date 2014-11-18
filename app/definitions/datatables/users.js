@@ -10,7 +10,32 @@ exports.name = path.basename(__filename, ".js").toLowerCase();
 exports.displayNameLabel = "UsersUpperCase";
 
 exports.settings = {
-    columns :[ "_checkbox", "_id", "person_name", "suspended", "person_email", "person_username", "plan_table_id", "ftp_access", "panel_access"],
+    columns :[
+        "_checkbox",
+        "_id",
+        "person_name",
+        "suspended",
+        {
+            name : "person_email",
+            class : "hidden-xs hidden-sm"
+        },
+        {
+            name : "person_username",
+            class : "hidden-xs"
+        },
+        {
+            name : "plan_table_id",
+            class : "hidden-320 hidden-480"
+        },
+        {
+            name : "ftp_access",
+            class : "hidden-xs hidden-sm"
+        },
+        {
+            name : "panel_access",
+            class : "hidden-xs"
+        }
+    ],
     addForm : "addUser",
     addFormURL : "adduser.html"
 };

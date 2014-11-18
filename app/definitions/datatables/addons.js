@@ -10,7 +10,19 @@ exports.displayNameLabel = "JXcoreNPMModules";
 exports.buttonsOnlyForAdmin = true;
 
 exports.settings = {
-    columns :[ "_checkbox",  "_id", "name", "version", "description" ]
+    columns :[
+        "_checkbox",
+        "_id",
+        "name",
+        {
+            name : "version",
+            class : "hidden-320"
+        },
+        {
+            name : "description",
+            class : "hidden-xs"
+        }
+    ]
 };
 
 

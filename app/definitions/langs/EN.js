@@ -114,6 +114,7 @@ exports.Labels = {
     "AppLog": "JXcore Application Log",
 
     // login page
+    "LoginPage" : "Login page",
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
     "Username" : "System user name",

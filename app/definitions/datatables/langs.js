@@ -9,7 +9,20 @@ exports.name = path.basename(__filename, ".js").toLowerCase();
 exports.displayNameLabel = "LanguageDictionary";
 
 exports.settings = {
-    columns :[ "_id", "Original", "Translation", "Apply" ]
+    columns :[
+        {
+            name : "_id",
+            class : "hidden-320"
+        },
+        {
+            name : "Original",
+            class : "original"
+        },
+        {
+            name : "Translation",
+            class : "translation"
+        }
+    ]
 };
 
 

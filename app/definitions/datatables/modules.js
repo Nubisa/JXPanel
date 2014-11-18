@@ -9,7 +9,18 @@ exports.name = path.basename(__filename, ".js").toLowerCase();
 exports.displayNameLabel = "JXcoreNPMModules";
 
 exports.settings = {
-    columns :[ "_checkbox",  "_id", "name", "version", "description" ]
+    columns :[
+        "_checkbox",
+        "_id", "name",
+        {
+            name : "version",
+            class : "hidden-320"
+        },
+        {
+            name : "description",
+            class : "hidden-xs"
+        }
+    ]
 };
 
 

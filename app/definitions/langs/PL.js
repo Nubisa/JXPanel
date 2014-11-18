@@ -3,10 +3,10 @@ exports.Labels =
     "Empty": "Pusty",
     "Yes": "Tak",
     "No": "Nie",
-    "PleaseWait": "Prosze czekac",
+    "PleaseWait": "Proszę czekać",
     "Apply": "Zastosuj",
     "Cancel": "Anuluj",
-    "Submit": "Zatwierdś",
+    "Submit": "Zatwierdź",
     "Accept": "Akceptuj",
     "Close": "Zamknij",
     "Done": "Gotowe",
@@ -38,8 +38,8 @@ exports.Labels =
     "Value": "Wartość",
     "Usage": "Wykorzystanie",
     "Undefined": "niezdefiniowany",
-    "Original": "Oryginal",
-    "Translation": "Tlumaczenie",
+    "Original": "Oryginał",
+    "Translation": "Tłumaczenie",
     "help": "Pomoc",
     "logoutQuestion": "Czy na pewno chcesz się wylogować?",
     "fileManager": "Menedżer plików",
@@ -363,5 +363,6 @@ exports.Labels =
     "JXcoreNPMInstalling": "Installing NPM module",
     "NginxConfDirCannotCreate": "Cannot create Nginx config directory",
     "NginxDirectivesInvalid": "Provided directives failed on test.",
-    "NoChanges": "Nie dokonano zadnych zmian"
+    "NoChanges": "Nie dokonano żadnych zmian",
+    "LoginPage": "Strona logowania"
 }

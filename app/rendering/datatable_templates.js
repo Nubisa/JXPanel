@@ -28,6 +28,30 @@ var getTable = function(table_name) {
 };
 
 
+var getTableColumns = function(table, active_user) {
+
+    var cols = table.settings.columns;
+    var ret = [];
+    for (var o in cols) {
+        var col = JSON.parse(JSON.stringify(cols[o]));
+        if (typeof col === "string")
+            col = { name : col };
+
+        if (col.displayName) {
+            col.displayName = form_lang.Get(active_user.lang, col.displayName, true);
+        } else {
+            col.displayName = col.name; // default
+            if (col.name == "_checkbox") col.displayName = ""; else
+            if (col.name == "_id") col.displayName = "ID"; else
+                col.displayName = form_lang.Get(active_user.lang, col.name, true);
+        }
+
+        ret.push(col);
+    }
+
+    return ret;
+};
+
 var getForm = function(table) {
 
     var fname = path.join(__dirname, '../definitions/forms/' + table.settings.addForm + ".js");
@@ -39,37 +63,21 @@ var getForm = function(table) {
 
 var getHTML = function (active_user, table) {
 
-    var ret = { err: false, html: null };
-
-    var columns = table.settings.columns;
     var form = getForm(table);
-
     if (!form)
         return { err: form_lang.Get(active_user.lang, "UnknownForm") };
 
     // getting form control display names
     var formControls = tools.getFormControls(form);
-
-    var ret = [];
-    ret.push([]);
+    var columns = getTableColumns(table, active_user);
+    var ret = [columns];
 
     // searching for display names of controls
     for (var a in columns) {
-        var displayName = columns[a];
-        if (displayName == "_checkbox") displayName = "";
-        if (displayName == "_id") displayName = "ID";
-        if (displayName == "port_http") displayName = "TCP";
-        if (displayName == "port_https") displayName = "TCPS";
+        var colName = columns[a].name;
 
-        if (formControls[columns[a]] && formControls[columns[a]].details) {
-            displayName = form_lang.Get(active_user.lang, formControls[columns[a]].details.label);
-        }
-
-        // for virtual fields not defined in form (e.g. on domains list)
-        if (displayName === "plan_table_id")
-            displayName = form_lang.Get(active_user.lang, "PlanID");
-
-        ret[0].push(displayName);
+        if (formControls[colName] && formControls[colName].details)
+            columns[a].displayName = form_lang.Get(active_user.lang, formControls[colName].details.label);
     }
 
     var data = null;
@@ -122,9 +130,9 @@ var getHTML = function (active_user, table) {
             single_row["_class"] = "warning";
 
         for (var x in columns) {
-            var colName = columns[x];
-            if (formControls[columns[x]] && formControls[columns[x]].details.dbName)
-                colName = formControls[columns[x]].details.dbName;
+            var colName = columns[x].name;
+            if (formControls[colName] && formControls[colName].details.dbName)
+                colName = formControls[colName].details.dbName;
 
             var val = record[colName];
 
@@ -178,16 +186,8 @@ var getModules = function(active_user, table) {
     } catch (ex) {
     }
 
-
-    var columns = table.settings.columns;
-    var arr = [];
-    arr.push([]); // columns
-    for (var a in columns) {
-        var displayName = columns[a];
-        if (displayName == "_checkbox") displayName = "";
-        if (displayName == "_id") displayName = "ID";
-        arr[0].push(displayName);
-    }
+    var columns = getTableColumns(table, active_user);
+    var arr = [columns];
 
     var cnt = 1;
     for (var i in data) {
@@ -196,7 +196,7 @@ var getModules = function(active_user, table) {
 
         var single_row = [];
         for (var x in columns) {
-            var colName = columns[x];
+            var colName = columns[x].name;
             var str = module[colName];
             if (colName === "_checkbox")
                 str = '<input type="checkbox" id="jxrow_' + module.name + '"></input>';
@@ -226,15 +226,8 @@ var getAddons = function(active_user, table) {
         data.push(addons[addon_name].json);
     }
 
-    var columns = table.settings.columns;
-    var arr = [];
-    arr.push([]); // columns
-    for (var a in columns) {
-        var displayName = columns[a];
-        if (displayName == "_checkbox") displayName = "";
-        if (displayName == "_id") displayName = "ID";
-        arr[0].push(displayName);
-    }
+    var columns = getTableColumns(table, active_user);
+    var arr = [columns];
 
     var cnt = 1;
     for (var i in data) {
@@ -243,7 +236,7 @@ var getAddons = function(active_user, table) {
 
         var single_row = [];
         for (var x in columns) {
-            var colName = columns[x];
+            var colName = columns[x].name;
             var str = addon[colName] || "";
             if (str) str = '<a href="/addon.html?' + addon.id + '">' + str + '</a>';
             if (colName === "_checkbox")
@@ -269,9 +262,17 @@ var getAddons = function(active_user, table) {
 //  [ "val1", val2, true ]           // row2
 // ]
 
-exports.getDataTable = function(rows, columnClasses) {
+exports.getDataTable = function(rows) {
 
     var cols = rows[0];
+    for (var o in cols) {
+        if (typeof cols[o] === "string")
+            cols[o] = { displayName : cols[o] };
+    }
+
+    var getTDstart = function(colID) {
+        return cols[colID].class ?  '<td class="' + cols[colID].class +'">' : "<td>";
+    };
 
     var thead = [];
     var tbody = [];
@@ -280,14 +281,10 @@ exports.getDataTable = function(rows, columnClasses) {
 
         if (rowID + "" === "0") {
             for(var colID in cols) {
-
-                var td = "<td>";
-                if (columnClasses && columnClasses[cols[colID]]) {
-                    td = '<td class="' + columnClasses[cols[colID]] +'">';
-                }
-                thead.push(td + cols[colID] + "</td>")
+                thead.push(getTDstart(colID) + cols[colID].displayName + "</td>")
             }
         } else {
+            // row class
             var _class = rows[rowID]["_class"] || "";
             if (!_class)
                 tbody.push('<tr>')
@@ -297,13 +294,13 @@ exports.getDataTable = function(rows, columnClasses) {
             }
 
             for(var colID in rows[rowID]) {
-                tbody.push("<td>" + rows[rowID][colID] + "</td>");
+                tbody.push(getTDstart(colID) + rows[rowID][colID] + "</td>");
             }
             tbody.push("</tr>");
         }
     }
 
-    return '<table id="dt_basic" class="table table-striped table-bordered table-hover jxTable">' +
+    return '<table id="dt_basic" class="table table-striped table-bordered table-hover jxTable" width="100%">' +
            "<thead><tr>" + thead.join("\n") + "</tr></thead>\n<tbody>" + tbody.join("\n") + "</tbody>" +
            "</table>";
 };
@@ -721,16 +718,8 @@ exports.getMyPlanAsTable = function (active_user) {
 
 exports.getLangs = function (active_user, table) {
 
-    var columns = table.settings.columns;
-    var arr = [];
-    arr.push([]); // columns
-    for (var a in columns) {
-        var displayName = columns[a];
-        if (displayName == "_checkbox") displayName = ""; else
-        if (displayName == "_id") displayName = "ID"; else
-        displayName = form_lang.Get(active_user.lang, displayName, true);
-        arr[0].push(displayName);
-    }
+    var columns = getTableColumns(table, active_user);
+    var arr = [columns];
 
     var cnt = 1;
     for(var i in form_lang.langs.EN) {
@@ -739,7 +728,7 @@ exports.getLangs = function (active_user, table) {
 
         var single_row = [];
         for (var x in columns) {
-            var colName = columns[x];
+            var colName = columns[x].name;
             var str = "";
             if (colName === "_checkbox")
                 str = '<input type="checkbox" id="jxrow_' + i + '"></input>';
@@ -782,8 +771,5 @@ exports.getLangs = function (active_user, table) {
         arr.push(single_row);
     }
 
-    var columnClasses = {};
-    columnClasses[form_lang.Get(active_user.lang, "Original", true)] = "original";
-    columnClasses[form_lang.Get(active_user.lang, "Translation", true)] = "translation";
-    return { err: false, html: exports.getDataTable(arr, columnClasses )};
+    return { err: false, html: exports.getDataTable(arr)};
 };
