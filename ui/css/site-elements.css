@@ -176,3 +176,9 @@ div.jxl span {
 .dataTables_filter .input-group-addon {
     height: 34px!important;
 }
+
+
+a.hplan span {
+    margin-right: 25px;
+    white-space: nowrap;
+}

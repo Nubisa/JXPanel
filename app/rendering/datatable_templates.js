@@ -704,7 +704,7 @@ exports.getMyPlanAsTable = function (active_user) {
         html.push('<tr>');
         html.push('<td>' + form_lang.Get(active_user.lang, ctrl.details.label) + '</td>');
         html.push('<td>' + val + '</td>');
-        html.push('<td>' + usage + '</td>');
+        html.push('<td class="hidden-480">' + usage + '</td>');
         html.push('</tr>');
     }
 

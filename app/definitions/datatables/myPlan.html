@@ -3,11 +3,12 @@
         <div class="panel-heading">
             <!--<div class="alert alert-info fade in" style="padding: 0px; margin: 0px;">-->
                 <div class="panel-title">
-                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseUserPlan">
+                    <a class="collapsed hplan" data-toggle="collapse" data-parent="#accordion" href="#collapseUserPlan">
                         <i class="fa fa-lg fa-angle-down pull-right"></i>
-                        <i class="fa fa-lg fa-angle-up pull-right"></i>{{label.PlanCurrent}}: <strong>{{plan.name}}</strong>
-                        <span style="margin-left: 25px;">{{label.Status}}: {{plan.status}}</span>
-                        <span style="margin-left: 25px;">{{label.UserFTPAccess}}: {{user.ftpAccess}}</span>
+                        <i class="fa fa-lg fa-angle-up pull-right"></i>
+                        <span>{{label.PlanCurrent}}: <strong>{{plan.name}}</strong></span>
+                        <span>{{label.Status}}: {{plan.status}}</span>
+                        <span>{{label.UserFTPAccess}}: {{user.ftpAccess}}</span>
                     </a>
                 </div>
             <!--</div>-->
@@ -26,7 +27,7 @@
                     <tr>
                         <th>{{label.Name}}</th>
                         <th>{{label.Value}}</th>
-                        <th>{{label.Usage}}</th>
+                        <th class="hidden-480">{{label.Usage}}</th>
                     </tr>
                     </thead>
                     <tbody>

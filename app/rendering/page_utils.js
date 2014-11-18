@@ -36,7 +36,7 @@ exports.getProgressBar = function(maxValue, value, unit) {
 //             +'</div>';
 
     var str = ''//'<div style="display: inline-block;">'
-        + '<div class="progress" style="margin: 0px; margin-right: 20px; width: 200px; display: inline-block; white-space: nowrap; vertical-align: middle;">'
+        + '<div class="progress" style="margin: 0px; margin-right: 20px; width: 100%; display: inline-block; white-space: nowrap; vertical-align: middle;">'
         +'    <div aria-valuenow="_val_" style="width: _val_%;" class="progress-bar ' + color + '" aria-valuetransitiongoal="_val_"></div>'
         +'</div>'
         + '<div style="display: inline-block;">'

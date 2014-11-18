@@ -46,3 +46,9 @@ DONE
 - window - remove - DONE
 - tabbing for log file - DONE
 - dynamic control list server's side for form's instance - DONE
+
+
+Tips:
+
+- js toggle visibility of datatable column:
+     $('#datatable_col_reorder').dataTable().fnSetColumnVis(1,false)  // (columnId, visible)
