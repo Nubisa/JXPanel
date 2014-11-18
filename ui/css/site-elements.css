@@ -45,6 +45,7 @@
     background:#3A3F42;
     border:1px solid #444;
     border-radius: 2px;
+    box-sizing: border-box;
 }
 
 .jxbuttons input[type=radio], .jxbuttons input[type=checkbox] {
@@ -86,6 +87,7 @@
     background: -ms-linear-gradient(top,  #454a4b 0%,#414647 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #454a4b 0%,#414647 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#454a4b', endColorstr='#414647',GradientType=0 ); /* IE6-9 */
+    white-space: nowrap;
 }
 
 .jxbtn:hover{
@@ -151,10 +153,18 @@ div.jxl span {
         display:none!important
     }
 }
+@media (min-width:321px) {
+    .visible-320 {
+        display:none!important
+    }
+}
 
 @media (max-width:480px) {
     .hidden-480 {
         display:none!important
+    }
+    .dataTables_filter .form-control {
+        font-size: 12px;
     }
 }
 
@@ -162,4 +172,8 @@ div.jxl span {
     .visible-480 {
         display:none!important
     }
+}
+
+.dataTables_filter .input-group-addon {
+    height: 34px!important;
 }
