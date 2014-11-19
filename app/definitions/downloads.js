@@ -4,6 +4,8 @@ var _active_user = require('./active_user');
 var server = require('jxm');
 var form_lang = require('./form_lang');
 var addons_tools = require("../addons_tools")
+var site_defaults = require("./site_defaults");
+var database = require("../install/database");
 
 var formidable = require('formidable'),
     util = require('util');
@@ -77,6 +79,37 @@ function upload_file(req, res, user) {
     return false;
 }
 
+
+var saveLogo = function(user, file) {
+
+    if (!_active_user.isAdmin(user))
+        return "Access Denied";
+
+    var allowed = [ ".gif", ".png", ".jpg", '.jpeg' ];
+
+    var ext = pathModule.extname(file.name).toLowerCase();
+    if (allowed.indexOf(ext) === -1)
+        return "LoginPageUnsupportedLogoExtension|" + allowed.join(" ");
+
+    if (!fs.existsSync(site_defaults.dirAdminUploads))
+        fs.mkdirSync(site_defaults.dirAdminUploads);
+
+    for(var o in allowed) {
+        var f = pathModule.join(site_defaults.dirAdminUploads, "logo_custom" + allowed[o]);
+        if (fs.existsSync(f) && allowed[o] !== ext)
+            fs.unlinkSync(f);
+    }
+
+    var basename = "logo_custom" + ext;
+    var fname = pathModule.join(site_defaults.dirAdminUploads, basename);
+    fs.writeFileSync(fname, fs.readFileSync(file.path));
+    server.linkResourcesFromPath("/img/", site_defaults.dirAdminUploads);
+    database.setConfigValue("logo_custom", "/img/" + basename, true);
+
+    return "UploadCompleted";
+};
+
+
 var saveFile = function(file, target, res, user){
     var lang = user.lang;
     var home = user.homeFolder();
@@ -92,6 +125,13 @@ var saveFile = function(file, target, res, user){
             res.end(form_lang.Get(lang, err || "UploadCompleted", true));
         });
 
+        return;
+    }
+
+    if (target === "__logo__") {
+        var ret = saveLogo(user, file);
+        res.writeHead(200, {'content-type': 'text/plain'});
+        res.end(form_lang.Get(lang, ret, true));
         return;
     }
 

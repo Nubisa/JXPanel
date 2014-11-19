@@ -16680,7 +16680,7 @@ textarea.clone {
     width: 300px;
 }
 
-@media (min-width:768px) and (max-width:880px) {
+@media (min-width:0px) and (max-width:880px) {
     #extr-page #header {
         padding: 0 5px!important;
     }

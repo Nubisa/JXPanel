@@ -113,7 +113,9 @@ var smart_rule = [
     {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
 
             val = val.replace(/_/g, "/");
-            var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
+
+            var fromDB = database.getConfigValue(val);
+            var view = fromDB ? fromDB : fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
             view = smart_replace(view, smart_rule);
 
             return view;
@@ -137,6 +139,10 @@ var smart_rule = [
     {from:"{{utils.$$}}", to:"$$", "$":function(val, gl){
             return page_utils[val](gl);
         }
+    },
+    {from:"{{utils.##:$$}}", to:"@@", "@!":function(first, second, gl) {
+        return page_utils[first](second);
+    }
     },
     {from:"{{hosting.$$}}", to:"$$", "$":function(val, gl){
 

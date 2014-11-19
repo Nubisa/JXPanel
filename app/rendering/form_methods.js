@@ -521,6 +521,11 @@ methods.sessionApply = function(env, params){
             });
             return;
         }
+    } else
+    if (params.form === "jxconfigLoginPage") {
+        var cfg = database.getConfig();
+        update(cfg, json);
+        database.setConfig(cfg);
     } else {
         ret = "UnknownForm";
     }
@@ -938,7 +943,22 @@ methods.getUserDomains = function (env, params) {
     server.sendCallBack(env, { err : err, res : arr });
 };
 
+methods.removeLogo = function (env, params) {
 
+    var active_user = _active_user.checkAdmin(env);
+    if (!active_user)
+        return;
+
+    var url = database.getConfigValue("logo_custom");
+    if (url) {
+        var fname = path.join(site_defaults.dirAdminUploads, path.basename(url));
+        if (fs.existsSync(fname))
+            fs.unlinkSync(fname);
+
+        database.setConfigValue("logo_custom", null, true);
+    }
+    server.sendCallBack(env, { err : false });
+};
 
 
 module.exports = methods;

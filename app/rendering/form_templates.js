@@ -43,9 +43,16 @@ var logic = [
     }}
 ];
 
-exports.getClientFormScript = function() {
+exports.getClientFormScript = function(formName) {
     var containerFilejs = path.join(__dirname, "../definitions/forms/container_js.html");
-    return fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
+    var str = fs.existsSync(containerFilejs) ? fs.readFileSync(containerFilejs).toString() : "";
+
+    if (formName) {
+        var containerFilejs = path.join(__dirname, "../definitions/forms/" + formName + "_js.html");
+        if (fs.existsSync(containerFilejs))
+            str += fs.readFileSync(containerFilejs).toString();
+    }
+    return str;
 };
 
 
@@ -118,7 +125,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             return form_lang.Get(active_user.lang, "NoTemplate", null, [ "form" ]);
         }
 
-        var widget = exports.getClientFormScript() + fs.readFileSync(containerFile).toString();
+        var widget = exports.getClientFormScript(formName) + fs.readFileSync(containerFile).toString();
         var _icon = (!activeForm.icon)? "": activeForm.icon;
         logic.globals = { name: formName, contents: "", active_user:active_user, icon:_icon, form: activeForm, lang:active_user.lang};
         var result = rep(widget, logic);
@@ -138,7 +145,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     var isUpdate = null;
     var values = null;
 
-    if (formName === "jxconfig") {
+    if (formName === "jxconfig" || formName === "jxconfigLoginPage") {
         if (!_active_user.isAdmin(active_user))
             return accessDeniedError0;
         isUpdate = { };

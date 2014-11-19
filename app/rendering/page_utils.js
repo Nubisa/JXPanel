@@ -1,4 +1,10 @@
 
+var database = require("../install/database");
+var site_defaults = require("../definitions/site_defaults");
+var fs = require("fs");
+var path = require("path");
+var server = require("jxm");
+
 exports.dateNow = function(gl){
     return Date.now();
 };
@@ -48,7 +54,7 @@ exports.getProgressBar = function(maxValue, value, unit) {
 
 exports.getSingleButton = function(label, iconClass, onclick, additionalStyle) {
 
-    var str = '<a data-original-title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
+    var str = '<a title="' + label + '" class="jxbtn" onclick="' + onclick + '">'
           +'<i class="fa ' + iconClass + '"></i><span class="dummy-label">' + label + '</span>'
           +'</a>';
 
@@ -59,10 +65,11 @@ exports.getSingleButton = function(label, iconClass, onclick, additionalStyle) {
 };
 
 
-exports.getButtonsGroup = function(html, additionalStyle) {
+exports.getButtonsGroup = function(html, additionalStyle, _class) {
 
     additionalStyle = additionalStyle || "";
-    return '<span id="buttons" class="jxbuttons" style="' + additionalStyle + '">'
+    _class = _class || "jxbuttons"
+    return '<span id="buttons" class="' + _class + '" style="' + additionalStyle + '">'
              +'<i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;'
              + html
              +'</span>';
@@ -123,4 +130,26 @@ exports.getTabs = function (id, tabs, currentTab) {
     str += '</ul>';
 
     return str + tab_contents;
+};
+
+var linked = false;
+
+exports.logo = function(_class) {
+
+    if (!linked && fs.existsSync(site_defaults.dirAdminUploads)) {
+        server.linkResourcesFromPath("/img/", site_defaults.dirAdminUploads);
+        linked = true;
+    }
+
+    _class = _class || "logo-group2";
+    var url = database.getConfigValue("logo_custom");
+    if (!url) url = "/img/logo.png";
+
+    var ret =
+        '<div id="' + _class +  '">' +
+        '<span class="logo_span2"></span>' +
+        '<img class="logo2" src="' + url + '" alt="' + site_defaults.EN.panelName +  '">' +
+        '</div>';
+
+    return ret;
 };

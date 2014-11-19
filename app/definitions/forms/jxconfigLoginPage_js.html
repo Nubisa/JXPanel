@@ -1,0 +1,21 @@
+<script type="text/javascript">
+
+    window.jxUploadLogo = function(){
+
+        var uploadHTML = '<span style="background-color: #f2f2f2;color:#000000;padding:10px;display: block;overflow:hidden;">'
+                +'<iframe scrolling="no" style="width:98%;height:35px;overflow:hidden;border:none;" src="/uploads.html?#__logo__'
+                +'"></iframe></span>';
+
+        $.SmartMessageBox({
+            title : '<i class="fa fa-upload txt-color-orangeDark"></i> {{label.Upload}}',
+            content : "{{label.SelectFileToUpload}}<br/><br/>" + uploadHTML,
+            buttons : "[{{label.Close}}]"
+        }, function(ButtonPress) {
+            document.location.reload();
+            return 0;
+        });
+
+        return false;
+    };
+
+</script>
