@@ -397,7 +397,7 @@ var logic = [
                 var txt = fs.readFileSync(containerFile).toString();
                 txt = rep(txt, logic);
 
-                return page_utils.getButtonsGroup(txt, 'margin-left:-6px;margin-top:0px;');
+                return page_utils.getButtonsGroup(txt, null, "jxbuttons-top");
             } else
                 return "";
         }

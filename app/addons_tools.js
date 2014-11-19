@@ -305,12 +305,11 @@ var extension_class = function (env, active_user, addon_id) {
             if (!__buttons.length)
                 return "";
 
-            var html = '<div style="margin-left:-6px;margin-top:0px;">' +
-                '<span id="buttons" class="jxbuttons">' +
+            var html =
+                '<span id="buttons" class="jxbuttons-top">' +
                 '<i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;' +
                 '{{datatable.buttons}}' +
-                '</span>' +
-                '</div>';
+                '</span>';
 
             var str = "";
             for (var a in __buttons)
