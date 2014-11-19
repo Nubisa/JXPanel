@@ -40,12 +40,19 @@
     padding-right: 5px;
 }
 
-.jxbuttons {
+.jxbuttons, .jxbuttons-top {
     padding:6px;
     background:#3A3F42;
     border:1px solid #444;
     border-radius: 2px;
+    display: inline-block;
 }
+
+.jxbuttons-top {
+    margin-left: -6px;
+    margin-top: -6px;
+}
+
 
 .jxbuttons input[type=radio], .jxbuttons input[type=checkbox] {
     margin-right: 7px;
@@ -180,4 +187,31 @@ div.jxl span {
 a.hplan span {
     margin-right: 25px;
     white-space: nowrap;
+}
+
+#logoBig {
+    vertical-align: middle!important;
+    height: 60px!important;
+    width: 300px;
+    /*padding-top: 10px;*/
+    /*padding-bottom: 10px;*/
+}
+
+#logoSmall {
+    vertical-align: middle!important;
+    height: 15px;
+    width: 75px;
+    padding: 0px;
+}
+
+span.logo_span2 {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+img.logo2 {
+    max-width: 100%;
+    max-height: 100%;
+    vertical-align: middle;
 }

@@ -46,6 +46,7 @@ exports.Labels = {
     "UnknownMethod" : "Unknown method",
     "NoResults" : "No results",
     "FilterResults" : "Filter results",
+    "Example" :  "Example",
 
     "help":"Help",
     "logout":"Logout",
@@ -115,6 +116,16 @@ exports.Labels = {
 
     // login page
     "LoginPage" : "Login page",
+    "LoginPageText" : "Custom HTML block on login page",
+    "LoginPageText_Description" : "HTML code to be displayed on login page. Leaving the value empty makes the below example to be displayed.",
+    "LoginPageUnsupportedLogoExtension" : "Only the following extensions are supported: %s",
+    "Logo" : "Logo",
+    "LogoLoginPage" : "Logo on login page",
+    "LogoLoginPage_Description" : "Recommended size for uploaded file is 300x60 pixels. Larger images will be scaled down to that fit that dimensions.",
+    "LogoHeader" : "Logo at the header",
+    "LogoHeader_Description" : "This is how the logo looks at the header, after user logs in. It is automatically scaled down to fit the rectangle of 15x75 pixels.",
+    "LogoUpload" : "Upload logo",
+    "LogoRestore" : "Restore default",
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
     "Username" : "System user name",

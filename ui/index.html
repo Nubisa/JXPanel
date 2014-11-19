@@ -8,8 +8,8 @@
     <div id='panel-main'>
 
         <header id="header">
-            <div id="logo-group">
-                <span id="logo"> <img src="img/logo.png" alt="{{defaults.panelName}}"> </span>
+            <div class="padding-7">
+              {{utils.logo:logoBig}}
             </div>
         </header>
 
@@ -18,24 +18,7 @@
 
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 hidden-xs hidden-sm">
-                        <!--<h1 class="txt-color-blue login-header-big">{{defaults.panelName}}</h1>-->
-                        <div class="hero">
-
-                            Later...
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                <h5 class="about-heading">{{label.BlockLeftHeader}}</h5>
-                                <p>{{label.BlockLeftBody}}</p>
-                            </div>
-                            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                                <h5 class="about-heading">{{label.BlockRightHeader}}</h5>
-                                <p>{{label.BlockRightBody}}</p>
-                            </div>
-                        </div>
-
+                        {{view.customLoginText}}
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
                         <div class="well no-padding">
