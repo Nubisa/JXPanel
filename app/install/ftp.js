@@ -55,6 +55,17 @@ exports.stop = function() {
     return true;
 };
 
+
+// returns false if it's successful otherwise returns { err : .... }
+exports.startIfStopped = function(){
+
+    if (!fs.existsSync(pid_file)) {
+        return exports.start();
+    }
+    return false;
+};
+
+
 var allowedUsers = [];
 var conf_str = null;
 

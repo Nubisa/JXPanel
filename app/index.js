@@ -77,8 +77,9 @@ else {
     var terminal = require("./definitions/terminal");
     var addons_tools = require("./addons_tools");
     var nginx = require("./install/nginx");
+    var ftp = require("./install/ftp");
 
-    if (nginx.startIfStopped())
+    if (nginx.startIfStopped() || ftp.startIfStopped().err)
         process.exit(-1);
 
     require('http').setMaxHeaderLength(0);
