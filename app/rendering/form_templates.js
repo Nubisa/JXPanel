@@ -242,10 +242,20 @@ exports.renderForm = function(sessionId, formName, onlyControls){
     }
 
     var arr = tabs[0].arr;
+    var skip = false;
     for(var i in controls) {
 
-        if(controls[i].BEGIN != undefined){
+        skip = (isUpdate && controls[i].OnEdit === false) || (!isUpdate && controls[i].OnInsert === false);
 
+        if(controls[i].END != undefined){
+            arr.push({html:tool.endFieldSet(), js:""});
+            skip = false;
+            continue;
+        }
+
+        if (skip) continue;
+
+        if(controls[i].BEGIN != undefined){
             var _tabId = parseInt(controls[i].tab);
             tabId = isNaN(_tabId) ? 0 : _tabId;
             arr = tabs[tabId].arr;
@@ -257,18 +267,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
             continue;
         }
 
-        if(controls[i].END != undefined){
-            arr.push({html:tool.endFieldSet(), js:""});
-            continue;
-        }
-
         if(controls[i].INFO != undefined){
-            if (isUpdate && controls[i].OnEdit === false)
-                continue;
-
-            if (!isUpdate && controls[i].OnInsert === false)
-                continue;
-
             var str = (controls[i].prefix || "") + form_lang.Get(active_user.lang, controls[i].INFO, true) + (controls[i].suffix || "");
             arr.push(tool.createSimpleText(" ", null, null, str, active_user, {}));
             continue;

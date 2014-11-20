@@ -139,7 +139,7 @@ exports.form = function () {
         this.subForms = [ "appLog" ];
 
         this.tabs = [
-            { label : "Domain Details", showAlways : true },
+            { label : "Domain Details", showAlways : false },
             { label : "JXcoreAppApp" }
         ];
 
@@ -315,7 +315,7 @@ exports.form = function () {
 
             {"INFO": "JXcoreAppAppInfo"  },
 
-            {"BEGIN": "Ghost", tab : 1},
+            {"BEGIN": "Ghost", tab : 1, OnInsert : false},
 
             {
                 name: "jx_app_ghost",
@@ -333,7 +333,7 @@ exports.form = function () {
 
             {"END" : 1},
 
-            {"BEGIN": "NodeBB", tab : 1},
+            {"BEGIN": "NodeBB", tab : 1, OnInsert : false},
 
             {
                 name: "jx_app_nodebb",
@@ -449,7 +449,7 @@ exports.form = function () {
 
             {"END" : 1},
 
-            {"BEGIN": "Meteor", tab : 1},
+            {"BEGIN": "Meteor", tab : 1, OnInsert : false},
 
             {
                 name: "jx_app_meteor",

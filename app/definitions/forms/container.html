@@ -31,7 +31,8 @@
                     utils.jxAppViewLog();
 
                 if (!param.new) {
-                    $("#jxAppLog_Tab").removeClass("disabled");
+                    $("#jxAppLog_Tab").removeClass("hidden");
+                    $("#jxAppConfig_Tab").removeClass("hidden");
                     $("#jxAppLog_Tab a").attr("href", "applog.html");
                 }
             }
