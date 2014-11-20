@@ -260,6 +260,27 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
 };
 
 
+exports.appRemoveNginxConfigPath = function(domain_name, reloadIfNeeded) {
+
+    var cfgPath = exports.appGetNginxConfigPath(domain_name);
+    if (cfgPath.err)
+        return cfgPath;
+
+    if (fs.existsSync(cfgPath)) {
+        fs.unlinkSync(cfgPath);
+        nginx.needsReload = true;
+
+        if (reloadIfNeeded) {
+            var res = nginx.reload(true);
+            if (res)
+                return { err : res };
+        }
+    }
+
+    return false;
+};
+
+
 exports.appGetSpawnerPath = function (domain_name) {
     var dir = site_defaults.dirAppConfigs;
     if (!fs.existsSync(dir))
@@ -389,6 +410,8 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                         if (err2) msg += " " + err2;
                     } else {
                         console.log(startOrStop ? "JXcoreAppStarted" : "JXcoreAppStopped", domain_name);
+                        if (!startOrStop)
+                            exports.appRemoveNginxConfigPath(domain_name);
                     }
 
                     if (!msg) {
@@ -509,6 +532,8 @@ exports.appStopMultiple = function (domain_names, cb) {
                     if (online_after) {
                         infos[domain_name].err = "JXcoreAppCannotStop";
                         isErr = true;
+                    } else {
+                        exports.appRemoveNginxConfigPath(domain_name, false);
                     }
                 }
                 if (cb) cb(isErr, isErr ? infos : false);
@@ -729,6 +754,7 @@ var appStartEnabledApplications = function(cb) {
         return;
     }
 
+    nginx.removeAllConfigs();
     var domains = database.getDomainsByPlanName(database.unlimitedPlanName, 1e7);
     for(var o in domains) {
         var domain_name = domains[o];
