@@ -93,7 +93,7 @@ exports.createConfig = function(domain, node_ports, log_location, directives, ss
 
 
 
-exports.createDefaultConfig = function(){ // node_ports is an array (first http, second https)
+exports.createDefaultConfig = function(ssl_info){ // node_ports is an array (first http, second https)
 
     var sports = ["80", "443"];
     var config_str = "";
@@ -104,20 +104,13 @@ exports.createDefaultConfig = function(){ // node_ports is an array (first http,
             var ip = ifc_list[o];
             var str_config =
                 "server{\n"
-                +"  listen "+ip+":"+sport+' default_server;' + '\n'
-//                +"  listen "+ip+":"+sport+ (sport=='443'?' ssl;':';') + '\n'
-//                +(sport=='443'?"  ssl on;\n":'')
-//                +"  location / {\n"
-//                +"    proxy_pass http://jxcore_target_" + domain + ";\n"
-//                +"    proxy_read_timeout 9999999;\n"
-//                +"    proxy_http_version 1.1;\n"
-//                +"    proxy_set_header Upgrade $http_upgrade;\n"
-//                +"    proxy_set_header Connection \"Upgrade\";\n"
-//
+                +"  listen "+ip+":"+sport+ (sport=='443'?' ssl':'') + ' default_server;\n'
+                +(sport=='443'?"  ssl on;\n":'')
+                +(sport=='443'?"  ssl_certificate_key " + ssl_info.key + ";\n" : "")
+                +(sport=='443'?"  ssl_certificate " + ssl_info.crt + ";\n" : "")
                 +"    proxy_set_header Host $host;\n"
                 +"    proxy_set_header X-Real-IP $remote_addr;\n"
                 + " return 404;"
-
 
                 +"}\n";
 
