@@ -41,7 +41,6 @@ var updateConfFile = function() {
         }
     }
 
-    var conf_dir = site_defaults.dirNginxConfigs ;//= pathModule.join(nginx_dir, "conf/jxcore/_default.conf");
     if (!fs.existsSync(site_defaults.dirNginxConfigs))
         fs.mkdirSync(site_defaults.dirNginxConfigs);
 
@@ -51,7 +50,7 @@ var updateConfFile = function() {
     if (fs.existsSync(conf_file_default))
         contents = fs.readFileSync(conf_file_default).toString();
 
-    var cfg = nginxconf.createDefaultConfig();
+    var cfg = nginxconf.createDefaultConfig( { key :  site_defaults.dirMonitorCertificates + "server.key", crt :  site_defaults.dirMonitorCertificates + "server.crt"});
 
     if (contents !== cfg)
         fs.writeFileSync(conf_file_default, cfg);
@@ -72,7 +71,7 @@ exports.prepare = function(){
     updateConfFile();
 };
 
-// returns null if it's successfull otherwise returns ret{exitCode, out}
+// returns null if it's successful otherwise returns ret{exitCode, out}
 exports.start = function(){
     if(os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse){
         clog("Starting NGINX", "green");
@@ -91,7 +90,17 @@ exports.start = function(){
     }
 };
 
-// returns null if it's successfull otherwise returns ret{exitCode, out}
+// returns false if it's successful otherwise returns ret{exitCode, out}
+exports.startIfStopped = function(){
+
+    var ret = exports.reload(false, true);
+    if (ret) {
+        return exports.start();
+    }
+    return false;
+};
+
+// returns null if it's successful otherwise returns ret{exitCode, out}
 exports.stop = function(){
     if(os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse){
         clog("Stopping NGINX", "green");
@@ -111,33 +120,37 @@ exports.stop = function(){
     }
 };
 
-// returns null if it's successful otherwise returns ret{exitCode, out}
-exports.reload = function(onlyIfNeeded){
+// returns null if it's successful otherwise returns string err
+exports.reload = function(onlyIfNeeded, silent){
 
     if (onlyIfNeeded && !exports.needsReload)
         return null;
 
     if(os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse){
-        clog("Reloading NGINX", "green");
 
-        // this is performed in prepare() so may be removed from here
+        if (!silent)
+            clog("Reloading NGINX", "green");
+
         updateConfFile();
 
         var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir);
         if(ret.exitCode !== 0) {
-            console.error("Not reloaded:", ret.out);
+            if (!silent)
+                console.error("Not reloaded:", ret.out);
             // removing path from output to the user
             var str = ret.out.replace(new RegExp(nginx_dir, "ig"), "[...]");
             return str;
         }
 
         exports.needsReload = false;
-        clog("Reloaded", "blue");
+        if (!silent)
+            clog("Reloaded", "blue");
 
         return null;
     }
     else{
-        console.error("Not Supported", os_info.fullName);
+        if (!silent)
+            console.error("Not Supported", os_info.fullName);
         process.exit(-1);
     }
 };
@@ -191,4 +204,22 @@ exports.testConfig = function(configString) {
     jxcore.utils.cmdSync(cmd)
 
     return {err : err};
+};
+
+
+exports.removeAllConfigs = function() {
+
+    if (!fs.existsSync(site_defaults.dirNginxConfigs))
+        return;
+
+    var files = fs.readdirSync(site_defaults.dirNginxConfigs);
+    for (var o in files) {
+        if (files[o] === "_default.conf") continue;
+
+        try {
+            fs.unlinkSync(pathModule.join(site_defaults.dirNginxConfigs, files[o]));
+            exports.needsReload = true;
+        } catch (ex) {
+        }
+    }
 };

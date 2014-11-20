@@ -76,6 +76,10 @@ else {
     var downloads = require("./definitions/downloads")
     var terminal = require("./definitions/terminal");
     var addons_tools = require("./addons_tools");
+    var nginx = require("./install/nginx");
+
+    if (nginx.startIfStopped())
+        process.exit(-1);
 
     require('http').setMaxHeaderLength(0);
 
