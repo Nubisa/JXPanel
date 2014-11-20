@@ -1339,11 +1339,11 @@ div.DTTT_collection a.DTTT_button,div.DTTT_collection button.DTTT_button,div.DTT
     width: 100%;
     float: left;
     border-bottom: 1px solid #ccc;
-    background: #fafafa;
+    /*background: #fafafa;*/
 }
 
 .dt-toolbar-footer {
-    background: #fafafa;
+    /*background: #fafafa;*/
     font-size: 11px;
     overflow: hidden;
     padding: 5px 10px;
