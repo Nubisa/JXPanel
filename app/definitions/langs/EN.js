@@ -47,6 +47,7 @@ exports.Labels = {
     "NoResults" : "No results",
     "FilterResults" : "Filter results",
     "Example" :  "Example",
+    "Connecting" : "Connecting...",
 
     "help":"Help",
     "logout":"Logout",

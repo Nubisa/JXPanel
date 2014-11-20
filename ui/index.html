@@ -31,18 +31,19 @@
 
                                     <section>
                                         <label class="label">{{label.Username}}</label>
-                                        <label class="input"> <i class="icon-append fa fa-user"></i>
-                                            <input type="text" id="username{{utils.dateNow}}" name="username">
+                                        <label class="input state-disabled"> <i class="icon-append fa fa-user"></i>
+                                            <input type="text" id="username" name="username" disabled="disabled">
                                             <b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i> {{label.UsernameEnter}}</b></label>
                                     </section>
 
                                     <section>
                                         <label class="label">{{label.Password}}</label>
-                                        <label class="input"> <i class="icon-append fa fa-lock"></i>
-                                            <input type="password" id="password{{utils.dateNow}}" name="password">
+                                        <label class="input state-disabled"> <i class="icon-append fa fa-lock"></i>
+                                            <input type="password" id="password" name="password" disabled="disabled">
                                             <b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i> {{label.PasswordEnter}}</b> </label>
                                         <div class="note">
-                                            <a href="../__htmls/forgotpassword.html">{{label.PasswordForgot}}</a>
+                                            <!--<a href="../__htmls/forgotpassword.html">{{label.PasswordForgot}}</a>-->
+                                            &nbsp;
                                         </div>
                                         <span id="notify">
 
@@ -51,14 +52,18 @@
 
                                 </fieldset>
                                 <footer>
+                                     <span id="connect" style="margin-top: 20px; height: 100%; display: inline-block;">
+                                        <i class="fa fa-fw fa-circle-o-notch fa-spin"></i>&nbsp;&nbsp;{{label.Connecting}}...
+                                    </span>
+
                                     <span id="buttons" class="jxbuttons" style="margin-top: 10px; float: right;">
                                         <i class="fa fa-fw fa-align-justify" style="color: #757a7b;"></i>&nbsp;&nbsp;
 
-                                        <!--<a id="btnSubmit" data-original-title="{{label.AddOnAddNew}}" class="jxbtn">-->
+                                        <!--<a id="btnSubmit" title="{{label.AddOnAddNew}}" class="jxbtn jxbtn_disabled">-->
                                             <!--<i class="glyphicon glyphicon-log-in"></i><span class="dummy-label">{{label.SignIn}}</span>-->
                                         <!--</a>-->
 
-                                      <button id="btnSubmit" type="submit" class="jxbtn" disabled>
+                                      <button id="btnSubmit" type="submit" class="jxbtn jxbtn_disabled" disabled>
                                           <i class="glyphicon glyphicon-log-in"></i>
                                           <span class="dummy-label">{{label.SignIn}}</span>
                                       </button>
@@ -81,16 +86,11 @@
 
 		<!--================================================== -->	
 
-        <script>
+        <script type="text/javascript">
+
             window.jxTemplateReadyForjxm = function() {
-                document.getElementById("btnSubmit").disabled = null;
-            };
-        </script>
 
-		<script type="text/javascript">
-
-            window.jxTemplateReady = function() {
-                //runAllForms();
+                var enabled = null;
 
                 $(function() {
                     // Validation
@@ -116,36 +116,60 @@
                         },
                         errorPlacement : function(error, element) {
                             error.insertAfter(element.parent());
+                        },
+                        submitHandler : function(form) {
+                            submitLogin();
                         }
                     });
+
                     var submitLogin = function(e){
-                        document.getElementById("btnSubmit").disabled = "disabled";
-                        var uname = document.getElementById("username{{utils.dateNow}}").value;
-                        var pwd = document.getElementById("password{{utils.dateNow}}").value;
-                        if(!jxcore.IsConnected){
+                        if (!enabled) return false;
+
+                        btnEnableDisable(false);
+                        var uname = document.getElementById("username").value;
+                        var pwd = document.getElementById("password").value;
+                        if(!jxcore.IsConnected) {
                             location.reload();
-                        }else{
-                            setTimeout(function(){
-                                window.toServer("tryLogin", {username:uname, password:pwd, lang:"EN", url:location.href}, function(result){
-
-                                    if(result.err){
-                                        document.getElementById('notify').innerHTML =
-                                                '<div class="note">'
-                                                +'<span style="color:red">' + result.err + '</span>'
-                                        '</div>';
-
-                                        document.getElementById("btnSubmit").disabled = null;
-                                    }else{
-                                        location.href = result.url;
-                                    }
-                                }, true);
-                            }, 100);
+                            return false;
                         }
+
+
+                        setTimeout(function(){
+                            window.toServer("tryLogin", {username:uname, password:pwd, lang:"EN", url:location.href}, function(result){
+
+                                if(result.err){
+                                    document.getElementById('notify').innerHTML =
+                                            '<div class="note">'
+                                            +'<span style="color:red">' + result.err + '</span>'
+                                    '</div>';
+
+                                    btnEnableDisable(true);
+                                }else{
+                                    location.href = result.url;
+                                }
+                            }, true);
+                        }, 100);
+
                         return false;
                     };
 
-                    $("#login-form").submit(submitLogin);
-                    $("#btnSubmit").click(submitLogin);
+                    var btnEnableDisable = function(enable) {
+
+                        enabled = enable;
+                        if (enable) {
+                            $("#btnSubmit").removeClass("jxbtn_disabled").prop("disabled", "");
+                            $("label.input").removeClass("state-disabled");
+                            $("input").prop("disabled", "");
+                            $("#connect").hide();
+                        }
+                        else {
+                            $("#btnSubmit").addClass("jxbtn_disabled").prop("disabled", "disabled")
+                            $("label.input").addClass("state-disabled");
+                            $("input").prop("disabled", "disabled");
+                        }
+                    };
+
+                    btnEnableDisable(true);
                 });
             };
 		</script>

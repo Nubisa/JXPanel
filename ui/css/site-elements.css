@@ -106,8 +106,14 @@
     text-decoration: underline;
 }
 
+.jxbtn_disabled:hover .dummy-label {
+    color:#757a7b!important;
+    text-decoration: none!important;
+}
+
 .jxbtn_disabled, .jxbtn_disabled:hover{
     color:#757a7b;
+    text-decoration: none!important;
 }
 
 .jxbtn_save, .jxbtn_save:hover{
