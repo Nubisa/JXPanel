@@ -24,6 +24,9 @@ var log = function (str, error) {
     }
 };
 
+process.on("uncaughtException", function(err) {
+    log("UncaughtException: " + err, true);
+});
 
 var options = null;
 var pos = process.argv.indexOf("-opt");
@@ -35,7 +38,12 @@ if (pos > -1 && process.argv[pos + 1]) {
     process.exit(7);
 }
 
-var logPath = options.log;
+if (!options.home || !fs.existsSync(options.home)) {
+    log("Unknown home dir.", true);
+    process.exit(7);
+}
+
+var logPath = pathModule.join(options.home, options.log);
 if (!logPath) {
     log("Unknown log path.", true);
     process.exit(7);
@@ -81,7 +89,7 @@ if (!isRoot || !respawned) {
     // exiting, so monitor can spawn the spawner as root
     // and then the spawner may spawn the app as -u (user)
 
-    // subscribing to monitor
+    // subscribing to monitor as non-root user
     jxcore.monitor.followMe(function (err, txt) {
         if (err) {
             log("Did not subscribed (as user " + whoami + ") to the monitor: " + txt, true);
@@ -148,39 +156,25 @@ if (!isRoot || !respawned) {
     }
 
     var root_functions = require("./root_functions.js");
+    var chokidar = require('chokidar');
 
-    var file = options.file;
+    var file = pathModule.join(options.home, options.file);
+    var appDir = pathModule.dirname(file);
 
     // ########  saving nginx conf
-    if (!options.dontSaveNginxConfigFile) {
-        var confDir = "/etc/nginx/jxcore.conf.d/";
-        var confFile = confDir + options.domain + ".conf";
-
-        if (fs.existsSync(confDir)) {
-            var nginx = require("./nginxconf.js");
-            nginx.resetInterfaces();
-            var logWebAccess = options.logWebAccess == 1 || options.logWebAccess == "true";
-            var conf = nginx.createConfig(options.domain, [ options.tcp, options.tcps], logWebAccess ? pathModule.dirname(logPath) : null);
-
-            try {
-                fs.writeFileSync(confFile, conf);
-                var ret = jxcore.utils.cmdSync("chown psaadm:nginx " + confFile + ";");
-                if (ret.exitCode) {
-                    log("Cannot set ownership for nginx config: " + ret.out);
-                }
-            } catch (ex) {
-                log("Cannot save nginx conf file: " + ex);
+    if (options.plesk) {
+        try {
+            var ret = root_functions.saveNginxConfigFileForDomain(options);
+            if (ret.err) {
+                log(ret.err, true);
+                process.exit(7);
             }
+        } catch(ex) {
+            log(ex.toString(), true);
+            process.exit(7);
         }
     }
 
-    delete options.log;
-    delete options.user;
-    delete options.file;
-    delete options.domain;
-    delete options.tcp;
-    delete options.tcps;
-    delete options.logWebAccess;
 
     var child = null;
     // this can be done only by privileged user.
@@ -211,6 +205,32 @@ if (!isRoot || !respawned) {
         }
     };
 
+    // if app is located in subfolders - let's create them
+    if (!fs.existsSync(appDir)) {
+        try {
+            jxcore.utils.cmdSync('mkdir -p ' + appDir);
+        } catch (ex) {
+            log("Cannot create app's directory: " + ex);
+            process.exit(7);
+        }
+
+        if (fs.existsSync(appDir)) {
+            // if app is located in domain.home/sub1/sub2/sub3/index.txt
+            // then after we create /sub1/sub2/sub3/
+            // we set ownership recursively for /sub1 folder
+            var relative_arr = pathModule.normalize("/" + options.file).split(pathModule.sep);
+            // result: [ '', 'sub1', 'sub2', 'sub3', 'index.js' ]
+            if (relative_arr[1]) {
+                var relative_root = pathModule.join(options.home, relative_arr[1]);
+                var ret = jxcore.utils.cmdSync("chown -R " + uid + ":" + gid + " " + relative_root);
+                if (ret.exitCode) {
+                    log("Cannot set app's directory ownership: " + ex);
+                    process.exit(7);
+                }
+            }
+        }
+    }
+
     // subscribing to monitor
     jxcore.monitor.followMe(function (err, txt) {
         if (err) {
@@ -221,27 +241,38 @@ if (!isRoot || !respawned) {
             try{
                 runApp();
             }catch(ex){
+                log("Cannot run the application: " + ex);
                 exiting = true;
                 process.exit();
-            };
+            }
 
-            root_functions.watch(pathModule.dirname(file), logPathDir, function (param) {
+            var opts = { ignored: /[\/\\]\./, persistent : true, ignoreInitial : true, ignorePermissionErrors : true };
+            chokidar.watch(appDir, opts ).on('all', function(event, path) {
 
-                if (param.clearlog && out && out != "ignore" ) {
-                    fs.ftruncateSync(out, 0);
-//                    log("clearing the log!: " + JSON.stringify(param) );
-                    try {
-                        fs.unlinkSync(pathModule.join(param.dir, "/", param.file));
-                    } catch (ex) {
+                log("chokidar: " + event + ", " + path);
+
+                if (pathModule.dirname(path) === logPathDir) {
+
+                    // condition below is not used by jxpanel (only by plesk)
+                    if (pathModule.basename(path) === "clearlog.txt" && out && out != "ignore" ) {
+                        log("clearLog!!!");
+                        //try {
+                        //    fs.ftruncateSync(out, 0);
+                        //    log("Log cleared");
+                        //} catch(ex) {
+                        //}
+                        //try {
+                        //    // removing clearlog.txt
+                        //    fs.unlinkSync(path);
+                        //    log("Cleared: " + path);
+                        //} catch (ex) {
+                        //}
                     }
-                    try {
-                        fs.unlinkSync(pathModule.join(param.dir, "/clearlog.txt"));
-                    } catch (ex) {
-                    }
+                    // ignore changes inside log directory
                     return;
                 }
 
-                var _extname = pathModule.extname(param.path).toLowerCase();
+                var _extname = pathModule.extname(path).toLowerCase();
                 if(exiting || (_extname != '.js' && _extname != ".jx"))
                     return;
 

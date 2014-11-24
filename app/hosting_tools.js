@@ -172,21 +172,26 @@ exports.appGetOptions = function (domain_name, domain_data) {
     var appPath = path.join(appDir, domain.jx_app_path);
 
     var app3rdparty = domain.jx_app_type === 'custom' ? false : domain.jx_app_type;
+    var app3rdpartyError = null;
     if (app3rdparty) {
         var appData = apps_tools.getData(domain_name, domain.jx_app_type);
         if (appData.err)
             return { err : appData.err };
+
+        if (!appData.exists)
+            app3rdpartyError = { err : "JXcoreAppAppNotInstalled|" + appData.appNameLowerCase };
 
         appPath = appData.path;
     }
 
     var appPathReplaced = appPath.replace(/[\/]/g, "_").replace(/[\\]/g, "_");
     var cfgPath = site_defaults.dirAppConfigs + appPathReplaced + ".jxcore.config";
-    var logPath = path.join(appDir, "jxcore_logs/index.txt");
+    var logPathRelative = "jxcore_logs/index.txt";
+    var logPath = path.join(appDir, logPathRelative);
 
     var ssl_info = exports.appGetSSLInfo(appDir, domain.ssl, domain.ssl_crt, domain.ssl_key );
 
-    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_replaced : appPathReplaced, log_path : logPath, user : user, plan: plan, domain : domain, ssl_info : ssl_info };
+    return { cfg : json, cfg_path : cfgPath, app_dir : appDir, app_path : appPath, app_path_relative : domain.jx_app_path, app_path_replaced : appPathReplaced, log_path : logPath, log_path_relative : logPathRelative, user : user, plan: plan, domain : domain, ssl_info : ssl_info, app_3rdparty_error : app3rdpartyError };
 };
 
 exports.appCreateHomeDir = function(domain_name) {
@@ -333,13 +338,13 @@ exports.appGetSpawnerCommand = function (domain_name) {
 
     var opt = {
         "user": user.name,
-        "log": options.log_path,
-        "file": options.app_path,
+        "log": options.log_path_relative,
+        "file": options.app_path_relative,
+        "home" : options.app_dir,
         "domain": domain.name,
         "tcp": domain.port_http,
         "tcps": domain.port_https,
-        "logWebAccess": domain.jx_web_log,
-        "dontSaveNginxConfigFile" : true
+        "logWebAccess": domain.jx_web_log
     };
 
     var cmd = jxPath + " " + spawnerPath + " -opt '" + JSON.stringify(opt) + "'";
@@ -441,6 +446,9 @@ var appGetStartCommand = function(domain_name) {
     var options = exports.appGetOptions(domain_name);
     if (options.err)
         return options;
+
+    if (options.app_3rdparty_error)
+        return options.app_3rdparty_error;
 
     var spawner = exports.appGetSpawnerPath(domain_name);
     if (spawner.err)

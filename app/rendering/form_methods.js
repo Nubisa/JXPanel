@@ -693,6 +693,9 @@ methods.appStartStop = function (env, params) {
 
         hosting_tools.appStartStop(params.op, params.id, function(err, domain_name, online_before) {
 
+            if (err)
+                err = form_lang.Get(active_user.lang, err, true);
+
             // JXPanel should know, whether user wanted to start or stop an app
             var domain = database.getDomain(params.id);
             domain.jx_enabled = params.op;
