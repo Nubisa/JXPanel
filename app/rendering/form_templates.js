@@ -288,6 +288,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         var val = (values && (values[dbname] || values[dbname] === 0 || values[dbname] === false)) ? values[dbname] : null;
         // if we'll check against !val
         if (val === 0) val = "0";
+        if (typeof val === "string") val = val.replace(/"/g, "&quot;");
 
         ctrl.options.extra = { formName : formName, isUpdate : isUpdate };
         if (ctrl.options.password && isUpdate)
