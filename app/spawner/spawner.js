@@ -175,7 +175,6 @@ if (!isRoot || !respawned) {
         }
     }
 
-
     var child = null;
     // this can be done only by privileged user.
     // node throws exception otherwise
@@ -183,7 +182,10 @@ if (!isRoot || !respawned) {
     var runApp = function(){
         if (fs.existsSync(file)) {
             var spawn = require('child_process').spawn;
-            child = spawn(process.execPath, [file], { uid: uid, gid: gid, maxBuffer: 1e7, stdio: [ 'ignore', out, out ], cwd: pathModule.dirname(file)});
+            var args = [file];
+            if (options.args)
+                args = args.concat(options.args);
+            child = spawn(process.execPath, args, { uid: uid, gid: gid, maxBuffer: 1e7, stdio: [ 'ignore', out, out ], cwd: pathModule.dirname(file)});
 
             child.on('error', function (err) {
                 if (err.toString().trim().length) {

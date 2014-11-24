@@ -5,6 +5,7 @@ var hosting_tools = require("./../hosting_tools");
 var database = require("./../install/database");
 var site_defaults = require("./site_defaults");
 var nginxconf = require("../spawner/nginxconf");
+var root_functions = require("../spawner/root_functions");
 var nginx = require("../install/nginx");
 var _active_user = require("../definitions/active_user");
 var path = require('path');
@@ -224,7 +225,7 @@ exports.UserName = function() {
 
 exports.Domain = function() {
 
-    this.validate = function (env, active_user, val) {
+    this.validate = function (env, active_user, val, params, field_name) {
 
         var reg = new RegExp("^([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.)+[a-zA-Z]{2,4}$", "i");
 
@@ -421,6 +422,19 @@ exports.AppType = function() {
         var appData = apps_tools.getData(domain_name, val, true);
         if (appData.err)
             return { result: false, msg : form_lang.Get(active_user.lang, appData.err, true) };
+
+        return {result: true};
+    };
+};
+
+// validates app's file name
+exports.AppArgs = function() {
+
+    this.validate = function (env, active_user, val, params, field_name) {
+
+        var ret = root_functions.parseUserArgs(val);
+        if (ret.err)
+            return { result: false, msg : form_lang.Get(active_user.lang, 'JXcoreAppArgsCannotParse', true) };
 
         return {result: true};
     };

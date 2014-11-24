@@ -91,3 +91,23 @@ exports.getUID = function(username) {
         return uid;
     }
 };
+
+// parses args string into array with proper quoted values, e.g.: s1 s2="s s" s3='test '
+exports.parseUserArgs = function(args_str) {
+
+    if (args_str) {
+        var jxPath = '"' + process.execPath + '"';
+
+        var ret = jxcore.utils.cmdSync(jxPath + ' -e "console.log(JSON.stringify(process.argv.slice(2)))" '+ args_str);
+        if (ret.exitCode)
+            return { err : true };
+
+        try {
+            return JSON.parse(ret.out);
+        } catch(ex) {
+            return { err : true };
+        }
+    } else {
+        return [];
+    }
+};

@@ -16,6 +16,7 @@ var system_tools = require("./system_tools");
 var nginxconf = require("./spawner/nginxconf");
 var nginx = require("./install/nginx");
 var apps_tools = require("./rendering/apps_tools");
+var root_functions = require("./spawner/root_functions");
 
 // iterating through domains and assigning http/https port
 exports.setPortRange = function (min, max) {
@@ -344,7 +345,8 @@ exports.appGetSpawnerCommand = function (domain_name) {
         "domain": domain.name,
         "tcp": domain.port_http,
         "tcps": domain.port_https,
-        "logWebAccess": domain.jx_web_log
+        "logWebAccess": domain.jx_web_log,
+        args: root_functions.parseUserArgs(domain.jx_app_args)
     };
 
     var cmd = jxPath + " " + spawnerPath + " -opt '" + JSON.stringify(opt) + "'";
@@ -426,6 +428,7 @@ exports.appStartStop = function(startOrStop, domain_name, cb) {
                     } else {
                         var s = form_lang.Get('EN', msg, true);
                         console.error(s, errExec, stdout, stderr);
+                        exports.appRemoveNginxConfigPath(domain_name);
                     }
 
 

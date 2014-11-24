@@ -263,6 +263,16 @@ exports.form = function () {
                 validation : new validations.FileName()
             },
 
+            {
+                name: "jx_app_args",
+                details: {
+                    label: "JXcoreAppArgs",
+                    method: tool.createTextBox,
+                    options: { }
+                },
+                validation : new validations.AppArgs()
+            },
+
             { name: "jx_web_log",
                 details: {
                     label: "AppLogWebAccess",

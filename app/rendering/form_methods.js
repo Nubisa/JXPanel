@@ -396,8 +396,12 @@ methods.sessionApply = function(env, params){
             if (isUpdate) {
                 var domain = database.getDomain(update_name);
                 var jx_web_log_changed = domain.jx_web_log !== json.jx_web_log;
-                var jx_app_path_changed = domain.jx_app_path !== json.jx_app_path;
-                var jx_app_type_changed = domain.jx_app_type !== json.jx_app_type;
+
+                var restart_related_fields_changed =
+                    domain.jx_web_log !== json.jx_web_log ||
+                    domain.jx_app_type !== json.jx_app_type ||
+                    domain.jx_app_args !== json.jx_app_args;
+
                 var jx_app_options = hosting_tools.appGetOptions(update_name);
                 var ssl_changed = domain.ssl !== json.ssl || domain.ssl_crt !== json.ssl_crt || domain.ssl_key !== json.ssl_key;
                 if (!domain)
@@ -422,7 +426,7 @@ methods.sessionApply = function(env, params){
                         if (err)
                             return sendError(err);
 
-                        if (jx_app_path_changed || jx_app_type_changed || changed) {
+                        if (restart_related_fields_changed || changed) {
                             if (jx_app_options && !jx_app_options.err) {
                                 var file = jx_app_options.cfg_path;
                                 if (fs.existsSync(file)) {
