@@ -98,7 +98,7 @@ exports.parseUserArgs = function(args_str) {
     if (args_str) {
         var jxPath = '"' + process.execPath + '"';
 
-        var ret = jxcore.utils.cmdSync(jxPath + ' -e "console.log(JSON.stringify(process.argv.slice(2)))" '+ args_str);
+        var ret = jxcore.utils.cmdSync(jxPath + ' -e "console.log(JSON.stringify(process.argv.slice(1)))" '+ args_str);
         if (ret.exitCode)
             return { err : true };
 

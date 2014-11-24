@@ -212,7 +212,7 @@ if (!isRoot || !respawned) {
         try {
             jxcore.utils.cmdSync('mkdir -p ' + appDir);
         } catch (ex) {
-            log("Cannot create app's directory: " + ex);
+            log("Cannot create app's directory: " + ex, true);
             process.exit(7);
         }
 
@@ -226,7 +226,7 @@ if (!isRoot || !respawned) {
                 var relative_root = pathModule.join(options.home, relative_arr[1]);
                 var ret = jxcore.utils.cmdSync("chown -R " + uid + ":" + gid + " " + relative_root);
                 if (ret.exitCode) {
-                    log("Cannot set app's directory ownership: " + ex);
+                    log("Cannot set app's directory ownership: " + ex, true);
                     process.exit(7);
                 }
             }
@@ -243,7 +243,7 @@ if (!isRoot || !respawned) {
             try{
                 runApp();
             }catch(ex){
-                log("Cannot run the application: " + ex);
+                log("Cannot run the application: " + ex, true);
                 exiting = true;
                 process.exit();
             }
@@ -251,13 +251,13 @@ if (!isRoot || !respawned) {
             var opts = { ignored: /[\/\\]\./, persistent : true, ignoreInitial : true, ignorePermissionErrors : true };
             chokidar.watch(appDir, opts ).on('all', function(event, path) {
 
-                log("chokidar: " + event + ", " + path);
+                //log("chokidar: " + event + ", " + path);
 
                 if (pathModule.dirname(path) === logPathDir) {
 
                     // condition below is not used by jxpanel (only by plesk)
                     if (pathModule.basename(path) === "clearlog.txt" && out && out != "ignore" ) {
-                        log("clearLog!!!");
+                        //log("clearLog!!!");
                         //try {
                         //    fs.ftruncateSync(out, 0);
                         //    log("Log cleared");
