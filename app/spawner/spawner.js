@@ -25,7 +25,7 @@ var log = function (str, error) {
 };
 
 process.on("uncaughtException", function(err) {
-    log("UncaughtException: " + err, true);
+    log("UncaughtException (" + whoami + "): " + err, true);
 });
 
 var options = null;
@@ -95,12 +95,12 @@ if (!isRoot || !respawned) {
             log("Did not subscribed (as user " + whoami + ") to the monitor: " + txt, true);
         } else {
             log("Subscribed successfully: " + txt);
-/*
-            var str = "Exiting, to be respawned by JXcore monitor."
-            if (!isRoot) {
-                str = "I am not a root. " + str;
-            }
-            log(str);*/
+            /*
+             var str = "Exiting, to be respawned by JXcore monitor."
+             if (!isRoot) {
+             str = "I am not a root. " + str;
+             }
+             log(str);*/
             setTimeout(function(){process.exit(77)}, 1000);
         }
 
@@ -184,8 +184,9 @@ if (!isRoot || !respawned) {
             var spawn = require('child_process').spawn;
             var args = [file];
             if (options.args)
-                args = args.concat(options.args);
-            child = spawn(process.execPath, args, { uid: uid, gid: gid, maxBuffer: 1e7, stdio: [ 'ignore', out, out ], cwd: pathModule.dirname(file)});
+                args = args.concat(options.args);  //expected array (after options was parsed)
+
+            child = spawn(process.execPath, args, { uid: uid, gid: gid, maxBuffer: 1e7, stdio: [ 'ignore', out, out ], cwd: appDir});
 
             child.on('error', function (err) {
                 if (err.toString().trim().length) {
@@ -194,8 +195,8 @@ if (!isRoot || !respawned) {
             });
 
             child.on('exit', function (code) {
-                if (code) {
-                    log("Child is exiting " + code, true);
+                if (code && !exiting) {
+                    log("Application exited by itself with code: " + code, true);
                 }
                 if (!exiting) {
                     exiting = true;
@@ -217,7 +218,7 @@ if (!isRoot || !respawned) {
         }
 
         if (fs.existsSync(appDir)) {
-            // if app is located in domain.home/sub1/sub2/sub3/index.txt
+            // if app is located in domain.home/sub1/sub2/sub3/index.js
             // then after we create /sub1/sub2/sub3/
             // we set ownership recursively for /sub1 folder
             var relative_arr = pathModule.normalize("/" + options.file).split(pathModule.sep);
@@ -249,34 +250,35 @@ if (!isRoot || !respawned) {
             }
 
             var opts = { ignored: /[\/\\]\./, persistent : true, ignoreInitial : true, ignorePermissionErrors : true };
-            chokidar.watch(appDir, opts ).on('all', function(event, path) {
-
-                //log("chokidar: " + event + ", " + path);
+            var watcher = chokidar.watch(appDir, opts ).on('all', function(event, path) {
 
                 if (pathModule.dirname(path) === logPathDir) {
 
                     // condition below is not used by jxpanel (only by plesk)
-                    if (pathModule.basename(path) === "clearlog.txt" && out && out != "ignore" ) {
-                        //log("clearLog!!!");
-                        //try {
-                        //    fs.ftruncateSync(out, 0);
-                        //    log("Log cleared");
-                        //} catch(ex) {
-                        //}
-                        //try {
-                        //    // removing clearlog.txt
-                        //    fs.unlinkSync(path);
-                        //    log("Cleared: " + path);
-                        //} catch (ex) {
-                        //}
+                    if (options.plesk && pathModule.basename(path) === "clearlog.txt" && out && out != "ignore" ) {
+                        try {
+                            fs.ftruncateSync(out, 0);
+                            log("Log file cleared.");
+                        } catch(ex) {
+                            log("Could not clear the log file: " + ex, true);
+                        }
+                        try {
+                            // removing clearlog.txt
+                            if (fs.existsSync(path))
+                                fs.unlinkSync(path);
+                        } catch (ex) {
+                            log("Could not remove clearlog file: " + ex, true);
+                        }
                     }
-                    // ignore changes inside log directory
+                    // ignore other changes inside log directory
                     return;
                 }
 
                 var _extname = pathModule.extname(path).toLowerCase();
                 if(exiting || (_extname != '.js' && _extname != ".jx"))
                     return;
+
+                log("File change (" + event + ") detected on " + path.replace(options.home, ""));
 
                 exiting = true;
 
@@ -287,11 +289,15 @@ if (!isRoot || !respawned) {
                     if(counter>=6 || fs.existsSync(file)){
                         clearInterval(_inter);
 
+                        log("Restarting the application.")
                         process.exit(77);
                     }
                 }, 500);
             });
 
+            // if app is located in subfolders, we need to monitor log dir separately for clearlog.txt
+            if (logPathDir !== appDir)
+                watcher.add(logPathDir);
         }
     }, function (delay) {
         log("Subscribing is delayed by " + delay + " ms.");
