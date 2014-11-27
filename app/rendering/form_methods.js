@@ -518,7 +518,7 @@ methods.sessionApply = function(env, params){
 
         var min = json["jx_app_min_port"];
         var max = json["jx_app_max_port"];
-        var changed = hosting_tools.setPortRange(min,max);
+        var changed = hosting_tools.setPortRange(min,max, json["jx_app_port_per_domain"]);
         if (changed | jx_monitor_api_changed) {
             hosting_tools.monitorRestart(active_user, function(err) {
                 sendError(err);

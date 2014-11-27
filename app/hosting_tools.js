@@ -19,7 +19,7 @@ var apps_tools = require("./rendering/apps_tools");
 var root_functions = require("./spawner/root_functions");
 
 // iterating through domains and assigning http/https port
-exports.setPortRange = function (min, max) {
+exports.setPortRange = function (min, max, ports_per_domain) {
 
     var domains = database.getDomainsByUserName(null, 1e5);
 
@@ -28,18 +28,26 @@ exports.setPortRange = function (min, max) {
     var current = min;
     for (var i in domains) {
         var domain = database.getDomain(domains[i]);
-        var ok = current <= max - 2;
-        var prev_http = domain.port_http;
-        var prev_https = domain.port_https;
-        domain.port_http = ok ? current++ : null;
-        domain.port_https = ok ? current++ : null;
+        var ok = current <= max - ports_per_domain;
 
-        if (prev_http !== domain.port_http || prev_https !== domain.port_https)
+        var ports = [];
+        for(var o=1; o<= ports_per_domain; o++) {
+            var port = current++;
+            if (o === 1) domain.port_http = ok ? port : null; else
+            if (o === 2) domain.port_https = ok ? port : null;
+
+            ports.push(port);
+        }
+
+        if (JSON.stringify(domain.ports) !== JSON.stringify(ports)) {
             changed = true;
+            domain.ports = ports;
+        }
     }
 
     database.setConfigValue("jx_app_min_port", min);
     database.setConfigValue("jx_app_max_port", max);
+    database.setConfigValue("jx_app_port_per_domain", ports_per_domain);
     database.updateDBFile();
 
     return changed;

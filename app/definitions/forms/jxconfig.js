@@ -140,6 +140,16 @@ exports.form = function () {
             {"BEGIN": "JXcoreConfiguration"},
 
             {
+                name: "jx_app_port_per_domain",
+                details: {
+                    label: "JXcoreAppPortsPerDomain",
+                    method: tool.createTextBox,
+                    options: { required: true, default: 1 }
+                },
+                validation : new validations.Int({ gte : 1, lte : 10 })
+            },
+
+            {
                 name: "jx_app_min_port",
                 details: {
                     label: "JXcoreAppMinPort",
@@ -154,7 +164,11 @@ exports.form = function () {
                 details: {
                     label: "JXcoreAppMaxPort",
                     method: tool.createTextBox,
-                    options: { required: true, default : site_defaults.defaultAppMaxPort }
+                    options: { required: true, default : site_defaults.defaultAppMaxPort },
+                    getDescription : function(active_user, values, formName) {
+                        var ports_per_domain = database.getConfigValue("jx_app_port_per_domain") || 1;
+                        return form_lang.Get(active_user.lang, "JXcoreAppMaxPort_Description", true, [ ports_per_domain ] );
+                    }
                 },
                 validation : new validations.MaxPort("jx_app_min_port")
             },

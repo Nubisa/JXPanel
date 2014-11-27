@@ -463,7 +463,7 @@ exports.Labels = {
     "JXcoreAppPortsPerDomain_Description" : "This number indicates, how many ports should be allocated per each domain. Default value is 1.",
     "JXcoreAppMinPort" : "Minimum app port number",
     "JXcoreAppMaxPort" : "Maximum app port number",
-    "JXcoreAppMaxPort_Description" : "The port range should be greater than domain count multiplied by two (HTTP + HTTPS). It means, that you need two ports for each of your domains.",
+    "JXcoreAppMaxPort_Description" : "The port range should be greater than domain count multiplied by defined number of ports per domain (%s).",
     "JXcoreAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
     "JXcoreAppsRestartWarning" : "Submitting the form may result in restarting the monitor together with all running applications.",
     "JXcoreAppCannotStart" : "Cannot start application %s.",
