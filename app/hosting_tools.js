@@ -53,6 +53,11 @@ exports.setPortRange = function (min, max, ports_per_domain) {
     return changed;
 };
 
+exports.getPortsPerDomain = function() {
+    return database.getConfigValue("jx_app_port_per_domain") || 1;
+};
+
+
 exports.getPortRange = function () {
     var cfg = database.getConfig();
     var min = parseInt(cfg.jx_app_min_port);
@@ -70,15 +75,18 @@ exports.getTakenPorts = function () {
     var ret = [];
     for (var o in domains) {
         var domain = database.getDomain(domains[o]);
-        ret.push(domain.port_http);
-        ret.push(domain.port_https);
+        if (domain.ports)
+            ret = ret.concat(domain.ports);
+        else
+            ret.push(domain.port_http);
+        //ret.push(domain.port_https);
     }
     return ret;
 };
 
 exports.getFreePorts = function (howMany) {
 
-    if (!howMany) howMany = 2;
+    if (!howMany) howMany = exports.getPortsPerDomain();
 
     var range = exports.getPortRange();
     var taken = exports.getTakenPorts();

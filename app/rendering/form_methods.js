@@ -447,7 +447,7 @@ methods.sessionApply = function(env, params){
                     return;
                 }
             } else {
-                var arr = hosting_tools.getFreePorts(2);
+                var arr = hosting_tools.getFreePorts();
                 if (!arr || arr.length < 2) {
                     var range = hosting_tools.getPortRange();
                     ret = form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ range.count, range.count + 2 ])
