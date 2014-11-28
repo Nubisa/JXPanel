@@ -7,6 +7,8 @@ var form_lang = require('../form_lang');
 var path = require("path");
 var validations = require('./../validations');
 var database = require("./../../install/database");
+var util = require("util");
+var ip_tools = require("./../../ip_tools");
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -283,6 +285,32 @@ exports.form = function () {
                     options: { multiline : true }
                 },
                 validation : new validations.NginxDirectives()
+            },
+
+
+            { name: "plan_ipv4_pool",
+                details: {
+                    label: "IPv4Pool",
+                    method: tool.createCheckedListBox,
+                    options: { required : true, required_label : "ValueRequiredAtLeastOne" },
+                    getValuesList : function(active_user, values, listOrForm) {
+                        return ip_tools.getPlanIPs(active_user, false, true);
+                    }
+                },
+                validation : new validations.IPAdresses(false)
+            },
+
+
+            { name: "plan_ipv6_pool",
+                details: {
+                    label: "IPv6Pool",
+                    method: tool.createCheckedListBox,
+                    options: { required : true, required_label : "ValueRequiredAtLeastOne" },
+                    getValuesList : function(active_user, values, listOrForm) {
+                        return ip_tools.getPlanIPs(active_user, true, true);
+                    }
+                },
+                validation : new validations.IPAdresses(true)
             },
 
             {"END" : 1}

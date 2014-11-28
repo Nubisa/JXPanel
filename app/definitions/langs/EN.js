@@ -166,6 +166,7 @@ exports.Labels = {
     "UserPanelAccess" : "JXPanel access",
 
     "ValueRequired" : "This field is required.",
+    "ValueRequiredAtLeastOne" : "At least one of the values has to be selected.",
     "ValueInvalid" : "The value for the field is invalid.",
     "ValueInvalidBoolean" : "The value is supposed to be boolean.",
     "ValueInvalidInteger" : "The value is supposed to be integer.",
@@ -347,7 +348,11 @@ exports.Labels = {
     "SubDomainCanOnlyAddToDomain" : "Cannot add subdomain for another subdomain. Please, choose domain instead.",
 
     "IPv4" : "IPv4 address",
+    "IPv4Pool" : "IPv4 addresses",
+    "IPv4Pool_Description" : "Please choose, which IPv4 addresses will be available for the hosting plan.",
     "IPv6" : "IPv6 address",
+    "IPv6Pool" : "IPv6 addresses",
+    "IPv6Pool_Description" : "Please choose, which IPv6 addresses will be available for the hosting plan.",
     "JXEnabled" : "JXcore",
     "JXcoreAppPath" : "Custom application file path",
     "JXcoreAppArgs" : "Application parameters",
@@ -380,6 +385,8 @@ exports.Labels = {
     "PlanAlreadyExists" : "Plan already exists",
     "PlanParentDefinesValue" : "Parent hosting plan defines this value as %s.",
     "PlanCurrent" : "Your current plan",
+    "PlanParentNoIPv4Pool" : "Parent hosting plan does not define IPv4 pool for. Please contact parent user.",
+    "PlanParentNoIPv6Pool" : "Parent hosting plan does not define IPv6 pool for. Please contact parent user.",
     "UserSuspended" : "User is suspended",
     "PlanSuspended" : "Hosting plan is suspended",
     "YouAreSuspended" : "You are suspended (%s).",

@@ -2,6 +2,7 @@ var server = require('jxm');
 var form_lang = require('./form_lang');
 var system_tools = require("./../system_tools");
 var hosting_tools = require("./../hosting_tools");
+var ip_tools = require("./../ip_tools");
 var database = require("./../install/database");
 var site_defaults = require("./site_defaults");
 var nginxconf = require("../spawner/nginxconf");
@@ -14,6 +15,7 @@ var pam = require('authenticate-pam');
 var form_tools = require('../rendering/form_tools');
 var apps_tools = require('../rendering/apps_tools');
 var addDomain = require("../definitions/forms/addDomain");
+var util = require("util");
 
 // forces the form to ask user a question in order to confirm something
 var needToConfirm = function(active_user, formName, input_id, title, confirm_text) {
@@ -242,14 +244,11 @@ exports.Domain = function() {
             return {result: false, msg: form_lang.Get(active_user.lang, "DomainAlreadyExists", true)};
 
         var domains = database.getDomainsByUserName(null, 1e5);
+        var port_range = hosting_tools.getPortRange();
 
-        var cfg = database.getConfig();
-        var min = cfg.jx_app_min_port;
-        var max = cfg.jx_app_max_port;
-
-        var needed = domains.length * 2 + 2;
-        if (max - min < needed)
-            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, max - min] )};
+        var needed = domains.length * port_range.ppd + port_range.ppd;
+        if (port_range.count < needed)
+            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, port_range.count] )};
 
         // value update
         if (changed) params.controls[field_name] = val;
@@ -285,14 +284,11 @@ exports.SubDomain = function() {
             return {result: false, msg: form_lang.Get(active_user.lang, "DomainAlreadyExists", true)};
 
         var domains = database.getDomainsByUserName(null, 1e5);
+        var port_range = hosting_tools.getPortRange();
 
-        var cfg = database.getConfig();
-        var min = cfg.jx_app_min_port;
-        var max = cfg.jx_app_max_port;
-
-        var needed = domains.length * 2 + 2;
-        if (max - min < needed)
-            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, max - min] )};
+        var needed = domains.length * port_range.ppd + port_range.ppd;
+        if (port_range.count < needed)
+            return { result: false, msg: form_lang.Get(active_user.lang,  "DomainCannotAdd", true) + " " + form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [needed, port_range.count] )};
 
         // value update
         params.controls[field_name] = val;
@@ -399,6 +395,28 @@ exports.SSLCertFileName = function(testConfig) {
             var test = nginx.testConfig(configString);
             if (test.err)
                 return {result: false, msg: form_lang.Get(active_user.lang, "NginxDirectivesInvalid", true ) + " " + test.err};
+        }
+
+        return {result: true};
+    };
+};
+
+
+exports.IPAdresses = function(v6) {
+
+    var _v6 = v6;
+
+    this.validate = function (env, active_user, val, params) {
+
+        var ips = ip_tools.getPlanIPs(active_user, _v6, true);
+        if (ips.err)
+            return { result : false, msg: form_lang.Get(active_user.lang, ips.err, null) };
+
+        var _val = util.isArray(val) ? val : [ val ];
+
+        for (var o in _val) {
+            if (ips.indexOf(_val[o]) === -1)
+                return { result : false, msg: form_lang.Get(active_user.lang, "ValueInvalid", null) };
         }
 
         return {result: true};
