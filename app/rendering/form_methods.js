@@ -133,12 +133,14 @@ var sessionAdd = function(env, active_user, params){
             continue;
 
         var fakeId = active_user.session.forms[params.form].fakeIdsReversed[o];
-
-        var ctrlDisplayName = form_lang.Get(active_user.lang, ctrl.details.label, true);
+        var hasValue = !!params.controls[o];
+        if (util.isArray(params.controls[o]) && !params.controls[o].length)
+            hasValue = false;
 
         // checking if field is required and has a value
-        if (ctrl.options && ctrl.options.required && !params.controls[o]) {
-            messages.push({ msg:form_lang.Get(active_user.lang, "ValueRequired"), id : fakeId});
+        if (ctrl.details && ctrl.details.options && ctrl.details.options.required && !hasValue) {
+            var str = ctrl.details.options.required_label || "ValueRequired";
+            messages.push({ msg:form_lang.Get(active_user.lang, str), id : fakeId});
         }
 
         var valids = [];
@@ -448,12 +450,14 @@ methods.sessionApply = function(env, params){
                 }
             } else {
                 var arr = hosting_tools.getFreePorts();
-                if (!arr || arr.length < 2) {
+                var ppd = hosting_tools.getPortsPerDomain();
+                if (!arr || arr.length < ppd) {
                     var range = hosting_tools.getPortRange();
-                    ret = form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ range.count, range.count + 2 ])
+                    ret = form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ range.count, range.count + ppd ])
                 } else {
                     json.port_http = arr[0];
-                    json.port_https = arr[1];
+                    if (arr.length > 1)
+                        json.port_https = arr[1];
                     ret = database.AddDomain(active_user.username, json.name, json);
 
                     if (!ret) {
