@@ -3,6 +3,7 @@ var page_utils = require('./page_utils');
 var path = require("path");
 var fs = require("fs");
 var database = require("../install/database");
+var util = require("util");
 
 exports.begin = '<form class="form-horizontal" onsubmit="return false;">';
 
@@ -146,6 +147,93 @@ exports.createComboBox = function(label, _title, input_id, _value, active_user, 
 
     return {html:_html, js:""};
 };
+
+
+exports.createListBox = function(label, _title, input_id, _value, active_user, options){
+
+    var data = getData(label, _title, input_id, _value, active_user, options);
+
+    var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
+        +'<label class="col-md-2 control-label">'+data.label + data.required_label + '</label>'
+        +'<div class="col-md-10">';
+
+    if (options && options.extra && options.extra.noEditDisplayValue) {
+        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
+        return {html: _html + v + "</div></div>", js: ""};
+    }
+
+    _html += '<select class="form-control custom-scroll'+data.required_class+'" id="'+data.fakeId+'" multiple="multiple">';
+
+    if (!util.isArray(data.value))
+        data.value = [data.value];
+
+    if(options && options.values){
+        for(var o in options.values){
+            var str = "value='"+options.values[o]+"' ";
+            if(data.value && data.value.length){
+                if(data.value.indexOf(options.values[o]) !== -1)
+                    str += " selected";
+            }
+            _html += "<option " + str + ">" + options.values[o] + "</option>";
+        }
+    }
+
+    _html += "</select>";
+
+    if(data.description)
+        _html += '<p class="note">'+data.description+'</p>';
+
+    _html +=
+        '</div>'
+        +'</div>';
+
+    return {html:_html, js:""};
+};
+
+exports.createCheckedListBox = function(label, _title, input_id, _value, active_user, options){
+
+    var data = getData(label, _title, input_id, _value, active_user, options);
+
+    var _html = '<div class="' + data.class + '" id="' + data.fakeId + '_group">'
+        +'<label class="col-md-2 control-label">'+data.label + data.required_label + '</label>'
+        +'<div class="col-md-10">';
+
+    if (options && options.extra && options.extra.noEditDisplayValue) {
+        var v = '<div style="margin-top: 7px;">' + options.extra.noEditDisplayValue + '</div>';
+        return {html: _html + v + "</div></div>", js: ""};
+    }
+
+    _html += '<div style="height: auto; overflow: auto; border: 1px solid #ccc;" class="form-control">';
+
+    if (!util.isArray(data.value))
+        data.value = [data.value];
+
+    if(options && options.values){
+        for(var o in options.values){
+
+            var checked = "";
+            if(data.value && data.value.length && data.value.indexOf(options.values[o]) !== -1)
+                checked = " checked='checked'";
+            _html += '<div class="checkbox" style="padding: 0px; min-height: 0;"><label>';
+            _html += '<input id="' + data.fakeId + "clb" + o + '" class="form-control checkbox style-0' + data.required_class + '" type="checkbox" style="min-height: 0"' + checked + ' />';
+            _html += '<span>&nbsp;</span>' + options.values[o];
+            _html += '</label></div>';
+        }
+    }
+
+    _html += "</div>";
+    _html += '<span class="help-block" id="'+data.fakeId+'_note" style="margin-bottom: 0px; display: none;"></span>';
+
+    if(data.description)
+        _html += '<p class="note">'+data.description+'</p>';
+
+    _html +=
+        '</div>'
+        +'</div>';
+
+    return {html:_html, js:""};
+};
+
 
 // <input type="checkbox" class="checkbox style-0" checked="checked">
 exports.createCheckBox = function(label, _title, input_id, _value, active_user, options){
@@ -354,6 +442,7 @@ exports.getFieldDisplayValue = function (active_user, activeInstance, field_name
             }
         } else if (controls[field_name].details.getValue) {
             val = controls[field_name].details.getValue(active_user, record, true);
+            if (val.err) val = val.err;
         } else if (controls[field_name].details.method === exports.createCheckBox) {
             val = form_lang.GetBool(active_user.lang, val, "Yes", "No");
         }

@@ -7,7 +7,6 @@
         ntc : {},
         apply:function(){
             var _this = window.jxForms["{{form.id}}"];
-
             var values = {};
             var failed = false;
             utils.jxAddMessage();
@@ -21,14 +20,27 @@
                 var type = $(el).attr('type');
                 var val = type === 'checkbox' ? el.checked : el.value;
                 var empty = (type === 'checkbox' && !val) || (type !== 'checkbox' && !val.trim().length);
+                var iscbl = this.id.indexOf("clb") !== -1; // checkedListBox
 
-                if (isRequired && empty) {
-                    _this.showError(this.id, "{{label.ValueRequired}}");
-                    failed = true;
+                if (!iscbl) {
+                    if (isRequired && empty) {
+                        _this.showError(this.id, "{{label.ValueRequired}}");
+                        failed = true;
+                        return;
+                    }
+
+                    values[this.id] = val;
                     return;
                 }
 
-                values[this.id] = val;
+                var baseId = this.id.split("clb")[0];
+                var val_str = $(el).parent().text().trim();
+
+                if (!values[baseId])
+                    values[baseId] = [];
+
+                if (val)
+                    values[baseId].push(val_str);
             });
 
             $("select").each(function(index, el) {
@@ -42,7 +54,14 @@
                     return;
                 }
 
-                values[this.id] = selected.index() ? selected.val() : "";
+                if (selected.length > 1) {
+                    _arr = [];
+                    for(var o=0; o<selected.length; o++)
+                        _arr.push(selected[o].value)
+                    values[this.id] = _arr;
+                } else {
+                    values[this.id] = selected.index() ? selected.val() : "";
+                }
             });
 
             $("textarea").each(function(index, el) {
@@ -101,7 +120,7 @@
         hideErrors : function() {
             var _this = window.jxForms["{{form.id}}"];
             $("input, select").each(function() {
-                $("#" + this.id + "_note").remove();
+                $("#" + this.id + "_note").hide();
                 $("#" + this.id + "_group").removeClass("has-error");
                 //                $("#" + o + "_group").addClass("has-success");
             });
@@ -110,12 +129,17 @@
         showError : function(id, msg) {
 
             var _this = window.jxForms["{{form.id}}"];
+            var note_id = id + "_note";
 
-            if (id && document.getElementById(id)) {
-                var str = '<span class="help-block" id="'+id+'_note" style="margin-bottom: 0px;"><i class="fa fa-warning"></i> ' + msg + '</span>';
+            if (id && document.getElementById(id) && !document.getElementById(note_id)) {
+                var str = '<span class="help-block" id="'+id+'_note" style="margin-bottom: 0px;"></span>';
                 $(str).insertAfter("#" + id);
-//                $("#" + id + "_group").removeClass("has-success");
-                $("#" + id + "_group").addClass("has-error");
+            }
+
+            $("#" + id + "_group").addClass("has-error");
+            var note = $("#" + note_id);
+            if (note.length) {
+                note.html('<i class="fa fa-warning"></i> ' + msg).show();
             } else {
                 utils.jxAddMessage('danger', msg);
             }
