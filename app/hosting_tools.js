@@ -65,7 +65,7 @@ exports.getPortRange = function () {
     var max = parseInt(cfg.jx_app_max_port);
     if (!max || isNaN(max)) max = site_defaults.defaultAppMaxPort;
 
-    return { min: min, max: max, count: max - min}
+    return { min: min, max: max, count: max - min, ppd : exports.getPortsPerDomain() };
 };
 
 

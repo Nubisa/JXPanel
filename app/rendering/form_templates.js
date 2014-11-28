@@ -296,7 +296,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
 
         if (isUpdate && (ctrl.cannotEdit || ctrl.method === tool.createSimpleText || (ctrl.cannotEditOwnRecord && values["name"] === active_user.username))) {
             if (ctrl.getValue && typeof ctrl.getValue === "function") {
-                val = ctrl.getValue(active_user, values);
+                val = ctrl.getValue(active_user, values, false);
             }
             ctrl.options.extra.noEditDisplayValue = val;
         }
@@ -316,7 +316,7 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         }
 
         if (ctrl.getValuesList)
-            ctrl.options.values = ctrl.getValuesList(active_user);
+            ctrl.options.values = ctrl.getValuesList(active_user, values, false);
 
 //        if (!isUpdate && active_user.username=== "nubisa" && formName==="addUser") {
 //            if (name === "person_name") val = "kris2";
