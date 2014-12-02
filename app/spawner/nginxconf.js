@@ -1,27 +1,7 @@
 //Copyright Nubisa Inc. 2014 All Rights Reserved
 
-var os = require('os');
-var ifcs = os.networkInterfaces();
-
-var ifc_list = [];
-
-exports.resetInterfaces = function(){
-    ifc_list = [];
-    for (var i in ifcs) {
-        var arr = ifcs[i];
-        for(var o in arr){
-            if(arr[o] && arr[o].family === "IPv4")
-            {
-                ifc_list.push(arr[o].address);
-            }
-        }
-    }
-};
-
-exports.resetInterfaces();
-
 //ssl_info {key: "", crt: ""}  OR NULL
-exports.createConfig = function(domain, node_ports, log_location, directives, ssl_info){ // node_ports is an array (first http, second https)
+exports.createConfig = function(domain, node_ports, log_location, directives, ssl_info, ifc_list){ // node_ports is an array (first http, second https)
     var config_str = "map $http_upgrade $connection_upgrade {\n"
         +"  default upgrade;\n"
         +"  '' close;\n"
@@ -52,9 +32,17 @@ exports.createConfig = function(domain, node_ports, log_location, directives, ss
         var sport = sports[i];
         for(var o in ifc_list){
             var ip = ifc_list[o];
+            if (!ip) continue;
+            var extra = "";
+            // ipv6
+            if (ip.indexOf(":") !== -1) {
+                ip = "[" + ip + "]";
+                extra += " ipv6only=on";
+            }
+            if (sport == 443) extra += " ssl";
             var str_config =
                 "server{\n"
-                    +"  listen "+ip+":"+sport+ (sport=='443'?' ssl;':';') + '\n'
+                    +"  listen "+ip+":"+sport+ extra + ';\n'
                     +"  server_name "+domain+";\n"
                     +"  server_name www."+domain+";\n"
                     +"  server_name ipv4."+domain+";\n"
@@ -93,7 +81,7 @@ exports.createConfig = function(domain, node_ports, log_location, directives, ss
 
 
 
-exports.createDefaultConfig = function(ssl_info){ // node_ports is an array (first http, second https)
+exports.createDefaultConfig = function(ssl_info, ifc_list){ // node_ports is an array (first http, second https)
 
     var sports = ["80", "443"];
     var config_str = "";
@@ -102,9 +90,16 @@ exports.createDefaultConfig = function(ssl_info){ // node_ports is an array (fir
         var sport = sports[i];
         for(var o in ifc_list){
             var ip = ifc_list[o];
+            var extra = "";
+            // ipv6
+            if (ip.indexOf(":") !== -1) {
+                ip = "[" + ip + "]";
+                extra += " ipv6only=on";
+            }
+            if (sport == 443) extra += " ssl";
             var str_config =
                 "server{\n"
-                +"  listen "+ip+":"+sport+ (sport=='443'?' ssl':'') + ' default_server;\n'
+                +"  listen "+ip+":"+sport+ extra + ' default_server;\n'
                 +(sport=='443'?"  ssl on;\n":'')
                 +(sport=='443'?"  ssl_certificate_key " + ssl_info.key + ";\n" : "")
                 +(sport=='443'?"  ssl_certificate " + ssl_info.crt + ";\n" : "")
