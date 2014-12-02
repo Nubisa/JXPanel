@@ -99,11 +99,11 @@ exports.getDomainIPs = function(domain, v6) {
     if (ips.err)
         return ips;
 
-    if (v6 && ips.indexOf(domain.sub_ipv6) === -1)
-        return { err : "IPDoesNotExists|" + domain.sub_ipv6 };
-
     if (!v6 && ips.indexOf(domain.sub_ipv4) === -1)
         return { err : "IPDoesNotExists|" + domain.sub_ipv4 };
+
+    if (v6 && domain.sub_ipv6 && ips.indexOf(domain.sub_ipv6) === -1)
+        return { err : "IPDoesNotExists|" + domain.sub_ipv6 };
 
     return _concat([domain.sub_ipv4], [ domain.sub_ipv6], v6);
 };
