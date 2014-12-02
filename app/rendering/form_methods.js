@@ -305,6 +305,15 @@ methods.sessionApply = function(env, params){
         }
     }
 
+    for(var field_name in _controls) {
+        var fld = _controls[field_name];
+        // for control is not present on the form (due to visibility = false)
+        if (typeof params.controls[field_name] === "undefined") {
+            if (fld.details && fld.details.options && typeof fld.details.options.hiddenValue !== "undefined")
+                json[field_name] = fld.details.options.hiddenValue;
+        }
+    }
+
     if (!cnt && !activeForm.activeInstance.allowEmpty)
         return sendError("FormEmpty");
 
@@ -402,7 +411,9 @@ methods.sessionApply = function(env, params){
                 var restart_related_fields_changed =
                     domain.jx_web_log !== json.jx_web_log ||
                     domain.jx_app_type !== json.jx_app_type ||
-                    domain.jx_app_args !== json.jx_app_args;
+                    domain.jx_app_args !== json.jx_app_args ||
+                    domain.sub_ipv4 !== json.sub_ipv4 ||
+                    domain.sub_ipv6 !== json.sub_ipv6;
 
                 var jx_app_options = hosting_tools.appGetOptions(update_name);
                 var ssl_changed = domain.ssl !== json.ssl || domain.ssl_crt !== json.ssl_crt || domain.ssl_key !== json.ssl_key;
