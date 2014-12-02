@@ -17,6 +17,7 @@ var nginxconf = require("./spawner/nginxconf");
 var nginx = require("./install/nginx");
 var apps_tools = require("./rendering/apps_tools");
 var root_functions = require("./spawner/root_functions");
+var ip_tools = require("./ip_tools");
 
 // iterating through domains and assigning http/https port
 exports.setPortRange = function (min, max, ports_per_domain) {
@@ -260,7 +261,7 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
     var plan = options.plan;
 
     var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null,
-        plan.plan_nginx_directives, options.ssl_info);
+        plan.plan_nginx_directives, options.ssl_info, [ domain.sub_ipv4, domain.sub_ipv6 ]);
 
     var current = "";
     if (fs.existsSync(cfgPath)) {

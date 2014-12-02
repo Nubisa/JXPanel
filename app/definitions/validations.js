@@ -350,7 +350,7 @@ exports.NginxDirectives = function() {
         if (!plan)
             return {result: false, msg: form_lang.Get(active_user.lang, "PlanInvalid", true )};
 
-        var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, params.controls["plan_nginx_directives"]);
+        var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, params.controls["plan_nginx_directives"], null, ip_tools.getUserIPs(active_user, "both"));
         var test = nginx.testConfig(configString);
 
         if (test.err)
@@ -391,7 +391,7 @@ exports.SSLCertFileName = function(testConfig) {
         if (params.controls.ssl && _testConfig) {
             var ssl_info = hosting_tools.appGetSSLInfo(options.app_dir, true, params.controls.ssl_crt, params.controls.ssl_key);
 
-            var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, "", ssl_info );
+            var configString = nginxconf.createConfig("jxcorefakedomain.com", [ 9998, 9999 ], null, "", ssl_info, ip_tools.getUserIPs(active_user, "both") );
             var test = nginx.testConfig(configString);
             if (test.err)
                 return {result: false, msg: form_lang.Get(active_user.lang, "NginxDirectivesInvalid", true ) + " " + test.err};
@@ -408,7 +408,7 @@ exports.IPAdresses = function(v6) {
 
     this.validate = function (env, active_user, val, params) {
 
-        var ips = ip_tools.getPlanIPs(active_user, _v6, true);
+        var ips = ip_tools.getUserIPs(active_user, _v6);
         if (ips.err)
             return { result : false, msg: form_lang.Get(active_user.lang, ips.err, null) };
 

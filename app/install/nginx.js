@@ -2,6 +2,7 @@ var fs = require('fs');
 var pathModule = require('path');
 var os_info = jxcore.utils.OSInfo();
 var site_defaults = require("../definitions/site_defaults");
+var ip_tools = require("./../ip_tools");
 
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
@@ -50,7 +51,10 @@ var updateConfFile = function() {
     if (fs.existsSync(conf_file_default))
         contents = fs.readFileSync(conf_file_default).toString();
 
-    var cfg = nginxconf.createDefaultConfig( { key :  site_defaults.dirMonitorCertificates + "server.key", crt :  site_defaults.dirMonitorCertificates + "server.crt"});
+    var cfg = nginxconf.createDefaultConfig( {
+        key :  site_defaults.dirMonitorCertificates + "server.key",
+        crt :  site_defaults.dirMonitorCertificates + "server.crt"
+    }, ip_tools.getAllIPs("both"));
 
     if (contents !== cfg)
         fs.writeFileSync(conf_file_default, cfg);
