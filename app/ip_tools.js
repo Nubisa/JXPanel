@@ -74,7 +74,7 @@ exports.getPlanIPs = function(plan, v6) {
     var pool = v6 ? plan.plan_ipv6_pool : plan.plan_ipv4_pool;
 
     if (!pool)
-        return { err : v6 ? "PlanParentNoIPv6Pool" : "PlanParentNoIPv4Pool" };
+        return { err : v6 ? [] : "PlanParentNoIPv4Pool" };
 
     var ipv4 = [];
     var ipv6 = [];
