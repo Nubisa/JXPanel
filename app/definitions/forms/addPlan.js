@@ -10,28 +10,6 @@ var database = require("./../../install/database");
 var util = require("util");
 var ip_tools = require("./../../ip_tools");
 
-var os = require('os');
-var ifcs = os.networkInterfaces();
-
-var ifcv4_list = [];
-var ifcv6_list = [];
-
-var resetInterfaces = function () {
-    ifcv4_list = [];
-    for (var i in ifcs) {
-        var arr = ifcs[i];
-        for (var o in arr) {
-            if (arr[o]) {
-                if (arr[o].family === "IPv4")
-                    ifcv4_list.push(arr[o].address);
-
-                if (arr[o].family === "IPv6")
-                    ifcv6_list.push(arr[o].address);
-            }
-        }
-    }
-}();
-
 
 exports.form = function () {
 
@@ -294,7 +272,7 @@ exports.form = function () {
                     method: tool.createCheckedListBox,
                     options: { required : true, required_label : "ValueRequiredAtLeastOne" },
                     getValuesList : function(active_user, values, listOrForm) {
-                        return ip_tools.getPlanIPs(active_user, false, true);
+                        return ip_tools.getUserIPs(active_user, false);
                     }
                 },
                 validation : new validations.IPAdresses(false)
@@ -307,10 +285,13 @@ exports.form = function () {
                     method: tool.createCheckedListBox,
                     options: { required : true, required_label : "ValueRequiredAtLeastOne" },
                     getValuesList : function(active_user, values, listOrForm) {
-                        return ip_tools.getPlanIPs(active_user, true, true);
+                        return ip_tools.getUserIPs(active_user, true);
                     }
                 },
-                validation : new validations.IPAdresses(true)
+                validation : new validations.IPAdresses(true),
+                visibility : function(active_user, values, listOrForm) {
+                    return ip_tools.getUserIPs(active_user, true).length > 0;
+                }
             },
 
             {"END" : 1}
