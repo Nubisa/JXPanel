@@ -89,6 +89,26 @@ exports.getPlanIPs = function(plan, v6) {
 };
 
 
+exports.getDomainIPs = function(domain, v6) {
+
+    if (!domain)
+        return { err : "DomainNotFound" };
+
+    var plan = database.getPlanByDomainName(domain.name);
+    var ips = exports.getPlanIPs(plan, v6);
+    if (ips.err)
+        return ips;
+
+    if (v6 && ips.indexOf(domain.sub_ipv6) === -1)
+        return { err : "IPDoesNotExists|" + domain.sub_ipv6 };
+
+    if (!v6 && ips.indexOf(domain.sub_ipv4) === -1)
+        return { err : "IPDoesNotExists|" + domain.sub_ipv4 };
+
+    return _concat([domain.sub_ipv4], [ domain.sub_ipv6], v6);
+};
+
+
 // v6 = true / false / "both"
 exports.getAllIPs = function(v6) {
 

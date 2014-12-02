@@ -260,8 +260,12 @@ exports.appSaveNginxConfigPath = function(domain_name, reloadIfNeeded) {
 
     var plan = options.plan;
 
+    var ips = ip_tools.getDomainIPs(domain, "both");
+    if (ips.err)
+        return ips;
+
     var cfg = nginxconf.createConfig(domain_name, [ domain.port_http, domain.port_https ], domain.jx_web_log ? options.log_path : null,
-        plan.plan_nginx_directives, options.ssl_info, [ domain.sub_ipv4, domain.sub_ipv6 ]);
+        plan.plan_nginx_directives, options.ssl_info, ips);
 
     var current = "";
     if (fs.existsSync(cfgPath)) {
@@ -483,7 +487,9 @@ var appGetStartCommand = function(domain_name) {
 
     fs.writeFileSync(options.cfg_path, JSON.stringify(options.cfg, null, 9));
 
-    exports.appSaveNginxConfigPath(domain_name);
+    var res = exports.appSaveNginxConfigPath(domain_name);
+    if (res.err)
+        return res;
 
     return { cmd : spawnerCmd, jxPath : jxPath, options : options , spawner : spawner};
 };

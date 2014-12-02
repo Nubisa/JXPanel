@@ -353,6 +353,7 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
     "IPv6Pool" : "IPv6 addresses",
     "IPv6Pool_Description" : "Please choose, which IPv6 addresses will be available for the hosting plan.",
+    "IPDoesNotExists" : "This IP address does not exists.",
     "JXEnabled" : "JXcore",
     "JXcoreAppPath" : "Custom application file path",
     "JXcoreAppArgs" : "Application parameters",
