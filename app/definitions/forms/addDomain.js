@@ -184,7 +184,7 @@ exports.form = function () {
                     method: tool.createComboBox,
                     options: { required: true },
                     getValuesList : function(active_user, values) {
-                        return ip_tools.getPlanIPs(active_user, false, true);
+                        return ip_tools.getUserIPs(active_user, false);
                     }
                 },
                 validation : new validations.IPAdresses(false)
@@ -194,12 +194,15 @@ exports.form = function () {
                 details: {
                     label: "IPv6",
                     method: tool.createComboBox,
-                    options: { required: true },
+                    options: { required: true, hiddenValue : null },
                     getValuesList : function(active_user, values) {
-                        return ip_tools.getPlanIPs(active_user, true, true);
+                        return ip_tools.getUserIPs(active_user, true);
                     }
                 },
-                validation : new validations.IPAdresses(true)
+                validation : new validations.IPAdresses(true),
+                visibility : function(active_user, values, listOrForm) {
+                    return ip_tools.getUserIPs(active_user, true).length > 0;
+                }
             },
 
             {"END" : 1},
