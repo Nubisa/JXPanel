@@ -35,9 +35,9 @@ var installNGINX = function(){
     fs.unlinkSync( app_folder + sep + "nginx.jx");
 
     nginx.prepare();
-    var res = nginx.start();
-    if(res){
-        console.error(res.out);
+    var res = nginx.start(true);
+    if(res.err) {
+        console.error(res.err);
         process.exit(res.exitCode);
     }
 };
@@ -171,14 +171,8 @@ exports.uninstall = function(){
     if(fs.existsSync(app_folder))
     {
         clog("Uninstalling the previous installation", "red");
-        var res = nginx.stop();
-        if(res){
-            console.error(res.out);
-        }
-
-        var res = ftp.stop();
-        if (res.err)
-            console.error(res.err);
+        nginx.stopIfStarted(true);
+        ftp.stopIfStarted();
 
         var removeFiles = function() {
             clog("Removing files", "red");
