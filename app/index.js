@@ -39,9 +39,10 @@ if(argv[0] == "uninstall" || argv[0] == "reinstall"){
         return;
 }
 
-var unknownArg = function() {
+var unknownArg = function(noExit) {
     console.log("Unknown parameters: " + argv.join(" "));
-    process.exit();
+    if (!noExit)
+        process.exit();
 };
 
 if(argv[0] === "nginx") {
@@ -180,7 +181,7 @@ if(icheck.requireInstallation()){
 else {
 
     if (argv[0])
-        return unknownArg();
+        unknownArg(true);
 
     var server = require('jxm');
     var render_engine = require('./rendering/render');
