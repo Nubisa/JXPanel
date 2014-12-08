@@ -24,9 +24,6 @@ process.on('uncaughtException', function(err) {
 var index = process.argv.indexOf(__filename);
 var argv = process.argv.slice(index + 1);
 
-console.log(process.argv);
-console.log(argv);
-
 if(argv[0] == "help"){
     jxcore.utils.console.log("Command line options for "+site_defaults.EN.panelName);
     jxcore.utils.console.log("Start: jx index.js");
@@ -115,14 +112,16 @@ if(argv[0] === "set") {
     if (argv[1] === "address") {
         var syntax = "The syntax is:\nset address [IP address or domain name]";
 
-        if (!argv[2]) {
+        var ip_tools = require("./ip_tools");
+        var validations = require("./definitions/validations");
+
+        var valid_domain = validations.checkDomain(argv[2]);
+        var supported_ip = ip_tools.isSupported(argv[2]);
+
+        if (!argv[2] || (!valid_domain && !supported_ip)) {
             console.log("Please provide valid argument. " + syntax);
             return;
         }
-
-        var ip_tools = require("./ip_tools");
-        if (!ip_tools.isSupported(argv[2], true))
-            return;
 
         var database = require("./install/database");
         database.ReadDB(function(err) {

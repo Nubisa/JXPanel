@@ -225,13 +225,17 @@ exports.UserName = function() {
 };
 
 
+exports.checkDomain = function(val) {
+
+    var reg = new RegExp("^([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.)+[a-zA-Z]{2,4}$", "i");
+    return reg.test(val);
+};
+
 exports.Domain = function() {
 
     this.validate = function (env, active_user, val, params, field_name) {
 
-        var reg = new RegExp("^([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.)+[a-zA-Z]{2,4}$", "i");
-
-        if (!reg.test(val))
+        if (!exports.checkDomain(val))
             return {result: false, msg: form_lang.Get(active_user.lang, "DomainInvalid", true)};
 
         var changed = false;
