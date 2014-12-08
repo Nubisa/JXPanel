@@ -355,7 +355,7 @@ exports.getSupportedLangs = function (active_user) {
     if (lang === "EN") alias = "US";
     lang = countries[lang] || lang;
     html.push('<a href="#" class="dropdown-toggle jxbtn" data-toggle="dropdown" style="background: none;!important">');
-    html.push('<img src="img/blank.gif" class="flag flag-' + alias.toLocaleLowerCase() + '" alt="' + countries[lang] + '"><span style="margin-left: 5px; margin-right: 5px;">' + lang + '</span><i class="fa fa-angle-down"></i></a>');
+    html.push('<img src="/img/blank.gif" class="flag flag-' + alias.toLocaleLowerCase() + '" alt="' + countries[lang] + '"><span style="margin-left: 5px; margin-right: 5px;">' + lang + '</span><i class="fa fa-angle-down"></i></a>');
 
 
     html.push('<ul class="dropdown-menu pull-right">');
@@ -404,7 +404,7 @@ exports.getFlag = function(lang) {
 
     if (!str) str = exports.Get("EN", "LanguageUnsupported", true);
 
-    return '<img src="img/blank.gif" class="flag flag-' + lang.toLowerCase() + '" alt="' + str + '"> ' + str + ' </a>';
+    return '<img src="/img/blank.gif" class="flag flag-' + lang.toLowerCase() + '" alt="' + str + '"> ' + str + ' </a>';
 };
 
 // function expects arr of { id : 2, PL : "Pusty", TR : "ssss" etc }
