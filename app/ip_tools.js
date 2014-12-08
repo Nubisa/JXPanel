@@ -5,8 +5,9 @@
 
 var form_lang = require('./definitions/form_lang');
 var path = require("path");
-var database = require("./install/database");
 var util = require("util");
+var database = require("./install/database");
+var system_tools = require("./system_tools");
 
 var os = require('os');
 var ifcs = os.networkInterfaces();
@@ -113,4 +114,33 @@ exports.getDomainIPs = function(domain, v6) {
 exports.getAllIPs = function(v6) {
 
     return _concat(ifcv4_list, ifcv6_list, v6);
+};
+
+
+// checks if given ip is within public network interfaces
+exports.isSupported = function(ip, verbose) {
+
+    var ips = exports.getAllIPs("both");
+    var supported = ips.indexOf(ip) !== -1;
+
+    if (!supported && verbose)
+        system_tools.console.error("IPDoesNotExists|" + ip);
+
+    return supported;
+};
+
+exports.getAppsWithInvalidIP = function() {
+
+    var ips = exports.getAllIPs("both");
+
+    var ret = [];
+    var allDomains = database.getDomainsByPlanName(database.unlimitedPlanName, 1e5);
+    for (var o in allDomains) {
+        var domain = database.getDomain(allDomains[o]);
+
+        if (ips.indexOf(domain.sub_ipv4) === -1 || ips.indexOf(domain.sub_ipv6) === -1)
+            ret.push(domain.name);
+    }
+
+    return ret;
 };

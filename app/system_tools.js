@@ -8,6 +8,7 @@ var hosting_tools = require("./hosting_tools");
 var folder_utils = require('./definitions/user_folders');
 var form_lang = require('./definitions/form_lang');
 var site_defaults = require('./definitions/site_defaults');
+var os_info = jxcore.utils.OSInfo();
 
 var outputConvert = function(str, expects, fixer){
     var lines = str.split('\n');
@@ -498,3 +499,62 @@ exports.installJX = function (active_user, cb) {
 };
 
 
+exports.processExistsByPidFile = function(pid_file) {
+    var file_exists = fs.existsSync(pid_file);
+    if (!file_exists) return false;
+
+    var pid = null;
+    try {
+        pid = fs.readFileSync(pid_file);
+    } catch (ex) {
+        return false;
+    }
+
+    return exports.processExists(pid);
+};
+
+exports.processExists = function(pid) {
+
+    var exists = false;
+    try {
+        // checks process existence
+        exists = process.kill(pid, 0);
+    } catch(ex) {
+        exists = false;
+    }
+
+    return exists;
+};
+
+
+exports.platformSupported = function(doExit) {
+
+    var supported = os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse;
+    if (supported) return true;
+
+    console.error("This platform is not supported", os_info.fullName);
+
+    if (doExit)
+        process.exit(-1);
+};
+
+
+var translateArgs = function(arr, lang) {
+    for (var o in arr) {
+        arr[o] = form_lang.Get(lang, arr[o], true);
+    }
+    return arr;
+};
+
+exports.console = {
+    log : function() {
+        var lang = "EN";
+        var args = translateArgs(arguments, lang);
+        console.log.apply(this, args);
+    },
+    error : function() {
+        var lang = "EN";
+        var args = translateArgs(arguments, lang);
+        console.error.apply(this, args);
+    }
+};

@@ -307,6 +307,23 @@ exports.appRemoveNginxConfigPath = function(domain_name, reloadIfNeeded) {
     return false;
 };
 
+exports.appRemoveMultipleNginxConfigPath = function(domain_names, reloadIfNeeded) {
+
+    if (!domain_names.length)
+        return false;
+
+    for(var o in domain_names)
+        exports.appRemoveNginxConfigPath(domain_names[o], false);
+
+
+    if (reloadIfNeeded) {
+        var res = nginx.reload(true);
+        if (res)
+            return { err : res };
+    }
+
+    return false;
+};
 
 exports.appGetSpawnerPath = function (domain_name) {
     var dir = site_defaults.dirAppConfigs;
@@ -523,6 +540,8 @@ exports.appStopMultiple = function (domain_names, cb) {
 
         if (err || !ret) {
             // monitor is offline, don't treat this a error
+            // but try to remove nginx configs
+            exports.appRemoveMultipleNginxConfigPath(domain_names, false);
             if (cb) cb();
             return;
         }
