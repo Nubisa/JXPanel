@@ -1,3 +1,7 @@
+var system_tools = require("./system_tools");
+if (!system_tools.platformSupported())
+    process.exit();
+
 if(!global.jxcore){
     console.error("This application requires JXcore to run. Please visit http://jxcore.com");
     return;
@@ -18,7 +22,9 @@ process.on('uncaughtException', function(err) {
 });
 
 
-if(process.argv[2] == "help"){
+var argv = process.IsEmbedded ? process.argv.slice(1) : process.argv.slice(2);
+
+if(argv[0] == "help"){
     jxcore.utils.console.log("Command line options for "+site_defaults.EN.panelName);
     jxcore.utils.console.log("Start: jx index.js");
     jxcore.utils.console.log("Install: jx index.js install");
@@ -26,39 +32,142 @@ if(process.argv[2] == "help"){
     jxcore.utils.console.log("ReInstall: jx index.js reinstall");
 }
 
-if(process.argv[2] == "uninstall" || process.argv[2] == "reinstall"){
+if(argv[0] == "uninstall" || argv[0] == "reinstall"){
     icheck.uninstall();
 
-    if(process.argv[2] == "uninstall")
+    if(argv[0] == "uninstall")
         return;
 }
 
-if(process.argv[2] === "nginx") {
+var unknownArg = function() {
+    console.log("Unknown parameters: " + argv.join(" "));
+    process.exit();
+};
+
+if(argv[0] === "nginx") {
 
     var nginx = require("./install/nginx");
-    if (process.argv[3] === "start") nginx.start(); else
-    if (process.argv[3] === "stop") nginx.stop(); else
-    if (process.argv[3] === "reload") nginx.reload(false);
+    if (argv[1] === "start") return nginx.startIfStopped(true, true); else
+    if (argv[1] === "stop") return nginx.stopIfStarted(true, true); else
+    if (argv[1] === "restart") return nginx.restart(true, true); else
+    if (argv[1] === "reload") return nginx.reload(false); else
+    if (argv[1] === "fix" && argv[2] === "config") {
 
-    return;
+        var ip_tools = require("./ip_tools");
+        var database = require("./install/database");
+        var hosting_tools = require("./hosting_tools");
+        database.ReadDB(function(err) {
+            if (err)
+                throw err;
+
+            var invalid_domains = ip_tools.getAppsWithInvalidIP();
+            if (invalid_domains.length) {
+
+                hosting_tools.appStopMultiple(invalid_domains, function(err){
+                    if (err)
+                        console.error("There were some errors while trying to stop applications.", err);
+                    else
+                        console.log("OK");
+                });
+            }
+        });
+        return;
+    } else
+    return unknownArg();
 }
 
-if(process.argv[2] === "ftp") {
+if(argv[0] === "ftp") {
 
     var ftp = require("./install/ftp");
-    if (process.argv[3] === "start") ftp.start(); else
-    if (process.argv[3] === "stop") ftp.stop(); else
-    if (process.argv[3] === "reload") ftp.restart(false);
-//    if (process.argv[3] === "test") ftp.denyUser("nubisa");
-//    if (process.argv[3] === "allow") ftp.allowUser(process.argv[4]);
-//    if (process.argv[3] === "deny") ftp.denyUser(process.argv[4]);
+    if (argv[1] === "start") return ftp.startIfStopped(true); else
+    if (argv[1] === "stop") return ftp.stopIfStarted(true); else
+    if (argv[1] === "reload") return ftp.restart(); else
+    if (argv[1] === "deny" || argv[1] === "allow") {
 
-    return;
+        var database = require("./install/database");
+        database.ReadDB(function(err) {
+            if (err)
+                throw err;
+
+            var ret = true;
+            if (argv[1] == "deny")
+                ret = ftp.denyUser(argv[2], true);
+            else
+            if (argv[1] == "allow")
+                ret = ftp.allowUser(argv[2], true);
+
+            if (ret.err)
+                system_tools.console.error(ret.err);
+
+            return; // do not use process.exit() as changes in db may not be saved
+        });
+        return;
+    } else
+        return unknownArg();
+}
+
+
+if(argv[0] === "set") {
+
+    if (argv[1] === "address") {
+        var syntax = "The syntax is:\nset address [IP address or domain name]";
+
+        if (!argv[2]) {
+            console.log("Please provide valid argument. " + syntax);
+            return;
+        }
+
+        var ip_tools = require("./ip_tools");
+        if (!ip_tools.isSupported(argv[2], true))
+            return;
+
+        var database = require("./install/database");
+        database.ReadDB(function(err) {
+            if (err)
+                throw err;
+
+            database.setConfigValue("address", argv[2], true);
+            return;
+        });
+        return;
+    }
+
+    return unknownArg();
+}
+
+if(argv[0] === "fix") {
+
+    if ((argv[1] || "").toLowerCase() === "ip") {
+        var syntax = "The syntax is:\nfix IP [old IP address] [new IP address]"
+
+        if (!argv[2] || !argv[3]) {
+            console.log("Please provide valid IP address. " + syntax);
+            return;
+        }
+
+        var ip_tools = require("./ip_tools");
+        var database = require("./install/database");
+        database.ReadDB(function(err) {
+            if (err)
+                throw err;
+
+            var ret = ip_tools.replaceIP(argv[2], argv[3]);
+            if (ret.err)
+                console.error(ret.err);
+            else
+                console.log("OK");
+
+            return;
+        });
+        return;
+    }
+
+    return unknownArg();
 }
 
 
 if(icheck.requireInstallation()){
-    if(process.argv[2] != "install" && process.argv[2] != "reinstall"){
+    if(argv[0] != "install" && argv[0] != "reinstall"){
         jxcore.utils.console.log("To install "+site_defaults.EN.panelName+", use\n" + process.argv[0] + " index install");
         process.exit(0);
     }
@@ -67,6 +176,10 @@ if(icheck.requireInstallation()){
     icheck.install();
 }
 else {
+
+    if (argv[0])
+        return unknownArg();
+
     var server = require('jxm');
     var render_engine = require('./rendering/render');
     var form_methods = require('./rendering/form_methods');
@@ -78,9 +191,8 @@ else {
     var addons_tools = require("./addons_tools");
     var nginx = require("./install/nginx");
     var ftp = require("./install/ftp");
-
-    if (nginx.startIfStopped() || ftp.startIfStopped().err)
-        process.exit(-1);
+    var help_tools = require("./help/help_tools");
+    var hosting_tools = require("./hosting_tools");
 
     require('http').setMaxHeaderLength(0);
 
@@ -101,6 +213,7 @@ else {
     charts.defineChartMethods();
     _active_users.defineMethods();
     addons_tools.defineMethods();
+    help_tools.defineMethods();
 
     server.linkResourcesFromPath("/", "../ui/");
 
@@ -113,13 +226,41 @@ else {
         opts = JSON.parse(fs.readFileSync(__dirname + '/app.dev_config') + "");
     }
 
+    opts = opts || {};
+    opts.port = site_defaults.port;
+
     server.on('request', downloads.check);
 
     database.ReadDB(function(err) {
 
+        var address = database.getConfigValue("address");
+        if (address)
+            opts.address = address;
+
         if (err)
             throw err;
-        else
+        else {
+            server.on("start", function() {
+
+                hosting_tools.getMonitorJSON(false, function(err) {
+                    if (err) {
+                        // monitor offline, for safety we can delete nginx configs, since they will be recreated on apps start
+                        nginx.removeAllConfigs();
+
+                        if (nginx.restart(false, true).err || ftp.startIfStopped().err)
+                            process.exit();
+                    }
+
+                    var str =
+                        "\n\tYou can use the following commands to change IP address:\n" +
+                        "\t$ jx index set address [IP address or domain name]\n";
+
+                    jxcore.utils.console.log(str);
+                });
+
+            });
+
             server.start(opts);
+        }
     });
 }
