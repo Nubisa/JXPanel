@@ -1,18 +1,21 @@
 var fs = require('fs');
 var pathModule = require('path');
-var os_info = jxcore.utils.OSInfo();
 var site_defaults = require("../definitions/site_defaults");
 var ip_tools = require("./../ip_tools");
+var system_tools = require("./../system_tools");
 
 var sep = pathModule.sep;
 var clog = jxcore.utils.console.log;
 var nginx_dir = site_defaults.apps_folder + sep + "nginx";
 var nginx_process =  nginx_dir + sep + "sbin" + sep + "nginx";
+var nginx_pid_file = pathModule.join(nginx_dir, "logs/nginx.pid");
 
 var nginxconf = require("../spawner/nginxconf");
 var server = require("jxm");
 
 exports.needsReload = false;
+exports.startError = null;
+
 
 var getPorts = function() {
     var opts = null;
@@ -61,6 +64,10 @@ var updateConfFile = function() {
 };
 
 
+exports.isRunning = function() {
+    return system_tools.processExistsByPidFile(nginx_pid_file);
+};
+
 exports.prepare = function(){
     clog("Preparing NGINX for the first time usage", "green");
     jxcore.utils.cmdSync("service nginx stop");
@@ -75,53 +82,79 @@ exports.prepare = function(){
     updateConfFile();
 };
 
-// returns null if it's successful otherwise returns ret{exitCode, out}
-exports.start = function(){
-    if(os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse){
+// returns true if it's successful otherwise returns ret{exitCode, err}
+exports.start = function(verbose){
+
+    if (verbose)
         clog("Starting NGINX", "green");
-        var ret = jxcore.utils.cmdSync(nginx_process + " -p "+ nginx_dir);
-        if(ret.exitCode !== 0) {
-            console.error("Could not start nginx:", ret.out);
-            return ret;
-        }
 
+    var ret = jxcore.utils.cmdSync(nginx_process + " -p "+ nginx_dir + " 2>&1");
+    if(ret.exitCode !== 0) {
+        exports.startError = "Could not start nginx:" + ret.out;
+        ret.err = exports.startError;
+        return ret;
+    }
+
+    if (verbose)
         clog("Started", "blue");
-        return null;
-    }
-    else{
-        console.error("Not Supported", os_info.fullName);
-        process.exit(-1);
-    }
+    exports.startError = null;
+    return true;
 };
 
-// returns false if it's successful otherwise returns ret{exitCode, out}
-exports.startIfStopped = function(){
 
-    var ret = exports.reload(false, true);
-    if (ret) {
-        return exports.start();
+exports.startIfStopped = function(verbose, showMessageIfRunning){
+
+    var running = exports.isRunning();
+    if (running) {
+        if (verbose && showMessageIfRunning)
+            console.log("Nginx is already running.");
+        return true;
     }
-    return false;
+
+    var ret = exports.start(verbose);
+    if (ret.err) {
+        if (verbose)
+            console.error(ret.err);
+        return ret;
+    }
+
+    return true;
 };
 
-// returns null if it's successful otherwise returns ret{exitCode, out}
-exports.stop = function(){
-    if(os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse){
+// returns true if it's successful otherwise returns ret{exitCode, out}
+exports.stop = function(verbose){
+    if (verbose)
         clog("Stopping NGINX", "green");
 
-        var ret = jxcore.utils.cmdSync(nginx_process + " -s stop -p "+ nginx_dir);
-        if(ret.exitCode !== 0) {
-            console.error("Could not stop nginx:", ret.out);
-            return ret;
-        }
+    var ret = jxcore.utils.cmdSync(nginx_process + " -s stop -p "+ nginx_dir);
+    if(ret.exitCode !== 0) {
+        ret.err = "Could not stop nginx: " + ret.out;
+        return ret;
+    }
 
+    if (verbose)
         clog("Stopped", "blue");
-        return null;
+    return true;
+};
+
+
+exports.stopIfStarted = function(verbose, showMessageIfStopped){
+
+    var running = exports.isRunning();
+    if (!running) {
+        if (verbose && showMessageIfStopped)
+            console.log("Nginx is already stopped.");
+        return true
     }
-    else{
-        console.error("Not Supported", os_info.fullName);
-        process.exit(-1);
+
+    var ret = exports.stop(verbose);
+    if (ret.err) {
+        if (verbose)
+            console.error(ret.err);
+        return ret;
     }
+
+    return true;
 };
 
 // returns null if it's successful otherwise returns string err
@@ -130,33 +163,58 @@ exports.reload = function(onlyIfNeeded, silent){
     if (onlyIfNeeded && !exports.needsReload)
         return null;
 
-    if(os_info.isDebian || os_info.isUbuntu || os_info.isRH || os_info.isSuse){
-
+    if (!exports.isRunning()) {
         if (!silent)
-            clog("Reloading NGINX", "green");
-
-        updateConfFile();
-
-        var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir);
-        if(ret.exitCode !== 0) {
-            if (!silent)
-                console.error("Not reloaded:", ret.out);
-            // removing path from output to the user
-            var str = ret.out.replace(new RegExp(nginx_dir, "ig"), "[...]");
-            return str;
-        }
-
-        exports.needsReload = false;
-        if (!silent)
-            clog("Reloaded", "blue");
+            console.log("Nginx is not running.");
 
         return null;
     }
-    else{
+
+    if (!silent)
+        clog("Reloading NGINX", "green");
+
+    updateConfFile();
+
+    var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir + " 2>&1");
+    if(ret.exitCode !== 0) {
         if (!silent)
-            console.error("Not Supported", os_info.fullName);
-        process.exit(-1);
+            console.error("Not reloaded:", ret.out);
+        // removing path from output to the user
+        var str = ret.out.replace(new RegExp(nginx_dir, "ig"), "[...]");
+        return str;
     }
+
+    exports.needsReload = false;
+    if (!silent)
+        clog("Reloaded", "blue");
+
+    return null;
+};
+
+
+// it stops nginx (if running) and then starts again
+exports.restart = function(verboseStop, verboseStart) {
+
+    var ret = true;
+    var running = exports.isRunning();
+
+    if (running) {
+        ret = exports.stop(verboseStop);
+        if (ret.err) {
+            if (verboseStop)
+                console.error(ret.err);
+            return ret;
+        }
+    }
+
+    ret = exports.start(verboseStart);
+    if (ret.err) {
+        if (verboseStart)
+            console.error(ret.err);
+        return ret;
+    }
+
+    return true;
 };
 
 

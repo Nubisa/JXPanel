@@ -81,13 +81,14 @@ exports.createConfig = function(domain, node_ports, log_location, directives, ss
 
 
 
-exports.createDefaultConfig = function(ssl_info, ifc_list){ // node_ports is an array (first http, second https)
+exports.createDefaultConfig = function(ssl_info, ifc_list, panel_port){ // node_ports is an array (first http, second https)
 
-    var sports = ["80", "443"];
+    var sports = ["80", "443", panel_port]
     var config_str = "";
 
     for(var i in sports){
         var sport = sports[i];
+        if (!sport) continue;
         for(var o in ifc_list){
             var ip = ifc_list[o];
             var extra = "";
@@ -102,12 +103,25 @@ exports.createDefaultConfig = function(ssl_info, ifc_list){ // node_ports is an 
                 +"  listen "+ip+":"+sport+ extra + ' default_server;\n'
                 +(sport=='443'?"  ssl on;\n":'')
                 +(sport=='443'?"  ssl_certificate_key " + ssl_info.key + ";\n" : "")
-                +(sport=='443'?"  ssl_certificate " + ssl_info.crt + ";\n" : "")
+                +(sport=='443'?"  ssl_certificate " + ssl_info.crt + ";\n" : "");
+
+            if (sport == panel_port) {
+                str_config += "\n"
+                +"  location / {\n"
+                +"    proxy_pass http://127.0.0.1:8000;\n"
                 +"    proxy_set_header Host $host;\n"
                 +"    proxy_set_header X-Real-IP $remote_addr;\n"
-                + " return 404;"
+                +"    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n"
+                +"  }\n";
+            } else {
+                str_config += "\n"
+                +"  proxy_set_header Host $host;\n"
+                +"  proxy_set_header X-Real-IP $remote_addr;\n"
+                +"  return 404;\n";
+            }
 
-                +"}\n";
+            str_config += ""
+            +"}\n";
 
             config_str += str_config + "\n\n";
         }
