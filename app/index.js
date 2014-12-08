@@ -21,8 +21,11 @@ process.on('uncaughtException', function(err) {
    console.error("uncaughtException", err);
 });
 
+var index = process.argv.indexOf(__filename);
+var argv = process.argv.slice(index + 1);
 
-var argv = process.IsEmbedded ? process.argv.slice(1) : process.argv.slice(2);
+console.log(process.argv);
+console.log(argv);
 
 if(argv[0] == "help"){
     jxcore.utils.console.log("Command line options for "+site_defaults.EN.panelName);
