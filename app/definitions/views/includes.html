@@ -474,7 +474,7 @@
         var addMenuIcons = function(){
             $('.normal-menu').each(function(index){
                 var id = $(this).attr('id');
-                var str = $(this).attr('data-icon') === "none" ? "" : '<img class="menu-icon" src="icons/' + id + '.png" id="'+id+'_img"/><span class="menu-text">';
+                var str = $(this).attr('data-icon') === "none" ? "" : '<img class="menu-icon" src="/icons/' + id + '.png" id="'+id+'_img"/><span class="menu-text">';
                 $(this).html(str + $(this).html() + "</span>");
                 $(this).click(function(){
                     var id = $(this).attr('id');
@@ -490,12 +490,12 @@
         addMenuIcons();
         $( ".normal-menu" ).hover(function() {
                     var id = $(this).attr('id');
-                    $('#' + id + '_img').attr('src','icons/' + id + '_orange.png');
+                    $('#' + id + '_img').attr('src','/icons/' + id + '_orange.png');
                     $( this ).css('color','#ffffff').css('background-color','#414647').css('border-top','dotted 1px #333').css('border-bottom','dotted 1px #444').css('padding-top','2px').css('padding-bottom','2px');
                 },
                 function(){
                     var id = $(this).attr('id');
-                    $('#' + id + '_img').attr('src','icons/' + id + '.png');
+                    $('#' + id + '_img').attr('src','/icons/' + id + '.png');
                     $( this ).css('color','#d0d0d0').css('background-color','').css('border-top','').css('border-bottom','').css('padding-top','3px').css('padding-bottom','3px');;
                 });
 
