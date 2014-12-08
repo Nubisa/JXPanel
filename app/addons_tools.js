@@ -167,7 +167,7 @@ var getContents = function (env, active_user, cb) {
 
     var addon = load(addon_name);
     if (addon.err) {
-        cb( { err : addon.err });
+        cb(addon.err);
         return;
     }
 

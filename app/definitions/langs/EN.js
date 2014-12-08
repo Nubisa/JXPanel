@@ -267,7 +267,7 @@ exports.Labels = {
     "UserAlreadyExists" : "User with this name already exists.",
     "UserSystemAlreadyExists" : "System user with this name already exists.",
     "UserSystemReuse" : "Would you like to reuse him?",
-    "UserUnknown" : "Unknown user.",
+    "UserUnknown" : "Unknown user",
     "UserAuthentication" : "User authentication",
     "UserHomeDirNotExists" : "User's home directory does not exists.",
     "UserHomeDirNotMoved" : "User's home directory could not be moved.",
@@ -353,7 +353,7 @@ exports.Labels = {
     "IPv6" : "IPv6 address",
     "IPv6Pool" : "IPv6 addresses",
     "IPv6Pool_Description" : "Please choose, which IPv6 addresses will be available for the hosting plan.",
-    "IPDoesNotExists" : "This IP address does not exists.",
+    "IPDoesNotExists" : "Could not find network interface for given IP address: %s.",
     "JXEnabled" : "JXcore",
     "JXcoreAppPath" : "Custom application file path",
     "JXcoreAppArgs" : "Application parameters",
@@ -524,7 +524,9 @@ exports.Labels = {
     "AddOnMethodErrorWhileCalling" : "Error while calling addon's method: %s.",
 
     "AddonMongoAddDB" : "Add database",
-    "AddonMongoAddDBEnterName" : "Enter database name"
+    "AddonMongoAddDBEnterName" : "Enter database name",
+
+    "HelpIndex" : "Main index"
 };
 
 
