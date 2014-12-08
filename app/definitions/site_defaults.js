@@ -96,5 +96,6 @@ exports.dirMonitorCertificates = path.join(__dirname, "../spawner") + path.sep;
 exports.dirNginxConfigs = path.join(exports.apps_folder, "nginx/conf/jxcore") + path.sep;
 exports.defaultAppMinPort = 10000;
 exports.defaultAppMaxPort = 20000;
+exports.port = 1402;  // jxpanel port
 
 //{{defaults.LABELHERE}}
