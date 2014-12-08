@@ -1,4 +1,90 @@
 var database = require('../install/database');
+var form_lang = require("../definitions/form_lang");
+var _active_user = require("../definitions/active_user");
+
+// menu items in array (order matters)
+var menuItems = [
+
+    {
+        name: "loginpage",
+        label: "LoginPage",
+        helpMenuOnly : true
+    },
+    {
+        name: "dashboard",
+        label: "Dashboard"
+    },
+    {
+        label : "Management",
+        group : true
+    },
+
+    {
+        name : "hostingp",
+        label : "DataPlans",
+        plan_check : "canCreatePlan"
+    },
+    {
+        name : "users",
+        label : "UsersUpperCase",
+        plan_check : "canCreateUser"
+    },
+    {
+        name : "domains",
+        label : "DomainsUpperCase"
+    },
+    {
+        label : "ToolsAndServices",
+        group : true
+    },
+    {
+        name : "jxcore",
+        label : "JXcoreUpperCase",
+        admin : true
+    },
+    {
+        name: "npmw",
+        label: "JXcoreNPMModules",
+        admin : true
+    },
+    {
+        name : "filem",
+        label : "fileManager"
+    },
+    {
+        name : "remotem",
+        label : "RemoteManagement",
+        plan_check : "plan_ssh"
+    },
+    {
+        label : "Extras",
+        group : true
+    },
+    {
+        name : "addonm",
+        label : "AddOnManager"
+    },
+    {
+        name : "help",
+        label : "help",
+        menuOnly : true
+    }
+];
+
+
+exports.pages = {
+    "adduser" : {
+        label : "AddUser",
+        link : "/adduser.html"
+    }
+};
+
+// cache of items by name
+var menuItemsByName = {};
+for(var o in menuItems)
+    if (menuItems[o].name)
+        menuItemsByName[menuItems[o].name] = menuItems[o];
+
 
 exports.hasView = function(active_user, file){
     if(!active_user)
@@ -34,39 +120,64 @@ exports.hasView = function(active_user, file){
     return true;
 };
 
-exports.render = function(active_user){
+// checks, whether specified menu item is allow dor user or not
+var checkItem = function(active_user, item) {
 
     var plan = database.getPlan(active_user.plan);
 
+    if (!item) debugger;
+    if (item.admin && !_active_user.isAdmin(active_user))
+        return false;
+
+    if (item.plan_check && !plan[item.plan_check])
+        return false;
+
+    return true;
+};
+
+// return menu item with information, if is allowed for user or not (ret.denied)
+exports.getMenuItem = function(active_user, item_name) {
+
+    if (!menuItemsByName[item_name])
+        return null;
+
+    var item = JSON.parse(JSON.stringify(menuItemsByName[item_name]));
+    item.denied = !checkItem(active_user, item);
+    return item;
+};
+
+// return menu items per specific user
+exports.getMenu = function(active_user) {
+
+    var ret = [];
+
+    for (var o in menuItems) {
+        var item = menuItems[o];
+        if (checkItem(active_user, item))
+            ret.push(item);
+    }
+
+    return ret;
+};
+
+// renders html code for menu per specific user
+exports.render = function(active_user){
+
+    var items = exports.getMenu(active_user);
+
     var str = '';
+    for(var o in items) {
 
-    if(plan.canCreatePlan){
-        str += "<div class='normal-menu' id='hostingp'>{{label.DataPlans}}</div>";
+        var item = items[o];
+        if (item.helpMenuOnly) continue;
+
+        var label = form_lang.Get(active_user.lang, item.label, true);
+
+        if (item.group)
+            str += "<div class='bold-menu' style='margin-top:10px;'>" + label + "</div>";
+        else
+            str += "<div class='normal-menu' id='" + item.name + "'>" + label + "</div>";
     }
 
-    if(plan.canCreateUser){
-        str += "<div class='normal-menu' id='users'>{{label.UsersUpperCase}}</div>";
-    }
-
-    str += "<div class='normal-menu' id='domains'>{{label.DomainsUpperCase}}</div>";
-
-    str += "<div class='bold-menu' style='margin-top:10px;'>{{label.ToolsAndServices}}</div>";
-
-    if(plan.name == "Unlimited"){
-        str += "<div class='normal-menu' id='jxcore'>{{label.JXcoreUpperCase}}</div>";
-        str += "<div class='normal-menu' id='npmw'>{{label.JXcoreNPMModules}}</div>";
-    }
-
-    str += "<div class='normal-menu' id='filem'>{{label.fileManager}}</div>";
-
-    if(plan.plan_ssh) {
-        str += "<div class='normal-menu' id='remotem'>{{label.RemoteManagement}}</div>";
-    }
-
-    str += "<div class='normal-menu' id='configuration'>{{label.Configuration}}</div>";
-    str += "<div class='bold-menu' style='margin-top:10px;'>{{label.Extras}}</div>";
-    str += "<div class='normal-menu' id='addonm'>{{label.AddOnManager}}</div>";
-    str += "<div class='normal-menu' id='help'>{{label.help}}</div>";
-
-    return str;
+   return str;
 };
