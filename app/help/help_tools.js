@@ -1,0 +1,300 @@
+/**
+ * Created by root on 12/4/14.
+ */
+
+// this file converts all markdowns into html files and put them into ui/docs/
+
+var smart_require = jxcore.utils.smartRequire(require);
+var marked = smart_require("marked");
+var _active_user = require("../definitions/active_user");
+var form_lang = require("../definitions/form_lang");
+var menu_creator = require("../rendering/menu_creator");
+var smart_replace = require('../rendering/smart_search').replace;
+var site_defaults = require('../definitions/site_defaults');
+var page_utils = require("../rendering/page_utils");
+var database = require("../install/database");
+
+var fs = require("fs");
+var path = require("path");
+var server = require("jxm");
+
+var input_dir = path.join(__dirname, "markdowns");
+var files = fs.readdirSync(input_dir);
+
+//var template = fs.readFileSync("./template.html").toString();
+
+
+
+
+var renderer = new marked.Renderer();
+renderer.heading = function (text, level) {
+    if (text.indexOf("<a") === -1) {
+        var anchor = text.toLowerCase().replace(/\s/g, "_");
+        var str = anchor ? '<a id="' + anchor + '"></a>' : "";
+        return str +'<h' + level + '>' + text + '</h' + level + '>';
+    } else {
+        return '<h' + level + '>' + text + '</h' + level + '>'
+    }
+};
+
+//renderer.list = function (text, ordered) {
+//    var tag = ordered ? "ol" : "ul";
+//    return '<' + tag + ' class="helpMenu">' + text + '</' + tag + '>';
+//};
+
+// options.lang == "user"
+// - item.denied   -> Plany hostingowe // no url
+// - !item.denied  -> <a>Plany Hostingowe</a>
+// options.lang == "both"
+// - item.denied   -> Hosting Plans (Plany Hostingowe)// no url
+// - !item.denied  -> Hosting Plans (<a>Plany Hostingowe</a>)
+// add_translation == false
+// - item.denied   -> Hosting Plans   // no url
+// - !item.denied  -> <a>Hosting Plans</a>
+var getLinkForItem = function(active_user, item, options) {
+
+    if (!options) options = {};
+
+    var item_name = null;
+    if (typeof item === "string") {
+        item_name = item;
+        item = menu_creator.getMenuItem(active_user, item);
+    }
+
+    if (!item) {
+        if (!item_name)
+            return "";
+
+        var page = menu_creator.pages[item_name];
+        if (!page)
+            return item_name;
+
+        item = {
+            denied : false,
+            name : item_name,
+            label : page.label
+        }
+    }
+
+    var fname = path.join(input_dir, item.name + ".markdown");
+    var todo = !fs.existsSync(fname);
+
+    var label_lang = form_lang.Get(active_user.lang, item.label, true);
+    var label_EN = form_lang.Get("EN", item.label, true);
+
+    var getCase = function(_str) {
+        var s = options.lowercase ? _str.toLowerCase() : _str;
+        if (todo) s+= " &#40;todo&#41;";
+        return s;
+    };
+
+    // just return text without link
+    if (item.denied || todo)
+        return getCase(options.lang == "user" ? label_lang : label_EN);
+
+    var str = "";
+    var for_link = "";
+
+    if (options.lang == "user" && active_user.lang !== "EN") {
+        if (item.denied) {
+            str = getCase(label_lang);
+        } else {
+            str = "";
+            for_link = label_lang
+        }
+    } else if (options.lang == "both" && active_user.lang !== "EN") {
+        if (item.denied) {
+            str = getCase(label_EN) + "(" + getCase(label_lang) + ")";
+        } else {
+            str = getCase(label_EN);
+            for_link = label_lang;
+        }
+    } else {
+        // just EN
+        if (item.denied) {
+            str = getCase(label_EN);
+        } else {
+            str = "";
+            for_link = label_EN
+        }
+    }
+
+    var ret = str;
+    if (for_link) {
+        if (options.html)
+            for_link = '<a href="/help.html?' + item.name + '">' + for_link + '</a>';
+        else
+            for_link = "[" + for_link + "](" + item.name + ".markdown)";
+
+        // wrapping in brackets
+        if (str)
+            for_link = " &#40;" + for_link + "&#41;";
+
+        ret += for_link;
+    }
+
+    return ret;
+};
+
+var markdownToHTML = function (str) {
+    // replacing links
+    str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/help.html?$1)");
+    return marked(str, { renderer : renderer, sanitize : true});
+};
+
+var getContents = function (env, active_user, cb) {
+
+    // e.g. /help.html?dashboard&id=1&par=2
+    var tmp = active_user.session.lastUrl.replace(new RegExp("&", "g"), "?").split("?");
+    var help_name = tmp[1] || "";
+
+    if (!help_name && tmp[0] === "/help.html")
+        help_name = "index";
+
+    var md_file = path.join(input_dir, help_name + ".markdown");
+    if (!help_name || !fs.existsSync(md_file)) {
+        cb(false, form_lang.Get(active_user, "FileNotFound", true));
+        return;
+    }
+
+    var str = fs.readFileSync(md_file).toString();
+    str = markdownToHTML(str);
+
+    smart_rule.globals = { "active_user": active_user  };
+    str = smart_replace(str, smart_rule);
+
+    //str = page_utils.getSingleButton("Main index", "fa-question-circle", 'document.location = "/help.html"') + str;
+
+    cb(false, str, help_name == "index");
+};
+
+exports.defineMethods = function() {
+
+    server.addJSMethod("getHelp", function (env, params) {
+        var active_user = _active_user.getUser(env.SessionID);
+        if (!active_user) {
+            server.sendCallBack(env, {err: form_lang.Get("EN", "Access Denied"), relogin: true});
+            return;
+        }
+
+        getContents(env, active_user, function (err, html, mainIndex) {
+            if (err) err = form_lang.Get(active_user.lang, err, true)
+            server.sendCallBack(env, { err: err, html: html, mainIndex : mainIndex });
+        });
+    });
+};
+
+
+exports.renderHelpMenu = function(active_user){
+
+    var items = menu_creator.getMenu(active_user);
+
+    var str = '';
+    for(var o in items) {
+
+        var item = items[o];
+        if (item.menuOnly) continue;
+        var label = form_lang.Get(active_user.lang, item.label, true);
+
+        var md = "";
+        if (item.group)
+            md = "### " + label;
+        else
+            md =  "* " + getLinkForItem(active_user, item, { lang : "user" });
+
+        str += markdownToHTML(md);
+    }
+
+    return '<div id="jxhelp_menu">\n' + str + "\n</div>";
+};
+
+
+var smart_rule = [
+    // gets htl code for help menu (all menu items defined in menu_creator)
+    {from:"{{helpMenu.$$}}", to:"$$", "$":function(val, gl){
+        if(!gl.active_user)
+            return "";
+
+        if (val == "menu")
+            return exports.renderHelpMenu(gl.active_user);
+    }
+    },
+    {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
+        var res = form_lang.Get(gl.lang, val);
+        return !res?"":res;
+    }
+    },
+    // gets link to the subpage (defined in menu_creator)
+    {from:"{{link.$$}}", to:"$$", "$":function(val, gl){
+        return getLinkForItem(gl.active_user, val, { lang : "both", lowercase : true, html : true });
+    }
+    },
+    // gets link to the subpage (not defined in menu_creator)
+    {from:"{{page.$$}}", to:"$$", "$":function(val, gl){
+
+        var page = menu_creator.pages[val];
+        if (!page)
+            return val;
+
+        return getLinkForItem(gl.active_user, val, { lang : "both", lowercase : true, html : true });
+    }
+    },
+    // gets text label for subpage defined in menu_creator)
+    {from:"{{linklabel.$$}}", to:"$$", "$":function(val, gl){
+
+        var item = menu_creator.getMenuItem(gl.active_user, val);
+        return item && item.label ? form_lang.Get(gl.active_user, item.label, true) : "";
+    }
+    },
+    {from:"{{if.##:$$}}", to:"@@", "@!":function(first, second, gl) {
+
+        var end = "{{endif}}";
+        if (first === "admin")
+            gl.remove_block = { end : end, remove : !_active_user.isAdmin(gl.active_user) };
+
+        return "";
+    }
+    },
+    {from:"{{view.$$}}", to:"$$", "$":function(val, gl){
+
+        val = val.replace(/_/g, "/");
+
+        var fromDB = database.getConfigValue(val);
+        var view = fromDB ? fromDB : fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
+        view = smart_replace(view, smart_rule);
+
+        return view;
+    }
+    },
+    {from:"{{img.$$}}", to:"$$", "$":function(val, gl){
+
+        var basename = val + ".png";
+
+        var file_name = path.join(__dirname, "images/" + basename);
+        if (!fs.existsSync(file_name))
+            return "[image `" + basename + "` not found]";
+
+        var base64 = new Buffer(fs.readFileSync(file_name)).toString('base64');
+        return '<img src="data:image/png;base64,' + base64 + '"/>';
+    }
+    }
+
+
+];
+
+
+
+//
+//
+//
+//for(var f in files) {
+//    var str = fs.readFileSync(path.join(input_dir, files[f])).toString();
+//
+//    // replacing links
+//    str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/docs/$1.html)");
+//
+//    var html = marked(str, { renderer : renderer });
+//    var out = template.replace("{{help.contents}}", html);
+//    //console.log(html);
+//    var basename = path.basename(files[f], ".markdown");
+//}

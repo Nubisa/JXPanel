@@ -221,3 +221,21 @@ img.logo2 {
     max-height: 100%;
     vertical-align: middle;
 }
+
+
+#jxhelp_contents {
+    width: 85%;
+    margin-left: 10px;
+}
+
+#jxhelp_contents h1:not(:first-child) {
+    margin-top: 40px;
+}
+
+#jxhelp_menu ul {
+    margin-bottom: 3px;
+}
+
+#jxhelp_menu h3 {
+    margin-bottom: 10px;
+}
