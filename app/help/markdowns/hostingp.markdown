@@ -4,7 +4,7 @@
 Those sets may be then assigned to any sub-users added to JXPanel by the user, who created the set.
 
 For example, super-user creates a hosting plan named *Default* and a user *guest_one*.
-The form for creating a user ({{link.adduser}} contains a {{labelb.PlanID}} combobox,
+The form for creating a user ({{link.adduser}} contains a {{labelb.PlanID}} ComboBox control,
 where the *Default* hosting plan (or any other created later) can be selected and assigned to the user.
 
 ## Table list
@@ -50,7 +50,7 @@ uploaded by FTP, etc.
 
 ### {{label.RemoveWithoutUserFiles}}
 
-Clicking this also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
+Clicking {{btn.RemoveWithoutUserFiles}} button also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
 that any files and folders located under each of user's home directory button will be moved to a archive.
 
 {{if.admin:true}}

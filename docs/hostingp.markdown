@@ -4,7 +4,7 @@ Hosting Plans may be described as sets of various parameters and limits.
 Those sets may be then assigned to any sub-users added to JXPanel by the user, who created the set.
 
 For example, super-user creates a hosting plan named *Default* and a user *guest_one*.
-The form for creating a user (add new user &#40;todo&#41; contains a <b>Hosting Plan</b> combobox,
+The form for creating a user (add new user &#40;todo&#41; contains a <b>Hosting Plan</b> ComboBox control,
 where the *Default* hosting plan (or any other created later) can be selected and assigned to the user.
 
 ## Table list
@@ -50,7 +50,7 @@ uploaded by FTP, etc.
 
 ### Remove the user, but move user files to the archive
 
-Clicking this also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
+Clicking `Remove the user, but move user files to the archive` button also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
 that any files and folders located under each of user's home directory button will be moved to a archive.
 
 
