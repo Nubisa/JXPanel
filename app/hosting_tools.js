@@ -958,3 +958,18 @@ exports.appGetConfigAsString = function(active_user) {
 
     return JSON.stringify(options.cfg, null, "#nbsp#").replace(/\n/g, "<br>").replace(/#nbsp#/g, '<span style="margin-left: 20px;"></span>');
 };
+
+
+exports.canAddNewPlan = function(plan) {
+
+    if (!plan)
+        return { err : "PlanInvalid" };
+
+    var max = plan.planMaximums ? plan.planMaximums.plan_max_plans : -1;
+
+    var current_plans = database.getPlansByPlanName(plan.name);
+    if (current_plans.length >= max)
+        return { err : "PlanCannotAddMorePlans|" + max };
+
+    return true;
+};
