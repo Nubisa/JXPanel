@@ -323,18 +323,12 @@ exports.renderEntireHelp = function() {
     for(var f in files) {
         var str = fs.readFileSync(path.join(input_dir, files[f])).toString();
 
-        //// replacing links
-        //str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/docs/$1.html)");
-        //
-        //var html = marked(str, { renderer : renderer });
-        //var out = template.replace("{{help.contents}}", html);
-
         fake_admin.session.lastUrl = "/help.html?" + path.basename(files[f], ".markdown");
 
         var ret = getContents(fake_admin);
         if (ret.mainIndex) {
             fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html);
-            fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html);
+            fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html.replace(/\(docs\//g, "("));
         } else {
             fs.writeFileSync(path.join(docs_dir, files[f]), ret.html);
         }
