@@ -189,7 +189,7 @@ var getButton = function(active_user, val) {
     if (active_user.for_markdown)
         return "`" + str + "`";
     else
-        return '<div style="color: #f8f8f8; margin: 0 2px 0 0; padding: 5px 10px 5px 10px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px; display: inline-block;">' + str + "</div>";
+        return '<span style="color: #f8f8f8; margin: 0 2px 0 0; padding: 3px 8px 3px 8px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px; display: inline-block;">' + str + "</span>";
 };
 
 exports.defineMethods = function() {
