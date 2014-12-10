@@ -21,7 +21,7 @@ It is exactly the same form as addplan, except that it is in edit mode now.
 
 ## Adding new hosting plan
 
-There is a button <span style="color: #f8f8f8; margin: 0 2px 0 0; padding: 5px 10px 5px 10px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px;">Add new hosting plan</span> on the top of the Hosting Plans page.
+There is a button `Add new hosting plan` on the top of the Hosting Plans page.
 
 However, in case when the hosting plan to which you belong does not allow to add any plans,
 or you already have maximum allowed number of hosting plans (<b>Max plans</b>) then you will see appropriate error message.

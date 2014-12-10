@@ -185,7 +185,11 @@ var getImage = function(active_user, val, with_border) {
 var getButton = function(active_user, val) {
 
     var str = form_lang.Get(active_user.lang, val, true);
-    return '<span style="color: #f8f8f8; margin: 0 2px 0 0; padding: 5px 10px 5px 10px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px;">' + str + "</span>";
+
+    if (active_user.for_markdown)
+        return "`" + str + "`";
+    else
+        return '<div style="color: #f8f8f8; margin: 0 2px 0 0; padding: 5px 10px 5px 10px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px; display: inline-block;">' + str + "</div>";
 };
 
 exports.defineMethods = function() {
