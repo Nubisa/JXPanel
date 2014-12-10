@@ -11,7 +11,7 @@ Instead, passwords are fully maintained by an operating system.
 ## Hierarchy structure
 
 JXPanel implements user's hierarchy tree, where each of the users may add sub-users and only he/she may manage them.
-Furthermore, each user is granted with [Hosting Plans](hostingp.markdown), which defines various parameters and limits applying to the user and sub-users, as well as sup-plans and sub-domains.
+Furthermore, each user is granted with hosting plans &#40;todo&#41;, which defines various parameters and limits applying to the user and sub-users, as well as sup-plans and sub-domains.
 
 ### First user
 

@@ -4,7 +4,7 @@ This is the first screen, which opens up after user logs-in.
 
 It contains couple of informations related with operating system(Disk Usage, System Information).
 
-Also, there is table containing actual properties and limits of currently logged user's [Hosting Plans](hostingp.markdown).
+Also, there is table containing actual properties and limits of currently logged user's [Hosting Plans](docs/hostingp.markdown).
 
 ### Disk Usage
 
@@ -22,4 +22,4 @@ This widget show various information about the system itself, for example:
 ### Your current plan
 
 Here are shown all parameters and limits defined in user's current hosting plan.
-See also [Hosting Plans](hostingp.markdown).
+See also [Hosting Plans](docs/hostingp.markdown).

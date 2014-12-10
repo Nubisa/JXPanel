@@ -120,8 +120,12 @@ var getLinkForItem = function(active_user, item, options) {
     if (for_link) {
         if (options.html && !active_user.for_markdown)
             for_link = '<a href="/help.html?' + item.name + '">' + for_link + '</a>';
-        else
+        else {
+            if (active_user.for_markdown)
+                item.name = "docs/" + item.name;
+
             for_link = "[" + for_link + "](" + item.name + ".markdown)";
+        }
 
         // wrapping in brackets
         if (str)
@@ -212,7 +216,7 @@ exports.renderHelpMenu = function(active_user){
 
         var md = "";
         if (item.group)
-            md =  extra_space +"### " + label;
+            md =  extra_space +"### " + label + extra_space;
         else
             md =  "* " + getLinkForItem(active_user, item, { lang : "user" }) + extra_space;
 
