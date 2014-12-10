@@ -580,6 +580,7 @@ methods.getForm = function(env, params) {
         // todo: just for now saving the value somewhere
         active_user.session.monitor = { isOnline : !err && ret, json : ret };
         var ret = forms.renderForm(env.SessionID, params.form, true);
+        if (ret.err) ret.err = form_lang.Get(active_user.lang, ret.err, true);
         active_user.session.monitor = null;
         ret.new = !!!_active_user.isRecordUpdating(active_user, params.form);
         server.sendCallBack(env, ret);

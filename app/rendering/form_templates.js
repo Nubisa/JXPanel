@@ -8,6 +8,7 @@ var database = require("./../install/database");
 var site_defaults = require("./../definitions/site_defaults");
 var page_utils = require("./page_utils");
 var addons_tools = require("../addons_tools");
+var hosting_tools = require("../hosting_tools");
 var validations = require("./../definitions/validations");
 var tools = require("./form_tools");
 
@@ -203,6 +204,10 @@ exports.renderForm = function(sessionId, formName, onlyControls){
                 var parentPlan = database.getPlan(me.plan);
                 if (!parentPlan)
                     return { err : "DBCannotGetPlan" };
+
+                var ret = hosting_tools.canAddNewPlan(parentPlan);
+                if (ret.err)
+                    return ret;
 
                 values = { planMaximums : {} };
                 for(var o in parentPlan.planMaximums) {
