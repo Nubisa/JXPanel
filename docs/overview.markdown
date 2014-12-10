@@ -2,7 +2,7 @@
 # What is JXPanel
 
 JXPanel is a software solution for web hosting of Node.JS/JXcore applications.
-Allows a server administrator (as well as each of the other users) to maintain hosting plans &#40;todo&#41;, users &#40;todo&#41; or domains &#40;todo&#41;
+Allows a server administrator (as well as each of the other users) to maintain [Hosting Plans](hostingp.markdown), users &#40;todo&#41; or domains &#40;todo&#41;
 and to launch node applications for specific internet domains.
 
 It also offers browser-based file manager &#40;todo&#41; for creating and editing files or folders and well as shell access through remote management &#40;todo&#41;.

@@ -120,12 +120,8 @@ var getLinkForItem = function(active_user, item, options) {
     if (for_link) {
         if (options.html && !active_user.for_markdown)
             for_link = '<a href="/help.html?' + item.name + '">' + for_link + '</a>';
-        else {
-            if (active_user.for_markdown)
-                item.name = "docs/" + item.name;
-
+        else
             for_link = "[" + for_link + "](" + item.name + ".markdown)";
-        }
 
         // wrapping in brackets
         if (str)
@@ -327,8 +323,8 @@ exports.renderEntireHelp = function() {
 
         var ret = getContents(fake_admin);
         if (ret.mainIndex) {
-            fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html);
-            fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html.replace(/\(docs\//g, "("));
+            fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html.replace(/\]\((.+)\.markdown\)/g, "](docs/$1)"));
+            fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html);
         } else {
             fs.writeFileSync(path.join(docs_dir, files[f]), ret.html);
         }

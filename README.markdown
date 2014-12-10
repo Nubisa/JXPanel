@@ -1,18 +1,18 @@
 
 # JXPanel manual and documentation
 
-## [Product Overview](docs/overview.markdown)
+## [Product Overview](docs/overview)
 
 
 ## superusers's guide &#40;todo&#41;
 
 
 ## Panel Menu
-* [Login page](docs/loginpage.markdown)
-* [Dashboard](docs/dashboard.markdown)
+* [Login page](docs/loginpage)
+* [Dashboard](docs/dashboard)
 
 ### Management
-* [Hosting Plans](docs/hostingp.markdown)
+* [Hosting Plans](docs/hostingp)
 * Users &#40;todo&#41;
 * Domains &#40;todo&#41;
 
