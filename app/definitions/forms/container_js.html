@@ -148,6 +148,8 @@
                 _this.focused = true;
 
                 var _input = $("#" + id);
+                if (!_input.length)
+                    _input = $("#" + id + "clb0");
 
                 // activating proper tab
                 _input.parents(".tab-pane").each(function(id, el) {
@@ -160,8 +162,9 @@
                 _input.parents(".tab-content").children(".tab-pane").removeClass("active in");
                 _input.parents(".tab-pane").addClass("active in");
 
-                _input.focus();
-                window.scrollBy(0,-100);
+                var offset = _input.offset();
+                if (offset)
+                    $(document).scrollTop(offset.top - 30);
             }
         }
     };
