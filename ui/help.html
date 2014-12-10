@@ -30,8 +30,10 @@
                                     if (param.err)
                                         utils.jxAddMessage("danger", param.err);
                                     else {
-                                        $("#jxhelp_contents").html(param.html);
+                                        var div = $("#jxhelp_contents");
+                                        div.html(param.html)
                                         param.mainIndex ? $("#buttons").hide() : $("#buttons").show();
+                                        div.addClass(param.mainIndex ? "jxhelp_index_contents" : "jxhelp_contents")
                                     }
                                 });
                             };
