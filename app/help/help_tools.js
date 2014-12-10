@@ -73,6 +73,9 @@ var getLinkForItem = function(active_user, item, options) {
         }
     }
 
+    var page_name = getPageName(active_user);
+    if (page_name == "index") options.lang = "user";
+
     var fname = path.join(input_dir, item.name + ".markdown");
     var todo = !fs.existsSync(fname);
 
@@ -140,7 +143,8 @@ var markdownToHTML = function (str) {
     return marked(str, { renderer : renderer, sanitize : false});
 };
 
-var getContents = function (active_user) {
+
+var getPageName = function(active_user) {
 
     // e.g. /help.html?dashboard&id=1&par=2
     var tmp = active_user.session.lastUrl.replace(new RegExp("&", "g"), "?").split("?");
@@ -148,6 +152,13 @@ var getContents = function (active_user) {
 
     if (!help_name && tmp[0] === "/help.html")
         help_name = "index";
+
+    return help_name;
+};
+
+var getContents = function (active_user) {
+
+    var help_name = getPageName(active_user);
 
     var md_file = path.join(input_dir, help_name + ".markdown");
     if (!help_name || !fs.existsSync(md_file))
@@ -157,10 +168,9 @@ var getContents = function (active_user) {
     if (!active_user.for_markdown)
         str = markdownToHTML(str);
 
-    smart_rule.globals = { "active_user": active_user  };
+    smart_rule.globals = { "active_user": active_user };
     str = smart_replace(str, smart_rule);
 
-    //str = page_utils.getSingleButton("Main index", "fa-question-circle", 'document.location = "/help.html"') + str;
     return { html : str, mainIndex : help_name == "index" };
 };
 
