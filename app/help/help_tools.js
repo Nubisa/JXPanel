@@ -26,7 +26,7 @@ var images_dir = path.join(__dirname, "images");
 var renderer = new marked.Renderer();
 renderer.heading = function (text, level) {
     if (text.indexOf("<a") === -1 && text.indexOf("{{page") !== -1 && text.indexOf("{{link") !==-1) {
-        var anchor = text.toLowerCase().replace(/\s/g, "_");
+        var anchor = text.toLowerCase().replace(/\s/g, "-");
         var str = anchor ? '<a id="' + anchor + '"></a>' : "";
         return str +'<h' + level + '>' + text + '</h' + level + '>';
     } else {

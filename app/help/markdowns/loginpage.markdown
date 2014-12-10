@@ -1,7 +1,7 @@
 # {{linklabel.loginpage}}
 
 In order to use JXPanel, one needs to successfully log in by providing username and password.
-See below for instruction, how to log in as [First user](#first_user).
+See below for instruction, how to log in as [First user](#first-user).
 
 ## Security
 
