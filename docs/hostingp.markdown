@@ -41,17 +41,17 @@ After clicking the button, you will be prompt with a popup window with another b
 The first button `Remove everything` as it indicates, deletes everything that was created under the hosting plan, which you are just about to remove.
 That includes:
 
-* all users who had the hosting plan assigned, as well as their sub-users,
-* all hosting plans created by those users (and their sub-users),
-* all domains created by those users (and their sub-users).
+* all users &#40;todo&#41; who had the hosting plan assigned, as well as their sub-users,
+* all [Hosting Plans](hostingp.markdown) created by those users (and their sub-users),
+* all domains &#40;todo&#41; created by those users (and their sub-users).
 
 Also any files located at those user's directories are removed, which means any folders/files created with file manager &#40;todo&#41;,
 uploaded by FTP, etc.
 
 ### Remove the user, but move user files to the archive
 
-Clicking `Remove the user, but move user files to the archive` button also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
-that any files and folders located under each of user's home directory button will be moved to a archive.
+Clicking `Remove the user, but move user files to the archive` button also deletes all database entries created under the hosting plan (users &#40;todo&#41; and sub-users, domains &#40;todo&#41; and [Hosting Plans](hostingp.markdown)) but the difference is,
+that any files and folders located under each of user's home directory button will be moved to a archive instead of permanent removal.
 
 
-The archive is a folder located in the following path: server_apps/deleted. It will contain multiple folders, each for deleted user.
+The archive is a folder located in the following path: *server_apps/deleted*. It will contain multiple folders, each for deleted user.

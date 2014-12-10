@@ -41,18 +41,18 @@ After clicking the button, you will be prompt with a popup window with another b
 The first button {{btn.RemoveWithUserFiles}} as it indicates, deletes everything that was created under the hosting plan, which you are just about to remove.
 That includes:
 
-* all users who had the hosting plan assigned, as well as their sub-users,
-* all hosting plans created by those users (and their sub-users),
-* all domains created by those users (and their sub-users).
+* all {{link.users}} who had the hosting plan assigned, as well as their sub-users,
+* all {{link.hostingp}} created by those users (and their sub-users),
+* all {{link.domains}} created by those users (and their sub-users).
 
 Also any files located at those user's directories are removed, which means any folders/files created with {{link.filem}},
 uploaded by FTP, etc.
 
 ### {{label.RemoveWithoutUserFiles}}
 
-Clicking {{btn.RemoveWithoutUserFiles}} button also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
-that any files and folders located under each of user's home directory button will be moved to a archive.
+Clicking {{btn.RemoveWithoutUserFiles}} button also deletes all database entries created under the hosting plan ({{link.users}} and sub-users, {{link.domains}} and {{link.hostingp}}) but the difference is,
+that any files and folders located under each of user's home directory button will be moved to a archive instead of permanent removal.
 
 {{if.admin:true}}
-The archive is a folder located in the following path: server_apps/deleted. It will contain multiple folders, each for deleted user.
+The archive is a folder located in the following path: *server_apps/deleted*. It will contain multiple folders, each for deleted user.
 {{endif}}
