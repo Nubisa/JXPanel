@@ -16,5 +16,14 @@ The table list on Hosting Plans page lists all hosting plans created by currentl
 The number of columns in the table may vary depending on width of the screen.
 For example, on mobile devices there may be visible only first two of the columns: <b>Plan name</b> and <b>Status</b>.
 
+Clicking the chosen row will get you to the hosting's plan modification form.
+It is exactly the same form as addplan, except that it is in edit mode now.
 
-<b>BOLD</b>
+## Adding new hosting plan
+
+There is a button <span style="color: #f8f8f8; margin: 0 2px 0 0; padding: 5px 10px 5px 10px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px;">Add new hosting plan</span> on the top of the Hosting Plans page.
+
+However, in case when the hosting plan to which you belong does not allow to add any plans,
+or you already have maximum allowed number of hosting plans (<b>Max plans</b>) then you will see appropriate error message.
+
+

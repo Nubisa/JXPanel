@@ -182,6 +182,12 @@ var getImage = function(active_user, val, with_border) {
     return '<img src="data:image/png;base64,' + base64 + '"' + style + '/>';
 };
 
+var getButton = function(active_user, val) {
+
+    var str = form_lang.Get(active_user.lang, val, true);
+    return '<span style="color: #f8f8f8; margin: 0 2px 0 0; padding: 5px 10px 5px 10px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px;">' + str + "</span>";
+};
+
 exports.defineMethods = function() {
 
     server.addJSMethod("getHelp", function (env, params) {
@@ -295,9 +301,12 @@ var smart_rule = [
     {from:"{{imgb.$$}}", to:"$$", "$":function(val, gl){
         return getImage(gl.active_user, val, true);
     }
+    },
+    {from:"{{btn.$$}}", to:"$$", "$":function(val, gl){
+        return getButton(gl.active_user, val);
+    }
     }
 ];
-
 
 
 
