@@ -386,12 +386,13 @@ methods.sessionApply = function(env, params){
                 }
             }
 
-            var res = json.ftp_access ? ftp.allowUser(update_name) : ftp.denyUser(update_name);
-            if (res.err)
-                ret = res.err;
+            if (!ret) {
+                var res = json.ftp_access ? ftp.allowUser(update_name) : ftp.denyUser(update_name);
+                if (res.err)
+                    ret = res.err;
 
-            if (!ret)
                 events.call(active_user, isUpdate ? "userUpdate" : "userAdd", { name : update_name, values : json });
+            }
 
         } catch(ex) {
             ret = ex.toString();
