@@ -13,22 +13,19 @@ var smart_replace = require('../rendering/smart_search').replace;
 var site_defaults = require('../definitions/site_defaults');
 var page_utils = require("../rendering/page_utils");
 var database = require("../install/database");
+var datatables = require('../rendering/datatable_templates');
 
 var fs = require("fs");
 var path = require("path");
 var server = require("jxm");
 
 var input_dir = path.join(__dirname, "markdowns");
-var files = fs.readdirSync(input_dir);
-
-//var template = fs.readFileSync("./template.html").toString();
-
-
+var images_dir = path.join(__dirname, "images");
 
 
 var renderer = new marked.Renderer();
 renderer.heading = function (text, level) {
-    if (text.indexOf("<a") === -1) {
+    if (text.indexOf("<a") === -1 && text.indexOf("{{page") !== -1 && text.indexOf("{{link") !==-1) {
         var anchor = text.toLowerCase().replace(/\s/g, "_");
         var str = anchor ? '<a id="' + anchor + '"></a>' : "";
         return str +'<h' + level + '>' + text + '</h' + level + '>';
@@ -121,7 +118,7 @@ var getLinkForItem = function(active_user, item, options) {
 
     var ret = str;
     if (for_link) {
-        if (options.html)
+        if (options.html && !active_user.for_markdown)
             for_link = '<a href="/help.html?' + item.name + '">' + for_link + '</a>';
         else
             for_link = "[" + for_link + "](" + item.name + ".markdown)";
@@ -137,12 +134,13 @@ var getLinkForItem = function(active_user, item, options) {
 };
 
 var markdownToHTML = function (str) {
+
     // replacing links
     str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/help.html?$1)");
-    return marked(str, { renderer : renderer, sanitize : true});
+    return marked(str, { renderer : renderer, sanitize : false});
 };
 
-var getContents = function (env, active_user, cb) {
+var getContents = function (active_user) {
 
     // e.g. /help.html?dashboard&id=1&par=2
     var tmp = active_user.session.lastUrl.replace(new RegExp("&", "g"), "?").split("?");
@@ -152,20 +150,36 @@ var getContents = function (env, active_user, cb) {
         help_name = "index";
 
     var md_file = path.join(input_dir, help_name + ".markdown");
-    if (!help_name || !fs.existsSync(md_file)) {
-        cb(false, form_lang.Get(active_user, "FileNotFound", true));
-        return;
-    }
+    if (!help_name || !fs.existsSync(md_file))
+        return { html : form_lang.Get(active_user, "FileNotFound", true) };
 
     var str = fs.readFileSync(md_file).toString();
-    str = markdownToHTML(str);
+    if (!active_user.for_markdown)
+        str = markdownToHTML(str);
 
     smart_rule.globals = { "active_user": active_user  };
     str = smart_replace(str, smart_rule);
 
     //str = page_utils.getSingleButton("Main index", "fa-question-circle", 'document.location = "/help.html"') + str;
+    return { html : str, mainIndex : help_name == "index" };
+};
 
-    cb(false, str, help_name == "index");
+var getImage = function(active_user, val, with_border) {
+
+    var basename = val + ".png";
+
+    var file_name = path.join(images_dir, basename);
+    if (!fs.existsSync(file_name))
+        return "[image `" + basename + "` not found]";
+
+    if (active_user.for_markdown) {
+        return "![" + basename + "](images/" + basename + ")";
+    }
+
+    var style = with_border ?  'style="border: solid 1px #ccc; padding: 15px;"' : "";
+
+    var base64 = new Buffer(fs.readFileSync(file_name)).toString('base64');
+    return '<img src="data:image/png;base64,' + base64 + '"' + style + '/>';
 };
 
 exports.defineMethods = function() {
@@ -177,10 +191,9 @@ exports.defineMethods = function() {
             return;
         }
 
-        getContents(env, active_user, function (err, html, mainIndex) {
-            if (err) err = form_lang.Get(active_user.lang, err, true)
-            server.sendCallBack(env, { err: err, html: html, mainIndex : mainIndex });
-        });
+        var ret = getContents(active_user);
+        if (ret.err) ret.err = form_lang.Get(active_user.lang, ret.err, true);
+        server.sendCallBack(env, { err: ret.err, html: ret.html, mainIndex : ret.mainIndex });
     });
 };
 
@@ -188,22 +201,26 @@ exports.defineMethods = function() {
 exports.renderHelpMenu = function(active_user){
 
     var items = menu_creator.getMenu(active_user);
+    var extra_space = active_user.for_markdown ? "\n" : "";
 
     var str = '';
     for(var o in items) {
 
         var item = items[o];
-        if (item.menuOnly) continue;
+        if (item.menu == "main") continue;
         var label = form_lang.Get(active_user.lang, item.label, true);
 
         var md = "";
         if (item.group)
-            md = "### " + label;
+            md =  extra_space +"### " + label;
         else
-            md =  "* " + getLinkForItem(active_user, item, { lang : "user" });
+            md =  "* " + getLinkForItem(active_user, item, { lang : "user" }) + extra_space;
 
-        str += markdownToHTML(md);
+        str += active_user.for_markdown ? md : markdownToHTML(md);
     }
+
+    if (active_user.for_markdown)
+        return str;
 
     return '<div id="jxhelp_menu">\n' + str + "\n</div>";
 };
@@ -222,6 +239,11 @@ var smart_rule = [
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
         var res = form_lang.Get(gl.lang, val);
         return !res?"":res;
+    }
+    },
+    {from:"{{labelb.$$}}", to:"$$", "$":function(val, gl){
+        var res = form_lang.Get(gl.lang, val);
+        return !res?"": "<b>"+res+"</b>";
     }
     },
     // gets link to the subpage (defined in menu_creator)
@@ -267,34 +289,50 @@ var smart_rule = [
     }
     },
     {from:"{{img.$$}}", to:"$$", "$":function(val, gl){
-
-        var basename = val + ".png";
-
-        var file_name = path.join(__dirname, "images/" + basename);
-        if (!fs.existsSync(file_name))
-            return "[image `" + basename + "` not found]";
-
-        var base64 = new Buffer(fs.readFileSync(file_name)).toString('base64');
-        return '<img src="data:image/png;base64,' + base64 + '"/>';
+        return getImage(gl.active_user, val);
+    }
+    },
+    {from:"{{imgb.$$}}", to:"$$", "$":function(val, gl){
+        return getImage(gl.active_user, val, true);
     }
     }
-
-
 ];
 
 
 
-//
-//
-//
-//for(var f in files) {
-//    var str = fs.readFileSync(path.join(input_dir, files[f])).toString();
-//
-//    // replacing links
-//    str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/docs/$1.html)");
-//
-//    var html = marked(str, { renderer : renderer });
-//    var out = template.replace("{{help.contents}}", html);
-//    //console.log(html);
-//    var basename = path.basename(files[f], ".markdown");
-//}
+
+exports.renderEntireHelp = function() {
+
+    var files = fs.readdirSync(input_dir);
+
+    var fake_admin = {
+        lang : "EN",
+        plan : database.unlimitedPlanName,
+        for_markdown : true,
+        session : {}
+    };
+
+    var docs_dir = path.join(__dirname, "../../docs/");
+    if (!fs.existsSync(docs_dir))
+        fs.mkdirSync(docs_dir);
+
+    for(var f in files) {
+        var str = fs.readFileSync(path.join(input_dir, files[f])).toString();
+
+        //// replacing links
+        //str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/docs/$1.html)");
+        //
+        //var html = marked(str, { renderer : renderer });
+        //var out = template.replace("{{help.contents}}", html);
+
+        fake_admin.session.lastUrl = "/help.html?" + path.basename(files[f], ".markdown");
+
+        var ret = getContents(fake_admin);
+        var output_file = ret.mainIndex ? path.join(__dirname, "../../README.markdown") : path.join(docs_dir, files[f]);
+        fs.writeFileSync(output_file, ret.html);
+    }
+
+    // copying pictures
+    var cmd = "cp -r " + images_dir + " " + docs_dir + path.sep;
+    jxcore.utils.cmdSync(cmd);
+};

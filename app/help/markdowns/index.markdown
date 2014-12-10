@@ -1,10 +1,10 @@
 
 # JXPanel manual and documentation
 
-## [Product Overview](overview.markdown)
+## {{page.overview}}
 
 {{if.admin:true}}
-## [Superuser's guide](admin_index.markdown)
+## {{link.admin_index}}
 {{endif}}
 
 ## Panel Menu

@@ -8,7 +8,7 @@ var menuItems = [
     {
         name: "loginpage",
         label: "LoginPage",
-        helpMenuOnly : true
+        menu : "help" // help menu only
     },
     {
         name: "dashboard",
@@ -67,17 +67,25 @@ var menuItems = [
     {
         name : "help",
         label : "help",
-        menuOnly : true
+        menu : "main" // only main menu
     }
 ];
 
 
+// extra definitions for links, that will not take part in menu rendering
 exports.pages = {
     "adduser" : {
         label : "AddUser",
         link : "/adduser.html"
+    },
+    "admin_index" : {
+        label: "Superusers's guide"
+    },
+    "overview" : {
+        label: "Product Overview"
     }
 };
+
 
 // cache of items by name
 var menuItemsByName = {};
@@ -125,7 +133,7 @@ var checkItem = function(active_user, item) {
 
     var plan = database.getPlan(active_user.plan);
 
-    if (!item) debugger;
+    if (!item || !plan) debugger;
     if (item.admin && !_active_user.isAdmin(active_user))
         return false;
 
@@ -169,7 +177,7 @@ exports.render = function(active_user){
     for(var o in items) {
 
         var item = items[o];
-        if (item.helpMenuOnly) continue;
+        if (item.menu == "help") continue;
 
         var label = form_lang.Get(active_user.lang, item.label, true);
 

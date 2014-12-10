@@ -18,7 +18,8 @@ var site_defaults = require('./definitions/site_defaults');
 var icheck = require('./install/install');
 
 process.on('uncaughtException', function(err) {
-   console.error("uncaughtException", err);
+    console.error("uncaughtException", err);
+    process.exit();
 });
 
 var index = process.argv.indexOf(__filename);
@@ -161,6 +162,24 @@ if(argv[0] === "fix") {
                 console.log("OK");
 
             return;
+        });
+        return;
+    }
+
+    return unknownArg();
+}
+
+
+if (argv[0] === "render") {
+
+    if (argv[1] === "help") {
+
+        var database = require("./install/database");
+        database.ReadDB(function(err) {
+            if (err)
+                throw err;
+
+            require("./help/help_tools").renderEntireHelp();
         });
         return;
     }
