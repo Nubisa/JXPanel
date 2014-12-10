@@ -16,9 +16,6 @@ The table list on Hosting Plans page lists all hosting plans created by currentl
 The number of columns in the table may vary depending on width of the screen.
 For example, on mobile devices there may be visible only first two of the columns: <b>Plan name</b> and <b>Status</b>.
 
-Clicking the chosen row will get you to the hosting's plan modification form.
-It is exactly the same form as addplan, except that it is in edit mode now.
-
 ## Adding new hosting plan
 
 There is a button `Add new hosting plan` on the top of the Hosting Plans page.
@@ -26,4 +23,35 @@ There is a button `Add new hosting plan` on the top of the Hosting Plans page.
 However, in case when the hosting plan to which you belong does not allow to add any plans,
 or you already have maximum allowed number of hosting plans (<b>Max plans</b>) then you will see appropriate error message.
 
+## Editing existing hosting plan
 
+Clicking the chosen row in the table list will get you to the hosting's plan modification form.
+It is exactly the same form as addplan, except that it is in edit mode now.
+
+## Removing hosting plans
+
+First column of table list contains a checkbox for each hosting plans.
+To remove a hosting plan, you need to select an appropriate checkbox and then click `Remove selected` button.
+You can also select multiple checkboxes to remove more than one hosting plan at once.
+
+After clicking the button, you will be prompt with a popup window with another buttons:
+
+### Remove everything
+
+The first button `Remove everything` as it indicates, deletes everything that was created under the hosting plan, which you are just about to remove.
+That includes:
+
+* all users who had the hosting plan assigned, as well as their sub-users,
+* all hosting plans created by those users (and their sub-users),
+* all domains created by those users (and their sub-users).
+
+Also any files located at those user's directories are removed, which means any folders/files created with file manager &#40;todo&#41;,
+uploaded by FTP, etc.
+
+### Remove the user, but move user files to the archive
+
+Clicking this also deletes all database entries created under the hosting plan(users and sub-users, domains and hosting plans) but the difference is,
+that any files and folders located under each of user's home directory button will be moved to a archive.
+
+
+The archive is a folder located in the following path: server_apps/deleted. It will contain multiple folders, each for deleted user.
