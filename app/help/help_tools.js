@@ -332,8 +332,12 @@ exports.renderEntireHelp = function() {
         fake_admin.session.lastUrl = "/help.html?" + path.basename(files[f], ".markdown");
 
         var ret = getContents(fake_admin);
-        var output_file = ret.mainIndex ? path.join(__dirname, "../../README.markdown") : path.join(docs_dir, files[f]);
-        fs.writeFileSync(output_file, ret.html);
+        if (ret.mainIndex) {
+            fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html);
+            fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html);
+        } else {
+            fs.writeFileSync(path.join(docs_dir, files[f]), ret.html);
+        }
     }
 
     // copying pictures
