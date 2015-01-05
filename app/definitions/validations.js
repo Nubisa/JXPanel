@@ -171,8 +171,9 @@ exports.MaxPort = function(min_port_field) {
         if (!ret.result) return ret;
 
         var domains = database.getDomainsByUserName(null, 1e5);
-        if ((max - min) < domains.length * 2)
-            return {result: false, msg: form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ domains.length * 2, max - min ])};
+        var ppd = hosting_tools.getPortsPerDomain();
+        if ((max - min) < domains.length * ppd)
+            return {result: false, msg: form_lang.Get(active_user.lang, "JXcoreAppSmallPortRange", true, [ domains.length * ppd, max - min + 1, domains.length, ppd ])};
 
         return {result : true} ;
     };
