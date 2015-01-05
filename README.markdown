@@ -4,7 +4,7 @@
 ## [Product Overview](docs/overview)
 
 
-## superusers's guide &#40;todo&#41;
+## [Superusers's guide](docs/admin_index)
 
 
 ## Panel Menu
@@ -17,8 +17,8 @@
 * Domains &#40;todo&#41;
 
 ### Tools & Services
-* JXcore &#40;todo&#41;
-* NPM Wizard &#40;todo&#41;
+* [JXcore](docs/jxcore_index)
+* [NPM Wizard](docs/npmw)
 * File Manager &#40;todo&#41;
 * Remote Management &#40;todo&#41;
 

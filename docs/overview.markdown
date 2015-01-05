@@ -10,11 +10,11 @@ It also offers browser-based file manager &#40;todo&#41; for creating and editin
 Embedded FTP Server handles ftp operations for users with enabled ftp access.
 
 JXPanel may also be extended by developers thanks to the supported addon's engine.
-Full documentation may be found here: addons_api.
+Full documentation may be found here: add-ons &#40;todo&#41;.
 
 # JXcore
 
-JXPanel is written entirely in javascript and runs with [JXcore](http://www.jxcore.com).
+JXPanel is written entirely in JavaScript and runs with [JXcore](http://www.jxcore.com).
 
 # Supported platforms
 

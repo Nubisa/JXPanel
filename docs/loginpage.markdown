@@ -15,15 +15,24 @@ Furthermore, each user is granted with [Hosting Plans](hostingp.markdown), which
 
 ### First user
 
-The first user that logs-in into the JXPanel becomes a super-user and is allowed to manage everything else from now on.
+The first user that logs-in into the JXPanel becomes a **super-user** and is allowed to manage everything else from now on.
 Login and password provided on Login page need to match credentials of existing OS's user so it means,
 that this user has to exist already in the operating system. However, there is no obligation, that the first user has to be a sudoer.
 
-JXPanel offers some functionalities available only for a super-user, for example: jxcore &#40;todo&#41;, npm wizard &#40;todo&#41;.
+JXPanel offers some functionalities available only for a super-user, for example: [JXcore](jxcore.markdown), [NPM Wizard](npmw.markdown).
 
-### Other users
+### Regular users
 
 Any other JXPanel's user needs to be created through JXPanel explicitly by already existing user.
 See add new user &#40;todo&#41; for details on that matter.
 
 Once new users are created in JXPanel, they also become an OS's users.
+
+
+## Customizing login page
+
+Super-user has an ability to customize the login page, for example to set a logo image or define a welcome text.
+For more information see [Custom Login Page](jxcoreloginpage.markdown).
+
+
+
