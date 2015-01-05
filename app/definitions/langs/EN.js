@@ -117,6 +117,7 @@ exports.Labels = {
 
     // login page
     "LoginPage" : "Login page",
+    "LoginPageCustom" : "Custom Login Page",
     "LoginPageText" : "Custom HTML block on login page",
     "LoginPageText_Description" : "HTML code to be displayed on login page. Leaving the value empty makes the below example to be displayed.",
     "LoginPageUnsupportedLogoExtension" : "Only the following extensions are supported: %s",
@@ -297,6 +298,7 @@ exports.Labels = {
     // Plan
     "plans":"plans",
     "PlanName" : "Plan name",
+    "PlanName_Description" : "Once the plan is created, you will not be able to change it's name.",
     "PlanID" : "Hosting Plan",
     "Overuse" : "Allow overuse",
     "MaxDiskSpace" : "Disk space",
@@ -472,7 +474,7 @@ exports.Labels = {
     "JXcoreAppMinPort" : "Minimum app port number",
     "JXcoreAppMaxPort" : "Maximum app port number",
     "JXcoreAppMaxPort_Description" : "The port range should be greater than domain count multiplied by defined number of ports per domain (%s).",
-    "JXcoreAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s).",
+    "JXcoreAppSmallPortRange" : "Too small port range. You need at least %s ports (instead of %s), since there is total number of %s domains registered, and there are %s ports allocated per domain.",
     "JXcoreAppsRestartWarning" : "Submitting the form may result in restarting the monitor together with all running applications.",
     "JXcoreAppCannotStart" : "Cannot start application %s.",
     "JXcoreAppCannotStop" : "Cannot stop application %s.",
@@ -497,7 +499,7 @@ exports.Labels = {
 
     "JXcoreNPMModules" : "NPM Wizard",
     "JXcoreNPMAddModule" : "Install new module",
-    "JXcoreNPMEnterName" : "Please enter a name for NPM module.",
+    "JXcoreNPMEnterName" : "Please enter a name for NPM module. You can also specify version followed by @ sign.",
     "JXcoreNPMCouldNotInstall" : "Could not install NPM module.",
     "JXcoreNPMCouldNotUnInstall" : "Could not uninstall the following NPM modules: %s.",
     "JXcoreNPMInstalled" : "NPM module successfully installed.",

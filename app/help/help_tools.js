@@ -171,6 +171,9 @@ var getContents = function (active_user) {
     smart_rule.globals = { "active_user": active_user };
     str = smart_replace(str, smart_rule);
 
+    if (!active_user.for_markdown)
+        str = markdownToHTML(str);
+
     return { html : str, mainIndex : help_name == "index" };
 };
 
@@ -247,7 +250,7 @@ exports.renderHelpMenu = function(active_user){
 
 
 var smart_rule = [
-    // gets htl code for help menu (all menu items defined in menu_creator)
+    // gets html code for help menu (all menu items defined in menu_creator)
     {from:"{{helpMenu.$$}}", to:"$$", "$":function(val, gl){
         if(!gl.active_user)
             return "";
@@ -285,6 +288,9 @@ var smart_rule = [
     {from:"{{linklabel.$$}}", to:"$$", "$":function(val, gl){
 
         var item = menu_creator.getMenuItem(gl.active_user, val);
+        if (!item)
+            item = menu_creator.pages[val];
+
         return item && item.label ? form_lang.Get(gl.active_user, item.label, true) : "";
     }
     },
@@ -301,11 +307,23 @@ var smart_rule = [
 
         val = val.replace(/_/g, "/");
 
-        var fromDB = database.getConfigValue(val);
+        //var fromDB = database.getConfigValue(val);
+        var fromDB = null;
         var view = fromDB ? fromDB : fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
         view = smart_replace(view, smart_rule);
 
         return view;
+    }
+    },
+    // view as html
+    {from:"{{viewplain.$$}}", to:"$$", "$":function(val, gl){
+
+        val = val.replace(/_/g, "/");
+
+        var view = fs.readFileSync(__dirname + '/../definitions/views/' + val + ".html") + "";
+        view = smart_replace(view, smart_rule);
+
+        return view.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g, "<br>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
     }
     },
     {from:"{{img.$$}}", to:"$$", "$":function(val, gl){
@@ -319,7 +337,23 @@ var smart_rule = [
     {from:"{{btn.$$}}", to:"$$", "$":function(val, gl){
         return getButton(gl.active_user, val);
     }
+    },
+    {from:"{{dir.$$}}", to:"$$", "$":function(val, gl){
+
+        var dir = "";
+        if (site_defaults[val]) {
+            dir = site_defaults[val].replace(path.dirname(site_defaults.apps_folder), "$JXPanel");
+        } else {
+            dir = "$JXpanel" + path.sep + path.basename(site_defaults.apps_folder) + path.sep + val;
+        }
+
+        return "*" + dir + "*";
     }
+    },
+    {from:"{{url.$$}}", to:"$$", "$":function(val, gl){
+        return "help.html?" + val;
+    }
+    },
 ];
 
 

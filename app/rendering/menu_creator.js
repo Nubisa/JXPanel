@@ -40,7 +40,14 @@ var menuItems = [
     {
         name : "jxcore",
         label : "JXcoreUpperCase",
-        admin : true
+        admin : true,
+        menu : "main"
+    },
+    {
+        name : "jxcore_index",
+        label : "JXcoreUpperCase",
+        admin : true,
+        menu : "help"
     },
     {
         name: "npmw",
@@ -79,10 +86,19 @@ exports.pages = {
         link : "/adduser.html"
     },
     "admin_index" : {
-        label: "Superusers's guide"
+        label : "Superusers's guide"
+    },
+    "jxcore_index" : {
+        label : "JXcore"
     },
     "overview" : {
         label: "Product Overview"
+    },
+    "jxcoreloginpage" : {
+        label: "LoginPageCustom"
+    },
+    "addons_api" : {
+        label : "Add-ons"
     }
 };
 
