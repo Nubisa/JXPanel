@@ -9,8 +9,6 @@ TODO
 - for now users/plans/ domains visibility is set to database.getXXXByUserName, and this prevents seeing  e.g. users on the same level (having the same parent plan)
     since we dont have plan aliases implemented
 
-- IP adresses - how to use them? Right now they are defined on domains' form. Should they be maybe on plan's form?
-
 - switching plan for the user!
     -- moving home directory
     -- suspending subplans
@@ -23,7 +21,9 @@ TODO
 
 - nodebb + socket.io policy issue
 
+___
 
+- ports per domain - they are allocated, but nothing more
 
 DONE
 
