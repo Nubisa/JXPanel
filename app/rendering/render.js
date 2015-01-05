@@ -294,6 +294,7 @@ var Stream = require('stream').Stream;
 
 
 var template = function() {
+    database.reloadIfNeeded();
     var stream = new Stream();
 
     stream.writable = true;

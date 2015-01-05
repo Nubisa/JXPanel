@@ -154,3 +154,7 @@ exports.UpdateDB = function (stringToSave, cb) {
 exports.SetFileName = function(fileName) {
     dbFileName = fileName;
 };
+
+exports.GetFileName = function() {
+    return dbFileName;
+};

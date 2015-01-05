@@ -1,7 +1,7 @@
 
 var sqlite2 = require("./sqlite2");
 var util = require('util');
-
+var fs = require("fs");
 var DB = {Plans:{}, Users:{}, Domains:{}, Config:{}};
 
 
@@ -12,12 +12,17 @@ var UpdateDB = function(stringToSave){ // KRIS FILL IN
     sqlite2.UpdateDB(stringToSave, function(err) {
         if (err)
             console.error(err);
+        else {
+            if (exports.markForReload)
+                _markForReload();
+        }
     });
 };
 
 // don't change it, otherwise db should be refreshed
 exports.defaultMaximum = -1;
 exports.unlimitedPlanName = "Unlimited";
+exports.markForReload = false;
 
 exports.updateDBFile = function(){
    UpdateDB(JSON.stringify(DB));
@@ -935,6 +940,27 @@ exports.fixDatabase = function() {
     } else {
         UpdateDB(JSON.stringify(DB));
         return { plans: arr_plans, users: arr_users, domains: arr_domains};
+    }
+};
+
+var _markForReload = function() {
+    var fname = sqlite2.GetFileName() + ".reload";
+    fs.writeFileSync(fname, "");
+    exports.markForReload = false;
+};
+
+
+// this is async, but executed as sync. However this shouldn't matter much
+// since it will be called only in case if db has been changed externally
+exports.reloadIfNeeded = function() {
+    try {
+        var fname = sqlite2.GetFileName() + ".reload";
+        if (fs.existsSync(fname)) {
+            exports.ReadDB();
+            fs.unlinkSync(fname);
+        }
+    } catch (ex) {
+        console.error(ex);
     }
 };
 

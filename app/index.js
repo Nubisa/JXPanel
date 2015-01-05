@@ -58,6 +58,7 @@ if(argv[0] === "nginx") {
         var ip_tools = require("./ip_tools");
         var database = require("./install/database");
         var hosting_tools = require("./hosting_tools");
+        database.markForReload = true;
         database.ReadDB(function(err) {
             if (err)
                 throw err;
@@ -87,6 +88,7 @@ if(argv[0] === "ftp") {
     if (argv[1] === "deny" || argv[1] === "allow") {
 
         var database = require("./install/database");
+        database.markForReload = true;
         database.ReadDB(function(err) {
             if (err)
                 throw err;
@@ -126,6 +128,7 @@ if(argv[0] === "set") {
         }
 
         var database = require("./install/database");
+        database.markForReload = true;
         database.ReadDB(function(err) {
             if (err)
                 throw err;
@@ -151,6 +154,7 @@ if(argv[0] === "fix") {
 
         var ip_tools = require("./ip_tools");
         var database = require("./install/database");
+        database.markForReload = true;
         database.ReadDB(function(err) {
             if (err)
                 throw err;
