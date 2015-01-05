@@ -15,15 +15,24 @@ Furthermore, each user is granted with {{link.hostingp}}, which defines various 
 
 ### First user
 
-The first user that logs-in into the JXPanel becomes a super-user and is allowed to manage everything else from now on.
+The first user that logs-in into the JXPanel becomes a **super-user** and is allowed to manage everything else from now on.
 Login and password provided on {{linklabel.loginpage}} need to match credentials of existing OS's user so it means,
 that this user has to exist already in the operating system. However, there is no obligation, that the first user has to be a sudoer.
 
 JXPanel offers some functionalities available only for a super-user, for example: {{link.jxcore}}, {{link.npmw}}.
 
-### Other users
+### Regular users
 
 Any other JXPanel's user needs to be created through JXPanel explicitly by already existing user.
 See {{link.adduser}} for details on that matter.
 
 Once new users are created in JXPanel, they also become an OS's users.
+
+{{if.admin:true}}
+## Customizing login page
+
+Super-user has an ability to customize the login page, for example to set a logo image or define a welcome text.
+For more information see {{link.jxcoreloginpage}}.
+{{endif}}
+
+

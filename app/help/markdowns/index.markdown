@@ -1,7 +1,7 @@
 
 # JXPanel manual and documentation
 
-## {{page.overview}}
+## {{link.overview}}
 
 {{if.admin:true}}
 ## {{link.admin_index}}

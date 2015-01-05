@@ -14,7 +14,7 @@ Full documentation may be found here: {{link.addons_api}}.
 
 # JXcore
 
-JXPanel is written entirely in javascript and runs with [JXcore](http://www.jxcore.com).
+JXPanel is written entirely in JavaScript and runs with [JXcore](http://www.jxcore.com).
 
 # Supported platforms
 

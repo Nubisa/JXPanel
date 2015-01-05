@@ -4,7 +4,7 @@
 Those sets may be then assigned to any sub-users added to JXPanel by the user, who created the set.
 
 For example, super-user creates a hosting plan named *Default* and a user *guest_one*.
-The form for creating a user ({{link.adduser}} contains a {{labelb.PlanID}} ComboBox control,
+The form for creating a user ({{link.adduser}}) contains a {{labelb.PlanID}} ComboBox control,
 where the *Default* hosting plan (or any other created later) can be selected and assigned to the user.
 
 ## Table list
@@ -30,8 +30,9 @@ It is exactly the same form as {{link.addplan}}, except that it is in edit mode 
 
 ## Removing hosting plans
 
-First column of table list contains a checkbox for each hosting plans.
+First column of the table list contains a checkbox for each hosting plan.
 To remove a hosting plan, you need to select an appropriate checkbox and then click {{btn.RemoveSelected}} button.
+
 You can also select multiple checkboxes to remove more than one hosting plan at once.
 
 After clicking the button, you will be prompt with a popup window with another buttons:
