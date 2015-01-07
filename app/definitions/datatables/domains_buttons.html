@@ -1,46 +1,42 @@
 <script type="text/javascript">
 
+    window.filteringDomains = false;
+    window.domains = {};
+
+    window.domains_addDomains = function(arr, header, search_string) {
+
+        var header_added = false;
+        var added = 0;
+        for(var o in arr) {
+            var val = arr[o];
+            if (!search_string || val.indexOf(search_string) !== -1) {
+                if (!header_added) {
+                    $('#txtdcombo').append($('<option>', { value: 0, text: header, style: "color: #a57225; font-weight: bold;" }));
+                    header_added = true;
+                }
+
+                $('#txtdcombo').append($('<option>', { value: val, text: val }));
+                added++;
+            }
+        }
+        return added;
+    };
+
     window.filterDomains = function() {
+        if (window.filteringDomains) return;
+        window.filteringDomains = true;
         var str = $("#txtdcombofilter").val();
 
-        var no_results = document.getElementById("txtdcombo_no_results");
-        if (!no_results) {
-            $('#txtdcombo').append($('<option>', {
-                value: 1,
-                text: '{{label.NoResults}}',
-                id : "txtdcombo_no_results",
-                style: "display: none;"
-            }));
-            $('#Msgdcombo').css("top", "25%");
-        }
+        $("#txtdcombo > option").remove();
+        var added = 0;
+        added += window.domains_addDomains(window.domains.my, "{{label.DomainsMine}}:", str);
+        added += window.domains_addDomains(window.domains.parent, "{{label.DomainsParent}}:", str);
 
-        var count = $("#txtdcombo > option").length;
-        var _index = 0;
-        var _hidden = 0;
-        $("#txtdcombo > option").each(function() {
+        if (!added)
+            $('#txtdcombo').append($('<option>', { value: 1, text: '{{label.NoResults}}' }));
 
-            if (!this.value || this.value.indexOf(" ") !== -1) {
-                $(this).css("color", "#a57225");
-                $(this).css("font-weight", "bold");
-                return;
-            }
-
-            var contains = this.value.indexOf(str) !== -1;
-            if (contains)
-                $(this).show();
-            else {
-                _hidden++;
-                $(this).hide();
-            }
-            _index++;
-
-            if (_index === count) {
-                if (_hidden === count)
-                    $("#txtdcombo_no_results").show();
-                else
-                    $("#txtdcombo_no_results").hide();
-            }
-        });
+        $('#Msgdcombo').css("top", "25%");
+        window.filteringDomains = false;
     };
 
     window.addSubdomain = function() {
@@ -62,12 +58,12 @@
 
         window.toServer("getUserDomains", null, function (param) {
             if (!param || param.err)
-                return  utils.jxAddMessage('danger', param.err);
+                return utils.jxAddMessage('danger', param.err);
 
-            if (!param.res)
-                return  utils.jxAddMessage('danger', "{{label.DomainsNone}}");
+            if (!param.my || !param.parent)
+                return utils.jxAddMessage('danger', "{{label.DomainsNone}}");
 
-            param.res = "[" + param.res.join("][") + "]";
+            window.domains = param;
 
             var filter =
                     '<div class="icon-addon">'
@@ -79,21 +75,22 @@
             $.SmartMessageBox({
                 title : '<i class="fa fa-globe txt-color-orangeDark"></i> {{label.AddSubDomain}}',
                 content : "",
-                buttons : "[{{label.No}}][{{label.Yes}}]",
+                buttons : "[{{label.Cancel}}][{{label.Add}}]",
                 input : "select",
-                options: param.res,
+                options: [],
                 placeholder : "Select",
                 beforeInput : filter,
                 inputAttr : 'style="display: inline; background-color: black; border: 1px solid lightgray; color: lightgray; font-weight: normal" size="8"',
                 inputId: "dcombo"
             }, function(ButtonPress, selected) {
-                if (ButtonPress == "{{label.Yes}}") {
+                if (ButtonPress == "{{label.Add}}") {
 
                     if (!selected || selected.indexOf(" ") !== -1)
                         return  utils.jxAddMessage('danger', "{{label.DomainsSelectForSubdomain}}");
 
                     add(selected);
-                }
+                } else
+                    return false;
             });
 
             window.filterDomains();
@@ -107,6 +104,6 @@
 <a id="btn_add_sub" title="{{label.AddSubDomain}}" class="jxbtn" onclick="return window.addSubdomain();">
     <i class="fa fa-plus"></i><span class="dummy-label hidden-480">{{label.AddSubDomain}}</span>
 </a>
-<a id="btn_remove" title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows(); return false;">
+<a id="btn_remove" title="{{label.RemoveSelected}}" class="jxbtn" onclick="if (window.jxRemoveRows) window.jxRemoveRows(true); return false;">
     <i class="fa fa-trash-o"></i><span class="dummy-label hidden-480">{{label.RemoveSelected}}</span>
 </a>

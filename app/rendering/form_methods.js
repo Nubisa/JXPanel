@@ -954,17 +954,9 @@ methods.getUserDomains = function (env, params) {
         }
     }
 
-    if (arr1.length) {
-        var header = arr2.length ? ["My domains:"] : [];
-        arr = arr.concat(header, arr1);
-    }
-    if (arr2.length)
-        arr = arr.concat(["Parent user domains:"], arr2);
+    var err = arr1.length || arr2.length ? false : form_lang.Get(active_user.lang, "DomainsNone", true);
 
-    //console.log("getUserDomains", arr);
-    var err = arr.length ? false : form_lang.Get(active_user.lang, "DomainsNone", true);
-
-    server.sendCallBack(env, { err : err, res : arr });
+    server.sendCallBack(env, { err : err, my : arr1, parent : arr2 });
 };
 
 methods.removeLogo = function (env, params) {

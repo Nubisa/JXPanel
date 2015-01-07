@@ -341,6 +341,8 @@ exports.Labels = {
     "DomainSSLCertFile" : "SSL certificate file",
     "DomainSSLKeyFile" : "SSL certificate key file",
     "DomainsNone" : "Neither you nor your parent user own any domain.",
+    "DomainsMine": "My domains",
+    "DomainsParent": "Parent user domains",
     "DomainsSelectForSubdomain": "Please select domain for new subdomain.",
 
     "SubDomainName" : "Subdomain",
