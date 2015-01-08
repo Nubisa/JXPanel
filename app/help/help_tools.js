@@ -425,7 +425,7 @@ exports.renderEntireHelp = function() {
             fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html.replace(/\]\((.+)\.markdown\)/g, "](docs/$1\.markdown)"));
             fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html);
         } else {
-            fs.writeFileSync(path.join(docs_dir, files[f]), ret.html);
+            fs.writeFileSync(path.join(docs_dir, files[f]), ret.html.replace(/\]\(help.html\?(.+)\)/g, "]($1\.markdown)"));
         }
     }
 
