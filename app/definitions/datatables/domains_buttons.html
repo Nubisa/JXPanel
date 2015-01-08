@@ -60,7 +60,7 @@
             if (!param || param.err)
                 return utils.jxAddMessage('danger', param.err);
 
-            if (!param.my || !param.parent)
+            if (!param.my && !param.parent)
                 return utils.jxAddMessage('danger', "{{label.DomainsNone}}");
 
             window.domains = param;

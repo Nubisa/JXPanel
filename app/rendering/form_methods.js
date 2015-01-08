@@ -946,7 +946,7 @@ methods.getUserDomains = function (env, params) {
         }
     }
 
-    if (my_domains.length) {
+    if (parent_user_domains.length) {
         for(var o in parent_user_domains) {
             var d = database.getDomain(parent_user_domains[o])
             if (d && !d.main_domain_name)
