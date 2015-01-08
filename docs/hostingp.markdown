@@ -4,7 +4,7 @@ Hosting Plans may be described as sets of various parameters and limits.
 Those sets may be then assigned to any sub-users added to JXPanel by the user, who created the set.
 
 For example, super-user creates a hosting plan named *Default* and a user *guest_one*.
-The form for creating a user (add new user &#40;todo&#41;) contains a <b>Hosting Plan</b> ComboBox control,
+The form for creating a user ([Add new user](adduser.markdown)) contains a <b>Hosting Plan</b> ComboBox control,
 where the *Default* hosting plan (or any other created later) can be selected and assigned to the user.
 
 ## Table list
@@ -19,6 +19,8 @@ For example, on mobile devices there may be visible only first two of the column
 ## Adding new hosting plan
 
 There is a button `Add new hosting plan` on the top of the Hosting Plans page.
+
+Clicking that button will get you to addplan form.
 
 However, in case when the hosting plan to which you belong does not allow to add any plans,
 or you already have maximum allowed number of hosting plans (<b>Max plans</b>) then you will see appropriate error message.
@@ -35,24 +37,24 @@ To remove a hosting plan, you need to select an appropriate checkbox and then cl
 
 You can also select multiple checkboxes to remove more than one hosting plan at once.
 
-After clicking the button, you will be prompt with a popup window with another buttons:
+After clicking the button, you will be prompted with a popup window with another buttons:
 
 ### Remove everything
 
 The first button `Remove everything` as it indicates, deletes everything that was created under the hosting plan, which you are just about to remove.
 That includes:
 
-* all users &#40;todo&#41; who had the hosting plan assigned, as well as their sub-users,
+* all [Users](users.markdown) who had the hosting plan assigned, as well as their sub-users,
 * all [Hosting Plans](hostingp.markdown) created by those users (and their sub-users),
-* all domains &#40;todo&#41; created by those users (and their sub-users).
+* all [Domains](domains.markdown) created by those users (and their sub-users).
 
 Also any files located at those user's directories are removed, which means any folders/files created with file manager &#40;todo&#41;,
 uploaded by FTP, etc.
 
 ### Remove the user, but move user files to the archive
 
-Clicking `Remove the user, but move user files to the archive` button also deletes all database entries created under the hosting plan (users &#40;todo&#41; and sub-users, domains &#40;todo&#41; and [Hosting Plans](hostingp.markdown)) but the difference is,
-that any files and folders located under each of user's home directory button will be moved to a archive instead of permanent removal.
+Clicking `Remove the user, but move user files to the archive` button also deletes all database entries created under the hosting plan ([Users](users.markdown) and sub-users, [Domains](domains.markdown) and [Hosting Plans](hostingp.markdown)) but the difference is,
+that any files and folders located under each of user's home directory button will be moved to an archive instead of permanent removal.
 
 
 The archive is a folder located in the following path: *server_apps/deleted*. It will contain multiple folders, each for deleted user.

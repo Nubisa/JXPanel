@@ -13,8 +13,8 @@
 
 ### Management
 * [Hosting Plans](hostingp.markdown)
-* Users &#40;todo&#41;
-* Domains &#40;todo&#41;
+* [Users](users.markdown)
+* [Domains](domains.markdown)
 
 ### Tools & Services
 * [JXcore](jxcore_index.markdown)

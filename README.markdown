@@ -13,8 +13,8 @@
 
 ### Management
 * [Hosting Plans](docs/hostingp)
-* Users &#40;todo&#41;
-* Domains &#40;todo&#41;
+* [Users](docs/users)
+* [Domains](docs/domains)
 
 ### Tools & Services
 * [JXcore](docs/jxcore_index)

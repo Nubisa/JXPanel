@@ -24,7 +24,7 @@ JXPanel offers some functionalities available only for a super-user, for example
 ### Regular users
 
 Any other JXPanel's user needs to be created through JXPanel explicitly by already existing user.
-See add new user &#40;todo&#41; for details on that matter.
+See [Add new user](adduser.markdown) for details on that matter.
 
 Once new users are created in JXPanel, they also become an OS's users.
 
