@@ -422,7 +422,7 @@ exports.renderEntireHelp = function() {
 
         var ret = getContents(fake_admin);
         if (ret.mainIndex) {
-            fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html.replace(/\]\((.+)\.markdown\)/g, "](docs/$1)"));
+            fs.writeFileSync(path.join(__dirname, "../../README.markdown"), ret.html.replace(/\]\((.+)\.markdown\)/g, "](docs/$1\.markdown)"));
             fs.writeFileSync(path.join(docs_dir, "README.markdown"), ret.html);
         } else {
             fs.writeFileSync(path.join(docs_dir, files[f]), ret.html);
