@@ -374,6 +374,9 @@ var smart_rule = [
                 continue;
             }
 
+            if (!item.details || !item.details.method)
+                continue;
+
             if (item.name) {
                 var label = form_lang.Get(gl.active_user, item.details.label, true);
                 var desc = form_lang.Get(gl.active_user, item.details.label + "_Description");
@@ -388,7 +391,7 @@ var smart_rule = [
                 out.push("\t" + str + "\n");
             }
 
-            if (item.details && item.details.cannotEditOwnRecord) {
+            if (item.details.cannotEditOwnRecord) {
                 out.push("\t! " + form_lang.Get(gl.active_user, "cannotEditOwnRecord", true) );
             }
         }
