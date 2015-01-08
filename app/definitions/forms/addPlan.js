@@ -80,6 +80,10 @@ exports.form = function () {
                             return iconOnline;
                         }
                     }
+                },
+                helpDescription: {
+                    markdown : "Displays an information about hosting plan's current status. When the form is in {{labeli.Add}} mode, this value is empty, "
+                    +"otherwise it may display one of the following statuses: {{labeli.Active}} or {{labeli.Suspended}}."
                 }
             },
 
@@ -253,7 +257,10 @@ exports.form = function () {
                     method: tool.createCheckBox,
                     options: { }
                 },
-                validation: new validations.Boolean()
+                validation: new validations.Boolean(),
+                helpDescription: {
+                    markdown : ""
+                }
             },
 
             { name: "plan_nginx_directives",
@@ -262,7 +269,12 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { multiline : true }
                 },
-                validation : new validations.NginxDirectives()
+                validation : new validations.NginxDirectives(),
+                helpDescription: {
+                    markdown : "Each of the domains configured in JXPanel has its own configuration file for NGINX."
+                        + "Within this file domain is defined inside of [server](http://nginx.org/en/docs/http/ngx_http_core_module.html#server) block tag "
+                        + "and these extra directives are added at the end of it."
+                }
             },
 
 
@@ -275,7 +287,10 @@ exports.form = function () {
                         return ip_tools.getUserIPs(active_user, false);
                     }
                 },
-                validation : new validations.IPAdresses(false)
+                validation : new validations.IPAdresses(false),
+                helpDescription: {
+                    markdown : "This field contains one ore more IPv4 addresses selected to the hosting plan (to which currently logged-in user belongs) by a parent user."
+                }
             },
 
 
@@ -291,6 +306,10 @@ exports.form = function () {
                 validation : new validations.IPAdresses(true),
                 visibility : function(active_user, values, listOrForm) {
                     return ip_tools.getUserIPs(active_user, true).length > 0;
+                },
+                helpDescription: {
+                    markdown : "This field is available only in case when the hosting plan, to which currently logged-in user belongs allows at least one of IPv6 addresses to use."+
+                        "{{if.admin:true}}\n\n\tIf you are superuser, and you don't see this field, it means that the current server does not expose any public IPv6 addresses.{{endif}}"
                 }
             },
 
