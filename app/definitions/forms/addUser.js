@@ -30,6 +30,9 @@ exports.form = function () {
                     label: "UserContactName",
                     method: tool.createTextBox,
                     options: { required: true }
+                },
+                helpDescription: {
+                    markdown : "This field is designed to contain a full display name of a user, for example 'John Doe'."
                 }
             },
 
@@ -57,6 +60,10 @@ exports.form = function () {
                             return iconOnline;
                         }
                     }
+                },
+                helpDescription: {
+                    markdown : "Displays an information about user's current status. When the form is in {{labeli.Add}} mode, this value is empty, "
+                         +"otherwise it may display one of the following statuses: {{labeli.Active}} or {{labeli.Suspended}}."
                 }
             },
 
@@ -77,6 +84,9 @@ exports.form = function () {
                     label: "UserPanelLanguage",
                     method: tool.createComboBox,
                     options: { values: ["EN", "PL"]}
+                },
+                helpDescription: {
+                    markdown : "Default JXPanel language for the user. It may be changed any time by editing user details or by switching the language on header navigation bar on top of JXPanel page."
                 }
             },
 
@@ -89,7 +99,10 @@ exports.form = function () {
                     dbName: "name",  // alias to name in database.getUser() object,
                     cannotEdit: true
                 },
-                validation : new validations.UserName()
+                validation : new validations.UserName(),
+                helpDescription: {
+                    markdown : "This field is editable only when the form is in {{labeli.Add}} mode.\nIf provided user does not exist in the OS yet, he/she will be created. Otherwise, when the system user already exists, you will be prompted with a question whether you want to reuse him/her."
+                }
             },
 
             {
@@ -163,7 +176,10 @@ exports.form = function () {
                         return form_lang.GetBool(active_user.lang, values["ftp_access"], "Granted", "Denied");
                     }
                 },
-                validation : new validations.Boolean()
+                validation : new validations.Boolean(),
+                helpDescription: {
+                    markdown : ""
+                }
             },
 
             {
@@ -177,7 +193,10 @@ exports.form = function () {
                         return form_lang.GetBool(active_user.lang, values["panel_access"], "Granted", "Denied");
                     }
                 },
-                validation : new validations.Boolean()
+                validation : new validations.Boolean(),
+                helpDescription: {
+                    markdown : "When you disable this field for the user while he/she is currently logged-in - his/her session will expire immediately leading to logging out."
+                }
             },
 
             {"END": 1}

@@ -131,6 +131,7 @@ exports.Labels = {
     "SignIn" : "Sign In",
     "StaySignedIn" : "Stay signed in",
     "Username" : "System user name",
+    "Username_Description" : "It has to be unique in scope of the OS. Once created, it cannot be changed.",
     "UsernameReuse" : "Reuse existing system user",
     "UsernameEnter" : "Please enter your username",
     "UsernameEnterRequired" : "Please enter valid username",
@@ -161,10 +162,13 @@ exports.Labels = {
     // form controls
     "ComboNotSelected" : "not selected",
     "UserContactName" : "Contact Name",
+    "UserContactName_Description" : "Full name of the user.",
     "UserEmailAddress" : "Email Address",
     "UserPanelLanguage" : "JXPanel language",
     "UserFTPAccess" : "FTP access",
+    "UserFTPAccess_Description" : "Grants an access to user's home directory by an FTP protocol.",
     "UserPanelAccess" : "JXPanel access",
+    "UserPanelAccess_Description" : "When this value is unchecked - user will not be able to log-in into JXPanel.",
 
     "ValueRequired" : "This field is required.",
     "ValueRequiredAtLeastOne" : "At least one of the values has to be selected.",
@@ -300,6 +304,7 @@ exports.Labels = {
     "PlanName" : "Plan name",
     "PlanName_Description" : "Once the plan is created, you will not be able to change it's name.",
     "PlanID" : "Hosting Plan",
+    "PlanID_Description" : "One of Hosting Plans created by you has to be assigned to the user.",
     "Overuse" : "Allow overuse",
     "MaxDiskSpace" : "Disk space",
     "MaxDiskSpace_Description" : "Maximum disk usage (MB). Empty value disables the limit.",
@@ -530,7 +535,9 @@ exports.Labels = {
     "AddonMongoAddDB" : "Add database",
     "AddonMongoAddDBEnterName" : "Enter database name",
 
-    "HelpIndex" : "Main index"
+    "HelpIndex" : "Main index",
+
+    "cannotEditOwnRecord" : "This field is readonly when user is editing his/her own profile. Only the parent user can modify this value."
 };
 
 
