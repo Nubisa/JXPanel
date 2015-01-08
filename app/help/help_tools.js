@@ -269,6 +269,11 @@ var smart_rule = [
         return !res?"": "<b>"+res+"</b>";
     }
     },
+    {from:"{{labeli.$$}}", to:"$$", "$":function(val, gl){
+        var res = form_lang.Get(gl.lang, val);
+        return !res?"": "<i>"+res+"</i>";
+    }
+    },
     // gets link to the subpage (defined in menu_creator)
     {from:"{{link.$$}}", to:"$$", "$":function(val, gl){
         return getLinkForItem(gl.active_user, val, { lang : "both", lowercase : true, html : true });
@@ -352,6 +357,43 @@ var smart_rule = [
     },
     {from:"{{url.$$}}", to:"$$", "$":function(val, gl){
         return "help.html?" + val;
+    }
+    },
+    {from:"{{form.$$}}", to:"$$", "$":function(val, gl){
+        var fname = path.join(__dirname, '../definitions/forms/', val + ".js");
+        if (!fs.existsSync(fname)) return "Unknown Form";
+
+        var form = require(fname).form();
+
+        var out = [];
+
+        for(var o in form.controls) {
+            var item = form.controls[o];
+            if (item.BEGIN) {
+                out.push('### ' +form_lang.Get(gl.active_user, item.BEGIN, true) + "\n");
+                continue;
+            }
+
+            if (item.name) {
+                var label = form_lang.Get(gl.active_user, item.details.label, true);
+                var desc = form_lang.Get(gl.active_user, item.details.label + "_Description");
+
+                var str = "- <b>" + label + "</b>";
+                if (desc) str += " - " + desc;
+                out.push(str + "\n");
+            }
+
+            if (item.helpDescription && item.helpDescription.markdown) {
+                var str = smart_replace(item.helpDescription.markdown, smart_rule);
+                out.push("\t" + str + "\n");
+            }
+
+            if (item.details && item.details.cannotEditOwnRecord) {
+                out.push("\t! " + form_lang.Get(gl.active_user, "cannotEditOwnRecord", true) );
+            }
+        }
+        var ret = out.join("\n");
+        return markdownToHTML(out.join("\n"));
     }
     },
 ];
