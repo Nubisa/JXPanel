@@ -20,6 +20,8 @@ For example, on mobile devices there may be visible only first two of the column
 
 There is a button {{btn.AddPlan}} on the top of the {{linklabel.hostingp}} page.
 
+Clicking that button will get you to {{link.addplan}} form.
+
 However, in case when the hosting plan to which you belong does not allow to add any plans,
 or you already have maximum allowed number of hosting plans ({{labelb.MaxPlans}}) then you will see appropriate error message.
 
@@ -35,7 +37,7 @@ To remove a hosting plan, you need to select an appropriate checkbox and then cl
 
 You can also select multiple checkboxes to remove more than one hosting plan at once.
 
-After clicking the button, you will be prompt with a popup window with another buttons:
+After clicking the button, you will be prompted with a popup window with another buttons:
 
 ### {{label.RemoveWithUserFiles}}
 
@@ -52,7 +54,7 @@ uploaded by FTP, etc.
 ### {{label.RemoveWithoutUserFiles}}
 
 Clicking {{btn.RemoveWithoutUserFiles}} button also deletes all database entries created under the hosting plan ({{link.users}} and sub-users, {{link.domains}} and {{link.hostingp}}) but the difference is,
-that any files and folders located under each of user's home directory button will be moved to a archive instead of permanent removal.
+that any files and folders located under each of user's home directory button will be moved to an archive instead of permanent removal.
 
 {{if.admin:true}}
 The archive is a folder located in the following path: *server_apps/deleted*. It will contain multiple folders, each for deleted user.
