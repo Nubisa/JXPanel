@@ -1,7 +1,7 @@
 # {{linklabel.jxcoreloginpage}}
 
 Super-user has an ability to customize the login page.
-This can be achieved through {{labelb.LoginPage}} tab available on {{link.jxcore}} menu item.
+This can be achieved through {{labelb.LoginPage}} tab available under {{link.jxcore}} menu item.
 
 ## {{label.Logo}}
 
