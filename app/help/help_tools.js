@@ -420,7 +420,7 @@ var smart_rule = [
             var label = form_lang.Get(gl.lang, form.tabs[o].label, true);
 
             if (gl.active_user.for_markdown)
-                str += '---\n## ' + label + "\n";
+                str += '\n## ' + label + "\n";
 
             if (form.tabs[o].helpDescription && form.tabs[o].helpDescription.markdown)
                 str += form_lang.Get(gl.lang, form.tabs[o].helpDescription.markdown, true) + "\n\n";

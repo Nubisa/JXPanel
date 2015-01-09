@@ -1,4 +1,4 @@
-<ul id="addDomain" class="nav nav-tabs bordered"><li class="active" id="tab0"><a href="#tab-pane-tab0" data-toggle="tab"><i class="fa fa-fw fa-align-justify"></i> Domain Details</a></li><li id="tab1"><a href="#tab-pane-tab1" data-toggle="tab"><i class="fa fa-fw fa-align-justify"></i> Third party Apps</a></li></ul><div class="tab-content padding-10"><div class="tab-pane fade in active" id="tab-pane-tab0">---
+<ul id="addDomain" class="nav nav-tabs bordered"><li class="active" id="tab0"><a href="#tab-pane-tab0" data-toggle="tab"><i class="fa fa-fw fa-align-justify"></i> Domain Details</a></li><li id="tab1"><a href="#tab-pane-tab1" data-toggle="tab"><i class="fa fa-fw fa-align-justify"></i> Third party Apps</a></li></ul><div class="tab-content padding-10"><div class="tab-pane fade in active" id="tab-pane-tab0">
 ## Domain Details
 ### Domain Details
 
@@ -47,7 +47,7 @@ Options below can be set only after record is added.
 - <b>SSL certificate file</b>
 
 - <b>SSL certificate key file</b>
-</div><div class="tab-pane fade" id="tab-pane-tab1">---
+</div><div class="tab-pane fade" id="tab-pane-tab1">
 ## Third party Apps
 This tab is visible only when form is in Edit mode.
 
