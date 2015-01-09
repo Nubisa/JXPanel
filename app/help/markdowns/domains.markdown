@@ -33,8 +33,8 @@ That includes all your first-level domains plus all first-level domains of your 
 {{img.add_subdomain}}
 
 Selecting a domain and clicking {{btn.Add}} will get you to {{link.adddomain}} form for adding a second-level domain.
-It is exactly the same form as for adding a first-level domain{{link.adddomain}},
-except that instead of {{labelb.DomainName}} you'll need to provide {{labelb.SubDomainName}}.
+It is exactly the same form as for adding a first-level domain {{link.adddomain}},
+except that instead of {{labelb.DomainName}} name you'll need to provide {{labelb.SubDomainName}} name.
 
 
 ## Editing existing domain

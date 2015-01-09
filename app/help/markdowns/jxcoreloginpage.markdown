@@ -1,5 +1,7 @@
 # {{linklabel.jxcoreloginpage}}
 
+This is a configuration page accessible only to super-user.
+
 Super-user has an ability to customize the login page.
 This can be achieved through {{labelb.LoginPage}} tab available under {{link.jxcore}} menu item.
 

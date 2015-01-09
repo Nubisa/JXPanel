@@ -156,19 +156,19 @@ var getPageName = function(active_user) {
     return help_name;
 };
 
-var getContents = function (active_user) {
+var getContents = function (active_user, help_name) {
 
-    var help_name = getPageName(active_user);
+    if (!help_name) help_name = getPageName(active_user);
 
     var md_file = path.join(input_dir, help_name + ".markdown");
     if (!help_name || !fs.existsSync(md_file))
-        return { html : form_lang.Get(active_user, "FileNotFound", true) };
+        return { html : form_lang.Get(active_user.lang, "FileNotFound", true) };
 
     var str = fs.readFileSync(md_file).toString();
     if (!active_user.for_markdown)
         str = markdownToHTML(str);
 
-    smart_rule.globals = { "active_user": active_user };
+    smart_rule.globals = { "active_user": active_user, lang : active_user.lang };
     str = smart_replace(str, smart_rule);
 
     if (!active_user.for_markdown)
@@ -260,17 +260,17 @@ var smart_rule = [
     }
     },
     {from:"{{label.$$}}", to:"$$", "$":function(val, gl){
-        var res = form_lang.Get(gl.lang, val);
+        var res = form_lang.Get(gl.lang, val, true);
         return !res?"":res;
     }
     },
     {from:"{{labelb.$$}}", to:"$$", "$":function(val, gl){
-        var res = form_lang.Get(gl.lang, val);
+        var res = form_lang.Get(gl.lang, val, true);
         return !res?"": "<b>"+res+"</b>";
     }
     },
     {from:"{{labeli.$$}}", to:"$$", "$":function(val, gl){
-        var res = form_lang.Get(gl.lang, val);
+        var res = form_lang.Get(gl.lang, val, true);
         return !res?"": "<i>"+res+"</i>";
     }
     },
@@ -296,7 +296,7 @@ var smart_rule = [
         if (!item)
             item = menu_creator.pages[val];
 
-        return item && item.label ? form_lang.Get(gl.active_user, item.label, true) : "";
+        return item && item.label ? form_lang.Get(gl.lang, item.label, true) : "";
     }
     },
     {from:"{{if.##:$$}}", to:"@@", "@!":function(first, second, gl) {
@@ -359,27 +359,42 @@ var smart_rule = [
         return "help.html?" + val;
     }
     },
-    {from:"{{form.$$}}", to:"$$", "$":function(val, gl){
+    {from:"{{form.$$}}", to:"$$", "$":function(val, gl) {
         var fname = path.join(__dirname, '../definitions/forms/', val + ".js");
         if (!fs.existsSync(fname)) return "Unknown Form";
 
         var form = require(fname).form();
 
-        var out = [];
+        var out;
 
-        for(var o in form.controls) {
+        var tabs = [];
+        var tabId = 0;
+        for (var o in form.controls) {
             var item = form.controls[o];
+
+            if (item.tab) {
+                tabId = item.tab;
+            }
+
+            if (!tabs[tabId]) tabs[tabId] = [];
+            out = tabs[tabId];
+
             if (item.BEGIN) {
-                out.push('### ' +form_lang.Get(gl.active_user, item.BEGIN, true) + "\n");
+                out.push('### ' + form_lang.Get(gl.lang, item.BEGIN, true) + "\n");
                 continue;
             }
 
-            if (!item.details || !item.details.method)
+            if (item.INFO) {
+                out.push(form_lang.Get(gl.lang, item.INFO, true) + "\n");
+                continue;
+            }
+
+            if (item.details && !item.details.method)
                 continue;
 
-            if (item.name) {
-                var label = form_lang.Get(gl.active_user, item.details.label, true);
-                var desc = form_lang.Get(gl.active_user, item.details.label + "_Description");
+            if (item.details && item.name) {
+                var label = form_lang.Get(gl.lang, item.details.label, true);
+                var desc = form_lang.Get(gl.lang, item.details.label + "_Description");
 
                 var str = "- <b>" + label + "</b>";
                 if (desc) str += " - " + desc;
@@ -391,12 +406,89 @@ var smart_rule = [
                 out.push("\t" + str + "\n");
             }
 
-            if (item.details.cannotEditOwnRecord) {
-                out.push("\t! " + form_lang.Get(gl.active_user, "cannotEditOwnRecord", true) );
+            if (item.details && item.details.cannotEditOwnRecord) {
+                out.push("\t! " + form_lang.Get(gl.lang, "CannotEditOwnRecord", true));
             }
         }
-        var ret = out.join("\n");
-        return markdownToHTML(out.join("\n"));
+
+        if (tabs.length == 1)
+            return markdownToHTML(tabs[0].join("\n"))
+
+        var _tabs = [];
+        for (var o in tabs) {
+            _tabs[o] = {
+                id: "tab" + o,
+                label: form_lang.Get(gl.lang, form.tabs[o].label, true),
+                contents: markdownToHTML(tabs[o].join("\n"))
+            };
+
+            if (form.tabs[o].helpDescription && form.tabs[o].helpDescription.markdown)
+                _tabs[o].contents = form_lang.Get(gl.lang, form.tabs[o].helpDescription.markdown, true) + "\n\n" + _tabs[o].contents;
+        }
+
+        return page_utils.getTabs(form.name, _tabs, _tabs[0].id);
+    }
+    },
+    {
+        from: "{{tabs.$$}}", to: "$$", "$": function (val, gl) {
+        var tabs = [];
+        if (val == "jxcore") {
+            var jxconfig = require(path.join(__dirname, '../definitions/forms/jxconfig.js')).form();
+            var jxconfigLoginPage = require(path.join(__dirname, '../definitions/forms/jxconfigLoginPage.js')).form();
+
+            tabs[0] = {
+                id: jxconfig.name,
+                label: form_lang.Get(gl.lang, jxconfig.title, true),
+                icon: jxconfig.icon,
+                basename: path.basename(jxconfig.onSubmitSuccess, ".html")
+            };
+            tabs[1] = {
+                id: jxconfigLoginPage.name,
+                label: form_lang.Get(gl.lang, jxconfigLoginPage.title, true),
+                icon: jxconfigLoginPage.icon,
+                basename: path.basename(jxconfigLoginPage.onSubmitSuccess, ".html")
+            };
+        } else
+        if (val == "adddomain") {
+            var addDomain = require(path.join(__dirname, '../definitions/forms/addDomain.js')).form();
+            var appLog = require(path.join(__dirname, '../definitions/forms/appLog.js')).form();
+            tabs[0] = {
+                id: addDomain.name,
+                label: form_lang.Get(gl.lang, addDomain.title, true),
+                icon: addDomain.icon,
+                basename: "adddomain_form"
+            };
+            tabs[1] = {
+                id: appLog.name,
+                label: form_lang.Get(gl.lang, appLog.title, true),
+                icon: appLog.icon,
+                basename: path.basename(appLog.onSubmitSuccess, ".html")
+            };
+            tabs[2] = {
+                id: "appconfig",
+                label: form_lang.Get(gl.lang, "JXcoreAppConfig", true),
+                icon: '<i class="fa fa-lg fa-gear">',
+                basename: "appconfig"
+            };
+        }
+
+
+        if (!tabs.length)
+            return "Tab data not found";
+
+        if (gl.active_user.for_markdown) {
+            var md = [];
+            for (var o in tabs)
+                md.push('* [' + tabs[o].label + ']({{url.' + tabs[o].basename + '}})');
+
+            var str = md.join("\n");
+            return smart_replace(str, smart_rule);
+        }
+
+        for (var o in tabs)
+            tabs[o].contents = getContents(gl.active_user, tabs[o].basename).html;
+
+        return page_utils.getTabs(val, tabs, tabs[0].id);
     }
     },
 ];

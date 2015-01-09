@@ -359,9 +359,11 @@ exports.Labels = {
     "SubDomainCanOnlyAddToDomain" : "Cannot add subdomain for another subdomain. Please, choose domain instead.",
 
     "IPv4" : "IPv4 address",
+    "IPv4_Description" : "The IPv4 address on which will be listened requests made for the domain.",
     "IPv4Pool" : "IPv4 addresses",
     "IPv4Pool_Description" : "Please choose, which IPv4 addresses will be available for the hosting plan.",
     "IPv6" : "IPv6 address",
+    "IPv6_Description" : "The IPv6 address on which will be listened requests made for the domain.",
     "IPv6Pool" : "IPv6 addresses",
     "IPv6Pool_Description" : "Please choose, which IPv6 addresses will be available for the hosting plan.",
     "IPDoesNotExists" : "Could not find network interface for given IP address: %s.",
@@ -384,6 +386,8 @@ exports.Labels = {
 
     "NoPlan" : "You have no hosting plan assigned. Please contact an administrator.",
     "NoPlanOwned" : "You have no hosting plan of your own. Please add one.",
+    "PlanGeneralTab" : "General Hosting Plan Settings",
+    "PlanAddonsTab" : "Addons' settings",
     "PlanCannotAddUsers" : "This hosting plan does not allow to add any users.",
     "PlanCannotAddMoreUsers" : "This hosting plan does not allow to add more than %s users.",
     "PlanCannotAddDomains" : "This hosting plan does not allow to add any domains.",
@@ -539,7 +543,8 @@ exports.Labels = {
 
     "HelpIndex" : "Main index",
 
-    "cannotEditOwnRecord" : "This field is readonly when user is editing his/her own profile. Only the parent user can modify this value."
+    "CannotEditOwnRecord" : "This field is readonly when user is editing his/her own profile. Only the parent user can modify this value.",
+    "TabEditOnly" : "This tab is visible only when form is in Edit mode."
 };
 
 
