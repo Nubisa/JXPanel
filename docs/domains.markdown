@@ -15,7 +15,7 @@ From here you can Start / Stop each of the domains.
 
 There is a button `Add new domain` on the top of the Domains page.
 
-Clicking that button will get you to adddomain form.
+Clicking that button will get you to [Add new domain](adddomain.markdown) form.
 
 However, in case when the hosting plan to which you belong does not allow to add any domains,
 or you already have maximum allowed number of domains and subdomains (<b>Max domains</b>) then you will see appropriate error message.
@@ -32,15 +32,15 @@ That includes all your first-level domains plus all first-level domains of your 
 
 ![add_subdomain.png](images/add_subdomain.png)
 
-Selecting a domain and clicking `Add` will get you to adddomain form for adding a second-level domain.
-It is exactly the same form as for adding a first-level domainadddomain,
-except that instead of <b>Domain</b> you'll need to provide <b>Subdomain</b>.
+Selecting a domain and clicking `Add` will get you to [Add new domain](adddomain.markdown) form for adding a second-level domain.
+It is exactly the same form as for adding a first-level domain [Add new domain](adddomain.markdown),
+except that instead of <b>Domain</b> name you'll need to provide <b>Subdomain</b> name.
 
 
 ## Editing existing domain
 
 Clicking the chosen row in the table list will get you to the domains's modification form.
-It is exactly the same form as adddomain, except that it is in edit mode now.
+It is exactly the same form as [Add new domain](adddomain.markdown), except that it is in edit mode now.
 
 ## Removing domains
 

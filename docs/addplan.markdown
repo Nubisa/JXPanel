@@ -1,6 +1,6 @@
-# 
+# Hosting Plan form
 
-Below is description of all available fields of adding/editing hosting plan form.
+Below is description of all available fields present on the form.
 
 <h3>General</h3><ul>
 <li><p><b>Plan name</b> - Once the plan is created, you will not be able to change it&#39;s name.</p>
@@ -37,7 +37,6 @@ Below is description of all available fields of adding/editing hosting plan form
 </ul>
 <h3>System options</h3><ul>
 <li><p><b>SSH</b> - Enables access to Remote Management console accessible from browser.</p>
-<p>  This option will affect all the users to whom this hosting plan will be assigned.</p>
 </li>
 <li><p><b>NGINX directives</b> - Here you can specify the settings for the nginx reverse proxy server that runs in front of Apache. Use the same syntax as you use for nginx.conf. For example, if you want to pack all the proxied requests with gzip, add the line: &#39;gzip_proxied any;&#39;.</p>
 <p>  Each of the domains configured in JXPanel has its own configuration file for NGINX.Within this file domain is defined inside of <a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#server">server</a> block tag and these extra directives are added at the end of it.</p>
@@ -50,3 +49,8 @@ Below is description of all available fields of adding/editing hosting plan form
 <p>  If you are superuser, and you don&#39;t see this field, it means that the current server does not expose any public IPv6 addresses.</p>
 </li>
 </ul>
+
+
+### Addons' settings
+
+This tab is available only in case when there are any addon's installed on JXPanel (see add-on manager &#40;todo&#41;) which expose additional maximums for the hosting plan.

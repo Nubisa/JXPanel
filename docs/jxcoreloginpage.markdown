@@ -1,5 +1,7 @@
 # Custom Login Page
 
+This is a configuration page accessible only to super-user.
+
 Super-user has an ability to customize the login page.
 This can be achieved through <b>Login page</b> tab available under [JXcore](jxcore.markdown) menu item.
 

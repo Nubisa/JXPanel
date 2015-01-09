@@ -20,7 +20,7 @@ For example, on mobile devices there may be visible only first two of the column
 
 There is a button `Add new hosting plan` on the top of the Hosting Plans page.
 
-Clicking that button will get you to addplan form.
+Clicking that button will get you to [Add new hosting plan](addplan.markdown) form.
 
 However, in case when the hosting plan to which you belong does not allow to add any plans,
 or you already have maximum allowed number of hosting plans (<b>Max plans</b>) then you will see appropriate error message.
@@ -28,7 +28,7 @@ or you already have maximum allowed number of hosting plans (<b>Max plans</b>) t
 ## Editing existing hosting plan
 
 Clicking the chosen row in the table list will get you to the hosting's plan modification form.
-It is exactly the same form as addplan, except that it is in edit mode now.
+It is exactly the same form as [Add new hosting plan](addplan.markdown), except that it is in edit mode now.
 
 ## Removing hosting plans
 

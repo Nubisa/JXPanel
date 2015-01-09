@@ -1,6 +1,6 @@
-# Add new user
+# User form
 
-Below is description of all available fields of adding/editing user form.
+Below is description of all available fields present on the form.
 
 <h3>User Details</h3><ul>
 <li><p><b>Contact Name</b> - Full name of the user.</p>
