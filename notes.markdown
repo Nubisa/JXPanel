@@ -14,8 +14,6 @@ TODO
     -- suspending subplans
     -- restart of applications
 
-- SSH
-
 - on jxPanel uninstall
     -- should we remove system users created before in panel?
 
