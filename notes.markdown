@@ -23,6 +23,8 @@ ___
 
 - ports per domain - they are allocated, but nothing more
 - users don't see users having the same hosting plan. so when superuser add a uses with unlimited plan, he cannot see it.
+- ssl for JXPanel and Remote Management (bash window)
+
 
 DONE
 

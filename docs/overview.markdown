@@ -5,7 +5,7 @@ JXPanel is a software solution for web hosting of Node.JS/JXcore applications.
 Allows a server administrator (as well as each of the other users) to maintain [Hosting Plans](hostingp.markdown), [Users](users.markdown) or [Domains](domains.markdown)
 and to launch node applications for specific internet domains.
 
-It also offers browser-based file manager &#40;todo&#41; for creating and editing files or folders and well as shell access through remote management &#40;todo&#41;.
+It also offers browser-based [File Manager](filem.markdown) for creating and editing files or folders and well as shell access through [Remote Management](remotem.markdown).
 
 Embedded FTP Server handles ftp operations for users with enabled ftp access.
 

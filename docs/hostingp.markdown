@@ -48,7 +48,7 @@ That includes:
 * all [Hosting Plans](hostingp.markdown) created by those users (and their sub-users),
 * all [Domains](domains.markdown) created by those users (and their sub-users).
 
-Also any files located at those user's directories are removed, which means any folders/files created with file manager &#40;todo&#41;,
+Also any files located at those user's directories are removed, which means any folders/files created with [File Manager](filem.markdown),
 uploaded by FTP, etc.
 
 ### Remove the user, but move user files to the archive
