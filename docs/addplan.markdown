@@ -57,4 +57,4 @@ Below is description of all available fields present on the form.
 
 ### Addons' settings
 
-This tab is available only in case when there are any addon's installed on JXPanel (see add-on manager &#40;todo&#41;) which expose additional maximums for the hosting plan.
+This tab is available only in case when there are any addon's installed on JXPanel (see [Add-On Manager](addonm.markdown)) which expose additional maximums for the hosting plan.

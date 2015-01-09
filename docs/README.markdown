@@ -23,6 +23,6 @@
 * [Remote Management](remotem.markdown)
 
 ### Extras
-* Add-On Manager &#40;todo&#41;
+* [Add-On Manager](addonm.markdown)
 
 
