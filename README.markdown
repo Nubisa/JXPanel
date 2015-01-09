@@ -19,8 +19,8 @@
 ### Tools & Services
 * [JXcore](docs/jxcore_index.markdown)
 * [NPM Wizard](docs/npmw.markdown)
-* File Manager &#40;todo&#41;
-* Remote Management &#40;todo&#41;
+* [File Manager](docs/filem.markdown)
+* [Remote Management](docs/remotem.markdown)
 
 ### Extras
 * Add-On Manager &#40;todo&#41;
