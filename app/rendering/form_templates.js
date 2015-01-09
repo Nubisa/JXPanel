@@ -91,7 +91,7 @@ var addMaximumsFromAddons = function(activeFormInstance) {
                     },
                     addon : addon_name,
                     validation : validations.getValidationByObject(options.validation)
-                }
+                };
 
                 newControls.push(ctrl);
             }
@@ -273,6 +273,12 @@ exports.renderForm = function(sessionId, formName, onlyControls){
         }
 
         if(controls[i].INFO != undefined){
+            var _tabId = parseInt(controls[i].tab);
+            if (!isNaN(_tabId)) {
+                tabId = _tabId;
+                arr = tabs[tabId].arr;
+            }
+
             var str = (controls[i].prefix || "") + form_lang.Get(active_user.lang, controls[i].INFO, true) + (controls[i].suffix || "");
             arr.push(tool.createSimpleText(" ", null, null, str, active_user, {}));
             continue;
