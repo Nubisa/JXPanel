@@ -20,6 +20,7 @@ exports.form = function () {
         this.name = path.basename(__filename, ".js");
 
         this.icon = '<i class="fa fa-fw fa-lg fa-sign-in"></i>';
+        this.title = 'LoginPageCustom';
 
         this.onSubmitSuccess = "jxcoreloginpage.html";
         this.onSubmitCancel = "jxcoreloginpage.html";

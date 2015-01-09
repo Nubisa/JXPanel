@@ -17,8 +17,9 @@ exports.form = function () {
         this.name = path.basename(__filename, ".js");
 
         this.icon = '<i class="fa fa-fw fa-lg fa-pencil-square-o"></i>';
+        this.title = 'AppLog';
 
-        this.onSubmitSuccess = "appLog.html";
+        this.onSubmitSuccess = "applog.html";
         this.onSubmitCancel = "domains.html";
 
         this.submitOnClick = "return utils.jxAppViewLog();",
@@ -39,6 +40,9 @@ exports.form = function () {
 
                         return '<span id="jxAppLogSize"></span>' + btnClearLog;
                     }
+                },
+                helpDescription: {
+                    markdown : "Displays information about size of the log file for the domain's application (in bytes)."
                 }
             },
 

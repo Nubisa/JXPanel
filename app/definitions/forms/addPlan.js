@@ -25,8 +25,8 @@ exports.form = function () {
         this.displayNameLabel_Edit = "EditPlan";
 
         this.tabs = [
-            { label : "General Hosting Plan Settings", showAlways : false },
-            { label : "Addons' settings" }
+            { label : "PlanGeneralTab", showAlways : false },
+            { label : "PlanAddonsTab" }
         ];
 
         this.controls = [

@@ -21,6 +21,7 @@ exports.form = function () {
 
         //this.icon = '<img id="jxcore_img" class="menu-icon" src="icons/jxcore.png">';
         this.icon = '<i class="fa fa-fw fa-lg fa-gear"></i>';
+        this.title = "JXcoreManagement";
 
         this.onSubmitSuccess = "jxcore.html";
         this.onSubmitCancel = "jxcore.html";

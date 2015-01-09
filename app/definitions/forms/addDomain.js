@@ -106,6 +106,7 @@ exports.form = function () {
         this.name = path.basename(__filename, ".js");
 
         this.icon = '<img id="domains_img" class="menu-icon" src="icons/domains.png">';
+        this.title = 'DomainConfiguration';
 
         this.onSubmitSuccess = "domains.html";
         this.onSubmitCancel = "domains.html";
@@ -118,7 +119,9 @@ exports.form = function () {
 
         this.tabs = [
             { label : "Domain Details", showAlways : false },
-            { label : "JXcoreAppApp" }
+            { label : "JXcoreAppApp", helpDescription : {
+                markdown: "TabEditOnly"
+            }}
         ];
 
         this.controls = [
@@ -136,6 +139,9 @@ exports.form = function () {
                 validation : new validations.Domain(),
                 visibility : function(active_user, values, formName) {
                     return !exports.isSubdomain(active_user, formName);
+                },
+                helpDescription: {
+                    markdown : "This field is not available when the form was invoke for second-level domain (subdomain)."
                 }
             },
 
@@ -154,6 +160,9 @@ exports.form = function () {
                 validation : new validations.SubDomain(),
                 visibility : function(active_user, values, formName) {
                     return exports.isSubdomain(active_user, formName);
+                },
+                helpDescription: {
+                    markdown : "This field is not available when the form was invoke for first-level domain."
                 }
             },
 
@@ -187,7 +196,11 @@ exports.form = function () {
                         return ip_tools.getUserIPs(active_user, false);
                     }
                 },
-                validation : new validations.IPAdresses(false)
+                validation : new validations.IPAdresses(false),
+                helpDescription: {
+                    markdown : "This field contains one ore more IPv4 addresses selected to the hosting plan (to which currently logged-in user belongs) by a parent user. " +
+                    "It is possible to choose only one."
+                }
             },
 
             { name: "sub_ipv6",
@@ -202,6 +215,11 @@ exports.form = function () {
                 validation : new validations.IPAdresses(true),
                 visibility : function(active_user, values, listOrForm) {
                     return ip_tools.getUserIPs(active_user, true).length > 0;
+                },
+                helpDescription: {
+                    markdown :
+                    "This field is available only in case when the hosting plan, to which currently logged-in user belongs allows at least one of IPv6 addresses to use. " +
+                    "It is possible to choose only one IPv6 address from the drop-down list."
                 }
             },
 
@@ -218,6 +236,11 @@ exports.form = function () {
                     getValue : function(active_user, values, listOrForm) {
                         return getStatus(active_user, values, listOrForm, false);
                     }
+                },
+                helpDescription: {
+                    markdown :
+                    "This is read-only field which displays information about domain's application status: whether it is {{labeli.Offline}} or {{labeli.Running}}. " +
+                    "In either case, there is an appropriate button visible: {{btn.Start}} or {{btn.Stop}} respectively. "
                 }
             },
 
@@ -241,7 +264,13 @@ exports.form = function () {
                     method: tool.createComboBox,
                     options: { required : true, values : [ "custom", "Ghost", "NodeBB", "Meteor" ], default : "custom" }
                 },
-                validation : new validations.AppType()
+                validation : new validations.AppType(),
+                helpDescription: {
+                    markdown :
+                    "You can choose between *custom*, *Ghost*, *NodeBB* or *Meteor*.\n" +
+                    "The *custom* option allows you to run your own application, and so you will need also to specify {{labelb.JXcoreAppPath}}.\n" +
+                    "Other options refer to 3-rd party application that can be installed separately per domain."
+                }
             },
 
             {
@@ -251,7 +280,11 @@ exports.form = function () {
                     method: tool.createTextBox,
                     options: { default : "index.js" }
                 },
-                validation : new validations.FileName()
+                validation : new validations.FileName(),
+                helpDescription: {
+                    markdown :
+                    "This field is related with *custom* value when selected in the {{labelb.JXcoreAppType}} field. In this case it is also required."
+                }
             },
 
             {
@@ -314,7 +347,7 @@ exports.form = function () {
 
             {"END" : 1},
 
-            {"INFO": "JXcoreAppAppInfo"  },
+            {"INFO": "JXcoreAppAppInfo", tab : 1, OnInsert : false  },
 
             {"BEGIN": "Ghost", tab : 1, OnInsert : false},
 
@@ -329,6 +362,10 @@ exports.form = function () {
                         var domain_name = values["name"];
                         return apps_tools.getAppStatus(active_user, domain_name, "Ghost");
                     }
+                },
+                helpDescription: {
+                    markdown :
+                        "Display status of Ghost application - whether it is installed for a domain or not."
                 }
             },
 
@@ -348,6 +385,10 @@ exports.form = function () {
                         var domain_name = values["name"];
                         return apps_tools.getAppStatus(active_user, domain_name, "NodeBB");
                     }
+                },
+                helpDescription: {
+                    markdown :
+                        "Display status of NodeBB application - whether it is installed for a domain or not."
                 }
             },
 
@@ -447,7 +488,6 @@ exports.form = function () {
 //                }
 //            },
 
-
             {"END" : 1},
 
             {"BEGIN": "Meteor", tab : 1, OnInsert : false},
@@ -463,6 +503,10 @@ exports.form = function () {
                         var domain_name = values["name"];
                         return apps_tools.getAppStatus(active_user, domain_name, "Meteor");
                     }
+                },
+                helpDescription: {
+                    markdown :
+                        "Display status of Meteor application - whether it is installed for a domain or not."
                 }
             },
 
