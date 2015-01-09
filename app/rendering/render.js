@@ -84,6 +84,9 @@ var smart_rule = [
             return form_lang.Get(gl.lang, isUpdate ? labelEdit : labelAdd);
         }
 
+        if(second == "title" && activeForm.title)
+            return form_lang.Get(gl.lang, activeForm.title, true);
+
         return activeForm[second] || "";
     }
     },

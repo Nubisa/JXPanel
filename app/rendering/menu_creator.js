@@ -85,6 +85,14 @@ exports.pages = {
         label : "AddUser",
         link : "/adduser.html"
     },
+    "addplan" : {
+        label : "AddPlan",
+        link : "/addplan.html"
+    },
+    "adddomain" : {
+        label : "AddDomain",
+        link : "/adddomain.html"
+    },
     "admin_index" : {
         label : "Superusers's guide"
     },
