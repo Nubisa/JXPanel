@@ -136,7 +136,10 @@ var getLinkForItem = function(active_user, item, options) {
     return ret;
 };
 
-var markdownToHTML = function (str) {
+var markdownToHTML = function (str, active_user) {
+
+    if (active_user && active_user.for_markdown)
+        return str;
 
     // replacing links
     str = str.replace(/\(([\s\S]*?)\.markdown\)/g, "(/help.html?$1)");
@@ -165,14 +168,11 @@ var getContents = function (active_user, help_name) {
         return { html : form_lang.Get(active_user.lang, "FileNotFound", true) };
 
     var str = fs.readFileSync(md_file).toString();
-    if (!active_user.for_markdown)
-        str = markdownToHTML(str);
+    str = markdownToHTML(str, active_user);
 
     smart_rule.globals = { "active_user": active_user, lang : active_user.lang };
     str = smart_replace(str, smart_rule);
-
-    if (!active_user.for_markdown)
-        str = markdownToHTML(str);
+    str = markdownToHTML(str, active_user);
 
     return { html : str, mainIndex : help_name == "index" };
 };
@@ -239,7 +239,7 @@ exports.renderHelpMenu = function(active_user){
         else
             md =  "* " + getLinkForItem(active_user, item, { lang : "user" }) + extra_space;
 
-        str += active_user.for_markdown ? md : markdownToHTML(md);
+        str += markdownToHTML(md, active_user);
     }
 
     if (active_user.for_markdown)
@@ -412,18 +412,22 @@ var smart_rule = [
         }
 
         if (tabs.length == 1)
-            return markdownToHTML(tabs[0].join("\n"))
+            return markdownToHTML(tabs[0].join("\n"), gl.active_user);
 
         var _tabs = [];
         for (var o in tabs) {
-            _tabs[o] = {
-                id: "tab" + o,
-                label: form_lang.Get(gl.lang, form.tabs[o].label, true),
-                contents: markdownToHTML(tabs[o].join("\n"))
-            };
+            var str = "";
+            var label = form_lang.Get(gl.lang, form.tabs[o].label, true);
+
+            if (gl.active_user.for_markdown)
+                str += '---\n## ' + label + "\n";
 
             if (form.tabs[o].helpDescription && form.tabs[o].helpDescription.markdown)
-                _tabs[o].contents = form_lang.Get(gl.lang, form.tabs[o].helpDescription.markdown, true) + "\n\n" + _tabs[o].contents;
+                str += form_lang.Get(gl.lang, form.tabs[o].helpDescription.markdown, true) + "\n\n";
+
+            str += tabs[o].join("\n");
+
+            _tabs[o] = { id: "tab" + o, label: label, contents: markdownToHTML(str, gl.active_user) };
         }
 
         return page_utils.getTabs(form.name, _tabs, _tabs[0].id);
