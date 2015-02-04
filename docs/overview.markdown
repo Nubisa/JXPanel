@@ -10,7 +10,7 @@ It also offers browser-based [File Manager](filem.markdown) for creating and edi
 Embedded FTP Server handles ftp operations for users with enabled ftp access.
 
 JXPanel may also be extended by developers thanks to the supported addon's engine.
-Full documentation may be found here: [Add-ons](addons_api.markdown).
+Full documentation may be found here: [Add-On documentation](addons_api_index.markdown).
 
 # JXcore
 

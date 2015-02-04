@@ -28,6 +28,7 @@ var validations = require("./definitions/validations");
 
 var addons = {};
 var addons_methods = {};
+var install_check = false;
 
 var checkUpacked = function (addon_dir) {
 
@@ -62,8 +63,11 @@ var checkUpacked = function (addon_dir) {
         return { err: "AddOnIndexAbsent" };
 
     try {
+        install_check = true;
         var index = require(index_path);
+        install_check = false;
     } catch (ex) {
+        install_check = false;
         console.error(ex);
         return { err: "AddOnIndexCannotRequire" };
     }
@@ -133,6 +137,7 @@ exports.loadAll = function() {
 
 
 var copy = function () {
+    return;
     // temporarily copies addons to server_apps folder
     var cmd = "cp -rf " + path.join(site_defaults.apps_folder, "../addons") + " " + site_defaults.apps_folder + path.sep;
     jxcore.utils.cmdSync(cmd);
@@ -140,7 +145,7 @@ var copy = function () {
 
 var getArgs = function(active_user) {
 
-    var parsedUrl = url.parse(active_user.session.lastUrl, true);
+    var parsedUrl = url.parse(active_user.session.lastUrl.replace("addon.html?", "addon.html?_id="), true);
     return parsedUrl.query;
 };
 
@@ -163,7 +168,7 @@ var getContents = function (env, active_user, cb) {
     }
 
     // just for development process
-//    unload(addon_name);
+    unload(addon_name);
 
     var addon = load(addon_name);
     if (addon.err) {
@@ -410,7 +415,7 @@ var extension_class = function (env, active_user, addon_id) {
         else
             html = file + html;
 
-        var title = addons[__addon_id].json.title;
+        var title = addons[__addon_id].json.title || addons[__addon_id].json.name;
         return __this.header.renderButtons() + "<br><h1>" + title + "</h1>" + html;
     };
 
@@ -488,13 +493,21 @@ var form = function(id, env, active_user, options, factory) {
             section_started = true;
             return;
         }
+        else if (type == "password") {
+            options.password = true;
+        }
+        else if (type == "multiline") {
+            options.multiline = true;
+        }
 
         var forms = __factory.db.get("__forms");
-        var value = forms && forms[__this.id] ? forms[__this.id][id] : options.value;
+        var value = forms && forms[__this.id] && forms[__this.id][id] ? forms[__this.id][id] : options.value;
 
         var method = tools.getMethod(type);
         if (method)
-            controls.push(method(options.label, options.label, id, value, __active_user, options).html);
+            controls.push(method(options.label, options.title || options.label, id, value, __active_user, options).html);
+        else
+            throw form_lang.Get(__active_user.lang, "UnknownMethod", true, [type]);
 
         /*
          {
@@ -544,6 +557,12 @@ var form = function(id, env, active_user, options, factory) {
     };
 
     this.callOnSubmit = function(values, cb) {
+
+        if (!events.EventEmitter.listenerCount(__eventEmitter, "submit")) {
+            cb();
+            return;
+        }
+
         __eventEmitter.emit("submit", values, function(save) {
             if (save) {
                 var forms = __factory.db.get("__forms") || {};
@@ -552,6 +571,12 @@ var form = function(id, env, active_user, options, factory) {
             }
             cb();
         });
+    };
+
+    this.clear = function() {
+        var forms = __factory.db.get("__forms") || {};
+        delete forms[__this.id];
+        __factory.db.set("__forms", forms);
     };
 };
 
@@ -651,7 +676,7 @@ global.getJXPanelAPI = function(module) {
     if (!module.parent && module.parent.filename !== __filename)
         throw "Cannot get JXPanel API. Invalid module's parent.";
 
-    if (module.filename.slice(0, site_defaults.dirAddons.length) !== site_defaults.dirAddons)
+    if (!install_check && module.filename.slice(0, site_defaults.dirAddons.length) !== site_defaults.dirAddons)
         throw "Cannot get JXPanel API. Invalid module path.";
 
     var str = module.filename.slice(site_defaults.dirAddons.length);

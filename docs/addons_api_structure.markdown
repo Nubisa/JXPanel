@@ -1,6 +1,4 @@
-# Add-ons API
-
-## File structure
+# File structure
 
 Valid add-on is a zip archive containing at least two files mentioned as followed:
 
@@ -55,7 +53,58 @@ var custom_value = jxpanel.package.json.custom.value;
 
 ### index.js
 
-to do this
+There is only one method, that *index.js* must expose:
+
+**request(env, args, cb)**
+
+* `env` {object}
+* `args` {object}
+* `cb` {Function}
+    * `err` {object}
+    * `html` {string}
+
+The `request()` method is supposed to construct an interface of the add-on's view and return it by invoking `cb` callback.
+If callback will not be eventually invoked - the add-on will display na empty page.
+
+There are no standard views to be utilized, however it is very easy to create one by using [API](addons_api_factory.markdown).
+
+The `env` object contains various information concerning current request, for example:
+
+```js
+{ ClientId: '600a20929axT0@1117894',
+  ApplicationName: 'JXPanel',
+  SessionID: '20929axT0',
+  Index: 1 }
+```
+
+It should not be modified and it's only purpose is to pass this object to api methods described in [API](addons_api_factory.markdown).
+
+The `args` object contains arguments passed to add-on's request (url) with GET method.
+
+For example:
+
+```
+http://[IP]:[PORT]/addon.html?simplest_addon&str11=value&int1=10
+```
+
+where *simplest_addon* is an **id** identifier of the add-on (defined in *package.json* file).
+For such url the `args` would be parsed into:
+
+```js
+{
+    _id: 'simplest_addon',
+    str11: 'value',
+    int1: '10'
+}
+```
+
+The callback `cb` function receives two arguments: `err` and `html`.
+If first one is provided (usually as a string) - it is send back to the browser as an error message.
+In any other case, the `html` string is send, which is a rendered add-on's interface and gets displayed in a browser.
+
+You can see sample implementations of an add-on here: [Tutorials](addons_api_tutorials.markdown).
+
 ### events.js
 
 and this
+

@@ -2,7 +2,7 @@
 
 Add-ons for JXPanel are modules which can be written in JavaScript. Anyone can write an add-on, but only super-user can install them to JXPanel.
 
-See {{link.addons_api}} for documentation on how to write an add-on.
+See {{link.addons_api_index}} to learn how to write an add-on.
 
 Add-ons may extend JXPanel features, for example add additional criteria for Hosting Plans or introduce support for databases, for example mongodb.
 

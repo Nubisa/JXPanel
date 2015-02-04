@@ -12,7 +12,7 @@ It also offers browser-based {{link.filem}} for creating and editing files or fo
 Embedded FTP Server handles ftp operations for users with enabled ftp access.
 
 JXPanel may also be extended by developers thanks to the supported addon's engine.
-Full documentation may be found here: {{link.addons_api}}.
+Full documentation may be found here: {{link.addons_api_index}}.
 
 ## JXcore
 

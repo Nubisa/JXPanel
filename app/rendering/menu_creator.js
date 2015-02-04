@@ -105,8 +105,17 @@ exports.pages = {
     "jxcoreloginpage" : {
         label: "LoginPageCustom"
     },
-    "addons_api" : {
-        label : "Add-ons"
+    "addons_api_index" : {
+        label : "Add-On documentation"
+    },
+    "addons_api_structure" : {
+        label : "File structure"
+    },
+    "addons_api_tutorials" : {
+        label : "Tutorials"
+    },
+    "addons_api_factory" : {
+        label : "API"
     }
 };
 
