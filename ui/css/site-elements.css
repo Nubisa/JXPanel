@@ -7,6 +7,18 @@
   height:18px;
 }
 
+#page-title-fixed{
+    padding:0px;
+    margin:5px;
+    width:100%;
+    color:#688081;
+    font-size:9pt;
+    height:18px;
+    position: fixed;
+    top: 0;
+    background-color: #3a3f42;
+}
+
 .bold-menu{
   font-size:90%;
   color:#788082;

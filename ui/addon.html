@@ -45,7 +45,7 @@
     window.jxAddonCall = function(method_name, args, selection) {
         args = args || {};
 
-        if (selection) {
+        if (selection && utils.jxGetSelection) {
             args.selection = utils.jxGetSelection();
             if (!args.selection)
                 return;

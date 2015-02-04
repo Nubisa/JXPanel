@@ -454,7 +454,7 @@ exports.getFieldDisplayValue = function (active_user, activeInstance, field_name
 
 exports.getMethod = function(type) {
 
-    if (type === "text" || type === "password" || type === "textarea")
+    if (type === "text" || type === "password" || type === "multiline")
         return exports.createTextBox;
 
     if (type === "checkbox")
