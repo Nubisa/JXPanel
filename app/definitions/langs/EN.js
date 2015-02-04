@@ -542,6 +542,7 @@ exports.Labels = {
     "AddonMongoAddDBEnterName" : "Enter database name",
 
     "HelpIndex" : "Main index",
+    "HelpIndexAddons" : "Add-on's main index",
 
     "CannotEditOwnRecord" : "This field is readonly when user is editing his/her own profile. Only the parent user can modify this value.",
     "TabEditOnly" : "This tab is visible only when form is in Edit mode."

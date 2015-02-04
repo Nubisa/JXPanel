@@ -174,7 +174,7 @@ var getContents = function (active_user, help_name) {
     str = smart_replace(str, smart_rule);
     str = markdownToHTML(str, active_user);
 
-    return { html : str, mainIndex : help_name == "index" };
+    return { html : str, mainIndex : help_name == "index", name : help_name };
 };
 
 var getImage = function(active_user, val, with_border) {
@@ -202,7 +202,7 @@ var getButton = function(active_user, val) {
     if (active_user.for_markdown)
         return "`" + str + "`";
     else
-        return '<span style="color: #f8f8f8; margin: 0 2px 0 0; padding: 3px 8px 3px 8px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px; display: inline-block;">' + str + "</span>";
+        return '<span style="color: #f8f8f8; margin: 0 2px 1px 0; padding: 3px 7px 3px 7px; text-align: center; white-space: nowrap; background: #000000; border-radius: 2px; display: inline-block;">' + str + "</span>";
 };
 
 exports.defineMethods = function() {
@@ -216,7 +216,7 @@ exports.defineMethods = function() {
 
         var ret = getContents(active_user);
         if (ret.err) ret.err = form_lang.Get(active_user.lang, ret.err, true);
-        server.sendCallBack(env, { err: ret.err, html: ret.html, mainIndex : ret.mainIndex });
+        server.sendCallBack(env, { err: ret.err, html: ret.html, mainIndex : ret.mainIndex, name : ret.name });
     });
 };
 

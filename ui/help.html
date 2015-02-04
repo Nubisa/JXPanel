@@ -21,9 +21,12 @@
                         <i style="color: #757a7b;" class="fa fa-fw fa-align-justify"></i>&nbsp;&nbsp;
                         <a href="/help.html" class="jxbtn" title="{{label.HelpIndex}}">
                         <i class="fa fa-question-circle"></i><span class="dummy-label">{{label.HelpIndex}}</span></a>
+
+                        <a href="/help.html?addons_api_index" class="jxbtn" title="{{label.HelpIndexAddons}}" id="jxbtn_addons">
+                            <i class="fa fa-question-circle"></i><span class="dummy-label">{{label.HelpIndexAddons}}</span></a>
                     </span>
 
-                    <div id="jxhelp_contents">
+                    <div id="jxhelp_contents" style="height: 100%; overflow-scrolling: auto;">
                         <script type="text/javascript">
                             window.jxTemplateReadyForjxm = function() {
                                 jxcore.Call('getHelp', null, function(param) {
@@ -31,9 +34,10 @@
                                         utils.jxAddMessage("danger", param.err);
                                     else {
                                         var div = $("#jxhelp_contents");
-                                        div.html(param.html)
+                                        div.html(param.html);
                                         param.mainIndex ? $("#buttons").hide() : $("#buttons").show();
-                                        div.addClass(param.mainIndex ? "jxhelp_index_contents" : "jxhelp_contents")
+                                        param.name.slice(0, 5) !== "addon" ? $("#jxbtn_addons").hide() : $("#jxbtn_addons").show();
+                                        div.addClass(param.mainIndex ? "jxhelp_index_contents" : "jxhelp_contents");
                                     }
                                 });
                             };
