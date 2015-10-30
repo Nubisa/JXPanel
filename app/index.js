@@ -69,8 +69,10 @@ if(argv[0] === "nginx") {
                 hosting_tools.appStopMultiple(invalid_domains, function(err){
                     if (err)
                         console.error("There were some errors while trying to stop applications.", err);
-                    else
+                    else {
                         console.log("OK");
+                        nginx.updateConfFile();
+                    }
                 });
             }
         });

@@ -31,7 +31,7 @@ var getPorts = function() {
     }
 };
 
-var updateConfFile = function() {
+exports.updateConfFile = function() {
 
     var conf_file = nginx_dir + sep + "conf" + sep + "nginx.conf";
     if (fs.existsSync(conf_file)) {
@@ -79,7 +79,7 @@ exports.prepare = function(){
         process.exit(ret.exitCode)
     }
 
-    updateConfFile();
+    exports.updateConfFile();
 };
 
 // returns true if it's successful otherwise returns ret{exitCode, err}
@@ -173,7 +173,7 @@ exports.reload = function(onlyIfNeeded, silent){
     if (!silent)
         clog("Reloading NGINX", "green");
 
-    updateConfFile();
+    exports.updateConfFile();
 
     var ret = jxcore.utils.cmdSync(nginx_process + " -s reload -p "+ nginx_dir + " 2>&1");
     if(ret.exitCode !== 0) {

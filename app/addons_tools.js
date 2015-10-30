@@ -397,13 +397,25 @@ var extension_class = function (env, active_user, addon_id) {
         smart_rule.globals = {"sessionId":__env.sessionId, "active_user": __active_user, "lang":__active_user.lang  };
         html = smart_replace(html, smart_rule);
 
+        var currentTab = __tabs.current || "index";
         var file = "";
-        var file_name = path.join(site_defaults.dirAddons, __addon_id, "html", __tabs.current + ".html");
+        var file_name = path.join(site_defaults.dirAddons, __addon_id, "html", currentTab + ".html");
         if (fs.existsSync(file_name)) {
             file = fs.readFileSync(file_name).toString();
         }
 
         if (__tabs.html) {
+            var tab_file = "";
+            var tab_file_name = path.join(site_defaults.dirAddons, __addon_id, "html", "tab_" + __tabs.current + ".html");
+            if (fs.existsSync(tab_file_name)) {
+                tab_file = fs.readFileSync(tab_file_name).toString();
+
+                if (tab_file.indexOf("{{contents}}") !== -1)
+                    html = tab_file.replace("{{contents}}", html);
+                else
+                    html = tab_file + html;
+            }
+
             html = __tabs.html
                  + '<div id="myTabContent1" class="tab-content padding-10"><div class="tab-pane fade in active">'
                  + html

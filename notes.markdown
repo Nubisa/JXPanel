@@ -19,12 +19,26 @@ TODO
 
 - nodebb + socket.io policy issue
 
+
+- when installed ghost, check app, because index.js is used !!!
+- when removing a domain - remove subdomains or not?
+- removing nginx for domain when domain is removed
+
 ___
 
 - ports per domain - they are allocated, but nothing more
 - users don't see users having the same hosting plan. so when superuser add a uses with unlimited plan, he cannot see it.
-- ssl for JXPanel and Remote Management (bash window)
+- ssl for JXPanel and Remote Management (bash window) - for long pwd  paths the prompt display is broken
+- on azure proftpd did not work. I needed to open few other ports e.g. 20000 - 20002 and tell to proftpd:
 
+PassivePorts 20000 20002
+MasqueradeAddress corejx.cloudapp.net
+
+later - check if ports are really needed, for active connections (are needed for passive)
+
+see this: http://blogs.msdn.com/b/holgerkenn/archive/2014/03/19/setting-up-a-linux-ftp-server-on-windows-azure.aspx
+
+- run panel/nginx/ftp on restart
 
 DONE
 
